@@ -22,6 +22,10 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 - [ ] **Blocking stops incoming shots and attacks;** parry timing.
 - [ ] **Enemy AI:** approach, take cover, shoot. *[free assets: Yuka]*
 
+- [ ] **Zombies** for dismemberment mode: slow, many, keep crawling after losing legs. *[free assets: Quaternius zombie models and animations]*
+- [ ] **Dismemberment polish:** choose the cut from where the blade actually passed; limbs cut off living soldiers (they keep fighting one-armed); blood decals on the ground.
+- [ ] **More combat moves:** air slash combos, a dash strike, a grapple yank (pull the enemy to you instead), a finisher on stunned soldiers.
+
 ## 2. Lightsaber
 - [ ] **Draw and holster animations.** *[needs you: Mixamo `Draw Sword 1`/`2`, `Sheath Sword 1`/`2`]*
 - [ ] **Many more combos,** simple but plentiful, Fortnite-style. *[needs you: Mixamo Great Sword Pack, `One Hand Sword Combo`, `Two Hand Sword Combo`]*
@@ -49,9 +53,10 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 - [ ] **Shotgun.** *[later]*
 
 ## 4. Grappling hook
+- [x] ~~Grapple onto enemies.~~ Done in v13: hook, stun, pull in, strike.
 - [ ] **Swinging** (Spider-Man style) as an option next to the zip-line.
 - [ ] **Hanging and climbing on walls** when the hook lands mid-wall. *[needs you: Mixamo `Hanging Idle`, `Braced Hang`, `Climbing Up Wall`]*
-- [ ] **Grapple onto enemies** to pull them to you, or you to them.
+- [ ] **Grapple yank:** pull the enemy to you instead of you to them.
 - [ ] **Rope physics:** sag and wobble on the rope.
 - [ ] **Per-character grapple:** a wrist hook only for characters who have it, from the ability pool (see section 6).
 

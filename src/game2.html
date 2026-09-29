@@ -396,6 +396,23 @@ function resolveCollisions() {
 // ---------------- load ----------------
 function decodeB64(b64) { const bin = atob(b64), out = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out.buffer; }
 const loader = new GLTFLoader();
+// Decode embedded textures straight from memory. The stock loader goes through blob: URLs, which a strict page
+// policy (like the Claude app's) can block, leaving every character plain white.
+loader.register((parser) => {
+  const orig = parser.loadImageSource.bind(parser);
+  parser.loadImageSource = (index, ldr) => {
+    const def = parser.json.images[index];
+    if (def.bufferView === undefined || typeof createImageBitmap !== 'function') return orig(index, ldr);
+    if (parser.sourceCache[index] !== undefined) return parser.sourceCache[index].then((t) => t.clone());
+    const p = parser.getDependency('bufferView', def.bufferView)
+      .then((buf) => createImageBitmap(new Blob([buf], { type: def.mimeType }), { premultiplyAlpha: 'none', colorSpaceConversion: 'none' }))
+      .then((bmp) => { const t = new THREE.Texture(bmp); t.needsUpdate = true; return t; })
+      .catch(() => { delete parser.sourceCache[index]; return orig(index, ldr); });
+    parser.sourceCache[index] = p;
+    return p;
+  };
+  return { name: 'in-memory-images' };
+});
 const parseGLB = (b64) => new Promise((res, rej) => loader.parse(decodeB64(b64), '', res, rej));
 
 const player = new THREE.Group(), lean = new THREE.Group();
@@ -536,6 +553,11 @@ function updateOvr(dt) {
     o.w = moveTo(o.w, o.target, rate);
     a.setEffectiveWeight(o.w);
     if (o.w <= 0 && o.target === 0) { a.stop(); ovr.delete(a); onDone.delete(a); }
+    // self-heal: a finished one-shot left at full weight with nothing to follow it freezes the body while you move
+    else if (o.target > 0 && a.paused && !movesOpen && !atk && mode === 'ground' && speed > 0.5) {
+      o.heldT = (o.heldT || 0) + dt;
+      if (o.heldT > 0.3) { const cb = onDone.get(a); onDone.delete(a); log('healed: held one-shot', a.getClip().name); if (cb) cb(); else { o.target = 0; o.fadeOut = 0.2; } }
+    } else o.heldT = 0;
     sum += o.w;
   }
   return clamp(1 - sum, 0, 1);
@@ -743,6 +765,7 @@ const nextHit = (i) => (i + 1) % HITS.length;
 function attackPress() {
   atkHeld = true; atkHeldT = 0;
   if (gear === 'pistol') { firePistol(); return; }
+  if (tryGroundPound()) return;
   if (!canFight() || blocking) return;
   if (atk) { if (atk.heavy) return; if (atk.rec) startAttack(nextHit(atk.i)); else atk.queued = true; return; }
   const C = CLASSES[klass];
@@ -750,6 +773,35 @@ function attackPress() {
   startAttack(0);
 }
 function attackRelease() { atkHeld = false; }
+// Ground pound: attack in the air after a double jump (or from 2.5 m up) with the saber lit.
+// Dive blade-first, then a shockwave on landing that throws everyone within 6.5 m.
+let pound = null;
+const POUND_R = 6.5;
+function tryGroundPound() {
+  if (gear !== 'lit' || ignite < 0.9 || mode !== 'air' || pound || movesOpen || blocking) return false;
+  const h = player.position.y - groundAt(player.position.x, player.position.z, player.position.y);
+  if (jumps < 2 && h < 2.5) return false;
+  pound = { t: 0 }; vy = Math.min(vy, -22); speed *= 0.3; slideOnLand = false;
+  playOvr('Sword_Attack', { from: 0.12, speed: 0.5, fade: 0.06 });
+  log('ground pound');
+  return true;
+}
+function poundImpact() {
+  pound = null;
+  const at = player.position.clone();
+  groundRing(at, POUND_R);
+  let n = 0;
+  for (const e of enemies) {
+    if (e.state === 'dead') continue;
+    const d = e.g.position.clone().sub(at); d.y = 0; const dist = d.length();
+    if (dist > POUND_R) continue;
+    const k = 1 - dist / POUND_R; if (dist < 1e-3) d.set(0, 0, 1); d.normalize();
+    knock(e, d.multiplyScalar(7 + 10 * k).add(new V3(0, 4 + 5 * k, 0)), 25 + 75 * k, 'pound'); n++;
+  }
+  speed = 0;
+  playOvr('M2M_Land_Three_Point', { from: 0.3, speed: 1.3, fade: 0.05, then: () => stopOvr(0.25) });
+  log('ground pound impact', n);
+}
 function startAttack(i) {
   const h = HITS[i];
   atk = { i, queued: false, rec: false, heavy: false, act: null };
@@ -761,12 +813,12 @@ function afterAttack() {
   if (atk.queued) { startAttack(nextHit(atk.i)); return; }
   const rec = HITS[atk.i].rec;
   if (!rec) { atk = null; stopOvr(0.25); return; }
-  atk.rec = true;
-  playOvr(rec, { speed: 1.2, fade: 0.1, then: () => { atk = null; stopOvr(0.25); } });
+  atk.rec = true; atk.stuckT = 0;
+  atk.act = playOvr(rec, { speed: 1.2, fade: 0.1, then: () => { atk = null; stopOvr(0.25); } });
 }
 function heavyAttack() {
   atk = { i: 0, heavy: true, rec: false, queued: false };
-  playOvr('Sword_Heavy_Combo', { speed: 1.1, fade: 0.12, then: () => { atk = null; stopOvr(0.25); } });
+  atk.act = playOvr('Sword_Heavy_Combo', { speed: 1.1, fade: 0.12, then: () => { atk = null; stopOvr(0.25); } });
 }
 function blockPress() {
   if (!canBlock() || atk) return;
@@ -774,6 +826,12 @@ function blockPress() {
 }
 function blockRelease() { blocking = false; }
 function updateCombat(dt) {
+  // self-heal: if a swing reached its end but its finish callback never ran, move the chain on anyway
+  // (a v12 report showed the body frozen in hit 1 while walking)
+  if (atk && atk.act && atk.act.paused) { // a paused one-shot has finished
+    atk.stuckT = (atk.stuckT || 0) + dt;
+    if (atk.stuckT > 0.1) { log('healed: swing finished without its callback'); const a = atk.act; onDone.delete(a); if (atk.rec || atk.heavy) { atk = null; stopOvr(0.25); } else afterAttack(); }
+  }
   if (atkHeld) {
     atkHeldT += dt;
     if (atkHeldT > 0.35 && atk && !atk.heavy && atk.i === 0 && !atk.rec) heavyAttack();
@@ -939,10 +997,26 @@ const hook = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.14, 8), new THREE.Mes
 rope.visible = hook.visible = false; scene.add(rope, hook);
 const wrist = () => boneByName(hero, 'hand_l').getWorldPosition(new V3());
 function grappleTarget() {
-  aimRay.set(camera.position, camera.getWorldDirection(new V3())); aimRay.far = GRAPPLE_RANGE + 20;
+  const dir = camera.getWorldDirection(new V3());
+  aimRay.set(camera.position, dir); aimRay.far = GRAPPLE_RANGE + 20;
   const h = aimRay.intersectObjects(blockMeshes, false)[0];
+  // an enemy in front of the first wall wins (within 150 m, with a little aim help that grows with distance)
+  const en = enemyOnRay(camera.position, dir, Math.min(h ? h.distance : 150, 150));
+  if (en && en.point.distanceTo(player.position) > 3) return { enemy: en.e, point: en.point, distance: en.along };
   if (!h || h.point.distanceTo(player.position) < 3 || h.point.distanceTo(player.position) > GRAPPLE_RANGE) return null;
   return h;
+}
+const chestOf = (e) => e.g.position.clone().add(new V3(0, 1.15, 0));
+function enemyOnRay(o, dir, far) {
+  let best = null;
+  for (const e of enemies) {
+    if (e.state === 'dead') continue;
+    const c = chestOf(e), rel = c.clone().sub(o), along = rel.dot(dir);
+    if (along < 0 || along > far) continue;
+    const perp = rel.addScaledVector(dir, -along).length();
+    if (perp < 0.55 + along * 0.012 && (!best || along < best.along)) best = { e, point: c, along };
+  }
+  return best;
 }
 function playGrappleAnim(slot, loop) {
   const v = nextVariant(slot);
@@ -957,8 +1031,11 @@ function grapplePress() {
   if (!h) {
     grapple.state = 'miss'; grapple.anchor.copy(grapple.from).addScaledVector(camera.getWorldDirection(new V3()), 40);
     log('grapple miss');
+  } else if (h.enemy) {
+    grapple.state = 'fire'; grapple.enemy = h.enemy; grapple.anchor.copy(h.point); grapple.block = null;
+    log('grapple fire at enemy', h.distance.toFixed(1) + ' m');
   } else {
-    grapple.state = 'fire'; grapple.anchor.copy(h.point);
+    grapple.state = 'fire'; grapple.enemy = null; grapple.anchor.copy(h.point);
     grapple.normal.copy(h.face.normal).transformDirection(h.object.matrixWorld).normalize();
     grapple.block = blocks.find((b) => b.mesh === h.object);
     log('grapple fire', h.distance.toFixed(1) + ' m');
@@ -976,7 +1053,23 @@ function releaseGrapple(jump) {
     if (jump) startJump(true);
     log('grapple release', jump ? 'with jump' : '');
   }
-  grapple.state = 'idle'; rope.visible = hook.visible = false;
+  grapple.state = 'idle'; grapple.enemy = null; rope.visible = hook.visible = false;
+}
+// Reeled into an enemy: strike on arrival (saber slash or a punch), knock them flying, flip off them.
+function arriveEnemy() {
+  const e = grapple.enemy, hz = Math.hypot(grapple.vel.x, grapple.vel.z);
+  grapple.state = 'idle'; grapple.enemy = null; rope.visible = hook.visible = false;
+  const dir = e.g.position.clone().sub(player.position).setY(0);
+  if (dir.lengthSq() < 1e-4) dir.set(Math.sin(yaw), 0, Math.cos(yaw)); dir.normalize();
+  yaw = Math.atan2(dir.x, dir.z);
+  const saber = gear === 'lit' && ignite > 0.9;
+  e.cutBy = saber; // a saber strike can take a limb off (dismemberment mode)
+  knock(e, dir.clone().multiplyScalar(11 + hz * 0.25).add(new V3(0, 5, 0)), (saber ? 100 : 45) + Math.min(40, hz), 'grapple'); // a saber strike always kills a fresh soldier
+  shockwave(chestOf(e), dir);
+  mode = 'air'; vy = 6.5; speed = 3; moveYaw = wrapAngle(yaw + Math.PI); jumps = 1; airVar = jumpVar || nextVariant('jump');
+  const strike = saber ? 'Sword_Dash' : 'Melee_Hook';
+  playOvr(strike, { from: 0.25, speed: 1.6, fade: 0.05, then: () => { if (mode === 'air') playOvr(airVar.seq[1], { loop: true, fade: 0.2 }); } });
+  log('grapple strike', hz.toFixed(1) + ' m/s');
 }
 function arriveGrapple() {
   const B = grapple.block?.box;
@@ -1003,6 +1096,10 @@ function updateGrapple(dt) {
   grapple.t += dt;
   const w = wrist();
   let tip;
+  if (grapple.enemy) { // the hook rides on the enemy
+    if (grapple.enemy.state === 'dead') { releaseGrapple(false); return; }
+    grapple.anchor.copy(chestOf(grapple.enemy));
+  }
   if (grapple.state === 'fire' || grapple.state === 'miss') {
     const k = grapple.state === 'miss' && grapple.t > grapple.flight ? Math.max(0, 2 - grapple.t / grapple.flight) : Math.min(1, grapple.t / grapple.flight);
     tip = w.clone().lerp(grapple.anchor, k);
@@ -1010,6 +1107,7 @@ function updateGrapple(dt) {
       grapple.state = 'pull'; mode = 'grapple'; crouch = false; atk = null;
       grapple.vel.set(Math.sin(moveYaw) * speed, vy, Math.cos(moveYaw) * speed);
       playGrappleAnim('gpull', true); log('grapple attached');
+      if (grapple.enemy) { const e = grapple.enemy; e.state = 'grappled'; e.grabT = 0; e.vel.set(0, 0, 0); eplay(e, 'SW_HitRecieve', { loop: false, fade: 0.06 }); }
     }
     if (grapple.state === 'miss' && grapple.t > grapple.flight * 2) { grapple.state = 'idle'; rope.visible = hook.visible = false; stopOvr(0.2); return; }
   } else tip = grapple.anchor.clone();
@@ -1021,7 +1119,9 @@ function updateGrapple(dt) {
 }
 // the pull itself: accelerate toward a point just off the surface, face along the rope
 function pullGrapple(dt) {
-  const target = grapple.anchor.clone().addScaledVector(grapple.normal, 0.5);
+  const target = grapple.enemy
+    ? grapple.anchor.clone().add(player.position.clone().sub(grapple.anchor).setY(0).normalize().multiplyScalar(0.9)) // stop just in front of them
+    : grapple.anchor.clone().addScaledVector(grapple.normal, 0.5);
   const to = target.clone().sub(player.position).add(new V3(0, -0.9, 0));
   const dist = to.length();
   const want = to.normalize().multiplyScalar(Math.min(GRAPPLE_PULL_SPEED, 10 + dist * 3));
@@ -1030,7 +1130,8 @@ function pullGrapple(dt) {
   const hz = Math.hypot(grapple.vel.x, grapple.vel.z);
   if (hz > 0.5) yaw = wrapAngle(yaw + wrapAngle(Math.atan2(grapple.vel.x, grapple.vel.z) - yaw) * (1 - Math.exp(-10 * dt)));
   moveYaw = yaw;
-  if (dist < Math.max(1.1, grapple.vel.length() * dt * 1.5) || grapple.t > 30) arriveGrapple();
+  if (grapple.enemy) { if (dist < Math.max(1.3, grapple.vel.length() * dt * 1.5) || grapple.t > 8) arriveEnemy(); }
+  else if (dist < Math.max(1.1, grapple.vel.length() * dt * 1.5) || grapple.t > 30) arriveGrapple();
 }
 
 // ---------------- enemies ----------------
@@ -1039,7 +1140,7 @@ function pullGrapple(dt) {
 let enemyTemplate = null;
 const enemies = [];
 const ENEMY_COUNT = 5, CORPSE_TIME = 90, MAX_CORPSES = 12;
-const enemyCfg = { on: true };
+const enemyCfg = { on: true, gore: true };
 try { Object.assign(enemyCfg, JSON.parse(localStorage.getItem('enemycfg') || '{}')); } catch (_) {}
 const killFeed = [], deathCounts = {};
 // Death pools by cause. Each entry: clip, where to start (0..1), playback speed. Picked at random, never the same twice in a row.
@@ -1060,6 +1161,8 @@ const DEATHS = { // sorted by watching each clip side-on (see CHANGELOG v12)
   impact:    [{ clip: 'Death01', from: 0.15, speed: 1.4 }, { clip: 'SW_Death', from: 0.2, speed: 1 }, { clip: 'M2M_Death_A', from: 0.28, speed: 1.3 },
               { clip: 'KK_Death_B', from: 0.2, speed: 1.3 }],
 };
+DEATHS.grapple = DEATHS.push; DEATHS.pound = DEATHS.explosion;
+const THROWN = new Set(['explosion', 'push', 'grapple', 'pound']); // these deaths play in the air and count on landing
 const HITS_REACT = { head: ['Hit_Head'], torso: ['Hit_Chest', 'SW_HitRecieve', 'SW_HitRecieve_2', 'KK_Hit_A', 'KK_Hit_B'], legs: ['SW_HitRecieve_2', 'Hit_Chest'] };
 const lastPick = {};
 function pickFrom(list, key) {
@@ -1095,7 +1198,7 @@ function eplay(e, name, { loop = true, fade = 0.2, from = 0, speed = 1 } = {}) {
   if (e.act && e.act !== a) { e.act.fadeOut(fade); a.fadeIn(fade); }
   e.act = a; e.actName = name;
 }
-function removeEnemy(e) { scene.remove(e.g); e.mixer.stopAllAction(); e.mixer.uncacheRoot(e.root); enemies.splice(enemies.indexOf(e), 1); }
+function removeEnemy(e) { for (const pc of [...(e.pieces || [])]) removePiece(pc); scene.remove(e.g); e.mixer.stopAllAction(); e.mixer.uncacheRoot(e.root); enemies.splice(enemies.indexOf(e), 1); }
 function openSpot(minR, maxR) {
   for (let i = 0; i < 40; i++) {
     const a = Math.random() * Math.PI * 2, r = minR + Math.random() * (maxR - minR);
@@ -1138,8 +1241,15 @@ function updateEnemies(dt) {
         e.root.traverse((o) => { if (o.isMesh) { o.material.transparent = true; o.material.opacity = Math.max(0, k); } });
         if (k <= 0) { removeEnemy(e); continue; }
       }
-      if (e.deadT < 6) e.mixer.update(dt); // the longest death clip runs about 4 s
+      if (e.deadT < 6) emix(e, dt); // the longest death clip runs about 4 s
       continue;
+    }
+    if (e.state === 'grappled') { // hooked: stops shooting, reels
+      if (grapple.enemy !== e) { e.state = 'engage'; continue; }
+      e.grabT += dt;
+      if (e.grabT > 0.3 && e.actName !== 'M2M_Dizzy') eplay(e, 'M2M_Dizzy', { fade: 0.15 });
+      e.yaw = wrapAngle(e.yaw + wrapAngle(Math.atan2(player.position.x - pos.x, player.position.z - pos.z) - e.yaw) * (1 - Math.exp(-8 * dt)));
+      e.g.rotation.y = e.yaw; emix(e, dt); continue;
     }
     if (e.state === 'knock') {
       e.vel.y -= 20 * dt;
@@ -1154,7 +1264,7 @@ function updateEnemies(dt) {
         if (e.hp <= 0) { finishDeath(e); continue; }
         e.state = 'getup'; e.vel.set(0, 0, 0); eplay(e, 'LayToIdle', { loop: false, fade: 0.15, speed: 1.3 }); e.hitT = (clips.get('LayToIdle')?.duration || 1.5) / 1.3;
       }
-      e.g.rotation.y = e.yaw; e.mixer.update(dt); continue;
+      e.g.rotation.y = e.yaw; emix(e, dt); continue;
     }
     const to = new V3(player.position.x - pos.x, 0, player.position.z - pos.z), dist = to.length();
     const active = !movesOpen && dist < 70;
@@ -1184,9 +1294,11 @@ function updateEnemies(dt) {
       }
     } else eplay(e, 'SW_Idle_Gun_Pointing');
     e.g.rotation.y = e.yaw;
-    e.mixer.update(dt);
+    emix(e, dt);
   }
 }
+// run an enemy's animation, then keep any cut-off limbs collapsed (clips would otherwise scale them back)
+function emix(e, dt) { e.mixer.update(dt); if (e.severed) for (const b of e.severed) b.scale.setScalar(1e-4); }
 // hit zones as capsules between bones
 function enemyZones(e) {
   const b = e.bones, W = (n) => b[n].getWorldPosition(new V3());
@@ -1251,10 +1363,11 @@ function damageEnemy(e, amount, zone, kind, dir) {
   e.last = { zone, kind };
   if (e.hp > 0) { if (e.state !== 'knock') hitReact(e, zone); return; }
   // your rules: head if the killing shot is in the head; legs if most of the damage (and the killing shot) went to the legs
-  const type = kind === 'explosion' ? 'explosion' : kind === 'impact' ? 'impact' : kind === 'push' ? 'push' :
+  const type = kind === 'explosion' ? 'explosion' : kind === 'impact' ? 'impact' : kind === 'push' ? 'push' : kind === 'grapple' ? 'grapple' : kind === 'pound' ? 'pound' :
     zone === 'head' ? 'head' : zone === 'legs' && e.dmg.legs >= e.total / 2 ? 'legs' : 'torso';
   e.deathType = type;
-  if ((type === 'explosion' || type === 'push') && e.state === 'knock') { // the death plays in the air; it counts once the body lands
+  if (enemyCfg.gore) goreOnDeath(e, type, kind, dir);
+  if (THROWN.has(type) && e.state === 'knock') { // the death plays in the air; it counts once the body lands
     e.death = pickFrom(DEATHS[type], 'death-' + type);
     if (e.death) eplay(e, e.death.clip, { loop: false, fade: 0.08, from: e.death.from, speed: e.death.speed });
     return;
@@ -1268,7 +1381,7 @@ function finishDeath(e) {
   const d = type !== 'impact' && e.death ? e.death : pickFrom(DEATHS[type], 'death-' + type);
   if (d && d !== e.death) eplay(e, d.clip, { loop: false, fade: 0.08, from: d.from, speed: d.speed });
   deathCounts[type] = (deathCounts[type] || 0) + 1;
-  const label = { head: 'Headshot', torso: 'Torso', legs: 'Leg shot', explosion: 'Explosion', impact: 'Wall impact', push: 'Force push' }[type];
+  const label = { head: 'Headshot', torso: 'Torso', legs: 'Leg shot', explosion: 'Explosion', impact: 'Wall impact', push: 'Force push', grapple: 'Grapple strike', pound: 'Ground pound' }[type];
   killFeed.unshift(`${label} · ${d ? d.clip : '?'}`); if (killFeed.length > 5) killFeed.pop();
   renderFeed(type); log('enemy died', type, d && d.clip);
   const corpses = enemies.filter((x) => x.state === 'dead');
@@ -1286,6 +1399,86 @@ function knock(e, vel, dmg, kind) {
   eplay(e, 'Hit_Knockback', { loop: false, fade: 0.06, speed: 1 });
   damageEnemy(e, dmg, 'torso', kind);
 }
+// ---------------- dismemberment ----------------
+// Cutting a limb: the enemy's bone is collapsed to nothing, and a copy of the soldier is made where only that limb
+// shows (every other bone shrunk away), posed exactly as it was and thrown with a spin. Both cut ends get a red cap.
+const pieces = [], MAX_PIECES = 24;
+const goreMat = new THREE.MeshStandardMaterial({ color: 0x7a0d0d, roughness: 0.55 });
+const capGeo = new THREE.SphereGeometry(1, 10, 8);
+const LIMB_SETS = {
+  saber: ['upperarm_l', 'upperarm_r', 'lowerarm_l', 'lowerarm_r', 'thigh_l', 'thigh_r', 'Head'],
+  legs: ['calf_l', 'calf_r', 'thigh_l', 'thigh_r'],
+  blast: ['upperarm_l', 'upperarm_r', 'lowerarm_l', 'lowerarm_r', 'thigh_l', 'thigh_r', 'calf_l', 'calf_r', 'Head'],
+};
+function addCap(bone, at, r, mat) {
+  const m = new THREE.Mesh(capGeo, mat); const ws = bone.getWorldScale(new V3());
+  m.scale.set(r / ws.x, r / ws.y, r / ws.z); m.position.copy(at); bone.add(m); return m;
+}
+function sever(e, name, push) {
+  e.severed = e.severed || [];
+  const bone = e.root.getObjectByName(name); if (!bone) return;
+  for (let b = bone; b; b = b.parent) if (e.severed.includes(b)) return; // already gone with a bigger piece
+  e.root.updateMatrixWorld(true);
+  const limbAt = bone.getWorldPosition(new V3());
+  // the flying piece
+  const pr = cloneSkinned(enemyTemplate); const own = [], mats = [];
+  e.root.traverse((o) => { if (o.isMesh) mats.push(o.material); });
+  let mi = 0; pr.traverse((o) => { if (o.isMesh) { o.material = mats[mi++] || o.material; o.frustumCulled = false; o.castShadow = true; } if (o.isBone) own.push(o); });
+  const byName = new Map(own.map((b) => [b.name, b]));
+  e.root.traverse((o) => { const b = byName.get(o.name); if (o.isBone && b) { b.position.copy(o.position); b.quaternion.copy(o.quaternion); b.scale.copy(o.scale); } });
+  const pelvis = byName.get('pelvis'), limb = byName.get(name);
+  pelvis.scale.setScalar(1e-3); limb.scale.setScalar(1e3); // everything shrinks away except this limb
+  const inner = new THREE.Group(); inner.add(pr); inner.position.copy(e.g.position); inner.quaternion.copy(e.g.quaternion);
+  inner.updateMatrixWorld(true);
+  inner.position.add(limbAt.clone().sub(limb.getWorldPosition(new V3())));
+  const outer = new THREE.Group(); outer.position.copy(limbAt); scene.add(outer);
+  inner.position.sub(limbAt); outer.add(inner);
+  const r = name === 'Head' ? 0.075 : name.startsWith('upper') || name.startsWith('thigh') ? 0.07 : 0.055;
+  const gm = e.goreMat || (e.goreMat = goreMat.clone()); // per soldier, so it fades with the body
+  addCap(limb, new V3(), r, gm);
+  // the stump on the body
+  bone.parent && addCap(bone.parent, bone.position.clone(), r, gm);
+  e.severed.push(bone); bone.scale.setScalar(1e-4);
+  const vel = (push ? push.clone() : new V3()).add(new V3((Math.random() - 0.5) * 3, 3 + Math.random() * 3, (Math.random() - 0.5) * 3));
+  const piece = { outer, vel, axis: new V3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), spin: 6 + Math.random() * 10, rest: false, e };
+  pieces.push(piece); (e.pieces = e.pieces || []).push(piece);
+  bloodBurst(limbAt, vel);
+  if (pieces.length > MAX_PIECES) removePiece(pieces[0]);
+  log('sever', name);
+}
+function removePiece(pc) { scene.remove(pc.outer); pieces.splice(pieces.indexOf(pc), 1); if (pc.e.pieces) pc.e.pieces.splice(pc.e.pieces.indexOf(pc), 1); }
+function updatePieces(dt) {
+  for (const pc of pieces) {
+    if (pc.rest) continue;
+    const o = pc.outer; pc.vel.y -= 20 * dt; o.position.addScaledVector(pc.vel, dt);
+    o.rotateOnAxis(pc.axis, pc.spin * dt);
+    const gy = groundAt(o.position.x, o.position.z, o.position.y + 0.5) + 0.06;
+    if (o.position.y < gy) {
+      o.position.y = gy;
+      if (Math.abs(pc.vel.y) < 2) { pc.rest = true; continue; }
+      pc.vel.set(pc.vel.x * 0.35, -pc.vel.y * 0.25, pc.vel.z * 0.35); pc.spin *= 0.4;
+    }
+  }
+}
+function bloodBurst(at, dir) {
+  for (let i = 0; i < 10; i++) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.035, 0.035), new THREE.MeshBasicMaterial({ color: 0x8e1010, transparent: true, opacity: 1, depthWrite: false }));
+    m.position.copy(at); scene.add(m);
+    const v = dir.clone().multiplyScalar(0.3).add(new V3((Math.random() - 0.5) * 4, Math.random() * 3, (Math.random() - 0.5) * 4));
+    fx.push({ m, t: 0, life: 0.6, vel: v });
+  }
+}
+function goreOnDeath(e, type, kind, dir) {
+  const away = (dir ? dir.clone() : e.vel.clone()).setY(0);
+  if (away.lengthSq() < 1e-4) away.set(e.g.position.x - player.position.x, 0, e.g.position.z - player.position.z);
+  away.normalize();
+  const pick = (list) => list[Math.floor(Math.random() * list.length)];
+  if (type === 'head' && kind === 'bullet') sever(e, 'Head', away.clone().multiplyScalar(4));
+  else if (kind === 'saber' || (type === 'grapple' && e.cutBy)) { sever(e, pick(LIMB_SETS.saber), away.clone().multiplyScalar(3)); if (Math.random() < 0.35) sever(e, pick(LIMB_SETS.saber), away.clone().multiplyScalar(3)); }
+  else if (type === 'legs' && kind === 'bullet') sever(e, pick(LIMB_SETS.legs), away.clone().multiplyScalar(2));
+  else if (type === 'explosion' || type === 'pound') { const n = 1 + Math.floor(Math.random() * (type === 'explosion' ? 3 : 2)); for (let i = 0; i < n; i++) sever(e, pick(LIMB_SETS.blast), away.clone().multiplyScalar(6)); }
+}
+
 // saber: one hit per enemy per swing, within 2.4 m in front of you
 function saberSweep(a) {
   a.hitSet = a.hitSet || new Set();
@@ -1293,7 +1486,7 @@ function saberSweep(a) {
   for (const e of enemies) {
     if (e.state === 'dead' || a.hitSet.has(e)) continue;
     const d = e.g.position.clone().sub(player.position); d.y = 0;
-    if (d.length() < 2.4 && d.normalize().dot(f) > 0.2) { a.hitSet.add(e); damageEnemy(e, a.heavy ? 90 : 55, 'torso', 'saber'); log('saber hit'); }
+    if (d.length() < 2.4 && d.normalize().dot(f) > 0.2) { a.hitSet.add(e); damageEnemy(e, a.heavy ? 90 : 55, 'torso', 'saber', d.clone()); log('saber hit'); }
   }
 }
 // Force push: a cone in front of the camera; closer enemies fly further. A wall hit at speed kills (impact death).
@@ -1366,6 +1559,11 @@ function blast(at) {
   const m = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), new THREE.MeshBasicMaterial({ color: 0xff9a3c, transparent: true, opacity: 0.8, depthWrite: false }));
   m.position.copy(at); scene.add(m); fx.push({ m, t: 0, life: 0.45, grow: 7 });
 }
+// a flat ring that spreads over the ground out to radius r
+function groundRing(at, r) {
+  const m = new THREE.Mesh(new THREE.TorusGeometry(1, 0.05, 6, 40), new THREE.MeshBasicMaterial({ color: 0x9cc8ff, transparent: true, opacity: 0.8, depthWrite: false }));
+  m.rotation.x = -Math.PI / 2; m.position.copy(at).add(new V3(0, 0.08, 0)); scene.add(m); fx.push({ m, t: 0, life: 0.3, grow: r - 0.3 });
+}
 function shockwave(at, dir) {
   const m = new THREE.Mesh(new THREE.TorusGeometry(1, 0.06, 6, 24), new THREE.MeshBasicMaterial({ color: 0x9cc8ff, transparent: true, opacity: 0.8, depthWrite: false }));
   m.position.copy(at); m.lookAt(at.clone().add(dir)); scene.add(m); fx.push({ m, t: 0, life: 0.35, grow: 4, move: dir.clone().multiplyScalar(18) });
@@ -1376,6 +1574,7 @@ function updateFx(dt) {
     f.t += dt; const k = f.t / f.life;
     if (f.grow) f.m.scale.setScalar(0.3 + f.grow * k);
     if (f.move) f.m.position.addScaledVector(f.move, dt);
+    if (f.vel) { f.vel.y -= 14 * dt; f.m.position.addScaledVector(f.vel, dt); }
     f.m.material.opacity = Math.max(0, 1 - k) * 0.9;
     if (k >= 1) { scene.remove(f.m); f.m.geometry.dispose(); f.m.material.dispose(); fx.splice(fx.indexOf(f), 1); }
   }
@@ -1415,7 +1614,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v12 · 2026-09-29';
+const BUILD = 'v13 · 2026-09-29';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -1676,6 +1875,7 @@ function startJump(dbl) {
 }
 function land() {
   mode = 'ground'; vy = 0; jumps = 0;
+  if (pound) { poundImpact(); return; }
   if (slideOnLand) { slideOnLand = false; log('land into slide'); startSlide(true); return; }
   const landClip = airVar?.seq?.[2];
   if (speed > CLASSES[klass].walk * 1.2 || !landClip) stopOvr(0.15);
@@ -1804,7 +2004,7 @@ function step(dt) {
 
   updateCombat(dt);
   updateSaber(dt);
-  updateEnemies(dt); updateGrenades(dt); updateFx(dt);
+  updateEnemies(dt); updatePieces(dt); updateGrenades(dt); updateFx(dt);
   animateLoco(dt, C);
   updateCamera(dt, C);
   hud(C);
@@ -2040,6 +2240,7 @@ function buildMoves() {
     `<button type="button" id="clipsweep">Check saber clipping</button><p class="note" id="clipsummary" role="status"></p><ol class="results" id="clipresults"></ol>` +
     `<h3>Noticed while playing</h3><ul class="results" id="clipnotes"></ul>`);
   h.push(`<h3>Enemies</h3><label class="switch"><input type="checkbox" id="enemyon" ${enemyCfg.on ? 'checked' : ''}> Enemy soldiers (five, they can't hurt you)</label>` +
+    `<label class="switch"><input type="checkbox" id="goreon" ${enemyCfg.gore ? 'checked' : ''}> Dismemberment: saber kills, headshots, leg kills and blasts cut limbs off</label>` +
     `<div class="seg" style="margin-top:8px;grid-template-columns:repeat(2,1fr)"><button type="button" id="enemyreset">Respawn all</button><button type="button" id="enemyclear">Clear bodies</button></div>` +
     `<p class="stats" id="enemystats"></p>` +
     `<p class="note">Deaths by cause: head (killing shot in the head), legs (most damage and the killing shot in the legs), torso (the rest), explosion, wall impact (Force push into a wall), push. Pistol: head 100, torso 34, legs 26 damage out of 100.</p>`);
@@ -2059,7 +2260,8 @@ function buildMoves() {
   showTab(tab);
   document.querySelectorAll('#moves [data-tab]').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
   $('movesexpand').addEventListener('click', () => { const on = $('moves').classList.toggle('tall'); $('movesexpand').setAttribute('aria-pressed', String(on)); });
-  body.addEventListener('change', (e) => { if (e.target.id === 'enemyon') { enemyCfg.on = e.target.checked; try { localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } catch (_) {} if (!enemyCfg.on) [...enemies].forEach(removeEnemy); renderEnemyTests(); } });
+  body.addEventListener('change', (e) => { if (e.target.id === 'enemyon') { enemyCfg.on = e.target.checked; try { localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } catch (_) {} if (!enemyCfg.on) [...enemies].forEach(removeEnemy); renderEnemyTests(); }
+    if (e.target.id === 'goreon') { enemyCfg.gore = e.target.checked; try { localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } catch (_) {} } });
   body.addEventListener('click', (e) => {
     if (e.target.closest('#enemyreset')) { [...enemies].filter((x) => x.state !== 'dead').forEach(removeEnemy); respawnT = 0; filled = false; renderEnemyTests(); }
     if (e.target.closest('#enemyclear')) { [...enemies].filter((x) => x.state === 'dead').forEach(removeEnemy); renderEnemyTests(); }
@@ -2127,7 +2329,7 @@ function start() {
   pickGaitVariants(true);
   renderer.setAnimationLoop((t) => {
     timer.update(t);
-    const raw = timer.getDelta(), dt = Math.min(raw, 0.05);
+    const raw = Math.max(0, timer.getDelta()), dt = Math.min(raw, 0.05); // never run animations backwards
     checkHitch(raw);
     try {
     if (movesOpen) {
@@ -2158,6 +2360,10 @@ function start() {
     // test hook: run the game for sec seconds at 30 steps a second, without waiting on the browser's frame rate
     advance(sec) { for (let t = 0; t < sec; t += 1 / 30) step(1 / 30); timer.update(performance.now()); },
     enemyAct(i) { const e = enemies.filter((q) => q.state !== 'dead')[i] || enemies[i]; const a = e.act; return { name: e.actName, t: +a.time.toFixed(2), dur: +a.getClip().duration.toFixed(2), paused: a.paused, enabled: a.enabled, w: +a.getEffectiveWeight().toFixed(2), head: +e.bones.Head.getWorldPosition(new V3()).y.toFixed(2), others: e.mixer._actions.filter((x) => x !== a && x.isRunning()).map((x) => x.getClip().name + ':' + x.getEffectiveWeight().toFixed(2)) }; },
+    get textures() { const out = []; hero.traverse((o) => { if (o.isMesh && o.material.map) out.push(o.material.map.image ? o.material.map.image.constructor.name + ' ' + o.material.map.image.width : 'none'); }); return out; },
+    dropCallbacks() { onDone.clear(); }, get atkInfo() { return atk && atk.act ? { t: atk.act.time, d: atk.act.getClip().duration, paused: atk.act.paused, enabled: atk.act.enabled, running: atk.act.isRunning(), w: atk.act.getEffectiveWeight(), stuckT: atk.stuckT, ts: atk.act.timeScale, ets: atk.act._effectiveTimeScale, lc: atk.act._loopCount, st: atk.act._startTime, loop: atk.act.loop, name: atk.act.getClip().name, rec: atk.rec, i: atk.i } : atk; }, get overrides() { return [...ovr].map(([a, o]) => a.getClip().name + ':' + o.w.toFixed(2)); },
+    get pound() { return !!pound; }, tryGroundPound, get pieces() { return pieces.length; }, sever: (i, name) => { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) sever(e, name, new V3(0, 2, 3)); },
+    setMode(m, y) { mode = m; if (y !== undefined) player.position.y = y; }, setJumps(n) { jumps = n; }, get grappleEnemy() { return grapple.enemy ? grapple.enemy.id : null; },
     fillEnemies() { while (enemies.filter((x) => x.state !== 'dead').length < ENEMY_COUNT) spawnEnemy(openSpot(20, 34)); },
     moveEnemy(i, x, z, yawR) { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) { e.g.position.set(x, groundAt(x, z, 99), z); if (yawR !== undefined) e.yaw = yawR; e.state = 'hit'; e.hitT = 5; e.g.updateMatrixWorld(true); } }, killFeed, damageEnemy: (i, amt, zone, kind) => { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) damageEnemy(e, amt, zone, kind); return !!e; },
     playOnEnemy(i, name, from = 0, speed = 1) { const e = enemies.filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },

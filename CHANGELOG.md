@@ -2,6 +2,33 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v13: grapple strikes, ground pound, dismemberment, combo freeze fixed, skin shows on phones
+- **Fixed: stuck mid saber combo.**
+  - Hits 1 and 2 end in a recovery move (`Sword_Regular_A_Rec`, `Sword_Regular_B_Rec`). Those clips were never packed into the game, so if you stopped tapping after hit 1 or 2, the swing froze at full strength while you walked. That was your "Animation froze" report.
+  - The recovery clips are now in the game (`tools/pack.mjs`).
+  - A safety net also finishes any swing or one-shot move that ends without handing off, so the body can't freeze while you move.
+- **Fixed: white hero and grey enemies on your phone.**
+  - The skin textures loaded through temporary `blob:` links, which the Claude app's page rules block. Every material fell back to plain white, and the enemies' tint turned white into grey.
+  - Textures are now decoded straight from memory. Reproduced and confirmed fixed locally under the same kind of page rules.
+- **Grapple onto enemies:**
+  - Aim the crosshair at a soldier (it lights up) and press Grapple. The aim is forgiving and gets more so with distance.
+  - Once hooked, the soldier stops shooting and reels.
+  - You're pulled in fast and strike on arrival: with a lit saber, a lunging slash that always kills; empty-handed, a hook punch (45 + speed damage).
+  - The soldier is knocked flying, and you flip back off them.
+  - New death cause: **Grapple strike**.
+- **Ground pound:**
+  - With the saber lit, press Attack in the air after a double jump (or from 2.5 m up).
+  - You dive blade-first and land in a superhero landing. A ring spreads across the ground and throws every soldier within 6.5 m; closer ones take more damage (up to 100).
+  - New death cause: **Ground pound**.
+- **Dismemberment mode** (Menu → Tests; on by default):
+  - Saber kills take off an arm, a leg or the head, sometimes two.
+  - Pistol headshot kills take off the head, and leg-shot kills take off a leg.
+  - Grenade and ground-pound kills throw 1–3 limbs.
+  - Limbs fly off spinning, bounce and settle. Both cut ends are capped in dark red, with a small blood burst.
+  - Limbs fade with the body. At most 24 at once.
+  - Works on the current soldiers; it's built to carry over to zombies later.
+- **Automated test:** `tools/test18-combat.mjs` covers the grapple strike, ground pound, dismemberment, and a swing that loses its finish callback.
+
 ## v12: enemies, deaths by cause, Force push, grenades
 - **Five enemy soldiers** close in on you. They run at you from far off, back away if you get closer than 7 m, and strafe and shoot in between. The shots always miss and do no damage, but you see the tracer and the muzzle flash. When one dies, a replacement arrives every 3 s to keep five alive.
 - **Hit zones:**
