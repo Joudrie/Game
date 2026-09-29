@@ -1,0 +1,14 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 402, height: 812 }, hasTouch: true, isMobile: true });
+p.on('pageerror', e => console.log('pageerror:', e.message));
+await p.goto('http://127.0.0.1:8766/preview2.html');
+await p.waitForFunction(() => window.__game, null, { timeout: 90000 });
+await p.tap('#movesbtn'); await p.waitForTimeout(400);
+await p.fill('#reportnote', 'arms twist in run right');
+await p.tap('#reportsend'); await p.waitForTimeout(12500);
+const r = await p.evaluate(() => __game.lastReport);
+console.log(r.kind, '|', r.detail, '|', r.dbState, '| sent', r.sent, '| build', r.build);
+console.log(await p.evaluate(() => document.getElementById('alert').innerText.replace(/\n/g, ' / ')));
+await p.screenshot({ path: './m-report.png' });
+await b.close();
