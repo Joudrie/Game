@@ -1,6 +1,22 @@
 # Changelog
 
-Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v9 · …"`), so we can tell which version you were playing.
+Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v10 · …"`), so we can tell which version you were playing.
+
+## v10: buildings and grappling hook
+- **City blocks:** 38 plain grey boxes, 1.4 m to 32 m tall, scattered with wide streets between them. Three low ones sit near the start for hopping and grappling practice.
+  - You can't pass through them. You stop at the wall and slide along it.
+  - You can stand on roofs, and walking off an edge makes you fall.
+  - The camera pulls in rather than going through a wall.
+- **Grappling hook:** press **Grapple** (touch button, `R`, or gamepad RT) while the centre crosshair lights up on a building within 70 m.
+  1. **Fire:** the hook flies from the left wrist on a rope.
+  2. **Pull:** once it attaches, the rope reels you in.
+  3. **Arrive:** reaching a roof edge puts you on the roof; hitting a wall drops you from it.
+  - Press Grapple again to let go. Press Jump to let go with an upward boost and an air flip.
+  - A miss sends the hook out and back.
+- **Grapple animations:** there are three new Moves slots, each with free clips to compare:
+  - **Fire:** wrist thrust, point and fire, overhand throw, throw.
+  - **Pulled:** Superman, tucked, glide, airborne.
+  - **Arrive:** superhero landing, climb up, landing, roll.
 
 ## v9: momentum, combo flow, air moves, clipping list, menu tabs
 - **Slide momentum:**

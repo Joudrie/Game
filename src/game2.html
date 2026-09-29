@@ -70,6 +70,9 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #pad .armed-only { display: none; }
 body.armed #pad .armed-only { display: inline-block; }
 #pad .gun-only { display: none; }
+#xhair { top: 50%; left: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border: 2px solid var(--ink-soft); border-radius: 50%; opacity: .55; }
+#xhair.on { border-color: var(--signal); opacity: 1; }
+body.moves-open #xhair { display: none; }
 body.gun #pad .gun-only { display: inline-block; }
 body.armed #readout { bottom: calc(196px + env(safe-area-inset-bottom, 0px)); }
 .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
@@ -127,11 +130,13 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
 <div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
-<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · <kbd>V</kbd> walk · <kbd>1</kbd>–<kbd>4</kbd> gear · <kbd>E</kbd> saber · click attack, hold for heavy · right-click or <kbd>Q</kbd> block</div>
+<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · <kbd>V</kbd> walk · <kbd>R</kbd> grapple · <kbd>1</kbd>–<kbd>4</kbd> gear · <kbd>E</kbd> saber · click attack, hold for heavy · right-click or <kbd>Q</kbd> block</div>
 <div id="toast" class="hud panel" role="status" hidden></div>
 
 <div id="joy" hidden><i></i></div>
+<div id="xhair" class="hud" aria-hidden="true"></div>
 <div id="pad" class="hud">
+  <button type="button" id="grapplebtn">Grapple</button>
   <button type="button" id="blockbtn" class="armed-only">Block</button>
   <button type="button" id="aimbtn" class="gun-only">Aim</button>
   <button type="button" id="atkbtn" class="armed-only">Attack</button>
@@ -222,6 +227,21 @@ const MOVES = {
     { id: 'SW_Idle_Gun_Pointing', label: 'Shouldered, aimed', src: 'Quaternius SWAT · CC0' } ] },
   combo:  { label: 'Saber combo', when: 'Tap Attack to chain the hits. Each hit can flow into the next, and the finisher flows back into hit 1', variants: [
     { id: 'combo5', label: 'Five hits: A, B, C, spin slash, lunge', src: SRC_UAL, seq: ['Sword_Regular_A', 'Sword_Regular_B', 'Sword_Regular_C', 'Sword_Attack', 'Sword_Dash'] } ] },
+  gshoot: { label: 'Grapple: fire', when: 'Played as the hook leaves the wrist. Rotates each shot', variants: [
+    { id: 'Spell_Simple_Shoot', label: 'Wrist thrust', src: SRC_UAL, from: 0.1, speed: 1.6 },
+    { id: 'SW_Gun_Shoot', label: 'Point and fire', src: 'Quaternius SWAT · CC0', from: 0.05, speed: 1.4 },
+    { id: 'OverhandThrow', label: 'Overhand throw', src: SRC_UAL, from: 0.25, speed: 1.8 },
+    { id: 'M2M_Throw_Object', label: 'Throw', src: 'Mesh2Motion · CC0', from: 0.3, speed: 1.8 } ] },
+  gpull:  { label: 'Grapple: pulled', when: 'Held while the rope reels you in. Rotates each pull', variants: [
+    { id: 'M2M_Flying_Forward_Super', label: 'Superman, arm forward', src: 'Mesh2Motion · CC0' },
+    { id: 'NinjaJump_Idle_Loop', label: 'Tucked', src: SRC_UAL },
+    { id: 'M2M_Glide', label: 'Glide', src: 'Mesh2Motion · CC0' },
+    { id: 'Jump_Loop', label: 'Airborne', src: SRC_UAL } ] },
+  garrive: { label: 'Grapple: arrive', when: 'Played when the rope lands you on a roof. Rotates each time', variants: [
+    { id: 'M2M_Land_Three_Point', label: 'Superhero landing', src: 'Mesh2Motion · CC0', from: 0.15, speed: 1.3 },
+    { id: 'ClimbUp_1m', label: 'Climb up over the edge', src: SRC_UAL, from: 0, speed: 1.2 },
+    { id: 'Jump_Land', label: 'Landing', src: SRC_UAL, from: 0.2, speed: 1.4 },
+    { id: 'Roll', label: 'Roll', src: SRC_UAL, from: 0.1, speed: 1.3 } ] },
   djump:  { label: 'Double jump', when: 'Force users only. Rotates each use', variants: [
     { id: 'djump_ninja', label: 'Ninja flip', src: SRC_UAL, seq: ['NinjaJump_Start', 'NinjaJump_Idle_Loop', 'NinjaJump_Land'] } ] },
 };
@@ -309,6 +329,53 @@ function resize() {
 }
 new ResizeObserver(resize).observe(stage);
 resize();
+
+// ---------------- city blocks ----------------
+// Plain grey boxes scattered with wide streets between them; axis-aligned so collision stays simple.
+const blocks = [];
+function buildCity() {
+  let seed = 20260929; const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const mat = new THREE.MeshLambertMaterial({ color: 0xbdbdbd }), edge = new THREE.LineBasicMaterial({ color: 0x8e8e8e });
+  const add = (x, z, w, d, h) => {
+    const box = new THREE.Box3(new V3(x - w / 2, 0, z - d / 2), new V3(x + w / 2, h, z + d / 2));
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); mesh.position.set(x, h / 2, z);
+    mesh.castShadow = mesh.receiveShadow = true;
+    mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry), edge));
+    scene.add(mesh); blocks.push({ box, mesh });
+  };
+  add(9, 7, 4, 4, 1.4); add(-10, -6, 5, 5, 3.2); add(4, -13, 8, 6, 6); // low ones near the start to hop and grapple onto
+  const H = [4, 6, 8, 11, 14, 18, 24, 32];
+  for (let tries = 0; blocks.length < 38 && tries < 800; tries++) {
+    const r = 20 + Math.sqrt(rnd()) * 115, a = rnd() * Math.PI * 2;
+    const w = 6 + rnd() * 12, d = 6 + rnd() * 12, h = H[Math.floor(rnd() * H.length)];
+    const x = Math.cos(a) * r, z = Math.sin(a) * r;
+    const grown = new THREE.Box3(new V3(x - w / 2 - 7, 0, z - d / 2 - 7), new V3(x + w / 2 + 7, h, z + d / 2 + 7)); // keep streets open
+    if (blocks.some((b) => b.box.intersectsBox(grown))) continue;
+    add(x, z, w, d, h);
+  }
+}
+buildCity();
+const blockMeshes = blocks.map((b) => b.mesh);
+const PR = 0.35; // player radius
+function groundAt(x, z, y) {
+  let g = 0;
+  for (const { box: B } of blocks) if (x > B.min.x - 0.15 && x < B.max.x + 0.15 && z > B.min.z - 0.15 && z < B.max.z + 0.15 && B.max.y <= y + 0.45 && B.max.y > g) g = B.max.y;
+  return g;
+}
+function resolveCollisions() {
+  const p = player.position;
+  for (const { box: B } of blocks) {
+    if (p.y >= B.max.y - 0.05 || p.y + 1.7 <= B.min.y) continue;
+    const cx = clamp(p.x, B.min.x, B.max.x), cz = clamp(p.z, B.min.z, B.max.z);
+    const dx = p.x - cx, dz = p.z - cz, d2 = dx * dx + dz * dz;
+    if (d2 >= PR * PR) continue;
+    if (d2 > 1e-8) { const d = Math.sqrt(d2); p.x += (dx / d) * (PR - d); p.z += (dz / d) * (PR - d); }
+    else {
+      const o = [[B.min.x - PR - p.x, 0], [B.max.x + PR - p.x, 0], [0, B.min.z - PR - p.z], [0, B.max.z + PR - p.z]].sort((a, b) => Math.abs(a[0] + a[1]) - Math.abs(b[0] + b[1]))[0];
+      p.x += o[0]; p.z += o[1];
+    }
+  }
+}
 
 // ---------------- load ----------------
 function decodeB64(b64) { const bin = atob(b64), out = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out.buffer; }
@@ -833,6 +900,111 @@ function renderClipNotes() {
   el.innerHTML = clipNotes.size ? [...clipNotes].map(([k, v]) => `<li><b>${k}</b>: ${[...v].join(', ')}</li>`).join('') : '<li>None noticed yet while playing.</li>';
 }
 
+// ---------------- grappling hook ----------------
+// Fire at whatever the crosshair points at (buildings within 70 m). The hook flies out from the left wrist,
+// sticks, then the rope reels you in. Reaching a roof edge lands you on the roof; a wall hit drops you off it.
+// Press again to let go, or Jump to let go with a boost.
+const grapple = { state: 'idle', t: 0, flight: 0.2, anchor: new V3(), normal: new V3(), block: null, vel: new V3(), from: new V3() };
+const aimRay = new THREE.Raycaster(), camRay = new THREE.Raycaster();
+const ropeMat = new THREE.MeshStandardMaterial({ color: 0x2a2c30, roughness: 0.8 });
+const rope = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 1, 6), ropeMat);
+const hook = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.14, 8), new THREE.MeshStandardMaterial({ color: 0x55595f, metalness: 0.7, roughness: 0.4 }));
+rope.visible = hook.visible = false; scene.add(rope, hook);
+const wrist = () => boneByName(hero, 'hand_l').getWorldPosition(new V3());
+function grappleTarget() {
+  aimRay.set(camera.position, camera.getWorldDirection(new V3())); aimRay.far = 75;
+  const h = aimRay.intersectObjects(blockMeshes, false)[0];
+  if (!h || h.point.distanceTo(player.position) < 3 || h.point.distanceTo(player.position) > 70) return null;
+  return h;
+}
+function playGrappleAnim(slot, loop) {
+  const v = nextVariant(slot);
+  return playOvr(v.id, loop ? { loop: true, fade: 0.15 } : { from: v.from ?? 0.1, speed: v.speed ?? 1.5, fade: 0.07, then: slot === 'garrive' ? () => stopOvr(0.25) : undefined });
+}
+function grapplePress() {
+  if (movesOpen || !hero) return;
+  if (grapple.state === 'pull' || grapple.state === 'fire') { releaseGrapple(false); return; }
+  if (grapple.state !== 'idle') return;
+  const h = grappleTarget();
+  grapple.t = 0; grapple.from.copy(wrist());
+  if (!h) {
+    grapple.state = 'miss'; grapple.anchor.copy(grapple.from).addScaledVector(camera.getWorldDirection(new V3()), 22);
+    log('grapple miss');
+  } else {
+    grapple.state = 'fire'; grapple.anchor.copy(h.point);
+    grapple.normal.copy(h.face.normal).transformDirection(h.object.matrixWorld).normalize();
+    grapple.block = blocks.find((b) => b.mesh === h.object);
+    log('grapple fire', h.distance.toFixed(1) + ' m');
+  }
+  grapple.flight = clamp(grapple.from.distanceTo(grapple.anchor) / 90, 0.1, 0.8);
+  if (mode === 'slide') endSlide();
+  if (!atk) playGrappleAnim('gshoot');
+}
+function releaseGrapple(jump) {
+  if (grapple.state === 'pull') {
+    const C = CLASSES[klass], h = Math.hypot(grapple.vel.x, grapple.vel.z);
+    mode = 'air'; vy = grapple.vel.y + (jump ? 6 : 0); speed = Math.min(h, C.sprint * 1.3);
+    if (h > 0.1) yaw = moveYaw = Math.atan2(grapple.vel.x, grapple.vel.z);
+    jumps = 1; airVar = jumpVar || nextVariant('jump');
+    if (jump) startJump(true);
+    log('grapple release', jump ? 'with jump' : '');
+  }
+  grapple.state = 'idle'; rope.visible = hook.visible = false;
+}
+function arriveGrapple() {
+  const B = grapple.block?.box;
+  const nearTop = B && B.max.y - grapple.anchor.y < 1.8;
+  grapple.state = 'idle'; rope.visible = hook.visible = false;
+  if (nearTop) {
+    // step over the edge onto the roof
+    const inward = grapple.normal.clone().setY(0);
+    if (inward.lengthSq() < 0.01) inward.set(0, 0, 0); else inward.normalize().multiplyScalar(-0.9);
+    player.position.set(clamp(grapple.anchor.x + inward.x, B.min.x + PR, B.max.x - PR), B.max.y, clamp(grapple.anchor.z + inward.z, B.min.z + PR, B.max.z - PR));
+    mode = 'ground'; vy = 0; speed = 1.5; jumps = 0;
+    playGrappleAnim('garrive');
+    log('grapple arrive on roof', B.max.y.toFixed(1) + ' m');
+  } else {
+    mode = 'air'; vy = 2.5; speed = 0; jumps = 1; airVar = jumpVar || nextVariant('jump');
+    playOvr(airVar.seq[1], { loop: true, fade: 0.2 });
+    log('grapple arrive at wall');
+  }
+}
+// rope visuals + fire/miss timing (runs every frame)
+function updateGrapple(dt) {
+  if (grapple.state === 'idle') return;
+  grapple.t += dt;
+  const w = wrist();
+  let tip;
+  if (grapple.state === 'fire' || grapple.state === 'miss') {
+    const k = grapple.state === 'miss' && grapple.t > grapple.flight ? Math.max(0, 2 - grapple.t / grapple.flight) : Math.min(1, grapple.t / grapple.flight);
+    tip = w.clone().lerp(grapple.anchor, k);
+    if (grapple.state === 'fire' && k >= 1) {
+      grapple.state = 'pull'; mode = 'grapple'; crouch = false; atk = null;
+      grapple.vel.set(Math.sin(moveYaw) * speed, vy, Math.cos(moveYaw) * speed);
+      playGrappleAnim('gpull', true); log('grapple attached');
+    }
+    if (grapple.state === 'miss' && grapple.t > grapple.flight * 2) { grapple.state = 'idle'; rope.visible = hook.visible = false; stopOvr(0.2); return; }
+  } else tip = grapple.anchor.clone();
+  const d = tip.clone().sub(w), len = d.length();
+  rope.visible = hook.visible = len > 0.05;
+  rope.position.copy(w).addScaledVector(d, 0.5); rope.scale.set(1, Math.max(len, 0.01), 1);
+  rope.quaternion.setFromUnitVectors(new V3(0, 1, 0), d.normalize());
+  hook.position.copy(tip); hook.quaternion.copy(rope.quaternion);
+}
+// the pull itself: accelerate toward a point just off the surface, face along the rope
+function pullGrapple(dt) {
+  const target = grapple.anchor.clone().addScaledVector(grapple.normal, 0.5);
+  const to = target.clone().sub(player.position).add(new V3(0, -0.9, 0));
+  const dist = to.length();
+  const want = to.normalize().multiplyScalar(Math.min(24, 6 + dist * 2.2));
+  grapple.vel.lerp(want, 1 - Math.exp(-6 * dt));
+  player.position.addScaledVector(grapple.vel, dt);
+  const hz = Math.hypot(grapple.vel.x, grapple.vel.z);
+  if (hz > 0.5) yaw = wrapAngle(yaw + wrapAngle(Math.atan2(grapple.vel.x, grapple.vel.z) - yaw) * (1 - Math.exp(-10 * dt)));
+  moveYaw = yaw;
+  if (dist < 1.1 || grapple.t > 6) arriveGrapple();
+}
+
 // ---------------- strafing (aim / guard) ----------------
 // While aiming the pistol or guarding with the saber the body keeps facing the camera and the legs
 // blend the two clips whose measured travel direction is closest to where you push.
@@ -862,7 +1034,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v9 · 2026-09-29';
+const BUILD = 'v10 · 2026-09-29';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -968,6 +1140,7 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyC') { slideQueued = true; slideHeld = true; }
   if (e.code === 'KeyV') { walkToggle = !walkToggle; toast(walkToggle ? 'Walk on' : 'Walk off', 1200); }
   if (e.code === 'KeyG') toggleGrid();
+  if (e.code === 'KeyR') grapplePress();
   if (e.code === 'KeyM') openMoves();
   if (e.code === 'KeyE') setGear(gear === 'lit' ? 'none' : 'lit');
   if (/^Digit[1-4]$/.test(e.code)) setGear(GEAR_ORDER[+e.code.slice(5) - 1]);
@@ -986,6 +1159,7 @@ $('classchip').addEventListener('click', () => openMoves());
 $('movesclose').addEventListener('click', () => closeMoves());
 const press = (el, fn) => el.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); fn(); });
 press($('jumpbtn'), () => { jumpQueued = true; });
+press($('grapplebtn'), () => grapplePress());
 press($('slidebtn'), () => { slideQueued = true; slideHeld = true; });
 $('slidebtn').addEventListener('pointerup', () => { slideHeld = false; });
 $('slidebtn').addEventListener('pointercancel', () => { slideHeld = false; });
@@ -1078,7 +1252,8 @@ function readInput(dt) {
     if (b(4) && !padPrev[4]) { if (gear === 'pistol') aimHeld = true; else blockPress(); }
     if (!b(4) && padPrev[4]) { aimHeld = false; blockRelease(); }
     if (b(3) && !padPrev[3]) setGear(GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + 1) % GEAR_ORDER.length]);
-    padPrev = [b(0), b(1), b(2), b(3), b(4)];
+    if (b(7) && !padPrev[7]) grapplePress();
+    padPrev = [b(0), b(1), b(2), b(3), b(4), 0, 0, b(7)];
     break;
   }
   let mag = Math.hypot(x, y); if (mag > 1) { x /= mag; y /= mag; mag = 1; }
@@ -1113,7 +1288,7 @@ function startJump(dbl) {
   mode = 'air';
 }
 function land() {
-  mode = 'ground'; vy = 0; player.position.y = 0; jumps = 0;
+  mode = 'ground'; vy = 0; jumps = 0;
   if (slideOnLand) { slideOnLand = false; log('land into slide'); startSlide(true); return; }
   const landClip = airVar?.seq?.[2];
   if (speed > CLASSES[klass].walk * 1.2 || !landClip) stopOvr(0.15);
@@ -1195,9 +1370,12 @@ function step(dt) {
     jumpQueued = false;
     if (mode === 'ground' || mode === 'slide') { crouch = false; log('jump'); startJump(false); }
     else if (mode === 'air' && (testCfg.infiniteJumps || (C.doubleJump && jumps < 2))) { log('air jump', jumps + 1); startJump(true); }
+    else if (mode === 'grapple') releaseGrapple(true);
   }
 
   // speed
+  if (mode === 'grapple') pullGrapple(dt);
+  else {
   if (mode === 'ground') {
     const up = target > speed;
     const a = up ? (speed > C.jog ? 6 : 9) : 13;
@@ -1213,9 +1391,22 @@ function step(dt) {
   player.position.x += Math.sin(moveYaw) * speed * dt;
   player.position.z += Math.cos(moveYaw) * speed * dt;
   if (mode === 'air') {
+    const prevY = player.position.y;
     vy -= 14 * dt; player.position.y += vy * dt;
-    if (player.position.y <= 0) land();
+    const gy = groundAt(player.position.x, player.position.z, prevY);
+    if (player.position.y <= gy) { player.position.y = gy; land(); }
+  } else {
+    // walk off a roof edge and you fall
+    const gy = groundAt(player.position.x, player.position.z, player.position.y);
+    if (player.position.y - gy > 0.35) {
+      if (mode === 'slide') { mode = 'air'; } else mode = 'air';
+      vy = 0; jumps = Math.max(jumps, 1); airVar = jumpVar || nextVariant('jump');
+      playOvr(airVar.seq[1], { loop: true, fade: 0.2 }); log('fell off an edge');
+    } else player.position.y = gy;
   }
+  }
+  resolveCollisions();
+  updateGrapple(dt);
   player.rotation.y = yaw;
   roll = damp(roll, mode === 'ground' ? clamp(-yawVel * speed * 0.02, -0.14, 0.14) : 0, 8, dt);
   lean.rotation.z = roll;
@@ -1278,7 +1469,7 @@ function animateLoco(dt, C) {
     add('Crouch_Idle_Loop', (1 - t) * cb); add(cur.crouch, t * cb);
     rate = lerp(rate, cyc(cur.crouch, Math.max(speed, 0.9)), cb);
   }
-  if (mode === 'air') rate *= 0.35;
+  if (mode === 'air' || mode === 'grapple') rate *= 0.35;
   phase = (phase + rate * dt) % 1;
   const locoW = updateOvr(dt);
   for (const a of locoActive) a.setEffectiveWeight(0);
@@ -1331,6 +1522,11 @@ function updateCamera(dt, C) {
   const lx = Math.sin(camYaw) * cp, ly = -sp, lz = Math.cos(camYaw) * cp;
   right.set(-Math.cos(camYaw), 0, Math.sin(camYaw)).multiplyScalar(0.42 * narrow * narrow);
   camPos.set(pivot.x - lx * dist + right.x, Math.max(0.2, pivot.y - ly * dist), pivot.z - lz * dist + right.z);
+  // pull the camera in front of any building between it and the character
+  const eye = new V3(pivot.x + right.x, pivot.y, pivot.z + right.z), back = camPos.clone().sub(eye), bl = back.length();
+  camRay.set(eye, back.normalize()); camRay.far = bl;
+  const ch = camRay.intersectObjects(blockMeshes, false)[0];
+  if (ch) camPos.copy(eye).addScaledVector(back, Math.max(0.3, ch.distance - 0.3));
   camera.position.copy(camPos);
   camera.lookAt(pivot.x + right.x, pivot.y, pivot.z + right.z);
   const fov = lerp(55, klass === 'force' ? 66 : 62, sprintT);
@@ -1339,9 +1535,10 @@ function updateCamera(dt, C) {
 
 let hudN = 0;
 function hud(C) {
+  if (hudN % 4 === 0) $('xhair').classList.toggle('on', grapple.state === 'idle' && !!grappleTarget());
   if ((hudN += 1) % 6) return;
   $('spd').textContent = speed.toFixed(1);
-  const g = isStrafing() ? (gear === 'pistol' ? 'Aim' : 'Guard') + (speed > 0.1 ? ' · strafe' : '') : blocking ? 'Block' : atk ? (atk.heavy ? 'Heavy attack' : 'Attack ' + (atk.i + 1)) :
+  const g = mode === 'grapple' ? 'Grappling' : grapple.state === 'fire' ? 'Hook out' : isStrafing() ? (gear === 'pistol' ? 'Aim' : 'Guard') + (speed > 0.1 ? ' · strafe' : '') : blocking ? 'Block' : atk ? (atk.heavy ? 'Heavy attack' : 'Attack ' + (atk.i + 1)) :
     mode === 'air' ? (jumps === 2 ? 'Double jump' : 'Airborne') : mode === 'slide' ? 'Slide' :
     { idle: 'Idle', walk: 'Walk', jog: 'Run', sprint: 'Sprint', crouch: 'Crouch', crouchwalk: 'Crouch' }[gait];
   const el = $('gait'); el.textContent = g; el.classList.toggle('hot', g === 'Sprint' || g === 'Slide' || g === 'Double jump');
@@ -1362,7 +1559,8 @@ function openMoves() {
   $('moves').hidden = false;
   if (isLocked()) document.exitPointerLock?.();
   keys.clear(); joy.id = null; $('joy').hidden = true;
-  speed = 0; mode = 'ground'; crouch = false; player.position.y = 0; stopOvr(0.1);
+  if (grapple.state !== 'idle') releaseGrapple(false);
+  speed = 0; if (mode !== 'ground') { mode = 'ground'; player.position.y = groundAt(player.position.x, player.position.z, player.position.y); } crouch = false; stopOvr(0.1);
   savedCam = { camYaw, camPitch, camDist };
   const wide = innerWidth >= 820;
   camYaw = yaw + Math.PI; camPitch = 0.1; camDist = wide ? 3.8 : 6.2;
@@ -1548,7 +1746,9 @@ function start() {
     renderer.render(scene, camera);
   });
   setGear(gear, true);
-  window.__game = { sweepSaberClipping, get slide() { return { speed: +slideSpeed.toFixed(2), dur: +slideDur.toFixed(2) }; }, get crouchBlend() { return crouchBlend; }, get guardBlend() { return guardBlend; }, testCfg, get fingers() { const b = boneByName(hero, 'index_02_l'), f = fist && fist.find((x) => x.bone === b); return f ? +b.quaternion.angleTo(f.q).toFixed(3) : null; }, forceStuck() { speed = 0; CLASSES[klass]._frozen = true; }, strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
+  window.__game = { get blocks() { return blocks.map((b) => ({ min: b.box.min.toArray().map((v) => +v.toFixed(1)), max: b.box.max.toArray().map((v) => +v.toFixed(1)) })); },
+    get pos() { return player.position.toArray().map((v) => +v.toFixed(2)); }, place(x, z) { player.position.set(x, groundAt(x, z, 99), z); }, look(yawR, pitchR) { camYaw = yawR; camPitch = pitchR; },
+    grapplePress, get grapple() { return grapple.state; }, sweepSaberClipping, get slide() { return { speed: +slideSpeed.toFixed(2), dur: +slideDur.toFixed(2) }; }, get crouchBlend() { return crouchBlend; }, get guardBlend() { return guardBlend; }, testCfg, get fingers() { const b = boneByName(hero, 'index_02_l'), f = fist && fist.find((x) => x.bone === b); return f ? +b.quaternion.angleTo(f.q).toFixed(3) : null; }, forceStuck() { speed = 0; CLASSES[klass]._frozen = true; }, strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
     setClass(k) { klass = k; renderClass(); }, openMoves, closeMoves };
 }
 </script>
