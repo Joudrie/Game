@@ -17,12 +17,12 @@ for (const c of CLIPS) {
     await ev(() => { __game.moveEnemy(0, -53, 0, Math.PI / 2); for (let i = 1; i < 5; i++) __game.moveEnemy(i, -200 - i * 5, 200); });
     await p.waitForTimeout(80);
     shots.push(await p.screenshot({ clip: { x: 340, y: 80, width: 300, height: 400 } }));
-    await ev(() => __game.advance(0.45));
+    await ev((s) => __game.advance(s), +(process.env.STEP || 0.45));
   }
   const row = await sharp({ create: { width: 1800, height: 400, channels: 3, background: '#fff' } }).composite(shots.map((s, i) => ({ input: s, left: i * 300, top: 0 }))).png().toBuffer();
   rows.push(row);
   console.log(c, 'done');
 }
 for (const [i, r] of rows.entries()) await sharp(r).toFile(`sheet/row${i}.png`);
-await sharp({ create: { width: 1800, height: 400 * rows.length, channels: 3, background: '#fff' } }).composite(rows.map((r, i) => ({ input: r, left: 0, top: i * 400 }))).resize(1200).png().toBuffer().then((x) => sharp(x).resize(1200).toFile(process.env.SHEET || 'sheet/deaths.png'));
+// rows are joined with PIL (tools: sheet/row*.png)
 await b.close();

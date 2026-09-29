@@ -78,6 +78,7 @@ body.force #pad .force-only { display: inline-block; }
 #xhair.headhit { border-color: var(--signal); border-width: 3px; opacity: 1; transform: scale(1.4); }
 #pad .armed-only { display: none; }
 body.armed #pad .armed-only { display: inline-block; }
+body.fists #pad #atkbtn { display: inline-block; }
 #pad .gun-only { display: none; }
 #xhair { top: 50%; left: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border: 2px solid var(--ink-soft); border-radius: 50%; opacity: .55; }
 #xhair.on { border-color: var(--signal); opacity: 1; }
@@ -91,11 +92,16 @@ body.armed #readout { bottom: calc(196px + env(safe-area-inset-bottom, 0px)); }
 @media (pointer: fine) { body.armed #readout { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); } }
 
 /* Moves sheet */
+#weapon { position: fixed; z-index: 6; top: calc(var(--s4) + 48px + env(safe-area-inset-top, 0px)); right: var(--s4); width: min(380px, calc(100vw - 2 * var(--s4))); max-height: 70vh; display: flex; flex-direction: column; pointer-events: auto; padding: 0; }
+#weapon header { display: flex; align-items: center; gap: var(--s2); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
+#weapon header h2 { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin: 0; flex: 1; }
+#weapon .body { overflow-y: auto; padding: 0 var(--s4) var(--s4); }
+#moves .rec { display: inline-block; margin-left: var(--s2); font-style: normal; font-size: 12px; color: var(--signal); }
 #moves { position: fixed; z-index: 5; background: var(--panel); border-top: 1px solid var(--line); left: 0; right: 0; bottom: 0; height: 56%; display: flex; flex-direction: column; }
 @media (min-width: 820px) { #moves { top: 0; left: auto; width: 400px; height: auto; border-top: 0; border-left: 1px solid var(--line); } }
 #moves header { display: flex; align-items: center; gap: var(--s2); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
 #moves header h2 { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin: 0; flex: 1; }
-#moves .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s1); padding: var(--s2) var(--s4); border-bottom: 1px solid var(--line); }
+#moves .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s1); padding: var(--s2) var(--s4); border-bottom: 1px solid var(--line); }
 #moves .tabs button { min-height: 40px; padding: 0 var(--s1); }
 #moves .tabs button[aria-selected="true"] { border-color: var(--ink); background: var(--key); font-weight: 700; }
 #moves [data-panel][hidden] { display: none; }
@@ -132,14 +138,17 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 <div id="top" class="hud">
   <button type="button" id="classchip" class="panel" aria-label="Change class"><b id="classname">Light infantry</b><span id="classstats"></span></button>
   <div class="spacer"></div>
-  <button type="button" id="gearbtn">Gear: none</button>
+  <button type="button" id="gearbtn" aria-expanded="false" aria-controls="weapon">Weapon</button>
   <button type="button" id="movesbtn">Menu</button>
-  <button type="button" id="gridbtn" aria-pressed="false">Grid</button>
 </div>
+<section id="weapon" class="hud panel" hidden aria-label="Weapon and class">
+  <header><h2>Weapon and class</h2><button type="button" id="weaponclose">Close</button></header>
+  <div class="body" id="weaponbody"></div>
+</section>
 
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
 <div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
-<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · <kbd>V</kbd> walk · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>1</kbd>–<kbd>4</kbd> gear · <kbd>E</kbd> saber · click attack, hold for heavy · right-click or <kbd>Q</kbd> block</div>
+<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>1</kbd>–<kbd>4</kbd> weapons · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
 <div id="toast" class="hud panel" role="status" hidden></div>
 <div id="feed" class="hud" aria-live="polite"></div>
 
@@ -158,9 +167,9 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 </div>
 
 <section id="moves" hidden aria-label="Moves">
-  <header><h2>Test menu</h2><button type="button" id="movesexpand" aria-pressed="false">Expand</button><button type="button" id="movesclose">Done</button></header>
+  <header><h2>Menu</h2><button type="button" id="movesexpand" aria-pressed="false">Expand</button><button type="button" id="movesclose">Done</button></header>
   <nav class="tabs" role="tablist" aria-label="Menu sections">
-    <button type="button" role="tab" data-tab="setup">Setup</button><button type="button" role="tab" data-tab="moves">Moves</button>
+    <button type="button" role="tab" data-tab="moves">Moves</button>
     <button type="button" role="tab" data-tab="library">Library</button><button type="button" role="tab" data-tab="tests">Tests</button>
   </nav>
   <div class="body" id="movesbody"></div>
@@ -203,11 +212,11 @@ const COARSE = matchMedia('(pointer: coarse)').matches;
 // ---------------- classes (your rules) ----------------
 const CLASSES = {
   light: { label: 'Light infantry', who: 'Soldiers, suits, civilians', health: 150,
-           walk: 1.6, jog: 4.6, sprint: 7.0, jump: 4.8, doubleJump: false, slideTime: 0.85, slideBoost: 1.1 },
+           walk: 1.6, jog: 4.6, sprint: 8.4, jump: 4.8, djump: 6.8, doubleJump: false, slideTime: 0.85, slideBoost: 1.1 },
   force: { label: 'Ultralight (Force)', who: 'Anyone with a lightsaber', health: 100,
-           walk: 1.7, jog: 5.4, sprint: 10.5, jump: 5.4, doubleJump: true, djump: 6.0, slideTime: 1.15, slideBoost: 1.15 },
+           walk: 1.7, jog: 5.4, sprint: 12.5, jump: 5.4, doubleJump: true, djump: 8.2, slideTime: 1.15, slideBoost: 1.15 },
   heavy: { label: 'Heavy infantry', who: 'Heavy armour, miniguns', health: 250,
-           walk: 1.4, jog: 3.9, sprint: 5.8, jump: 4.0, doubleJump: false, slideTime: 0.6, slideBoost: 1.0 },
+           walk: 1.4, jog: 3.9, sprint: 7.0, jump: 4.0, djump: 5.6, doubleJump: false, slideTime: 0.6, slideBoost: 1.0 },
 };
 
 // ---------------- moves catalogue ----------------
@@ -237,6 +246,7 @@ const MOVES = {
     { id: 'STANCE_HighGuard', label: 'High guard', src: SRC_UAL + ' (block pose, held)' },
     { id: 'STANCE_Lunge', label: 'Low lunge', src: SRC_UAL + ' (dash pose, held)' } ] },
   rstance: { label: 'Pistol stance', when: 'Held while the pistol is out. Changes each time you stop', variants: [
+    { id: 'Pistol_Idle_Loop', label: 'Two-handed ready (default)', src: SRC_UAL },
     { id: 'SW_Idle_Gun', label: 'Low ready', src: 'Quaternius SWAT · CC0' },
     { id: 'SW_Idle_Gun_Pointing', label: 'Shouldered, aimed', src: 'Quaternius SWAT · CC0' } ] },
   combo:  { label: 'Saber combo', when: 'Tap Attack to chain the hits. Each hit can flow into the next, and the finisher flows back into hit 1', variants: [
@@ -277,9 +287,17 @@ const CLASS_DEFAULTS = {
   force: { sprint: ['M2M_Run_Anime'], djump: ['dj_back_b'] },
   heavy: { walk: ['M2M_Walk_Large'], jog: ['MX_Run'], sprint: ['Jog_Fwd_Loop'], djump: ['dj_back_b'] },
 };
+// what fits each class best, shown as a tag on the Moves tab
+const RECOMMEND = {
+  light: { idle: 'Idle_Loop', walk: 'Walk_Loop', sprint: 'Sprint_Loop', stance: 'Sword_Idle', rstance: 'Pistol_Idle_Loop' },
+  force: { idle: 'Idle_Loop', walk: 'Walk_Loop', sprint: 'M2M_Run_Anime', stance: 'Sword_Idle', rstance: 'Pistol_Idle_Loop' },
+  heavy: { idle: 'Idle_FoldArms_Loop', walk: 'M2M_Walk_Large', jog: 'MX_Run', sprint: 'Jog_Fwd_Loop', stance: 'STANCE_HighGuard', rstance: 'Pistol_Idle_Loop' },
+};
+const recommended = (k, slot) => RECOMMEND[k][slot] || CLASS_DEFAULTS[k][slot]?.[0] || MOVES[slot].variants[0].id;
 const pools = {};
 let saved = {};
 try { saved = JSON.parse(localStorage.getItem('moves-pools') || '{}'); } catch (_) {}
+try { if (!localStorage.getItem('v14-reset')) { for (const k of Object.keys(saved)) if (saved[k]) delete saved[k].rstance; localStorage.setItem('v14-reset', '1'); } } catch (_) {}
 for (const k of Object.keys(CLASSES)) {
   pools[k] = {};
   for (const [slot, m] of Object.entries(MOVES)) {
@@ -315,11 +333,11 @@ renderer.domElement.tabIndex = 0;
 stage.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-const SKY = new THREE.Color(0xffffff);
+const SKY = new THREE.Color(0xd6e6f2); // pale blue
 scene.background = SKY;
 scene.fog = new THREE.Fog(SKY, 60, 900);
 const camera = new THREE.PerspectiveCamera(55, 1, 0.05, 2500);
-scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8a8a, 1.9));
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb09a72, 1.9));
 const sun = new THREE.DirectionalLight(0xffffff, 1.6);
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
@@ -327,10 +345,10 @@ Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near:
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
 scene.add(sun, sun.target);
 const SUN_OFFSET = new V3(6, 14, 4);
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.MeshLambertMaterial({ color: 0x9a9a9a }));
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.MeshLambertMaterial({ color: 0xcdb78f })); // sand
 ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-const grid = new THREE.GridHelper(200, 200, 0x6f6f6f, 0x7f7f7f);
-grid.material.transparent = true; grid.material.opacity = 0.35; grid.position.y = 0.002; grid.visible = false; scene.add(grid);
+const grid = new THREE.GridHelper(200, 200, 0x8a7550, 0x9c8762); // always on, for judging distance and speed
+grid.material.transparent = true; grid.material.opacity = 0.4; grid.position.y = 0.002; scene.add(grid);
 
 let viewShift = { x: 0, y: 0 };
 function resize() {
@@ -421,7 +439,13 @@ let hero, mixer, lf, rf;
 const clips = new Map();
 const cal = {};  // per clip: { speed, dur, strike }
 
-function boneByName(root, name) { let b = null; root.traverse((o) => { if (!b && o.name === name) b = o; }); return b; }
+const boneCache = new WeakMap(); // root -> Map(name -> bone); bones never change once loaded
+function boneByName(root, name) {
+  let m = boneCache.get(root); if (!m) boneCache.set(root, (m = new Map()));
+  if (m.has(name)) return m.get(name);
+  let b = null; root.traverse((o) => { if (!b && o.name === name) b = o; });
+  if (b) m.set(name, b); return b;
+}
 
 function analyzeClip(root, clip) {
   const m = new THREE.AnimationMixer(root), a = m.clipAction(clip); a.play();
@@ -481,7 +505,7 @@ async function boot() {
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
   poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
-  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildFist(); buildGuardPose();
+  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildFist(); buildGuardPose(); buildJetpack();
   mixer = new THREE.AnimationMixer(hero);
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
@@ -621,6 +645,7 @@ function computeMounts() {
   }
   mounts.back = mk('spine_03', P('spine_03').add(new V3(0, 0, -0.17)), new V3(1, 1.2, 0));
   mounts.rifleBack = mk('spine_03', P('spine_03').add(new V3(0, -0.05, -0.2)), new V3(-1, 1.1, 0));
+  mounts.jetpack = mk('spine_03', P('spine_03').add(new V3(0, -0.06, -0.2)), new V3(0, 1, 0));
   bindQ = new Map(['thigh_l', 'thigh_r', 'calf_l', 'calf_r', 'upperarm_l', 'upperarm_r', 'lowerarm_l', 'lowerarm_r', 'spine_02']
     .map((n) => { const b = boneByName(hero, n); return [b, b.quaternion.clone()]; }));
   // pistol: barrel along the forearm, slide on the thumb side, grip in the palm (rest T-pose, palms down)
@@ -653,6 +678,31 @@ function buildRifle() {
   placeRifle();
 }
 const RIFLE_FLIP = false;
+// jetpack: a plain box with two nozzles on the upper back; flames grow with thrust
+let jetpack = null;
+function buildJetpack() {
+  const root = new THREE.Group();
+  const metal = new THREE.MeshStandardMaterial({ color: 0x5b6068, roughness: 0.5, metalness: 0.4 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.36, 0.13), metal); body.castShadow = true; root.add(body);
+  const flames = [];
+  for (const x of [-0.09, 0.09]) {
+    const nz = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.08, 10), metal); nz.position.set(x, -0.22, -0.01); root.add(nz);
+    const f = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.4, 10, 1, true), new THREE.MeshBasicMaterial({ color: 0xffb347, transparent: true, opacity: 0.85, depthWrite: false }));
+    f.rotation.x = Math.PI; f.position.set(x, -0.26, -0.01); root.add(f); flames.push(f);
+  }
+  jetpack = { root, flames };
+  const m = mounts.jetpack; m.bone.add(root); root.position.copy(m.p); root.quaternion.copy(m.q); root.scale.copy(m.s).multiplyScalar(0.72);
+}
+function updateJetpackLook() {
+  if (!jetpack) return;
+  jetpack.root.visible = !!gadgets.jetpack;
+  const on = mode === 'jet', k = on ? jet.thrust : 0;
+  for (const f of jetpack.flames) {
+    f.visible = k > 0.05;
+    const flick = 0.85 + Math.random() * 0.3, len = (0.35 + 0.9 * k) * flick;
+    f.scale.set(0.7 + 0.5 * k, len, 0.7 + 0.5 * k); f.position.y = -0.26 - 0.2 * (len - 1);
+  }
+}
 function placeRifle() {
   if (!rifle) return;
   const m = mounts.rifleBack; if (!m) return;
@@ -672,9 +722,10 @@ function buildPistol() {
   pistol = { root: new THREE.Group() }; pistol.root.add(inner);
   placePistol();
 }
+let pistolInHand = false; // follows the draw/holster motion, not the gear choice
 function placePistol() {
   if (!pistol) return;
-  const m = gear === 'pistol' ? mounts.pistolHand : mounts.pistolHip; if (!m) return;
+  const m = pistolInHand ? mounts.pistolHand : mounts.pistolHip; if (!m) return;
   m.bone.add(pistol.root); pistol.root.position.copy(m.p); pistol.root.quaternion.copy(m.q); pistol.root.scale.copy(m.s);
 }
 function attach(sb, name) { const m = mounts[name]; m.bone.add(sb.root); sb.root.position.copy(m.p); sb.root.quaternion.copy(m.q); sb.root.scale.copy(m.s); }
@@ -696,18 +747,22 @@ function showBlades() { for (const sb of sabers) for (const b of sb.blades) { b.
 function setGear(g, instant) {
   if (!GEARS[g]) g = 'none';
   if (g !== gear) log('gear', g);
+  const from = gear;
   gear = g;
+  if (instant || !hero || movesOpen) { drawing = null; pistolInHand = g === 'pistol'; }
+  else if (from !== g) startGearChange(from, g);
   try { if (!movesOpen) localStorage.setItem('gear', g); } catch (_) {}
   if (g !== 'lit') { if (atk || blocking) stopOvr(0.15); atk = null; blocking = false; }
   const inHand = g === 'hilt' || g === 'lit';
-  if (inHand && !armed) { armed = true; placeSabers(); }
-  igniteTarget = g === 'lit' ? 1 : 0;
-  if (instant) { ignite = igniteTarget; if (!inHand && armed) { armed = false; placeSabers(); } }
+  if (!drawing && inHand && !armed) { armed = true; placeSabers(); }
+  igniteTarget = g === 'lit' && !drawing ? 1 : 0;
+  if (!drawing) { ignite = instant ? igniteTarget : ignite; if (instant && !inHand && armed) { armed = false; placeSabers(); } }
   placeRifle(); placePistol();
   document.body.classList.toggle('armed', g === 'lit');
   document.body.classList.toggle('gun', g === 'pistol');
+  document.body.classList.toggle('fists', g === 'none' || g === 'hilt');
   if (g !== 'pistol') aimHeld = false;
-  $('gearbtn').textContent = 'Gear: ' + { none: 'none', hilt: 'hilt', lit: 'saber', pistol: 'pistol' }[g];
+  $('gearbtn').textContent = 'Weapon: ' + { none: 'fists', hilt: 'hilt', lit: 'saber', pistol: 'pistol' }[g];
   $('gearlbl').textContent = GEARS[g];
   document.querySelectorAll('[data-gear]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.gear === g)));
   showBlades();
@@ -715,10 +770,11 @@ function setGear(g, instant) {
 function setArmed(on, instant) { setGear(on ? 'lit' : 'none', instant); }
 function updateSaber(dt) {
   const prev = ignite;
+  igniteTarget = gear === 'lit' && armed && !drawing ? 1 : 0; // lights only once it's in hand
   ignite = moveTo(ignite, igniteTarget, dt / (igniteTarget ? 0.22 : 0.16));
   if (ignite !== prev) showBlades();
   // holster only after the blade has fully retracted
-  if (armed && gear !== 'hilt' && gear !== 'lit' && ignite === 0) { armed = false; placeSabers(); }
+  if (armed && gear !== 'hilt' && gear !== 'lit' && ignite === 0 && !drawing) { armed = false; placeSabers(); }
 }
 
 // held-pose clip sampled from a one-shot (used for extra stances)
@@ -758,10 +814,82 @@ const HITS = [
   { clip: 'Sword_Attack', speed: 1.3, cancel: 0.5 },
   { clip: 'Sword_Dash', speed: 1.25, cancel: 0.58 },
 ];
+// dual sabers mix in KayKit's dual-wield chop and slice
+const HITS_DUAL = [HITS[0], { clip: 'KK_Dual_Slice', speed: 1.3, cancel: 0.5 }, HITS[2], { clip: 'KK_Dual_Chop', speed: 1.3, cancel: 0.5 }, HITS[4]];
+// no gear or an unlit hilt: jab, cross, kick, hook. Kicks and hooks knock the soldier back.
+const FISTS = [
+  { clip: 'Punch_Jab', speed: 1.35, cancel: 0.45, dmg: 20, reach: 1.7 },
+  { clip: 'Punch_Cross', speed: 1.35, cancel: 0.45, dmg: 25, reach: 1.7 },
+  { clip: 'KK_Kick', speed: 1.25, cancel: 0.5, dmg: 35, reach: 2.0, knock: 6 },
+  { clip: 'Melee_Hook', speed: 1.25, cancel: 0.55, dmg: 40, reach: 1.8, knock: 8, rec: 'Melee_Hook_Rec' },
+];
+const chainFor = () => (gear === 'lit' ? (saberCfg.style === 'dual' && clips.has('KK_Dual_Slice') ? HITS_DUAL : HITS) : FISTS);
+// ---------------- draw and holster ----------------
+// No draw clips exist in the free packs, so the reach is done with two-bone IK over whatever the body is playing:
+// the hand goes to the holster, the weapon changes parent, the hand comes back. Holstering the pistol spins it first.
+let drawing = null; // { steps, i, t }
+const smooth = (x) => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
+function saberReach(steps, draw) {
+  const st = saberCfg.style;
+  const hands = st === 'dual' ? [['r', 'hip_r'], ['l', 'hip_l']] : st === 'staff' ? [['r', 'back']] : [['r', 'hip_l']]; // single: cross-draw from the left hip
+  steps.push({ kind: 'reach', hands, dur: 0.2, at: () => { armed = draw; placeSabers(); showBlades(); } }, { kind: 'back', hands, dur: 0.24 });
+}
+function startGearChange(from, to) {
+  const steps = [], saber = (g) => g === 'lit' || g === 'hilt';
+  if (pistolInHand && to !== 'pistol') steps.push({ kind: 'spin', dur: 0.55 },
+    { kind: 'reach', hands: [['r', 'pistolHip']], dur: 0.2, at: () => { pistolInHand = false; placePistol(); } }, { kind: 'back', hands: [['r', 'pistolHip']], dur: 0.22 });
+  if (armed && !saber(to)) { steps.push({ kind: 'wait', dur: ignite > 0.01 ? 0.2 : 0 }); saberReach(steps, false); } // the blade retracts first
+  if (!armed && saber(to)) saberReach(steps, true);
+  if (to === 'pistol' && !pistolInHand) steps.push({ kind: 'reach', hands: [['r', 'pistolHip']], dur: 0.2, at: () => { pistolInHand = true; placePistol(); } },
+    { kind: 'back', hands: [['r', 'pistolHip']], dur: 0.26 });
+  drawing = steps.length ? { steps, i: 0, t: 0 } : null;
+  if (drawing) { atk = null; log('draw/holster', from, '→', to); }
+}
+function updateDraw(dt) {
+  if (!drawing) return;
+  drawing.t += dt;
+  const s = drawing.steps[drawing.i];
+  if (drawing.t >= s.dur) { if (s.at) s.at(); drawing.i++; drawing.t = 0; if (drawing.i >= drawing.steps.length) { drawing = null; placePistol(); } }
+}
+function applyDraw() {
+  if (!drawing) return;
+  const s = drawing.steps[drawing.i], k = drawing.t / s.dur;
+  if (s.kind === 'spin' && pistol) { // cowboy spin: two turns around the trigger finger, fast in the middle
+    const m = mounts.pistolHand; pistol.root.quaternion.copy(m.q).multiply(new THREE.Quaternion().setFromAxisAngle(new V3(0, 0, 1), -4 * Math.PI * smooth(k)));
+    return;
+  }
+  if (!s.hands) return;
+  const w = s.kind === 'reach' ? smooth(k) : 1 - smooth(k);
+  for (const [side, mount] of s.hands) { const m = mounts[mount]; if (m) ikArm(side, m.bone.localToWorld(m.p.clone()), w); }
+}
+// two-bone IK: bend the elbow so the hand can reach the target, then swing the upper arm onto it; blended by w
+function ikArm(side, target, w) {
+  if (w <= 0.001) return;
+  const up = boneByName(hero, 'upperarm_' + side), lo = boneByName(hero, 'lowerarm_' + side), ha = boneByName(hero, 'hand_' + side);
+  const q0u = up.quaternion.clone(), q0l = lo.quaternion.clone();
+  const A = up.getWorldPosition(new V3()), B = lo.getWorldPosition(new V3()), Cp = ha.getWorldPosition(new V3());
+  const lab = A.distanceTo(B), lbc = B.distanceTo(Cp), lat = clamp(A.distanceTo(target), 0.05, lab + lbc - 0.01);
+  const ba = A.clone().sub(B), bc = Cp.clone().sub(B);
+  const cur = ba.angleTo(bc), want = Math.acos(clamp((lab * lab + lbc * lbc - lat * lat) / (2 * lab * lbc), -1, 1));
+  const n = ba.clone().cross(bc); if (n.lengthSq() < 1e-10) n.set(Math.cos(yaw), 0, -Math.sin(yaw));
+  rotateBoneWorld(lo, n.normalize(), want - cur);
+  const ac = ha.getWorldPosition(new V3()).sub(A).normalize(), at = target.clone().sub(A).normalize();
+  const ax = ac.clone().cross(at);
+  if (ax.lengthSq() > 1e-10) rotateBoneWorld(up, ax.normalize(), Math.acos(clamp(ac.dot(at), -1, 1)));
+  const iu = up.quaternion.clone(), il = lo.quaternion.clone();
+  up.quaternion.copy(q0u).slerp(iu, w); lo.quaternion.copy(q0l).slerp(il, w);
+}
 let atk = null, blocking = false, blockAct = null, atkHeld = false, atkHeldT = 0, guardBlend = 0;
-function canFight() { return gear === 'lit' && ignite > 0.9 && !movesOpen && mode === 'ground'; }
+function canFight() { return ((gear === 'lit' && ignite > 0.9) || gear === 'none' || gear === 'hilt') && !movesOpen && mode === 'ground' && !drawing; }
 function canBlock() { return gear === 'lit' && ignite > 0.9 && !movesOpen && mode !== 'slide'; }
-const nextHit = (i) => (i + 1) % HITS.length;
+const nextHit = (i) => (i + 1) % (atk?.chain || chainFor()).length;
+// once a swing passes its cancel point (or is in its recovery), moving, jumping or sliding ends it
+function attackCancelable() {
+  if (!atk || !atk.act) return true;
+  const k = atk.act.time / atk.act.getClip().duration;
+  if (atk.heavy) return k > 0.7;
+  return atk.rec || k >= (atk.chain || HITS)[atk.i].cancel;
+}
 function attackPress() {
   atkHeld = true; atkHeldT = 0;
   if (gear === 'pistol') { firePistol(); return; }
@@ -773,15 +901,25 @@ function attackPress() {
   startAttack(0);
 }
 function attackRelease() { atkHeld = false; }
+// soft lock-on: an attack turns you toward the nearest soldier within 3.5 m in front of the camera
+function faceNearestEnemy() {
+  let best = null, bd = 3.5;
+  for (const e of enemies) {
+    if (e.state === 'dead') continue;
+    const dx = e.g.position.x - player.position.x, dz = e.g.position.z - player.position.z, d = Math.hypot(dx, dz);
+    if (d < bd && Math.abs(wrapAngle(Math.atan2(dx, dz) - camYaw)) < 1.75) { bd = d; best = Math.atan2(dx, dz); }
+  }
+  if (best !== null) yaw = moveYaw = best;
+}
 // Ground pound: attack in the air after a double jump (or from 2.5 m up) with the saber lit.
 // Dive blade-first, then a shockwave on landing that throws everyone within 6.5 m.
 let pound = null;
 const POUND_R = 6.5;
 function tryGroundPound() {
-  if (gear !== 'lit' || ignite < 0.9 || mode !== 'air' || pound || movesOpen || blocking) return false;
+  if (gear !== 'lit' || ignite < 0.9 || (mode !== 'air' && mode !== 'jet') || pound || movesOpen || blocking) return false;
   const h = player.position.y - groundAt(player.position.x, player.position.z, player.position.y);
   if (jumps < 2 && h < 2.5) return false;
-  pound = { t: 0 }; vy = Math.min(vy, -22); speed *= 0.3; slideOnLand = false;
+  mode = 'air'; pound = { t: 0 }; vy = Math.min(vy, -22); speed *= 0.3; slideOnLand = false;
   playOvr('Sword_Attack', { from: 0.12, speed: 0.5, fade: 0.06 });
   log('ground pound');
   return true;
@@ -789,7 +927,7 @@ function tryGroundPound() {
 function poundImpact() {
   pound = null;
   const at = player.position.clone();
-  groundRing(at, POUND_R);
+  groundRing(at, POUND_R); dust(at, 1.6);
   let n = 0;
   for (const e of enemies) {
     if (e.state === 'dead') continue;
@@ -803,15 +941,16 @@ function poundImpact() {
   log('ground pound impact', n);
 }
 function startAttack(i) {
-  const h = HITS[i];
-  atk = { i, queued: false, rec: false, heavy: false, act: null };
+  const chain = atk?.chain && i ? atk.chain : chainFor(), h = chain[i];
+  faceNearestEnemy();
+  atk = { i, queued: false, rec: false, heavy: false, act: null, chain };
   atk.act = playOvr(h.clip, { speed: h.speed, fade: i === 0 ? 0.1 : 0.12, then: afterAttack });
   log('hit', i + 1);
 }
 function afterAttack() {
   if (!atk) return;
   if (atk.queued) { startAttack(nextHit(atk.i)); return; }
-  const rec = HITS[atk.i].rec;
+  const rec = atk.chain[atk.i].rec;
   if (!rec) { atk = null; stopOvr(0.25); return; }
   atk.rec = true; atk.stuckT = 0;
   atk.act = playOvr(rec, { speed: 1.2, fade: 0.1, then: () => { atk = null; stopOvr(0.25); } });
@@ -834,7 +973,7 @@ function updateCombat(dt) {
   }
   if (atkHeld) {
     atkHeldT += dt;
-    if (atkHeldT > 0.35 && atk && !atk.heavy && atk.i === 0 && !atk.rec) heavyAttack();
+    if (atkHeldT > 0.35 && atk && !atk.heavy && atk.i === 0 && !atk.rec && atk.chain !== FISTS) heavyAttack();
   }
   // swings hit enemies in front of you once per swing, during the middle of the clip
   if (atk && atk.act && !atk.rec) {
@@ -843,10 +982,11 @@ function updateCombat(dt) {
   }
   // flow: a buffered tap cuts the current hit at its cancel point
   if (atk && !atk.heavy && !atk.rec && atk.queued && atk.act) {
-    const h = HITS[atk.i];
+    const h = atk.chain[atk.i];
     if (atk.act.time >= h.cancel * atk.act.getClip().duration) startAttack(nextHit(atk.i));
   }
-  guardBlend = moveTo(guardBlend, blocking || (gear === 'pistol' && aimHeld) ? 1 : 0, dt / 0.12);
+  fireRaiseT = Math.max(0, fireRaiseT - dt);
+  guardBlend = moveTo(guardBlend, blocking || pistolUp() ? 1 : 0, dt / (fireRaiseT > 0 && !aimHeld ? 0.07 : 0.12));
 }
 
 // ---------------- closed fists ----------------
@@ -866,7 +1006,7 @@ function buildFist() {
   }
 }
 function handsHolding() {
-  if (gear === 'pistol') return 'r';
+  if (pistolInHand) return 'r';
   if (!armed) return '';
   return saberCfg.style === 'single' ? 'r' : 'lr';
 }
@@ -1014,7 +1154,7 @@ function enemyOnRay(o, dir, far) {
     const c = chestOf(e), rel = c.clone().sub(o), along = rel.dot(dir);
     if (along < 0 || along > far) continue;
     const perp = rel.addScaledVector(dir, -along).length();
-    if (perp < 0.55 + along * 0.012 && (!best || along < best.along)) best = { e, point: c, along };
+    if (perp < 0.85 + along * 0.015 && (!best || along < best.along)) best = { e, point: c, along }; // generous: easy to hook
   }
   return best;
 }
@@ -1027,7 +1167,7 @@ function grapplePress() {
   if (grapple.state === 'pull' || grapple.state === 'fire') { releaseGrapple(false); return; }
   if (grapple.state !== 'idle') return;
   const h = grappleTarget();
-  grapple.t = 0; grapple.from.copy(wrist());
+  grapple.t = 0; grapple.from.copy(wrist()); grapple.best = undefined; grapple.stallT = 0;
   if (!h) {
     grapple.state = 'miss'; grapple.anchor.copy(grapple.from).addScaledVector(camera.getWorldDirection(new V3()), 40);
     log('grapple miss');
@@ -1081,7 +1221,7 @@ function arriveGrapple() {
     if (inward.lengthSq() < 0.01) inward.set(0, 0, 0); else inward.normalize().multiplyScalar(-0.9);
     player.position.set(clamp(grapple.anchor.x + inward.x, B.min.x + PR, B.max.x - PR), B.max.y, clamp(grapple.anchor.z + inward.z, B.min.z + PR, B.max.z - PR));
     const hz = Math.hypot(grapple.vel.x, grapple.vel.z);
-    mode = 'ground'; vy = 0; speed = clamp(hz * 0.5, 1.5, CLASSES[klass].sprint * 1.2); jumps = 0;
+    mode = 'ground'; vy = 0; speed = clamp(hz * 0.2, 0, CLASSES[klass].jog * 0.8); jumps = 0; // a short skid, not a long slide
     playGrappleAnim('garrive');
     log('grapple arrive on roof', B.max.y.toFixed(1) + ' m');
   } else {
@@ -1122,16 +1262,22 @@ function pullGrapple(dt) {
   const target = grapple.enemy
     ? grapple.anchor.clone().add(player.position.clone().sub(grapple.anchor).setY(0).normalize().multiplyScalar(0.9)) // stop just in front of them
     : grapple.anchor.clone().addScaledVector(grapple.normal, 0.5);
-  const to = target.clone().sub(player.position).add(new V3(0, -0.9, 0));
+  // a hook on a roof top brings your feet onto the roof; anything else aims your chest at the hook
+  const top = !grapple.enemy && grapple.normal.y > 0.7;
+  const to = top ? grapple.anchor.clone().add(new V3(0, 0.05, 0)).sub(player.position) : target.clone().sub(player.position).add(new V3(0, -0.9, 0));
   const dist = to.length();
+  // stall guard: if you stop getting closer (a wall or roof edge in the way), arrive instead of hanging there
+  if (grapple.best === undefined || dist < grapple.best - 0.05) { grapple.best = dist; grapple.stallT = 0; } else grapple.stallT += dt;
   const want = to.normalize().multiplyScalar(Math.min(GRAPPLE_PULL_SPEED, 10 + dist * 3));
   grapple.vel.lerp(want, 1 - Math.exp(-8 * dt));
   player.position.addScaledVector(grapple.vel, dt);
   const hz = Math.hypot(grapple.vel.x, grapple.vel.z);
   if (hz > 0.5) yaw = wrapAngle(yaw + wrapAngle(Math.atan2(grapple.vel.x, grapple.vel.z) - yaw) * (1 - Math.exp(-10 * dt)));
   moveYaw = yaw;
-  if (grapple.enemy) { if (dist < Math.max(1.3, grapple.vel.length() * dt * 1.5) || grapple.t > 8) arriveEnemy(); }
-  else if (dist < Math.max(1.1, grapple.vel.length() * dt * 1.5) || grapple.t > 30) arriveGrapple();
+  const stalled = grapple.stallT > 0.35;
+  if (stalled) log('grapple stalled at', dist.toFixed(1), 'm');
+  if (grapple.enemy) { if (dist < Math.max(1.3, grapple.vel.length() * dt * 1.5) || grapple.t > 8 || stalled) arriveEnemy(); }
+  else if (dist < Math.max(1.1, grapple.vel.length() * dt * 1.5) || grapple.t > 30 || stalled) arriveGrapple();
 }
 
 // ---------------- enemies ----------------
@@ -1140,8 +1286,10 @@ function pullGrapple(dt) {
 let enemyTemplate = null;
 const enemies = [];
 const ENEMY_COUNT = 5, CORPSE_TIME = 90, MAX_CORPSES = 12;
-const enemyCfg = { on: true, gore: true };
+const enemyCfg = { on: true, gore: false, pushBodies: true };
 try { Object.assign(enemyCfg, JSON.parse(localStorage.getItem('enemycfg') || '{}')); } catch (_) {}
+try { if (!localStorage.getItem('v14-gore')) { enemyCfg.gore = false; localStorage.setItem('v14-gore', '1'); localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } } catch (_) {}
+const saveEnemyCfg = () => { try { localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } catch (_) {} };
 const killFeed = [], deathCounts = {};
 // Death pools by cause. Each entry: clip, where to start (0..1), playback speed. Picked at random, never the same twice in a row.
 const DEATHS = { // sorted by watching each clip side-on (see CHANGELOG v12)
@@ -1235,7 +1383,7 @@ function updateEnemies(dt) {
     const pos = e.g.position;
     if (e.state === 'dead') {
       e.deadT += dt;
-      if (pos.y > groundAt(pos.x, pos.z, pos.y) + 0.01) { e.vel.y -= 20 * dt; pos.y = Math.max(groundAt(pos.x, pos.z, pos.y), pos.y + e.vel.y * dt); }
+      moveBody(e, dt);
       if (e.deadT > CORPSE_TIME) {
         const k = 1 - (e.deadT - CORPSE_TIME) / 2;
         e.root.traverse((o) => { if (o.isMesh) { o.material.transparent = true; o.material.opacity = Math.max(0, k); } });
@@ -1249,6 +1397,7 @@ function updateEnemies(dt) {
       e.grabT += dt;
       if (e.grabT > 0.3 && e.actName !== 'M2M_Dizzy') eplay(e, 'M2M_Dizzy', { fade: 0.15 });
       e.yaw = wrapAngle(e.yaw + wrapAngle(Math.atan2(player.position.x - pos.x, player.position.z - pos.z) - e.yaw) * (1 - Math.exp(-8 * dt)));
+      tumble(e, dt);
       e.g.rotation.y = e.yaw; emix(e, dt); continue;
     }
     if (e.state === 'knock') {
@@ -1261,7 +1410,9 @@ function updateEnemies(dt) {
       const gy = groundAt(pos.x, pos.z, pos.y - e.vel.y * dt);
       if (pos.y <= gy && e.vel.y < 0) {
         pos.y = gy;
-        if (e.hp <= 0) { finishDeath(e); continue; }
+        if (e.vel.y < -8) dust(pos, Math.min(1.6, -e.vel.y / 10));
+        endTumble(e);
+        if (e.hp <= 0) { if (e.act) e.act.timeScale = 1; finishDeath(e); continue; }
         e.state = 'getup'; e.vel.set(0, 0, 0); eplay(e, 'LayToIdle', { loop: false, fade: 0.15, speed: 1.3 }); e.hitT = (clips.get('LayToIdle')?.duration || 1.5) / 1.3;
       }
       e.g.rotation.y = e.yaw; emix(e, dt); continue;
@@ -1286,10 +1437,20 @@ function updateEnemies(dt) {
       e.fireT -= dt;
       if (e.fireT <= 0 && dist < 50) {
         e.fireT = 0.9 + Math.random() * 1.6;
-        const from = muzzleOf(e), aimAt = player.position.clone().add(new V3((Math.random() - 0.5) * 2.4, 1.2 + (Math.random() - 0.3) * 1.2, (Math.random() - 0.5) * 2.4));
-        camRay.set(from, aimAt.clone().sub(from).normalize()); camRay.far = from.distanceTo(aimAt) + 30;
-        const wh = camRay.intersectObjects(blockMeshes, false)[0];
-        tracer(from, wh ? wh.point : from.clone().addScaledVector(camRay.ray.direction, camRay.far), 0xffc97a);
+        const from = muzzleOf(e);
+        // guarding with a lit saber toward the shooter: most shots come in on target and spark off the blade
+        const toE = e.g.position.clone().sub(player.position).setY(0).normalize(), facing = new V3(Math.sin(yaw), 0, Math.cos(yaw));
+        if (blocking && armed && ignite > 0.9 && toE.dot(facing) > 0.26 && Math.random() < 0.75) {
+          const hit = player.position.clone().add(new V3(0, 1.25, 0)).addScaledVector(toE, 0.45).add(new V3((Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.4, 0));
+          tracer(from, hit, 0xffc97a); sparks(hit, toE); blockedShots++;
+          const out = toE.clone().applyAxisAngle(new V3(0, 1, 0), (Math.random() - 0.5) * 2.2).add(new V3(0, (Math.random() - 0.3) * 0.6, 0)).normalize();
+          tracer(hit, hit.clone().addScaledVector(out, 25), 0xfff1c2); // deflected
+        } else {
+          const aimAt = player.position.clone().add(new V3((Math.random() - 0.5) * 2.4, 1.2 + (Math.random() - 0.3) * 1.2, (Math.random() - 0.5) * 2.4));
+          camRay.set(from, aimAt.clone().sub(from).normalize()); camRay.far = from.distanceTo(aimAt) + 30;
+          const wh = camRay.intersectObjects(blockMeshes, false)[0];
+          tracer(from, wh ? wh.point : from.clone().addScaledVector(camRay.ray.direction, camRay.far), 0xffc97a);
+        }
         if (sp === 0) eplay(e, 'SW_Idle_Gun_Shoot', { loop: false, fade: 0.08 });
       }
     } else eplay(e, 'SW_Idle_Gun_Pointing');
@@ -1332,8 +1493,8 @@ function rayZones(o, dir, far) {
 }
 let fireCd = 0;
 function firePistol(aimDir) {
-  if (movesOpen || gear !== 'pistol' || !hero || fireCd > 0) return;
-  fireCd = 0.16;
+  if (movesOpen || gear !== 'pistol' || !pistolInHand || drawing || !hero || fireCd > 0) return;
+  fireCd = 0.16; recoil = 1; fireRaiseT = 0.7;
   const dir = aimDir || camera.getWorldDirection(new V3()), o = camera.position.clone();
   aimRay.set(o, dir); aimRay.far = 300;
   const wall = aimRay.intersectObjects(blockMeshes, false)[0];
@@ -1369,12 +1530,13 @@ function damageEnemy(e, amount, zone, kind, dir) {
   if (enemyCfg.gore) goreOnDeath(e, type, kind, dir);
   if (THROWN.has(type) && e.state === 'knock') { // the death plays in the air; it counts once the body lands
     e.death = pickFrom(DEATHS[type], 'death-' + type);
-    if (e.death) eplay(e, e.death.clip, { loop: false, fade: 0.08, from: e.death.from, speed: e.death.speed });
+    if (e.death) { eplay(e, e.death.clip, { loop: false, fade: 0.08, from: e.death.from, speed: e.death.speed }); fitToFlight(e, e.death.from); }
     return;
   }
   finishDeath(e);
 }
 function finishDeath(e) {
+  endTumble(e);
   const type = e.deathType || 'torso';
   e.state = 'dead'; e.deadT = 0; e.vel.set(0, 0, 0);
   // a push or blast death already started in the air; don't restart it on landing (a wall hit replaces it with an impact death)
@@ -1396,8 +1558,48 @@ function knock(e, vel, dmg, kind) {
   if (e.state === 'dead') return;
   e.state = 'knock'; e.vel.copy(vel); e.g.position.y += 0.05;
   e.yaw = Math.atan2(-vel.x, -vel.z); // face back toward where the blow came from
+  // time in the air, so the clip lasts the whole flight instead of ending (and freezing) half-way up
+  const p = e.g.position, drop = Math.max(0, p.y - groundAt(p.x, p.z, p.y));
+  e.flightT = (vel.y + Math.sqrt(vel.y * vel.y + 40 * drop)) / 20;
   eplay(e, 'Hit_Knockback', { loop: false, fade: 0.06, speed: 1 });
+  fitToFlight(e, 0);
+  // a long, high throw flips the body over (a stand-in for a physics ragdoll)
+  e.tumble = e.flightT > 1.1 ? { t: 0, T: e.flightT, turns: Math.min(3, Math.round(e.flightT * 0.9)), dir: Math.random() < 0.5 ? 1 : -1 } : null;
   damageEnemy(e, dmg, 'torso', kind);
+}
+function fitToFlight(e, from) {
+  if (!e.act || !e.flightT) return;
+  const rest = (1 - from) * e.act.getClip().duration;
+  e.act.timeScale = clamp((rest * 0.8) / e.flightT, 0.3, 1.6); // ~80% through the clip at touchdown
+}
+const PIVOT = new V3(0, 0.95, 0);
+function tumble(e, dt) {
+  const tb = e.tumble; if (!tb) return;
+  tb.t += dt;
+  const a = tb.dir * tb.turns * Math.PI * 2 * smooth(tb.t / tb.T);
+  const q = new THREE.Quaternion().setFromAxisAngle(new V3(1, 0, 0), a); // head over heels, around the hips
+  e.root.quaternion.copy(q); e.root.position.copy(PIVOT).sub(PIVOT.clone().applyQuaternion(q));
+}
+function endTumble(e) { if (!e.tumble) return; e.tumble = null; e.root.quaternion.identity(); e.root.position.set(0, 0, 0); }
+// bodies on the ground can be shoved by blasts and pushes: they slide, hop and settle
+function moveBody(e, dt) {
+  const pos = e.g.position, gy = groundAt(pos.x, pos.z, pos.y + 0.3);
+  const air = pos.y > gy + 0.01;
+  if (!air && e.vel.lengthSq() < 0.01) return;
+  e.vel.y -= 20 * dt;
+  pos.addScaledVector(e.vel, dt);
+  if (e.spinV) { e.yaw += e.spinV * dt; e.spinV *= Math.exp(-3 * dt); e.g.rotation.y = e.yaw; }
+  collideCircle(pos, 0.35);
+  const g2 = groundAt(pos.x, pos.z, pos.y + 0.3);
+  if (pos.y <= g2) {
+    pos.y = g2;
+    if (e.vel.y < -8) dust(pos, Math.min(1.4, -e.vel.y / 12));
+    e.vel.y = e.vel.y < -4 ? -e.vel.y * 0.2 : 0;
+    const f = Math.exp(-7 * dt); e.vel.x *= f; e.vel.z *= f; // ground friction
+  }
+}
+function shoveBody(e, vel) {
+  e.vel.add(vel); e.g.position.y += 0.02; e.spinV = (Math.random() - 0.5) * 6; e.deadT = Math.min(e.deadT, CORPSE_TIME - 5);
 }
 // ---------------- dismemberment ----------------
 // Cutting a limb: the enemy's bone is collapsed to nothing, and a copy of the soldier is made where only that limb
@@ -1483,10 +1685,17 @@ function goreOnDeath(e, type, kind, dir) {
 function saberSweep(a) {
   a.hitSet = a.hitSet || new Set();
   const f = new V3(Math.sin(yaw), 0, Math.cos(yaw));
+  const h = a.chain && a.chain[a.i], fist = a.chain === FISTS;
   for (const e of enemies) {
     if (e.state === 'dead' || a.hitSet.has(e)) continue;
     const d = e.g.position.clone().sub(player.position); d.y = 0;
-    if (d.length() < 2.4 && d.normalize().dot(f) > 0.2) { a.hitSet.add(e); damageEnemy(e, a.heavy ? 90 : 55, 'torso', 'saber', d.clone()); log('saber hit'); }
+    if (d.length() < (fist ? h.reach : 2.4) && d.normalize().dot(f) > 0.2) {
+      a.hitSet.add(e);
+      if (fist && h.knock) knock(e, d.clone().multiplyScalar(h.knock).add(new V3(0, 3, 0)), h.dmg, 'melee');
+      else if (fist) damageEnemy(e, h.dmg, 'torso', 'melee', d.clone());
+      else damageEnemy(e, a.heavy ? 90 : 55, 'torso', 'saber', d.clone());
+      log(fist ? 'punch hit' : 'saber hit');
+    }
   }
 }
 // Force push: a cone in front of the camera; closer enemies fly further. A wall hit at speed kills (impact death).
@@ -1500,10 +1709,10 @@ function forcePush() {
   shockwave(player.position.clone().add(new V3(0, 1.2, 0)).addScaledVector(f, 1), f);
   let n = 0;
   for (const e of enemies) {
-    if (e.state === 'dead') continue;
     const d = e.g.position.clone().sub(player.position); d.y = 0; const dist = d.length();
     if (dist > 14 || d.normalize().dot(f) < 0.64) continue;
     const k = 1 - dist / 14;
+    if (e.state === 'dead') { if (enemyCfg.pushBodies) shoveBody(e, d.multiplyScalar(10 + 10 * k).add(new V3(0, 3 + 3 * k, 0))); continue; }
     knock(e, d.multiplyScalar(14 + 14 * k).add(new V3(0, 4 + 4 * k, 0)), 30, 'push'); n++;
   }
   log('force push', n);
@@ -1528,20 +1737,41 @@ function updateGrenades(dt) {
     const p = g.m.position;
     let boom = p.y <= groundAt(p.x, p.z, prev.y) + 0.05 || g.t > 6;
     if (!boom) for (const { box: B } of blocks) if (B.containsPoint(p)) { boom = true; break; }
-    if (!boom) for (const e of enemies) if (e.state !== 'dead' && e.g.position.clone().add(new V3(0, 1, 0)).distanceTo(p) < 0.7) { boom = true; break; }
-    if (boom) { scene.remove(g.m); grenades.splice(grenades.indexOf(g), 1); explode(p.clone()); }
+    let direct = null;
+    if (!boom) for (const e of enemies) if (e.state !== 'dead' && e.g.position.clone().add(new V3(0, 1, 0)).distanceTo(p) < 0.7) { boom = true; direct = e; break; }
+    if (boom) { scene.remove(g.m); grenades.splice(grenades.indexOf(g), 1); explode(p.clone(), direct, g.vel.clone()); }
   }
 }
-function explode(at) {
-  blast(at);
+function explode(at, direct, gvel) {
+  blast(at); dust(new V3(at.x, groundAt(at.x, at.z, at.y + 0.5), at.z), 1.6);
+  // a grenade that strikes a soldier goes off on him: with dismemberment on he comes apart, otherwise he's thrown hardest
+  if (direct) {
+    const push = (gvel || new V3()).setY(0).normalize().multiplyScalar(6).add(new V3(0, 9, 0));
+    if (enemyCfg.gore) for (const n of ['Head', 'upperarm_l', 'upperarm_r', 'thigh_l', 'thigh_r']) sever(direct, n, push.clone().add(new V3((Math.random() - 0.5) * 8, Math.random() * 4, (Math.random() - 0.5) * 8)));
+    knock(direct, push.clone().multiplyScalar(1.5), 999, 'explosion');
+    log('grenade direct hit');
+  }
   for (const e of enemies) {
-    if (e.state === 'dead') continue;
+    if (e === direct) continue;
     const d = e.g.position.clone().add(new V3(0, 0.9, 0)).sub(at), dist = d.length();
     if (dist > 7) continue;
     const k = 1 - dist / 7; d.y = Math.max(d.y, 0.4); d.normalize();
-    knock(e, d.multiplyScalar(9 + 12 * k).add(new V3(0, 5 + 4 * k, 0)), 20 + 150 * k, 'explosion');
+    if (e.state === 'dead') { shoveBody(e, d.multiplyScalar(7 + 10 * k).add(new V3(0, 3 + 5 * k, 0))); continue; }
+    // at their feet: the blast takes the feet off (dismemberment on)
+    const feet = Math.hypot(e.g.position.x - at.x, e.g.position.z - at.z) < 1.3 && at.y - e.g.position.y < 0.6;
+    if (enemyCfg.gore && feet) { sever(e, 'calf_l', new V3(0, 5, 0)); sever(e, 'calf_r', new V3(0, 5, 0)); }
+    knock(e, d.multiplyScalar(9 + 12 * k).add(new V3(0, 5 + 4 * k, 0)), feet ? 999 : 20 + 150 * k, 'explosion');
   }
   log('explosion');
+}
+// a dust cloud: soft tan puffs that spread and fade where something heavy lands
+function dust(at, size = 1) {
+  for (let i = 0; i < 9; i++) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.25 * size, 8, 6), new THREE.MeshBasicMaterial({ color: 0xcdb892, transparent: true, opacity: 0.6, depthWrite: false }));
+    const a = (i / 9) * Math.PI * 2;
+    m.position.set(at.x + Math.cos(a) * 0.3 * size, at.y + 0.15, at.z + Math.sin(a) * 0.3 * size); scene.add(m);
+    fx.push({ m, t: 0, life: 0.9, grow: 1.8, vel: new V3(Math.cos(a) * 2 * size, 0.6, Math.sin(a) * 2 * size), float: true });
+  }
 }
 // effects
 const fx = [];
@@ -1554,6 +1784,16 @@ function tracer(a, b, color) {
 function flash(at) {
   const m = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffe08a, transparent: true, opacity: 1, depthWrite: false }));
   m.position.copy(at); scene.add(m); fx.push({ m, t: 0, life: 0.06 });
+}
+let blockedShots = 0;
+function sparks(at, dir) {
+  flash(at);
+  for (let i = 0; i < 16; i++) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.026, 0.026, 0.09), new THREE.MeshBasicMaterial({ color: i % 3 ? 0xffd27a : 0xffffff, transparent: true, opacity: 1, depthWrite: false }));
+    m.position.copy(at); scene.add(m);
+    const v = dir.clone().multiplyScalar(2 + Math.random() * 3).add(new V3((Math.random() - 0.5) * 5, Math.random() * 3, (Math.random() - 0.5) * 5));
+    m.lookAt(at.clone().add(v)); fx.push({ m, t: 0, life: 0.22 + Math.random() * 0.15, vel: v });
+  }
 }
 function blast(at) {
   const m = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), new THREE.MeshBasicMaterial({ color: 0xff9a3c, transparent: true, opacity: 0.8, depthWrite: false }));
@@ -1574,7 +1814,7 @@ function updateFx(dt) {
     f.t += dt; const k = f.t / f.life;
     if (f.grow) f.m.scale.setScalar(0.3 + f.grow * k);
     if (f.move) f.m.position.addScaledVector(f.move, dt);
-    if (f.vel) { f.vel.y -= 14 * dt; f.m.position.addScaledVector(f.vel, dt); }
+    if (f.vel) { if (!f.float) f.vel.y -= 14 * dt; else f.vel.multiplyScalar(Math.exp(-3 * dt)); f.m.position.addScaledVector(f.vel, dt); }
     f.m.material.opacity = Math.max(0, 1 - k) * 0.9;
     if (k >= 1) { scene.remove(f.m); f.m.geometry.dispose(); f.m.material.dispose(); fx.splice(fx.indexOf(f), 1); }
   }
@@ -1591,7 +1831,9 @@ function renderEnemyTests() {
 const STRAFE_CLIPS = ['M2M_Walk_Backwards', 'M2M_Strafe_left', 'M2M_Strafe_right', 'SW_Run_Back', 'SW_Run_Left', 'SW_Run_Right'];
 let aimHeld = false, moveYaw = 0, strafeAngle = 0;
 const strafeProbe = {};
-const isStrafing = () => mode === 'ground' && ((gear === 'pistol' && aimHeld) || (gear === 'lit' && blocking));
+let fireRaiseT = 0; // after a hip shot the gun stays raised toward the crosshair for a moment
+const pistolUp = () => gear === 'pistol' && (aimHeld || fireRaiseT > 0);
+const isStrafing = () => mode === 'ground' && (pistolUp() || (gear === 'lit' && blocking));
 function strafeWeights(C) {
   // walk-speed set and run-speed set; each entry: clip id with its measured angle
   const walkSet = [cur.walk, 'M2M_Walk_Backwards', 'M2M_Strafe_left', 'M2M_Strafe_right'].filter((id) => cal[id]);
@@ -1614,7 +1856,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v13 · 2026-09-29';
+const BUILD = 'v14 · 2026-09-29';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -1707,7 +1949,7 @@ function fallbackCopy(text, done) { const t = document.createElement('textarea')
 
 // ---------------- input ----------------
 const keys = new Set();
-let walkToggle = false, jumpQueued = false, slideQueued = false, slideHeld = false;
+let walkToggle = false, jumpQueued = false, slideQueued = false, slideHeld = false, jumpHeld = false, jumpHeldT = 0;
 const GAME_KEYS = ['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','ShiftLeft','ShiftRight','KeyC'];
 addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
@@ -1716,31 +1958,32 @@ addEventListener('keydown', (e) => {
   if (e.repeat) return;
   if (!keys.has(e.code) && /^(Key[WASD]|Arrow)/.test(e.code)) log('key', e.code);
   keys.add(e.code);
-  if (e.code === 'Space') jumpQueued = true;
+  if (e.code === 'Space') { jumpQueued = true; jumpHeld = true; }
   if (e.code === 'KeyC') { slideQueued = true; slideHeld = true; }
   if (e.code === 'KeyV') { walkToggle = !walkToggle; toast(walkToggle ? 'Walk on' : 'Walk off', 1200); }
-  if (e.code === 'KeyG') toggleGrid();
   if (e.code === 'KeyR') grapplePress();
   if (e.code === 'KeyT') forcePush();
   if (e.code === 'KeyX') throwGrenade();
   if (e.code === 'KeyM') openMoves();
+  if (e.code === 'Tab') { e.preventDefault(); toggleWeapon(); }
   if (e.code === 'KeyE') setGear(gear === 'lit' ? 'none' : 'lit');
   if (/^Digit[1-4]$/.test(e.code)) setGear(GEAR_ORDER[+e.code.slice(5) - 1]);
   if (e.code === 'KeyF') attackPress();
   if (e.code === 'KeyQ') { if (gear === 'pistol') aimHeld = true; else blockPress(); }
 });
-addEventListener('keyup', (e) => { keys.delete(e.code); if (e.code === 'KeyC') slideHeld = false; if (e.code === 'KeyF') attackRelease(); if (e.code === 'KeyQ') { aimHeld = false; blockRelease(); } });
-addEventListener('blur', () => { keys.clear(); slideHeld = false; });
+addEventListener('keyup', (e) => { keys.delete(e.code); if (e.code === 'KeyC') slideHeld = false; if (e.code === 'Space') jumpHeld = false; if (e.code === 'KeyF') attackRelease(); if (e.code === 'KeyQ') { aimHeld = false; blockRelease(); } });
+addEventListener('blur', () => { keys.clear(); slideHeld = false; jumpHeld = false; });
 
 let toastTimer = 0;
 function toast(msg, ms = 2500) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, ms); }
-function toggleGrid() { grid.visible = !grid.visible; $('gridbtn').setAttribute('aria-pressed', String(grid.visible)); }
-$('gridbtn').addEventListener('click', toggleGrid);
+function toggleWeapon(open = $('weapon').hidden) { $('weapon').hidden = !open; $('gearbtn').setAttribute('aria-expanded', String(open)); if (open && isLocked()) document.exitPointerLock?.(); }
+$('weaponclose').addEventListener('click', () => toggleWeapon(false));
 $('movesbtn').addEventListener('click', () => openMoves());
-$('classchip').addEventListener('click', () => openMoves());
+$('classchip').addEventListener('click', () => toggleWeapon());
 $('movesclose').addEventListener('click', () => closeMoves());
 const press = (el, fn) => el.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); fn(); });
-press($('jumpbtn'), () => { jumpQueued = true; });
+press($('jumpbtn'), () => { jumpQueued = true; jumpHeld = true; });
+for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('jumpbtn').addEventListener(ev, () => { jumpHeld = false; });
 press($('grapplebtn'), () => grapplePress());
 press($('firebtn'), () => firePistol());
 press($('pushbtn'), () => forcePush());
@@ -1753,7 +1996,7 @@ press($('blockbtn'), blockPress);
 press($('aimbtn'), () => { aimHeld = true; });
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('aimbtn').addEventListener(ev, () => { aimHeld = false; });
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) { $('atkbtn').addEventListener(ev, attackRelease); $('blockbtn').addEventListener(ev, blockRelease); }
-$('gearbtn').addEventListener('click', () => { const g = GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + 1) % GEAR_ORDER.length]; setGear(g); toast('Gear: ' + GEARS[g], 1200); });
+$('gearbtn').addEventListener('click', () => toggleWeapon());
 const manualReport = () => {
   const note = ($('reportnote')?.value || '').trim();
   report('manual', note || 'Report sent from the Moves screen (no note)', true);
@@ -1770,9 +2013,7 @@ function look(dx, dy, s) { camYaw -= dx * s; camPitch = clamp(camPitch + dy * s,
 canvas.addEventListener('pointerdown', (e) => {
   canvas.focus();
   if (e.pointerType === 'mouse') {
-    if (!movesOpen && gear === 'lit' && isLocked()) { if (e.button === 0) attackPress(); if (e.button === 2) blockPress(); return; }
-    if (!movesOpen && gear === 'pistol' && isLocked() && e.button === 2) { aimHeld = true; return; }
-    if (!movesOpen && gear === 'pistol' && isLocked() && e.button === 0) { firePistol(); return; }
+    if (!movesOpen && isLocked()) return; // buttons are handled by mousedown below
     if (!movesOpen && !isLocked()) { try { const p = canvas.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (_) {} }
     dragging = true; return;
   }
@@ -1782,7 +2023,15 @@ canvas.addEventListener('pointerdown', (e) => {
 // stop the app around the game from treating a drag as a scroll or swipe (that cancels the joystick)
 for (const ev of ['touchstart', 'touchmove']) canvas.addEventListener(ev, (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
 canvas.addEventListener('lostpointercapture', (e) => { if (e.pointerType !== 'mouse' && (e.pointerId === joy.id || e.pointerId === lookT.id)) { log('touch lost', e.pointerId === joy.id ? 'joystick' : 'look'); touchEnd(e); } });
-addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') { dragging = false; if (e.button === 0) attackRelease(); if (e.button === 2) { blockRelease(); aimHeld = false; } } else touchEnd(e); });
+addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') dragging = false; else touchEnd(e); });
+// Mouse buttons use mouse events: a second button pressed while one is held (fire while aiming) never
+// sends a pointerdown, so aim + fire used to be impossible.
+canvas.addEventListener('mousedown', (e) => {
+  if (movesOpen || !isLocked()) return;
+  if (e.button === 0) attackPress(); // fires the pistol, swings the saber or throws a punch
+  if (e.button === 2) { if (gear === 'pistol') aimHeld = true; else blockPress(); }
+});
+addEventListener('mouseup', (e) => { if (e.button === 0) attackRelease(); if (e.button === 2) { blockRelease(); aimHeld = false; } });
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 addEventListener('pointercancel', (e) => { if (e.pointerType !== 'mouse') { if (e.pointerId === joy.id) log('joystick cancelled by the browser'); touchEnd(e); } });
 addEventListener('pointermove', (e) => {
@@ -1832,6 +2081,7 @@ function readInput(dt) {
     const b = (i) => !!gp.buttons[i]?.pressed;
     if (b(5) || b(10)) sprint = true;
     if (b(0) && !padPrev[0]) jumpQueued = true;
+    if (b(0) !== !!padPrev[0]) jumpHeld = b(0);
     if (b(1) && !padPrev[1]) slideQueued = true;
     slideHeld = slideHeld || b(1);
     if (b(2) && !padPrev[2]) attackPress(); if (!b(2) && padPrev[2]) attackRelease();
@@ -1874,6 +2124,7 @@ function startJump(dbl) {
   mode = 'air';
 }
 function land() {
+  if (vy < -13) dust(player.position, Math.min(1.8, -vy / 14)); // a heavy landing kicks up dust
   mode = 'ground'; vy = 0; jumps = 0;
   if (pound) { poundImpact(); return; }
   if (slideOnLand) { slideOnLand = false; log('land into slide'); startSlide(true); return; }
@@ -1905,6 +2156,29 @@ function endSlide(cancel) {
   if (s2) playOvr(s2, { speed: 1.3, fade: 0.1, then: () => stopOvr(0.2) }); else stopOvr(0.2);
 }
 
+// ---------------- jetpack ----------------
+// Hold Jump in the air: thrust up. Hold C: hover in place. Sprint: fly flat out, Mandalorian style.
+// Let go of everything and you fall with the pack idling; landing ends the flight.
+const gadgets = { jetpack: true };
+try { Object.assign(gadgets, JSON.parse(localStorage.getItem('gadgets') || '{}')); } catch (_) {}
+const saveGadgets = () => { try { localStorage.setItem('gadgets', JSON.stringify(gadgets)); } catch (_) {} };
+const jet = { boost: false, hover: false, thrust: 0, anim: '' };
+const JET = { up: 26, maxUp: 9, cruise: 9, boost: 24 };
+function startJet() {
+  mode = 'jet'; slideOnLand = false; jet.anim = ''; log('jetpack on');
+}
+function jetAnim(name) { if (jet.anim !== name) { jet.anim = name; playOvr(name, { loop: true, fade: 0.25 }); } }
+function updateJet(dt, inp, C) {
+  jet.hover = slideHeld; jet.boost = inp.sprint && inp.mag > 0.1;
+  const thrusting = jumpHeld;
+  if (thrusting) vy = Math.min(JET.maxUp, vy + JET.up * dt);
+  else if (jet.hover || jet.boost) vy = damp(vy, 0, 6, dt);  // hold altitude
+  else vy -= 9 * dt;                                         // idling: a gentle fall
+  const want = jet.boost ? JET.boost : inp.mag > 0.01 ? JET.cruise * Math.min(1, inp.mag) : 0;
+  speed = moveTo(speed, want, (want > speed ? (jet.boost ? 14 : 10) : 8) * dt);
+  jet.thrust = damp(jet.thrust, thrusting || jet.hover || jet.boost ? 1 : 0.25, 10, dt);
+  jetAnim(jet.boost ? 'M2M_Flying_Forward_Super' : 'M2M_Levitate_Idle');
+}
 function step(dt) {
   const inp = readInput(dt);
   const C = CLASSES[klass];
@@ -1923,8 +2197,10 @@ function step(dt) {
   if (crouch && (inp.sprint || jumpQueued)) crouch = false;
   if (C._frozen) target = 0; // test hook: simulates a character that ignores input
   if (blocking) target = Math.min(target, C.walk);          // no sprinting while blocking
-  if (atk) target = Math.min(target, 1.0);                   // swings commit you
-  if (atk) { jumpQueued = false; slideQueued = false; } // swings commit you
+  // a swing commits you until its cancel point; after that, moving, jumping or sliding ends it
+  if (atk && !atk.queued && (inp.mag > 0.3 || jumpQueued || slideQueued) && attackCancelable()) { log('attack ended by input'); atk = null; stopOvr(0.18); }
+  if (atk) target = Math.min(target, 1.0);
+  if (atk) { jumpQueued = false; slideQueued = false; }
   if (blocking) slideQueued = false;                     // you can block in the air, but not slide while guarding
   if ((gear === 'lit' || gear === 'pistol') && crouch) crouch = false;
 
@@ -1954,8 +2230,13 @@ function step(dt) {
     if (mode === 'slide') { log('slide cancel', speed.toFixed(1)); endSlide(true); }
     else if (mode === 'ground' && speed > C.jog * 0.8) { log('slide'); startSlide(false); }
     else if (mode === 'air') { slideOnLand = true; vy = Math.min(vy, -9); log('air to slide'); } // drop fast, slide on landing
+    else if (mode === 'jet') {} // held C hovers the jetpack (below)
     else if (mode === 'ground' && speed < C.walk) crouch = !crouch;
   }
+  // jetpack: hold Jump in the air to fly (a quick tap is still a double jump)
+  jumpHeldT = jumpHeld ? jumpHeldT + dt : 0;
+  if (gadgets.jetpack && mode === 'air' && jumpHeld && jumpHeldT > 0.2 && !pound) startJet();
+  if (jumpQueued && mode === 'jet') jumpQueued = false;
   if (jumpQueued) {
     jumpQueued = false;
     if (mode === 'ground' || mode === 'slide') { crouch = false; log(mode === 'slide' ? 'slide cancel: jump at ' + speed.toFixed(1) : 'jump'); startJump(false); }
@@ -1981,9 +2262,11 @@ function step(dt) {
   if (!strafing) moveYaw = yaw;
   player.position.x += Math.sin(moveYaw) * speed * dt;
   player.position.z += Math.cos(moveYaw) * speed * dt;
-  if (mode === 'air') {
+  if (mode === 'jet') updateJet(dt, inp, C);
+  if (mode === 'air' || mode === 'jet') {
     const prevY = player.position.y;
-    vy -= 14 * dt; player.position.y += vy * dt;
+    if (mode === 'air') vy -= 14 * dt;
+    player.position.y += vy * dt;
     const gy = groundAt(player.position.x, player.position.z, prevY);
     if (player.position.y <= gy) { player.position.y = gy; land(); }
   } else {
@@ -2002,6 +2285,8 @@ function step(dt) {
   roll = damp(roll, mode === 'ground' ? clamp(-yawVel * speed * 0.02, -0.14, 0.14) : 0, 8, dt);
   lean.rotation.z = roll;
 
+  updateDraw(dt);
+  updateJetpackLook();
   updateCombat(dt);
   updateSaber(dt);
   updateEnemies(dt); updatePieces(dt); updateGrenades(dt); updateFx(dt);
@@ -2061,19 +2346,20 @@ function animateLoco(dt, C) {
     add('Crouch_Idle_Loop', (1 - t) * cb); add(cur.crouch, t * cb);
     rate = lerp(rate, cyc(cur.crouch, Math.max(speed, 0.9)), cb);
   }
-  if (mode === 'air' || mode === 'grapple') rate *= 0.35;
+  if (mode === 'air' || mode === 'grapple' || mode === 'jet') rate *= 0.35;
   phase = (phase + rate * dt) % 1;
   const locoW = updateOvr(dt);
   for (const a of locoActive) a.setEffectiveWeight(0);
   // upper body: saber stance when lit, rifle stance with the rifle, hand closed round the hilt when unlit
-  const upper = gear === 'lit' ? (cur.stance || 'Sword_Idle') : gear === 'pistol' ? (cur.rstance || 'SW_Idle_Gun') : null;
-  const guardUpper = gear === 'lit' ? 'STANCE_HighGuard' : 'SW_Idle_Gun_Pointing';
+  const upper = gear === 'lit' ? (cur.stance || 'Sword_Idle') : gear === 'pistol' ? (cur.rstance || 'Pistol_Idle_Loop') : null;
+  const guardUpper = gear === 'lit' ? 'STANCE_HighGuard' : 'Pistol_Aim_Neutral';
   const split = upper && !crouch;
   const gripOnly = gear === 'hilt';
   // Standing: the whole upper body holds the stance. Moving: only the weapon arm holds it,
   // so the torso bobs and the free arm swings with the run (m blends between the two).
   // guarding or aiming locks the whole upper body into the guard/aim pose (no arm-only blend)
-  const m = split ? clamp(speed / (C.walk * 0.8), 0, 1) * (1 - guardBlend) : 0;
+  // the pistol is held in both hands, so the whole upper body keeps it up while you run
+  const m = split && gear !== 'pistol' ? clamp(speed / (C.walk * 0.8), 0, 1) * (1 - guardBlend) : 0;
   const layer = (id, w) => {
     if (w <= 0.001) return;
     const a = useLoop(id); if (!a) return;
@@ -2084,7 +2370,13 @@ function animateLoco(dt, C) {
   if (split) {
     const g = guardBlend;
     layer(masked(upper, 'upper'), (1 - m) * (1 - g) * locoW); layer(masked(upper, 'arm'), m * locoW);
-    layer(masked(guardUpper, 'upper'), (1 - m) * g * locoW);
+    if (gear === 'pistol' && clips.has('Pistol_Aim_Up')) {
+      // aim follows the camera: blend the level aim with the straight-up and straight-down aims
+      const k = clamp(-camPitch / (Math.PI / 2), -1, 1), up = Math.max(0, k), dn = Math.max(0, -k);
+      layer(masked('Pistol_Aim_Neutral', 'upper'), (1 - m) * g * locoW * (1 - up - dn));
+      layer(masked('Pistol_Aim_Up', 'upper'), (1 - m) * g * locoW * up);
+      layer(masked('Pistol_Aim_Down', 'upper'), (1 - m) * g * locoW * dn);
+    } else layer(masked(guardUpper, 'upper'), (1 - m) * g * locoW);
   }
   if (gripOnly) layer(masked('Sword_Idle', 'grip'), locoW);
   for (const [rawId, w] of wts) {
@@ -2095,9 +2387,26 @@ function animateLoco(dt, C) {
   mixer.update(dt);
   if (guardBlend > 0 && mode !== 'ground') applyAirGuard(guardBlend);
   applyFists();
+  applyDraw();
+  applyRecoil(dt);
   if (gear === 'lit' && armed && ignite > 0.95 && (clipCheckN = (clipCheckN + 1) % 3) === 0) noteSaberClipping();
 }
 let debugTpose = false, clipCheckN = 0;
+// pistol kick: both arms and the chest snap up a little on each shot and settle back
+let recoil = 0;
+const _q1 = new THREE.Quaternion(), _q2 = new THREE.Quaternion();
+function rotateBoneWorld(bone, axis, angle) {
+  bone.parent.getWorldQuaternion(_q1);
+  const world = _q1.clone().multiply(bone.quaternion);
+  _q2.setFromAxisAngle(axis, angle).multiply(world);
+  bone.quaternion.copy(_q1.invert().multiply(_q2));
+}
+function applyRecoil(dt) {
+  if (recoil <= 0) return;
+  const k = recoil * recoil, axis = new V3(-Math.cos(yaw), 0, Math.sin(yaw)); // turning about this lifts what points forward
+  for (const [n, a] of [['spine_03', 0.05], ['upperarm_r', 0.22], ['upperarm_l', 0.18]]) { const b = boneByName(hero, n); if (b) rotateBoneWorld(b, axis, a * k); }
+  recoil = Math.max(0, recoil - dt * 7);
+}
 
 const camPos = new V3(), right = new V3();
 let aimZoom = 0;
@@ -2108,7 +2417,7 @@ function updateCamera(dt, C) {
   pivot.z = damp(pivot.z, player.position.z, 14, dt);
   pivot.y = damp(pivot.y, player.position.y + h, mode === 'air' ? 5 : 10, dt);
   const narrow = clamp(camera.aspect, 0.45, 1);
-  aimZoom = damp(aimZoom, isStrafing() && gear === 'pistol' ? 1 : 0, 8, dt);
+  aimZoom = damp(aimZoom, isStrafing() && gear === 'pistol' && aimHeld ? 1 : 0, 8, dt);
   const dist = (camDist + 0.6 * sprintT - 0.6 * aimZoom) * (1 + (1 - narrow) * 0.9);
   const cp = Math.cos(camPitch), sp = Math.sin(camPitch);
   const lx = Math.sin(camYaw) * cp, ly = -sp, lz = Math.cos(camYaw) * cp;
@@ -2131,7 +2440,7 @@ function hud(C) {
   if ((hudN += 1) % 6) return;
   $('spd').textContent = speed.toFixed(1);
   const g = mode === 'grapple' ? 'Grappling' : grapple.state === 'fire' ? 'Hook out' : isStrafing() ? (gear === 'pistol' ? 'Aim' : 'Guard') + (speed > 0.1 ? ' · strafe' : '') : blocking ? 'Block' : atk ? (atk.heavy ? 'Heavy attack' : 'Attack ' + (atk.i + 1)) :
-    mode === 'air' ? (jumps === 2 ? 'Double jump' : 'Airborne') : mode === 'slide' ? 'Slide' :
+    mode === 'jet' ? (jet.boost ? 'Jetpack boost' : jet.hover ? 'Jetpack hover' : 'Jetpack') : mode === 'air' ? (jumps === 2 ? 'Double jump' : 'Airborne') : mode === 'slide' ? 'Slide' :
     { idle: 'Idle', walk: 'Walk', jog: 'Run', sprint: 'Sprint', crouch: 'Crouch', crouchwalk: 'Crouch' }[gait];
   const el = $('gait'); el.textContent = g; el.classList.toggle('hot', g === 'Sprint' || g === 'Slide' || g === 'Double jump');
 }
@@ -2148,6 +2457,7 @@ let movesOpen = false, previewing = null, pvTimer = 0, savedCam = null, movesGea
 function openMoves() {
   if (movesOpen) return;
   movesOpen = true; document.body.classList.add('moves-open');
+  toggleWeapon(false); openMoves.showTab?.('moves'); renderRec();
   gearBeforeMoves = movesGear = gear; atk = null; blocking = false; log('moves open');
   $('moves').hidden = false;
   if (isLocked()) document.exitPointerLock?.();
@@ -2207,9 +2517,9 @@ function buildMoves() {
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p><p class="note">Everything ticked below is for <b id="movesfor">${CLASSES[klass].label}</b>. Each class keeps its own set.</p>`);
-  h.push(`<h3>Equipment <small>Gear button or keys 1–4</small></h3><div class="seg" role="group" aria-label="Equipment" style="grid-template-columns:repeat(2,1fr)">`);
+  h.push(`<h3>Equipment <small>keys 1–4 on a keyboard</small></h3><div class="seg" role="group" aria-label="Equipment" style="grid-template-columns:repeat(2,1fr)">`);
   for (const g of GEAR_ORDER) h.push(`<button type="button" data-gear="${g}" aria-pressed="${gear === g}">${GEARS[g][0].toUpperCase() + GEARS[g].slice(1)}</button>`);
-  h.push(`</div><p class="note">Walk and run with each one to compare: no gear swings both arms, hilt closes the hand round the hilt, saber lit and pistol hold a stance over the legs. The rifle rides on the back until two-handed rifle animations arrive (Mixamo Rifle 8-Way pack).</p>`);
+  h.push(`</div><p class="note">No gear or hilt: jab, cross, kick, hook. Saber lit: the five-hit combo (dual sabers mix in dual-wield chops). Pistol: two hands, right-click or Aim to aim, fire from the hip or while aiming. Switching plays a draw or holster; the pistol gets a spin before it goes back.</p>`);
   h.push(`<h3>Saber</h3><div class="seg" role="group" aria-label="Saber style">`);
   for (const [k, l] of [['single', 'Single'], ['dual', 'Dual'], ['staff', 'Staff']]) h.push(`<button type="button" data-sstyle="${k}" aria-pressed="${saberCfg.style === k}">${l}</button>`);
   h.push(`</div><div class="seg" role="group" aria-label="Grip" style="margin-top:8px;grid-template-columns:repeat(2,1fr)">`);
@@ -2217,13 +2527,20 @@ function buildMoves() {
   h.push(`</div><div class="swatches" role="group" aria-label="Blade colour" style="margin-top:8px">`);
   for (const [k, c] of Object.entries(SABER_COLORS)) h.push(`<button type="button" data-scolor="${k}" aria-pressed="${saberCfg.color === k}"><i style="background:#${c.toString(16).padStart(6, '0')}"></i>${k}</button>`);
   h.push(`</div><p class="note">Tap Attack to chain five hits (the finisher flows back into hit 1), hold it for the heavy combo, hold Block to guard, even in the air.</p>`);
-  h.push(`<h3>Test switches</h3><label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>`);
-  h.push(`</section><section data-panel="moves">`);
+  h.push(`<h3>Settings</h3>` +
+    `<label class="switch"><input type="checkbox" id="jeton" ${gadgets.jetpack ? 'checked' : ''}> Jetpack: hold Jump in the air to fly, hold C (or Slide) to hover, sprint to fly flat out</label>` +
+    `<label class="switch"><input type="checkbox" id="goreon" ${enemyCfg.gore ? 'checked' : ''}> Dismemberment: saber kills, headshots, leg kills and blasts cut limbs off</label>` +
+    `<label class="switch"><input type="checkbox" id="pushbodies" ${enemyCfg.pushBodies ? 'checked' : ''}> Force push moves bodies (grenades always do)</label>` +
+    `<label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>`);
+  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, <kbd>1</kbd>–<kbd>4</kbd> or <kbd>E</kbd> weapons, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
+  h.push(`</section>`);
+  $('weaponbody').innerHTML = h.join(''); h.length = 0;
+  h.push(`<section data-panel="moves">`);
   for (const [slot, m] of Object.entries(MOVES)) {
     h.push(`<h3>${m.label} <small>${m.variants.length} found</small></h3>`);
     for (const v of m.variants) {
       const key = `${slot}:${v.id}`;
-      h.push(`<div class="row" data-pv="${key}"><button type="button" class="pv" data-slot="${slot}" data-id="${v.id}"><b>${v.label}</b><span>${v.src}${cal[v.id] ? ` · ${cal[v.id].speed.toFixed(1)} m/s natural` : ''}</span></button>` +
+      h.push(`<div class="row" data-pv="${key}"><button type="button" class="pv" data-slot="${slot}" data-id="${v.id}"><b>${v.label}<em class="rec" data-rec="${slot}:${v.id}" hidden></em></b><span>${v.src}${cal[v.id] ? ` · ${cal[v.id].speed.toFixed(1)} m/s natural` : ''}</span></button>` +
         `<label><input type="checkbox" id="rot-${slot}-${v.id}" data-slot="${slot}" data-id="${v.id}" ${pool[slot].includes(v.id) ? 'checked' : ''}> In play</label></div>`);
     }
     h.push(`<p class="note">${m.when}.</p>`);
@@ -2240,7 +2557,6 @@ function buildMoves() {
     `<button type="button" id="clipsweep">Check saber clipping</button><p class="note" id="clipsummary" role="status"></p><ol class="results" id="clipresults"></ol>` +
     `<h3>Noticed while playing</h3><ul class="results" id="clipnotes"></ul>`);
   h.push(`<h3>Enemies</h3><label class="switch"><input type="checkbox" id="enemyon" ${enemyCfg.on ? 'checked' : ''}> Enemy soldiers (five, they can't hurt you)</label>` +
-    `<label class="switch"><input type="checkbox" id="goreon" ${enemyCfg.gore ? 'checked' : ''}> Dismemberment: saber kills, headshots, leg kills and blasts cut limbs off</label>` +
     `<div class="seg" style="margin-top:8px;grid-template-columns:repeat(2,1fr)"><button type="button" id="enemyreset">Respawn all</button><button type="button" id="enemyclear">Clear bodies</button></div>` +
     `<p class="stats" id="enemystats"></p>` +
     `<p class="note">Deaths by cause: head (killing shot in the head), legs (most damage and the killing shot in the legs), torso (the rest), explosion, wall impact (Force push into a wall), push. Pistol: head 100, torso 34, legs 26 damage out of 100.</p>`);
@@ -2256,17 +2572,23 @@ function buildMoves() {
     if (t === 'tests') renderEnemyTests();
     if (t === 'tests') $('teststatus').textContent = `Build ${BUILD}. Reports: ${dbState}. Last report: ${lastReport ? lastReport.kind + ' at ' + lastReport.at.slice(11, 19) : 'none'}.`;
   };
-  let tab = 'setup'; try { tab = localStorage.getItem('menutab') || 'setup'; } catch (_) {}
-  showTab(tab);
+  showTab('moves'); renderRec();
+  openMoves.showTab = showTab;
   document.querySelectorAll('#moves [data-tab]').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
   $('movesexpand').addEventListener('click', () => { const on = $('moves').classList.toggle('tall'); $('movesexpand').setAttribute('aria-pressed', String(on)); });
   body.addEventListener('change', (e) => { if (e.target.id === 'enemyon') { enemyCfg.on = e.target.checked; try { localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } catch (_) {} if (!enemyCfg.on) [...enemies].forEach(removeEnemy); renderEnemyTests(); }
-    if (e.target.id === 'goreon') { enemyCfg.gore = e.target.checked; try { localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } catch (_) {} } });
+  });
+  const wb = $('weaponbody');
+  wb.addEventListener('change', (e) => {
+    if (e.target.id === 'goreon') { enemyCfg.gore = e.target.checked; saveEnemyCfg(); }
+    if (e.target.id === 'pushbodies') { enemyCfg.pushBodies = e.target.checked; saveEnemyCfg(); }
+    if (e.target.id === 'jeton') { gadgets.jetpack = e.target.checked; saveGadgets(); if (!gadgets.jetpack && mode === 'jet') mode = 'air'; }
+  });
   body.addEventListener('click', (e) => {
     if (e.target.closest('#enemyreset')) { [...enemies].filter((x) => x.state !== 'dead').forEach(removeEnemy); respawnT = 0; filled = false; renderEnemyTests(); }
     if (e.target.closest('#enemyclear')) { [...enemies].filter((x) => x.state === 'dead').forEach(removeEnemy); renderEnemyTests(); }
   });
-  body.addEventListener('change', (e) => { if (e.target.id === 'infjumps') { testCfg.infiniteJumps = e.target.checked; saveTest(); log('infinite jumps', testCfg.infiniteJumps); } });
+  wb.addEventListener('change', (e) => { if (e.target.id === 'infjumps') { testCfg.infiniteJumps = e.target.checked; saveTest(); log('infinite jumps', testCfg.infiniteJumps); } });
   body.addEventListener('click', (e) => {
     if (!e.target.closest('#clipsweep')) return;
     $('clipsummary').textContent = 'Checking…';
@@ -2278,8 +2600,9 @@ function buildMoves() {
     }, 30);
   });
   renderClassDetail();
-  body.addEventListener('click', (e) => {
+  const onPick = (e) => {
     const gb = e.target.closest('[data-gear]');
+    if (gb && !movesOpen) { setGear(gb.dataset.gear); return; } // in play: draw or holster with the animation
     if (gb) { movesGear = gb.dataset.gear; setGear(movesGear, true); preview(previewing || { kind: 'slot', slot: 'jog', id: pool.jog[0], key: `jog:${pool.jog[0]}` }); return; }
     const sb = e.target.closest('[data-sstyle],[data-sgrip],[data-scolor]');
     if (sb) {
@@ -2288,7 +2611,8 @@ function buildMoves() {
       if (sb.dataset.scolor) saberCfg.color = sb.dataset.scolor;
       saveSaber(); rebuildSabers();
       for (const [attr, key] of [['sstyle', 'style'], ['sgrip', 'grip'], ['scolor', 'color']])
-        body.querySelectorAll(`[data-${attr}]`).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset[attr] === saberCfg[key])));
+        document.querySelectorAll(`[data-${attr}]`).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset[attr] === saberCfg[key])));
+      if (!movesOpen) { if (gear !== 'lit') setGear('lit'); return; }
       movesGear = 'lit'; setGear('lit', true);
       preview({ kind: 'slot', slot: 'stance', id: pool.stance[0], key: `stance:${pool.stance[0]}` });
       return;
@@ -2299,15 +2623,16 @@ function buildMoves() {
       for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch', 'stance', 'rstance']) cur[s] = null;
       pickGaitVariants(true);
       body.querySelectorAll('input[data-slot]').forEach((i) => { i.checked = pool[i.dataset.slot].includes(i.dataset.id); });
-      $('movesfor').textContent = CLASSES[klass].label;
-      body.querySelectorAll('[data-class]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.class === klass))); renderClass(); renderClassDetail(); return; }
+      if ($('movesfor')) $('movesfor').textContent = CLASSES[klass].label;
+      document.querySelectorAll('[data-class]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.class === klass))); renderClass(); renderClassDetail(); renderRec(); return; }
     const pv = e.target.closest('.pv');
     if (pv) { preview({ kind: 'slot', slot: pv.dataset.slot, id: pv.dataset.id, key: `${pv.dataset.slot}:${pv.dataset.id}` }); return; }
     const lb = e.target.closest('[data-lib]');
     if (lb) preview({ kind: 'lib', id: lb.dataset.lib, key: `lib:${lb.dataset.lib}`, oneshot: !/_Loop$|Idle$|^M2M_(Walk|Strafe|Glide|Flying|Levitate_Idle)/.test(lb.dataset.lib) });
-  });
+  };
+  body.addEventListener('click', onPick); wb.addEventListener('click', onPick);
   body.addEventListener('change', (e) => {
-    const i = e.target; if (!i.matches('input[type=checkbox]')) return;
+    const i = e.target; if (!i.matches('input[type=checkbox]') || !i.dataset.slot) return;
     const { slot, id } = i.dataset;
     const p = pool[slot];
     if (i.checked) { if (!p.includes(id)) p.push(id); }
@@ -2315,6 +2640,12 @@ function buildMoves() {
     else { i.checked = true; toast('Keep at least one ' + MOVES[slot].label.toLowerCase() + ' in play'); }
     rot[slot] = -1; savePool();
     preview({ kind: 'slot', slot, id, key: `${slot}:${id}` });
+  });
+}
+function renderRec() {
+  document.querySelectorAll('[data-rec]').forEach((el) => {
+    const [slot, id] = el.dataset.rec.split(':'), on = recommended(klass, slot) === id;
+    el.hidden = !on; el.textContent = on ? 'Recommended for ' + CLASSES[klass].label : '';
   });
 }
 function renderClassDetail() {
@@ -2364,6 +2695,12 @@ function start() {
     dropCallbacks() { onDone.clear(); }, get atkInfo() { return atk && atk.act ? { t: atk.act.time, d: atk.act.getClip().duration, paused: atk.act.paused, enabled: atk.act.enabled, running: atk.act.isRunning(), w: atk.act.getEffectiveWeight(), stuckT: atk.stuckT, ts: atk.act.timeScale, ets: atk.act._effectiveTimeScale, lc: atk.act._loopCount, st: atk.act._startTime, loop: atk.act.loop, name: atk.act.getClip().name, rec: atk.rec, i: atk.i } : atk; }, get overrides() { return [...ovr].map(([a, o]) => a.getClip().name + ':' + o.w.toFixed(2)); },
     get pound() { return !!pound; }, tryGroundPound, get pieces() { return pieces.length; }, sever: (i, name) => { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) sever(e, name, new V3(0, 2, 3)); },
     setMode(m, y) { mode = m; if (y !== undefined) player.position.y = y; }, setJumps(n) { jumps = n; }, get grappleEnemy() { return grapple.enemy ? grapple.enemy.id : null; },
+    get events() { return events.slice(-12); },
+    get drawing() { return drawing ? drawing.steps[drawing.i].kind + ' ' + drawing.i + '/' + drawing.steps.length : null; }, get pistolInHand() { return pistolInHand; },
+    setGore(v) { enemyCfg.gore = v; },
+    get blockedShots() { return blockedShots; },
+    setKey(code, down) { if (down) { keys.add(code); if (code === 'Space') { jumpQueued = true; jumpHeld = true; } if (code === 'KeyC') { slideQueued = true; slideHeld = true; } } else { keys.delete(code); if (code === 'Space') jumpHeld = false; if (code === 'KeyC') slideHeld = false; } }, get vy() { return vy; }, get y() { return player.position.y; },
+    explodeAt(x, y, z) { explode(new V3(x, y, z)); },
     fillEnemies() { while (enemies.filter((x) => x.state !== 'dead').length < ENEMY_COUNT) spawnEnemy(openSpot(20, 34)); },
     moveEnemy(i, x, z, yawR) { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) { e.g.position.set(x, groundAt(x, z, 99), z); if (yawR !== undefined) e.yaw = yawR; e.state = 'hit'; e.hitT = 5; e.g.updateMatrixWorld(true); } }, killFeed, damageEnemy: (i, amt, zone, kind) => { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) damageEnemy(e, amt, zone, kind); return !!e; },
     playOnEnemy(i, name, from = 0, speed = 1) { const e = enemies.filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },
