@@ -135,6 +135,21 @@ From Joudrie/lego: 884 entries, 44 with full-body paintings. The paintings match
   - Attacks: tap for the A → B → C chain; hold for the heavy combo; hold Block to guard.
   - Your rules are enforced: no sprinting while blocking, no attacking while sprinting (the swing ends the sprint), no jumping while blocking or mid-swing.
   - Still missing: an unholster animation (the blade just ignites), a clash effect and saber sounds.
+- **v4 (fixes your play test):**
+  - **T-pose bug fixed.** Previewing a move in the Moves screen stopped the same animation player that walking and running use. Previews and one-shots now use their own copies, and walking and running restart their player if anything ever stops it.
+  - **Watchdog:** every frame it checks that the body is posed and 100% covered by animation. If it catches a T-pose, a pose gap, a missing clip or a script error, it saves a report (state, current animations, last 25 events) to the game's database, where Claude reads it, and shows a banner with Copy report. Moves also has a Send report button.
+  - **Mixing across sources:** every clip now keys every bone, with gaps filled from a natural idle. Mocap clips no longer leave fingers splayed.
+  - **Gear sets:**
+
+    | Gear | Walk and run |
+    |---|---|
+    | No gear | Full arm swing |
+    | Hilt in hand | Full swing, hand closed round the hilt |
+    | Saber lit | Legs run, upper body holds the saber stance |
+    | Pistol | Legs run, upper body holds a SWAT pistol stance (CC0) |
+
+  - **Rifle:** no free two-handed rifle animations exist. The SWAT and Toon Shooter gun clips are all one-handed. The rifle waits for the Mixamo Rifle 8-Way pack.
+  - **Unholster and draw:** no free assets. Mixamo has `Draw Sword 1`, `Draw Sword 2`, `Sheath Sword 1`, `Sheath Sword 2`, `Grab Rifle From Back` and `Put Back Rifle`.
 - **Next, in order:**
   1. Your 3D characters (needs `HF_TOKEN`).
   2. Mixamo downloads for the gaps above.

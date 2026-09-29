@@ -1,0 +1,13 @@
+import { chromium } from 'playwright';
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 375, height: 740 }, hasTouch: true, isMobile: true });
+p.on('pageerror', e => console.log('pageerror:', e.message));
+await p.goto('http://localhost:8766/preview2.html');
+await p.waitForFunction(() => window.__game, null, { timeout: 90000 });
+await p.waitForTimeout(500);
+await p.evaluate(() => __game.simulateTpose(true)); await p.waitForTimeout(900);
+const r = await p.evaluate(() => __game.lastReport);
+console.log('kind', r && r.kind, '| detail', r && r.detail, '| loops', r && JSON.stringify(r.loops), '| events', r && r.events.length);
+console.log('banner', await p.evaluate(() => !document.getElementById('alert').hidden && document.getElementById('alert').innerText.replace(/\n/g, ' / ')));
+await p.screenshot({ path: './v8-tpose-banner.png' });
+await b.close();
