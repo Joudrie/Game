@@ -41,7 +41,11 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #readout .gait.hot { color: var(--signal); }
 #help { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); right: var(--s4); padding: var(--s2) var(--s3); color: var(--ink-soft); white-space: nowrap; }
 #help kbd { font-family: var(--font-mono); font-size: 11px; color: var(--ink); background: var(--key); border: 1px solid var(--line); border-radius: 3px; padding: 0 var(--s1); }
-@media (max-width: 1240px) { #help { display: none; } }
+@media (max-width: 1500px) { #help { display: none; } }
+#alert { top: calc(64px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); z-index: 6; width: min(420px, calc(100vw - 32px)); padding: var(--s3); border-color: var(--signal); display: grid; gap: var(--s1); }
+#alert b { color: var(--signal); font-size: 13px; }
+#alert span { color: var(--ink-soft); overflow-wrap: anywhere; }
+#alert .row2 { display: flex; gap: var(--s2); margin-top: var(--s1); }
 #toast { top: calc(64px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); padding: var(--s2) var(--s3); max-width: calc(100vw - 32px); text-align: center; }
 
 #loading { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; background: #ffffff; font-size: 13px; color: var(--ink-soft); padding: 0 var(--s4); text-align: center; }
@@ -98,13 +102,14 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 <div id="top" class="hud">
   <button type="button" id="classchip" class="panel" aria-label="Change class"><b id="classname">Light infantry</b><span id="classstats"></span></button>
   <div class="spacer"></div>
-  <button type="button" id="saberbtn" aria-pressed="false">Saber</button>
+  <button type="button" id="gearbtn">Gear: none</button>
   <button type="button" id="movesbtn">Moves</button>
   <button type="button" id="gridbtn" aria-pressed="false">Grid</button>
 </div>
 
-<div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span></div>
-<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · <kbd>V</kbd> walk · <kbd>E</kbd> saber · click attack, hold for heavy · right-click or <kbd>Q</kbd> block</div>
+<div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
+<div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
+<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · <kbd>V</kbd> walk · <kbd>1</kbd>–<kbd>4</kbd> gear · <kbd>E</kbd> saber · click attack, hold for heavy · right-click or <kbd>Q</kbd> block</div>
 <div id="toast" class="hud panel" role="status" hidden></div>
 
 <div id="joy" hidden><i></i></div>
@@ -116,7 +121,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 </div>
 
 <section id="moves" hidden aria-label="Moves">
-  <header><h2>Moves</h2><button type="button" id="movesclose">Done</button></header>
+  <header><h2>Moves</h2><button type="button" id="reportbtn">Send report</button><button type="button" id="movesclose">Done</button></header>
   <div class="body" id="movesbody"></div>
 </section>
 <div id="pvlabel" class="hud panel" hidden></div>
@@ -188,6 +193,9 @@ const MOVES = {
     { id: 'Sword_Idle', label: 'One-handed ready', src: SRC_UAL },
     { id: 'STANCE_HighGuard', label: 'High guard', src: SRC_UAL + ' (block pose, held)' },
     { id: 'STANCE_Lunge', label: 'Low lunge', src: SRC_UAL + ' (dash pose, held)' } ] },
+  rstance: { label: 'Pistol stance', when: 'Held while the pistol is out. Changes each time you stop', variants: [
+    { id: 'SW_Idle_Gun', label: 'Low ready', src: 'Quaternius SWAT · CC0' },
+    { id: 'SW_Idle_Gun_Pointing', label: 'Shouldered, aimed', src: 'Quaternius SWAT · CC0' } ] },
   djump:  { label: 'Double jump', when: 'Force users only. Rotates each use', variants: [
     { id: 'djump_ninja', label: 'Ninja flip', src: SRC_UAL, seq: ['NinjaJump_Start', 'NinjaJump_Idle_Loop', 'NinjaJump_Land'] } ] },
 };
@@ -297,8 +305,11 @@ function analyzeClip(root, clip) {
 async function boot() {
   const A = window.__ASSETS;
   const [h, u1, u2] = await Promise.all([parseGLB(A.hero), parseGLB(A.ual1), parseGLB(A.ual2)]);
+  log('boot', BUILD);
   for (const c of [...u1.animations, ...u2.animations]) clips.set(c.name, c);
   for (const j of (EXTRA.clips || [])) { const c = THREE.AnimationClip.parse(j); clips.set(c.name, c); }
+  fillMissingTracks();
+  try { rifleModel = (await parseGLB(A.rifle)).scene; pistolModel = (await parseGLB(A.pistol)).scene; } catch (e) { report('error', 'Weapon model failed: ' + e.message); }
   hero = h.scene;
   hero.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
   lf = boneByName(hero, 'ball_l') || boneByName(hero, 'foot_l'); rf = boneByName(hero, 'ball_r') || boneByName(hero, 'foot_r');
@@ -323,7 +334,7 @@ async function boot() {
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
   poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
-  computeMounts(); rebuildSabers();
+  computeMounts(); rebuildSabers(); buildRifle(); buildPistol();
   mixer = new THREE.AnimationMixer(hero);
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, +v.speed.toFixed(2)]));
@@ -334,25 +345,45 @@ async function boot() {
 boot().catch((e) => { console.error(e); $('loadmsg').textContent = 'The character failed to load: ' + (e.message || e); document.querySelector('#loading .bar').hidden = true; });
 
 // ---------------- animation layers ----------------
-const actions = new Map();
+const actions = new Map(), ovrActions = new Map();
 function act(name) {
   let a = actions.get(name);
   if (!a) { const c = clips.get(name); if (!c) return null; a = mixer.clipAction(c); actions.set(name, a); }
   return a;
 }
+// One-shots and previews get their own copy of the clip, so stopping them can never stop a locomotion loop.
+function actO(name) {
+  let a = ovrActions.get(name);
+  if (!a) { const c = clips.get(name); if (!c) return null; const k = c.clone(); k.name = name + ' (one-shot)'; a = mixer.clipAction(k); ovrActions.set(name, a); }
+  return a;
+}
+// Every clip gets a key for every bone. A clip from another source that skips bones (fingers, root)
+// would otherwise let those bones drift back to the T-pose while it plays.
+function fillMissingTracks() {
+  const ref = clips.get('Idle_Loop'); if (!ref) return;
+  const base = ref.tracks.filter((t) => /\.quaternion$/.test(t.name) || t.name === 'pelvis.position')
+    .map((t) => [t.name, t.constructor, Array.from(t.values.slice(0, t.getValueSize()))]);
+  for (const c of clips.values()) {
+    const have = new Set(c.tracks.map((t) => t.name));
+    for (const [n, T, v] of base) if (!have.has(n)) c.tracks.push(new T(n, [0], v));
+  }
+}
 // locomotion: phase-synced loops whose weights we set every frame
 const loco = { idle: null, walk: null, jog: null, sprint: null };
 const locoActive = new Set();
 function useLoop(name) {
-  const a = act(name); if (!a) return null;
-  if (!locoActive.has(a)) { a.play(); a.setEffectiveWeight(0); locoActive.add(a); }
+  let a = act(name);
+  if (!a) { report('missing-clip', `No clip named "${name}"; using Idle_Loop instead`); a = act('Idle_Loop'); }
+  if (!locoActive.has(a)) { a.setEffectiveWeight(0); locoActive.add(a); }
+  if (!a.isScheduled()) a.play(); // self-heal: a loop must never be stopped while locomotion uses it
   return a;
 }
 // one-shot/overlay actions (jump, slide...) crossfaded over locomotion
 const ovr = new Map();   // action -> { w, target, fadeIn, fadeOut }
 const onDone = new Map(); // action -> callback when a LoopOnce finishes
 function playOvr(name, { from = 0, speed = 1, loop = false, fade = 0.12, then } = {}) {
-  const a = act(name); if (!a) return null;
+  const a = actO(name); if (!a) { report('missing-clip', `No clip named "${name}"`); return null; }
+  log('play', name);
   for (const [b, o] of ovr) if (b !== a) { o.target = 0; o.fadeOut = fade; onDone.delete(b); }
   a.reset();
   a.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity);
@@ -385,7 +416,10 @@ const SABER_COLORS = { Green: 0x35e06a, Blue: 0x3a8dff, Purple: 0x9b5cff, Red: 0
 const saberCfg = { style: 'single', grip: 'normal', color: 'Green' };
 try { Object.assign(saberCfg, JSON.parse(localStorage.getItem('saber') || '{}')); } catch (_) {}
 const saveSaber = () => { try { localStorage.setItem('saber', JSON.stringify(saberCfg)); } catch (_) {} };
-let armed = false, ignite = 0, igniteTarget = 0;
+let armed = false, ignite = 0, igniteTarget = 0, gear = 'none';
+const GEARS = { none: 'no gear', hilt: 'hilt in hand', lit: 'saber lit', pistol: 'pistol' };
+const GEAR_ORDER = ['none', 'hilt', 'lit', 'pistol'];
+let rifleModel = null, rifle = null, pistolModel = null, pistol = null;
 const mounts = {}, sabers = [];
 const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 const glowMat1 = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.5, depthWrite: false });
@@ -433,11 +467,67 @@ function computeMounts() {
     mounts['hip_' + side] = mk('pelvis', th.clone().addScaledVector(out, 0.12).add(new V3(0, -0.05, 0.03)), new V3(0, -1, 0.3));
   }
   mounts.back = mk('spine_03', P('spine_03').add(new V3(0, 0, -0.17)), new V3(1, 1.2, 0));
+  mounts.rifleBack = mk('spine_03', P('spine_03').add(new V3(0, -0.05, -0.2)), new V3(-1, 1.1, 0));
+  bindQ = new Map(['thigh_l', 'thigh_r', 'calf_l', 'calf_r', 'upperarm_l', 'upperarm_r', 'lowerarm_l', 'lowerarm_r', 'spine_02']
+    .map((n) => { const b = boneByName(hero, n); return [b, b.quaternion.clone()]; }));
+  // pistol: barrel along the forearm, slide on the thumb side, grip in the palm (rest T-pose, palms down)
+  const mkBasis = (boneName, pos, xDir, yDir) => {
+    const bone = boneByName(hero, boneName), x = xDir.clone().normalize();
+    const y = yDir.clone().addScaledVector(x, -yDir.dot(x)).normalize(), z = x.clone().cross(y);
+    const q = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
+    const m = bone.matrixWorld.clone().invert().multiply(new THREE.Matrix4().compose(pos, q, new V3(1, 1, 1)));
+    const o = { bone, p: new V3(), q: new THREE.Quaternion(), s: new V3() }; m.decompose(o.p, o.q, o.s); return o;
+  };
+  const hr = P('hand_r'), fore = hr.clone().sub(P('lowerarm_r'));
+  const palm = hr.clone().lerp(P('middle_01_r'), 0.45).add(new V3(0, -0.03, 0));
+  const thumbSide = P('thumb_01_r').sub(P('pinky_01_r'));
+  mounts.pistolHand = mkBasis('hand_r', palm, fore, thumbSide);
+  const th = P('thigh_r'), knee = P('calf_r'), outR = th.clone().sub(P('pelvis')).setY(0).normalize();
+  mounts.pistolHip = mkBasis('thigh_r', th.clone().lerp(knee, 0.3).addScaledVector(outR, 0.1), new V3(0, -1, 0), new V3(0, 0, 1));
+}
+// rifle: model centred and scaled to 0.85 m, barrel along +X of its mount
+function buildRifle() {
+  if (!rifleModel) return;
+  const inner = rifleModel; inner.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(inner), size = box.getSize(new V3()), c = box.getCenter(new V3());
+  const long = Math.max(size.x, size.y, size.z), k = 0.85 / long;
+  inner.scale.multiplyScalar(k); inner.position.sub(c.multiplyScalar(k));
+  inner.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+  const wrap = new THREE.Group(); wrap.add(inner);
+  // the pack models the barrel along X; flip here if a build shows it backwards
+  wrap.rotation.y = RIFLE_FLIP ? Math.PI : 0;
+  rifle = { root: new THREE.Group() }; rifle.root.add(wrap);
+  placeRifle();
+}
+const RIFLE_FLIP = false;
+function placeRifle() {
+  if (!rifle) return;
+  const m = mounts.rifleBack; if (!m) return;
+  m.bone.add(rifle.root); rifle.root.position.copy(m.p); rifle.root.quaternion.copy(m.q); rifle.root.scale.copy(m.s);
+  rifle.root.rotateZ(Math.PI / 2);
+  rifle.root.visible = false; // shown once two-handed rifle animations exist
+}
+// pistol: scaled to 0.22 m, its grip (rear-bottom of the model) at the mount origin
+function buildPistol() {
+  if (!pistolModel) return;
+  const inner = pistolModel; inner.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(inner), size = box.getSize(new V3());
+  const k = 0.22 / size.x; inner.scale.multiplyScalar(k);
+  const grip = new V3(box.min.x + size.x * 0.22, box.min.y + size.y * 0.35, (box.min.z + box.max.z) / 2).multiplyScalar(k);
+  inner.position.sub(grip);
+  inner.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+  pistol = { root: new THREE.Group() }; pistol.root.add(inner);
+  placePistol();
+}
+function placePistol() {
+  if (!pistol) return;
+  const m = gear === 'pistol' ? mounts.pistolHand : mounts.pistolHip; if (!m) return;
+  m.bone.add(pistol.root); pistol.root.position.copy(m.p); pistol.root.quaternion.copy(m.q); pistol.root.scale.copy(m.s);
 }
 function attach(sb, name) { const m = mounts[name]; m.bone.add(sb.root); sb.root.position.copy(m.p); sb.root.quaternion.copy(m.q); sb.root.scale.copy(m.s); }
 function placeSabers() {
   const st = saberCfg.style;
-  sabers.forEach((sb, i) => attach(sb, armed ? (i ? 'hand_l' : 'hand_r') : st === 'staff' ? 'back' : (i ? 'hip_l' : 'hip_r')));
+  sabers.forEach((sb, i) => attach(sb, armed ? (i ? 'hand_l' : 'hand_r') : st === 'staff' ? 'back' : st === 'dual' ? (i ? 'hip_l' : 'hip_r') : 'hip_l'));
   for (const sb of sabers) sb.inner.rotation.x = saberCfg.grip === 'reverse' && st !== 'staff' ? Math.PI : 0;
 }
 function rebuildSabers() {
@@ -449,23 +539,30 @@ function rebuildSabers() {
   setSaberColor(); placeSabers(); showBlades();
 }
 function showBlades() { for (const sb of sabers) for (const b of sb.blades) { b.scale.y = Math.max(ignite, 0.001); b.visible = ignite > 0.01; } }
-function setArmed(on, instant) {
-  if (on) {
-    if (!armed) { armed = true; placeSabers(); }
-    igniteTarget = 1; if (instant) ignite = 1;
-  } else {
-    igniteTarget = 0; atk = null; blocking = false;
-    if (instant) { ignite = 0; armed = false; placeSabers(); }
-  }
-  document.body.classList.toggle('armed', on || armed);
-  $('saberbtn').setAttribute('aria-pressed', String(on));
+// Gear: none (holstered) · hilt (saber in hand, blade off) · lit (blade on) · rifle. Each has its own upper-body set.
+function setGear(g, instant) {
+  if (!GEARS[g]) g = 'none';
+  if (g !== gear) log('gear', g);
+  gear = g;
+  if (g !== 'lit') { if (atk || blocking) stopOvr(0.15); atk = null; blocking = false; }
+  const inHand = g === 'hilt' || g === 'lit';
+  if (inHand && !armed) { armed = true; placeSabers(); }
+  igniteTarget = g === 'lit' ? 1 : 0;
+  if (instant) { ignite = igniteTarget; if (!inHand && armed) { armed = false; placeSabers(); } }
+  placeRifle(); placePistol();
+  document.body.classList.toggle('armed', g === 'lit');
+  $('gearbtn').textContent = 'Gear: ' + { none: 'none', hilt: 'hilt', lit: 'saber', pistol: 'pistol' }[g];
+  $('gearlbl').textContent = GEARS[g];
+  document.querySelectorAll('[data-gear]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.gear === g)));
   showBlades();
 }
+function setArmed(on, instant) { setGear(on ? 'lit' : 'none', instant); }
 function updateSaber(dt) {
   const prev = ignite;
   ignite = moveTo(ignite, igniteTarget, dt / (igniteTarget ? 0.22 : 0.16));
   if (ignite !== prev) showBlades();
-  if (armed && igniteTarget === 0 && ignite === 0) { armed = false; placeSabers(); document.body.classList.remove('armed'); }
+  // holster only after the blade has fully retracted
+  if (armed && gear !== 'hilt' && gear !== 'lit' && ignite === 0) { armed = false; placeSabers(); }
 }
 
 // held-pose clip sampled from a one-shot (used for extra stances)
@@ -476,11 +573,15 @@ function poseClip(src, t, name) {
 }
 // lower-body / upper-body copies of a clip, so legs keep running while arms hold the stance
 const LOWER = /^(root|pelvis|spine_01|thigh_|calf_|foot_|ball_)/;
-function masked(id, lower) {
-  const key = id + (lower ? '#L' : '#U');
+const FINGER_R = /^(thumb|index|middle|ring|pinky)_0\d_r$/, FINGER_L = /^(thumb|index|middle|ring|pinky)_0\d_l$/;
+const isGrip = (n) => FINGER_R.test(n) || (saberCfg.style === 'dual' && FINGER_L.test(n));
+const MASKS = { lower: (n) => LOWER.test(n), upper: (n) => !LOWER.test(n), grip: isGrip, nogrip: (n) => !isGrip(n) };
+function masked(id, mask) {
+  if (mask === true) mask = 'lower'; else if (mask === false) mask = 'upper';
+  const key = `${id}#${mask}${mask.endsWith('grip') && saberCfg.style === 'dual' ? '2' : ''}`;
   if (!clips.has(key)) {
     const c = clips.get(id); if (!c) return id;
-    clips.set(key, new THREE.AnimationClip(key, c.duration, c.tracks.filter((t) => LOWER.test(t.name.split('.')[0]) === lower)));
+    clips.set(key, new THREE.AnimationClip(key, c.duration, c.tracks.filter((t) => MASKS[mask](t.name.split('.')[0]))));
     if (cal[id]) cal[key] = cal[id];
   }
   return key;
@@ -490,7 +591,7 @@ function masked(id, lower) {
 // no sprinting while blocking, no jumping while blocking.
 const CHAIN = ['A', 'B', 'C'];
 let atk = null, blocking = false, blockAct = null, atkHeld = false, atkHeldT = 0;
-function canFight() { return armed && igniteTarget === 1 && !movesOpen && mode === 'ground'; }
+function canFight() { return gear === 'lit' && ignite > 0.9 && !movesOpen && mode === 'ground'; }
 function attackPress() {
   atkHeld = true; atkHeldT = 0;
   if (!canFight() || blocking) return;
@@ -529,6 +630,72 @@ function updateCombat(dt) {
   if (blocking && blockAct && blockAct.time >= 0.45) blockAct.timeScale = 0; // hold the guard pose
 }
 
+// ---------------- T-pose watchdog and reports ----------------
+// Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
+// a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
+const BUILD = 'v4 · 2026-09-29';
+const events = [];
+function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
+let db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
+(async () => {
+  for (let i = 0; i < 50 && !window.claude?.use; i++) await new Promise((r) => setTimeout(r, 200));
+  try { db = window.claude?.use ? await window.claude.use('db') : null; } catch (_) { db = null; }
+})();
+const trackSets = new WeakMap();
+const tracksOf = (c) => { let s = trackSets.get(c); if (!s) { s = new Set(c.tracks.map((t) => t.name)); trackSets.set(c, s); } return s; };
+function snapshot(kind, detail) {
+  const desc = (a) => `${a.getClip().name} w${a.getEffectiveWeight().toFixed(2)}${a.isScheduled() ? '' : ' STOPPED'}`;
+  let st = {};
+  try {
+    st = { klass, gear, mode, gait, speed: +speed.toFixed(2), crouch, jumps, movesOpen, atk: atk ? (atk.heavy ? 'heavy' : atk.i) : null, blocking,
+      cur: JSON.parse(JSON.stringify(cur)), pool: JSON.parse(JSON.stringify(pool)), saber: { ...saberCfg },
+      overrides: [...ovr.keys()].map(desc), loops: [...locoActive].filter((a) => a.getEffectiveWeight() > 0.001).map(desc),
+      pose: { deviationFromTpose: +lastDev.toFixed(3), legCoverage: +lastLeg.toFixed(2), armCoverage: +lastArm.toFixed(2) } };
+  } catch (e) { st = { stateError: String(e) }; }
+  return { at: new Date().toISOString(), kind, detail: String(detail).slice(0, 800), build: BUILD, device: navigator.userAgent, screen: `${innerWidth}x${innerHeight}`, ...st, events: events.slice(-25) };
+}
+const sentAt = {};
+async function report(kind, detail, force) {
+  const now = performance.now();
+  if (!force && sentAt[kind] && now - sentAt[kind] < 15000) return;
+  sentAt[kind] = now;
+  const r = snapshot(kind, detail); lastReport = r;
+  console.warn('[report]', r);
+  let sent = false;
+  try { if (db) { await db.collection('reports').add(r); sent = true; } } catch (e) { r.sendError = e?.code || String(e); }
+  const titles = { tpose: 'T-pose caught', coverage: 'Pose gap caught', 'missing-clip': 'Missing animation', error: 'Script error', manual: 'Report' };
+  $('alerttitle').textContent = titles[kind] || kind;
+  $('alerttext').textContent = `${detail}. ${sent ? 'Sent to Claude.' : 'Could not send from here. Tap Copy report and paste it in the chat.'}`;
+  $('alert').hidden = false;
+}
+function watchdog(dt) {
+  if (!bindQ || !mixer) return;
+  let d = 0; for (const [b, q] of bindQ) d += b.quaternion.angleTo(q);
+  let leg = 0, arm = 0; const seen = new Set();
+  for (const a of [...locoActive, ...ovr.keys()]) {
+    if (seen.has(a)) continue; seen.add(a);
+    if (!a.isScheduled() || !a.enabled) continue;
+    const w = a.getEffectiveWeight(); if (w <= 0) continue;
+    const t = tracksOf(a.getClip());
+    if (t.has('thigh_l.quaternion')) leg += w;
+    if (t.has('upperarm_l.quaternion')) arm += w;
+  }
+  lastDev = d; lastLeg = leg; lastArm = arm;
+  tposeT = d < 0.35 ? tposeT + dt : 0;
+  covT = leg < 0.9 || arm < 0.9 ? covT + dt : 0;
+  if (tposeT > 0.25) report('tpose', `Character is in the T-pose (${gait}, ${GEARS[gear]}, ${mode})`);
+  else if (covT > 0.3) report('coverage', `Only ${Math.round(leg * 100)}% of the legs and ${Math.round(arm * 100)}% of the arms are animated (${gait}, ${GEARS[gear]}, ${mode})`);
+}
+addEventListener('error', (e) => report('error', `${e.message || 'Error'} (${(e.filename || '').split('/').pop()}:${e.lineno || 0})`));
+addEventListener('unhandledrejection', (e) => report('error', `Unhandled: ${e.reason?.message || e.reason}`));
+$('alertclose').addEventListener('click', () => { $('alert').hidden = true; });
+$('alertcopy').addEventListener('click', () => {
+  const text = JSON.stringify(lastReport, null, 1);
+  const done = () => { $('alertcopy').textContent = 'Copied'; setTimeout(() => { $('alertcopy').textContent = 'Copy report'; }, 1500); };
+  try { navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done)); } catch (_) { fallbackCopy(text, done); }
+});
+function fallbackCopy(text, done) { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (_) {} t.remove(); }
+
 // ---------------- input ----------------
 const keys = new Set();
 let walkToggle = false, jumpQueued = false, slideQueued = false, slideHeld = false;
@@ -543,7 +710,8 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyV') { walkToggle = !walkToggle; toast(walkToggle ? 'Walk on' : 'Walk off', 1200); }
   if (e.code === 'KeyG') toggleGrid();
   if (e.code === 'KeyM') openMoves();
-  if (e.code === 'KeyE') setArmed(!(armed && igniteTarget));
+  if (e.code === 'KeyE') setGear(gear === 'lit' ? 'none' : 'lit');
+  if (/^Digit[1-4]$/.test(e.code)) setGear(GEAR_ORDER[+e.code.slice(5) - 1]);
   if (e.code === 'KeyF') attackPress();
   if (e.code === 'KeyQ') blockPress();
 });
@@ -565,7 +733,8 @@ $('slidebtn').addEventListener('pointercancel', () => { slideHeld = false; });
 press($('atkbtn'), attackPress);
 press($('blockbtn'), blockPress);
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) { $('atkbtn').addEventListener(ev, attackRelease); $('blockbtn').addEventListener(ev, blockRelease); }
-$('saberbtn').addEventListener('click', () => setArmed(!(armed && igniteTarget)));
+$('gearbtn').addEventListener('click', () => { const g = GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + 1) % GEAR_ORDER.length]; setGear(g); toast('Gear: ' + GEARS[g], 1200); });
+$('reportbtn').addEventListener('click', () => report('manual', 'Report sent from the Moves screen', true));
 
 let camYaw = Math.PI, camPitch = 0.28, camDist = 3.4;
 const canvas = renderer.domElement;
@@ -575,7 +744,7 @@ function look(dx, dy, s) { camYaw -= dx * s; camPitch = clamp(camPitch + dy * s,
 canvas.addEventListener('pointerdown', (e) => {
   canvas.focus();
   if (e.pointerType === 'mouse') {
-    if (!movesOpen && armed && isLocked()) { if (e.button === 0) attackPress(); if (e.button === 2) blockPress(); return; }
+    if (!movesOpen && gear === 'lit' && isLocked()) { if (e.button === 0) attackPress(); if (e.button === 2) blockPress(); return; }
     if (!movesOpen && !isLocked()) { try { const p = canvas.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (_) {} }
     dragging = true; return;
   }
@@ -620,7 +789,9 @@ function readInput(dt) {
   if (keys.has('KeyA') || keys.has('ArrowLeft')) x -= 1;
   sprint = keys.has('ShiftLeft') || keys.has('ShiftRight');
   if (joy.id !== null) { x = joy.x; y = joy.y; analog = true; sprint = Math.hypot(x, y) > 0.92; }
-  for (const gp of (navigator.getGamepads ? navigator.getGamepads() : [])) {
+  let pads = [];
+  try { pads = navigator.getGamepads ? navigator.getGamepads() : []; } catch (_) { pads = []; } // blocked inside some embedded frames
+  for (const gp of pads) {
     if (!gp) continue;
     const ax = gp.axes[0] || 0, ay = -(gp.axes[1] || 0), m = Math.hypot(ax, ay);
     if (m > 0.18) { const k = (m - 0.18) / (0.82 * m); x = ax * k; y = ay * k; analog = true; }
@@ -633,7 +804,7 @@ function readInput(dt) {
     slideHeld = slideHeld || b(1);
     if (b(2) && !padPrev[2]) attackPress(); if (!b(2) && padPrev[2]) attackRelease();
     if (b(4) && !padPrev[4]) blockPress(); if (!b(4) && padPrev[4]) blockRelease();
-    if (b(3) && !padPrev[3]) setArmed(!(armed && igniteTarget));
+    if (b(3) && !padPrev[3]) setGear(GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + 1) % GEAR_ORDER.length]);
     padPrev = [b(0), b(1), b(2), b(3), b(4)];
     break;
   }
@@ -650,7 +821,7 @@ const cur = { idle: null, walk: null, jog: null, sprint: null };
 const pivot = new V3(0, 1.55, 0);
 
 function pickGaitVariants(force) {
-  for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch', 'stance']) if (force || !cur[s]) cur[s] = nextVariant(s).id;
+  for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch', 'stance', 'rstance']) if (force || !cur[s]) cur[s] = nextVariant(s).id;
 }
 
 function startJump(dbl) {
@@ -707,7 +878,7 @@ function step(dt) {
   if (blocking) target = Math.min(target, C.walk);          // no sprinting while blocking
   if (atk) target = Math.min(target, 1.0);                   // swings commit you
   if (blocking || atk) { jumpQueued = false; slideQueued = false; } // no jumping while blocking or mid-swing
-  if (armed && crouch) crouch = false;
+  if ((gear === 'lit' || gear === 'pistol') && crouch) crouch = false;
 
   // facing
   const prevYaw = yaw;
@@ -726,12 +897,12 @@ function step(dt) {
   // actions
   if (slideQueued) {
     slideQueued = false;
-    if (mode === 'ground' && speed > C.jog * 0.8) startSlide();
+    if (mode === 'ground' && speed > C.jog * 0.8) { log('slide'); startSlide(); }
     else if (mode === 'ground' && speed < C.walk) crouch = !crouch;
   }
   if (jumpQueued) {
     jumpQueued = false;
-    if (mode === 'ground' || mode === 'slide') { crouch = false; startJump(false); }
+    if (mode === 'ground' || mode === 'slide') { crouch = false; log('jump'); startJump(false); }
     else if (mode === 'air' && C.doubleJump && jumps < 2) startJump(true);
   }
 
@@ -783,7 +954,8 @@ function animateLoco(dt, C) {
   if (gait !== prevGait) {
     const slot = gait === 'crouchwalk' ? 'crouch' : gait;
     if (gait === 'idle' || (order[gait] > order[prevGait] && MOVES[slot])) cur[slot] = nextVariant(slot).id;
-    if (gait === 'idle') cur.stance = nextVariant('stance').id;
+    if (gait === 'idle') { cur.stance = nextVariant('stance').id; cur.rstance = nextVariant('rstance').id; }
+    log('gait', prevGait, '→', gait);
     prevGait = gait;
   }
   const wts = new Map();
@@ -807,20 +979,23 @@ function animateLoco(dt, C) {
   phase = (phase + rate * dt) % 1;
   const locoW = updateOvr(dt);
   for (const a of locoActive) a.setEffectiveWeight(0);
-  const split = armed && !crouch;
-  if (split) {
-    const st = useLoop(masked(cur.stance || 'Sword_Idle', false));
-    if (st) { st.timeScale = 1; st.setEffectiveWeight(locoW); }
-  }
+  // upper body: saber stance when lit, rifle stance with the rifle, hand closed round the hilt when unlit
+  const upper = gear === 'lit' ? (cur.stance || 'Sword_Idle') : gear === 'pistol' ? (cur.rstance || 'SW_Idle_Gun') : null;
+  const split = upper && !crouch;
+  const gripOnly = gear === 'hilt';
+  if (split) { const st = useLoop(masked(upper, 'upper')); st.timeScale = 1; st.setEffectiveWeight(locoW); }
+  if (gripOnly) { const g = useLoop(masked('Sword_Idle', 'grip')); g.timeScale = 1; g.setEffectiveWeight(locoW); }
   for (const [rawId, w] of wts) {
-    const id = split ? masked(rawId, true) : rawId;
+    const id = split ? masked(rawId, 'lower') : gripOnly ? masked(rawId, 'nogrip') : rawId;
     const a = useLoop(id); if (!a) continue;
     if (cal[id]) { a.timeScale = 0; a.time = ((phase + cal[id].strike) % 1) * cal[id].dur; }
     else a.timeScale = 1;
     a.setEffectiveWeight(w * locoW);
   }
+  if (debugTpose) { let sk = null; hero.traverse((o) => { if (!sk && o.isSkinnedMesh) sk = o; }); sk.skeleton.pose(); return; }
   mixer.update(dt);
 }
+let debugTpose = false;
 
 const camPos = new V3(), right = new V3();
 function updateCamera(dt, C) {
@@ -858,11 +1033,11 @@ function renderClass() {
   $('classstats').textContent = `${C.health} HP · sprint ${C.sprint} m/s${C.doubleJump ? ' · 2× jump' : ''}`;
 }
 
-let movesOpen = false, previewing = null, pvTimer = 0, savedCam = null, movesWasArmed = false;
+let movesOpen = false, previewing = null, pvTimer = 0, savedCam = null, movesGear = 'none', gearBeforeMoves = 'none';
 function openMoves() {
   if (movesOpen) return;
   movesOpen = true; document.body.classList.add('moves-open');
-  movesWasArmed = armed && igniteTarget === 1; atk = null; blocking = false;
+  gearBeforeMoves = movesGear = gear; atk = null; blocking = false; log('moves open');
   $('moves').hidden = false;
   if (isLocked()) document.exitPointerLock?.();
   keys.clear(); joy.id = null; $('joy').hidden = true;
@@ -880,19 +1055,20 @@ function closeMoves() {
   movesOpen = false; document.body.classList.remove('moves-open');
   $('moves').hidden = true; $('pvlabel').hidden = true;
   clearTimeout(pvTimer); stopOvr(0.2);
-  if (!movesWasArmed && armed) setArmed(false, true);
+  setGear(movesGear, true); log('moves close', klass);
   if (savedCam) ({ camYaw, camPitch, camDist } = savedCam);
   viewShift = { x: 0, y: 0 }; resize();
-  for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch', 'stance']) cur[s] = null;
+  for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch', 'stance', 'rstance']) cur[s] = null;
   pickGaitVariants(true);
 }
 
 // Play a move in place. Sequences (jump, slide) loop start → hold → end.
 function preview(p) {
   previewing = p;
+  log('preview', p.id);
   const swordy = p.slot === 'stance' || /^(Sword|STANCE|M2M_Defend|M2M_Sword)/.test(p.id);
-  if (swordy) setArmed(true, true);
-  else if (!movesWasArmed && armed) setArmed(false, true);
+  const gunny = p.slot === 'rstance' || /^(SW_|Pistol)/.test(p.id);
+  setGear(swordy ? 'lit' : gunny ? 'pistol' : movesGear, true);
   clearTimeout(pvTimer);
   document.querySelectorAll('[data-pv]').forEach((el) => el.classList.toggle(el.matches('.row') ? 'previewing' : 'on', el.dataset.pv === p.key));
   let label, seq;
@@ -918,7 +1094,10 @@ function buildMoves() {
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p>`);
-  h.push(`<h3>Saber <small>E / Saber button to ignite</small></h3><div class="seg" role="group" aria-label="Saber style">`);
+  h.push(`<h3>Equipment <small>Gear button or keys 1–4</small></h3><div class="seg" role="group" aria-label="Equipment" style="grid-template-columns:repeat(2,1fr)">`);
+  for (const g of GEAR_ORDER) h.push(`<button type="button" data-gear="${g}" aria-pressed="${gear === g}">${GEARS[g][0].toUpperCase() + GEARS[g].slice(1)}</button>`);
+  h.push(`</div><p class="note">Walk and run with each one to compare: no gear swings both arms, hilt closes the hand round the hilt, saber lit and pistol hold a stance over the legs. The rifle rides on the back until two-handed rifle animations arrive (Mixamo Rifle 8-Way pack).</p>`);
+  h.push(`<h3>Saber</h3><div class="seg" role="group" aria-label="Saber style">`);
   for (const [k, l] of [['single', 'Single'], ['dual', 'Dual'], ['staff', 'Staff']]) h.push(`<button type="button" data-sstyle="${k}" aria-pressed="${saberCfg.style === k}">${l}</button>`);
   h.push(`</div><div class="seg" role="group" aria-label="Grip" style="margin-top:8px;grid-template-columns:repeat(2,1fr)">`);
   for (const [k, l] of [['normal', 'Normal grip'], ['reverse', 'Reverse grip (Ahsoka)']]) h.push(`<button type="button" data-sgrip="${k}" aria-pressed="${saberCfg.grip === k}">${l}</button>`);
@@ -940,6 +1119,8 @@ function buildMoves() {
   body.innerHTML = h.join('');
   renderClassDetail();
   body.addEventListener('click', (e) => {
+    const gb = e.target.closest('[data-gear]');
+    if (gb) { movesGear = gb.dataset.gear; setGear(movesGear, true); preview(previewing || { kind: 'slot', slot: 'jog', id: pool.jog[0], key: `jog:${pool.jog[0]}` }); return; }
     const sb = e.target.closest('[data-sstyle],[data-sgrip],[data-scolor]');
     if (sb) {
       if (sb.dataset.sstyle) saberCfg.style = sb.dataset.sstyle;
@@ -948,12 +1129,12 @@ function buildMoves() {
       saveSaber(); rebuildSabers();
       for (const [attr, key] of [['sstyle', 'style'], ['sgrip', 'grip'], ['scolor', 'color']])
         body.querySelectorAll(`[data-${attr}]`).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset[attr] === saberCfg[key])));
-      setArmed(true, true);
+      movesGear = 'lit'; setGear('lit', true);
       preview({ kind: 'slot', slot: 'stance', id: pool.stance[0], key: `stance:${pool.stance[0]}` });
       return;
     }
     const cb = e.target.closest('[data-class]');
-    if (cb) { klass = cb.dataset.class; try { localStorage.setItem('moves-class', klass); } catch (_) {}
+    if (cb) { klass = cb.dataset.class; log('class', klass); try { localStorage.setItem('moves-class', klass); } catch (_) {}
       body.querySelectorAll('[data-class]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.class === klass))); renderClass(); renderClassDetail(); return; }
     const pv = e.target.closest('.pv');
     if (pv) { preview({ kind: 'slot', slot: pv.dataset.slot, id: pv.dataset.id, key: `${pv.dataset.slot}:${pv.dataset.id}` }); return; }
@@ -984,6 +1165,7 @@ function start() {
   renderer.setAnimationLoop((t) => {
     timer.update(t);
     const dt = Math.min(timer.getDelta(), 0.05);
+    try {
     if (movesOpen) {
       updateSaber(dt);
       const locoW = updateOvr(dt);
@@ -995,9 +1177,15 @@ function start() {
       camera.position.set(pivot.x - Math.sin(camYaw) * cp * camDist, pivot.y + Math.sin(camPitch) * camDist, pivot.z - Math.cos(camYaw) * cp * camDist);
       camera.lookAt(pivot);
     } else step(dt);
+    watchdog(dt);
+    } catch (err) {
+      report('error', `${err.message} | ${(err.stack || '').split('\n').slice(1, 3).join(' ').trim()}`);
+      try { mixer.update(dt); } catch (_) {}
+    }
     renderer.render(scene, camera);
   });
-  window.__game = { get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
+  setGear(gear, true);
+  window.__game = { simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
     setClass(k) { klass = k; renderClass(); }, openMoves, closeMoves };
 }
 </script>

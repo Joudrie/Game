@@ -85,3 +85,68 @@ export function clipJSON(clip) {
   return j;
 }
 export function floorY(root, names) { root.updateMatrixWorld(true); return Math.min(...names.map((n) => root.getObjectByName(n).getWorldPosition(v()).y)); }
+
+// Direction-matching retarget: works when the two rest poses differ (e.g. A-pose vs T-pose).
+// Each mapped target bone is swung so the vector to its "aim" child matches the source's,
+// then twisted about that axis so a side vector matches too (pelvis, chest, hands).
+// map: { tgtBone: srcBone }, aims: { tgtBone: [tgtChild, srcChild] }, sides: { tgtBone: [[tA,tB],[sA,sB]] }
+export function retargetDir({ src, tgt, name, map, aims, sides, fps = 30, t0 = 0, t1, stripRootXZ = true }) {
+  const S = src.root, T = tgt.root, W = (o) => o.getWorldPosition(v());
+  T.updateMatrixWorld(true);
+  const tRoot = T.getObjectByName('root');
+  const tBones = []; tRoot.traverse((o) => tBones.push(o));
+  const restLocal = new Map(tBones.map((b) => [b, b.quaternion.clone()]));
+  // aim/side vectors in each target bone's own local frame (rest pose)
+  const localAim = new Map(), localSide = new Map();
+  for (const b of tBones) {
+    const inv = worldQ(b).invert();
+    if (aims[b.name]) localAim.set(b, W(T.getObjectByName(aims[b.name][0])).sub(W(b)).normalize().applyQuaternion(inv));
+    if (sides[b.name]) { const [a, c] = sides[b.name][0]; localSide.set(b, W(T.getObjectByName(c)).sub(W(T.getObjectByName(a))).normalize().applyQuaternion(inv)); }
+  }
+  const tHips = T.getObjectByName(tgt.hips), tHipsRefW = W(tHips), tHipsParentInv = tHips.parent.matrixWorld.clone().invert();
+  const sHips = S.getObjectByName(src.hips);
+  src.refPose(); S.updateMatrixWorld(true);
+  const sHipsRef = W(sHips), ratio = (tHipsRefW.y - tgt.floorY) / (sHipsRef.y - src.floorY);
+  const mixer = new THREE.AnimationMixer(S); mixer.clipAction(src.clip).play();
+  const end = t1 ?? src.clip.duration, n = Math.max(2, Math.round((end - t0) * fps) + 1);
+  const times = [], tracks = new Map(tBones.map((b) => [b, []])), hipsPos = [];
+  const tmp = q();
+  for (let i = 0; i < n; i++) {
+    const t = t0 + (end - t0) * (i / (n - 1));
+    mixer.setTime(t); S.updateMatrixWorld(true); times.push(t - t0);
+    const desiredW = new Map();
+    for (const b of tBones) {
+      const parentW = b === tRoot ? worldQ(b.parent) : desiredW.get(b.parent);
+      let w = parentW.clone().multiply(restLocal.get(b));
+      if (map[b.name] && aims[b.name]) {
+        const sA = S.getObjectByName(map[b.name]), sC = S.getObjectByName(aims[b.name][1]);
+        if (sA && sC) {
+          const want = W(sC).sub(W(sA)).normalize();
+          const have = localAim.get(b).clone().applyQuaternion(w);
+          w = tmp.setFromUnitVectors(have, want).clone().multiply(w);
+          if (sides[b.name]) {
+            const [, [sa, sb]] = sides[b.name];
+            const sideWant = W(S.getObjectByName(sb)).sub(W(S.getObjectByName(sa)));
+            const sideHave = localSide.get(b).clone().applyQuaternion(w);
+            // project both onto the plane normal to the aim axis, then rotate about the axis
+            const ax = want;
+            const p1 = sideHave.clone().addScaledVector(ax, -sideHave.dot(ax)).normalize();
+            const p2 = sideWant.clone().addScaledVector(ax, -sideWant.dot(ax)).normalize();
+            if (p1.lengthSq() > 0.5 && p2.lengthSq() > 0.5) w = q().setFromUnitVectors(p1, p2).multiply(w);
+          }
+        }
+      }
+      desiredW.set(b, w);
+      const local = parentW.clone().invert().multiply(w);
+      tracks.get(b).push(local.x, local.y, local.z, local.w);
+    }
+    const dlt = W(sHips).sub(sHipsRef).multiplyScalar(ratio);
+    if (stripRootXZ) { dlt.x = 0; dlt.z = 0; }
+    const wpos = tHipsRefW.clone().add(dlt).applyMatrix4(tHipsParentInv);
+    hipsPos.push(wpos.x, wpos.y, wpos.z);
+  }
+  const out = [];
+  for (const [b, vals] of tracks) if (map[b.name]) out.push(new THREE.QuaternionKeyframeTrack(`${b.name}.quaternion`, times, vals));
+  out.push(new THREE.VectorKeyframeTrack(`${tgt.hips}.position`, times, hipsPos));
+  return new THREE.AnimationClip(name, times[times.length - 1], out);
+}
