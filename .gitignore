@@ -1,0 +1,5 @@
+node_modules/
+dist/three/
+dist/preview*.html
+*.png
+!assets/**/*.png
