@@ -182,7 +182,8 @@ const MOVES = {
   jog:    { label: 'Run', when: 'Changes each time you start running', variants: [
     { id: 'Jog_Fwd_Loop', label: 'Jog', src: SRC_UAL } ] },
   sprint: { label: 'Sprint', when: 'Changes each time you start sprinting', variants: [
-    { id: 'Sprint_Loop', label: 'Sprint', src: SRC_UAL } ] },
+    { id: 'Sprint_Loop', label: 'Sprint', src: SRC_UAL },
+    { id: 'Jog_Fwd_Loop', label: 'Hard jog (heavy)', src: SRC_UAL } ] },
   slide:  { label: 'Slide', when: 'First ticked = normal. Second ticked = after 3 s of sprinting', variants: [
     { id: 'slide_ual', label: 'Baseball slide', src: SRC_UAL, seq: ['Slide_Start', 'Slide_Loop', 'Slide_Exit'] } ] },
   jump:   { label: 'Jump', when: 'Rotates each jump', variants: [
@@ -210,17 +211,28 @@ for (const [slot, list] of Object.entries(EXTRA.moves || {})) MOVES[slot]?.varia
 LIBRARY.push(...(EXTRA.library || []));
 
 // ticked state per slot (remembered on this device)
-const pool = {};
+// Each class has its own ticked set. Defaults match each class's speeds so feet stay planted:
+// heavy gets the heavy stride and a hard jog for its 5.8 m/s sprint, Force users get the dash sprint.
+const CLASS_DEFAULTS = {
+  light: {},
+  force: { sprint: ['M2M_Run_Anime'] },
+  heavy: { walk: ['M2M_Walk_Large'], jog: ['MX_Run'], sprint: ['Jog_Fwd_Loop'] },
+};
+const pools = {};
 let saved = {};
-try { saved = JSON.parse(localStorage.getItem('moves-pool') || '{}'); } catch (_) {}
-for (const [slot, m] of Object.entries(MOVES)) {
-  const ids = m.variants.map((v) => v.id);
-  const s = (saved[slot] || []).filter((id) => ids.includes(id));
-  pool[slot] = s.length ? s : [ids[0]];
+try { saved = JSON.parse(localStorage.getItem('moves-pools') || '{}'); } catch (_) {}
+for (const k of Object.keys(CLASSES)) {
+  pools[k] = {};
+  for (const [slot, m] of Object.entries(MOVES)) {
+    const ids = m.variants.map((v) => v.id);
+    const want = (saved[k]?.[slot] || CLASS_DEFAULTS[k][slot] || []).filter((id) => ids.includes(id));
+    pools[k][slot] = want.length ? want : [ids[0]];
+  }
 }
-const savePool = () => { try { localStorage.setItem('moves-pool', JSON.stringify(pool)); } catch (_) {} };
+const savePool = () => { try { localStorage.setItem('moves-pools', JSON.stringify(pools)); } catch (_) {} };
 let klass = 'light';
 try { const k = localStorage.getItem('moves-class'); if (CLASSES[k]) klass = k; } catch (_) {}
+let pool = pools[klass];
 const rot = {};  // rotation cursor per slot
 function nextVariant(slot) {
   const p = pool[slot]; rot[slot] = ((rot[slot] ?? -1) + 1) % p.length;
@@ -575,10 +587,14 @@ function poseClip(src, t, name) {
 const LOWER = /^(root|pelvis|spine_01|thigh_|calf_|foot_|ball_)/;
 const FINGER_R = /^(thumb|index|middle|ring|pinky)_0\d_r$/, FINGER_L = /^(thumb|index|middle|ring|pinky)_0\d_l$/;
 const isGrip = (n) => FINGER_R.test(n) || (saberCfg.style === 'dual' && FINGER_L.test(n));
-const MASKS = { lower: (n) => LOWER.test(n), upper: (n) => !LOWER.test(n), grip: isGrip, nogrip: (n) => !isGrip(n) };
+const ARM_R = /^(clavicle|upperarm|lowerarm|hand)_r$/, ARM_L = /^(clavicle|upperarm|lowerarm|hand)_l$/;
+const bothArms = () => saberCfg.style !== 'single' && gear === 'lit';
+const isArm = (n) => ARM_R.test(n) || FINGER_R.test(n) || (bothArms() && (ARM_L.test(n) || FINGER_L.test(n)));
+const MASKS = { lower: (n) => LOWER.test(n), upper: (n) => !LOWER.test(n), grip: isGrip, nogrip: (n) => !isGrip(n),
+  arm: isArm, noarm: (n) => !isArm(n) };
 function masked(id, mask) {
   if (mask === true) mask = 'lower'; else if (mask === false) mask = 'upper';
-  const key = `${id}#${mask}${mask.endsWith('grip') && saberCfg.style === 'dual' ? '2' : ''}`;
+  const key = `${id}#${mask}${(mask.endsWith('grip') && saberCfg.style === 'dual') || (mask.endsWith('arm') && bothArms()) ? '2' : ''}`;
   if (!clips.has(key)) {
     const c = clips.get(id); if (!c) return id;
     clips.set(key, new THREE.AnimationClip(key, c.duration, c.tracks.filter((t) => MASKS[mask](t.name.split('.')[0]))));
@@ -983,14 +999,21 @@ function animateLoco(dt, C) {
   const upper = gear === 'lit' ? (cur.stance || 'Sword_Idle') : gear === 'pistol' ? (cur.rstance || 'SW_Idle_Gun') : null;
   const split = upper && !crouch;
   const gripOnly = gear === 'hilt';
-  if (split) { const st = useLoop(masked(upper, 'upper')); st.timeScale = 1; st.setEffectiveWeight(locoW); }
-  if (gripOnly) { const g = useLoop(masked('Sword_Idle', 'grip')); g.timeScale = 1; g.setEffectiveWeight(locoW); }
-  for (const [rawId, w] of wts) {
-    const id = split ? masked(rawId, 'lower') : gripOnly ? masked(rawId, 'nogrip') : rawId;
-    const a = useLoop(id); if (!a) continue;
+  // Standing: the whole upper body holds the stance. Moving: only the weapon arm holds it,
+  // so the torso bobs and the free arm swings with the run (m blends between the two).
+  const m = split ? clamp(speed / (C.walk * 0.8), 0, 1) : 0;
+  const layer = (id, w) => {
+    if (w <= 0.001) return;
+    const a = useLoop(id); if (!a) return;
     if (cal[id]) { a.timeScale = 0; a.time = ((phase + cal[id].strike) % 1) * cal[id].dur; }
     else a.timeScale = 1;
-    a.setEffectiveWeight(w * locoW);
+    a.setEffectiveWeight(a.getEffectiveWeight() + w);
+  };
+  if (split) { layer(masked(upper, 'upper'), (1 - m) * locoW); layer(masked(upper, 'arm'), m * locoW); }
+  if (gripOnly) layer(masked('Sword_Idle', 'grip'), locoW);
+  for (const [rawId, w] of wts) {
+    if (split) { layer(masked(rawId, 'lower'), w * (1 - m) * locoW); layer(masked(rawId, 'noarm'), w * m * locoW); }
+    else layer(gripOnly ? masked(rawId, 'nogrip') : rawId, w * locoW);
   }
   if (debugTpose) { let sk = null; hero.traverse((o) => { if (!sk && o.isSkinnedMesh) sk = o; }); sk.skeleton.pose(); return; }
   mixer.update(dt);
@@ -1093,7 +1116,7 @@ function buildMoves() {
   const h = [];
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
-  h.push(`</div><p class="stats" id="classdetail"></p>`);
+  h.push(`</div><p class="stats" id="classdetail"></p><p class="note">Everything ticked below is for <b id="movesfor">${CLASSES[klass].label}</b>. Each class keeps its own set.</p>`);
   h.push(`<h3>Equipment <small>Gear button or keys 1–4</small></h3><div class="seg" role="group" aria-label="Equipment" style="grid-template-columns:repeat(2,1fr)">`);
   for (const g of GEAR_ORDER) h.push(`<button type="button" data-gear="${g}" aria-pressed="${gear === g}">${GEARS[g][0].toUpperCase() + GEARS[g].slice(1)}</button>`);
   h.push(`</div><p class="note">Walk and run with each one to compare: no gear swings both arms, hilt closes the hand round the hilt, saber lit and pistol hold a stance over the legs. The rifle rides on the back until two-handed rifle animations arrive (Mixamo Rifle 8-Way pack).</p>`);
@@ -1135,6 +1158,11 @@ function buildMoves() {
     }
     const cb = e.target.closest('[data-class]');
     if (cb) { klass = cb.dataset.class; log('class', klass); try { localStorage.setItem('moves-class', klass); } catch (_) {}
+      pool = pools[klass]; for (const k of Object.keys(rot)) delete rot[k];
+      for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch', 'stance', 'rstance']) cur[s] = null;
+      pickGaitVariants(true);
+      body.querySelectorAll('input[data-slot]').forEach((i) => { i.checked = pool[i.dataset.slot].includes(i.dataset.id); });
+      $('movesfor').textContent = CLASSES[klass].label;
       body.querySelectorAll('[data-class]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.class === klass))); renderClass(); renderClassDetail(); return; }
     const pv = e.target.closest('.pv');
     if (pv) { preview({ kind: 'slot', slot: pv.dataset.slot, id: pv.dataset.id, key: `${pv.dataset.slot}:${pv.dataset.id}` }); return; }
