@@ -1,0 +1,4 @@
+Source: https://quaternius.com/packs/ultimategun.html (Drive 12V-mHNB6bnW2WzgpJfRBQd-TG4pOO3yx)
+License: CC0 1.0 (License.txt)
+Downloaded: 2026-09-29
+Notes: GLB/ converted from FBX with FBX2glTF; static meshes.

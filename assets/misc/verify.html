@@ -1,0 +1,37 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Asset verify</title>
+<script type="importmap">{"imports":{"three":"/vendor/node_modules/three/build/three.module.js","three/addons/":"/vendor/node_modules/three/examples/jsm/","cannon-es":"/assets/misc/libs/npm/cannon-es-0.20.0/dist/cannon-es.js"}}</script></head><body><pre id="o"></pre>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
+const R = {}; const log = (k, v) => { R[k] = v; };
+const M = '/assets/misc/models/';
+const models = ['quaternius_toonshooter/Characters/glTF/Character_Soldier.gltf','quaternius_toonshooter/Characters/glTF/Character_Enemy.gltf','quaternius_toonshooter/Characters/glTF/Character_Hazmat.gltf',
+ 'quaternius_modular_chars/Individual Characters/glTF/Swat.gltf','quaternius_modular_chars/Individual Characters/glTF/Spacesuit.gltf',
+ 'quaternius_cyberpunk/Character/Character.gltf','quaternius_cyberpunk/Enemies/Enemy_2Legs_Gun.gltf','quaternius_cyberpunk/Enemies/Enemy_Large_Gun.gltf','quaternius_cyberpunk/Enemies/Enemy_Flying_Gun.gltf',
+ 'quaternius_mech/Textured/glTF/George.gltf','quaternius_mech/Textured/glTF/Mike.gltf','quaternius_mech/Textured/glTF/Stan.gltf','quaternius_mech/Textured/glTF/Leela.gltf',
+ 'threejs_examples/RobotExpressive.glb','threejs_examples/Xbot.glb','quaternius_toonshooter/Guns/glTF/AK.gltf'];
+const loader = new GLTFLoader();
+for (const m of models) {
+  try { const g = await loader.loadAsync(M + encodeURI(m)); let sk = 0, tris = 0; const box = new THREE.Box3().setFromObject(g.scene);
+    g.scene.traverse(o => { if (o.isSkinnedMesh) sk++; if (o.isMesh) tris += (o.geometry.index ? o.geometry.index.count : o.geometry.attributes.position.count) / 3; });
+    const mixer = new THREE.AnimationMixer(g.scene); if (g.animations[0]) { mixer.clipAction(g.animations[0]).play(); mixer.update(0.1); }
+    log(m, { ok: true, clips: g.animations.length, skinned: sk, tris: Math.round(tris), height: +(box.max.y - box.min.y).toFixed(2) });
+  } catch (e) { log(m, 'FAIL ' + e.message); }
+}
+const N = '/assets/misc/libs/npm/';
+try { const C = await import(N + 'cannon-es-0.20.0/dist/cannon-es.js'); const w = new C.World({ gravity: new C.Vec3(0, -9.8, 0) }); const b = new C.Body({ mass: 1, shape: new C.Sphere(1) }); w.addBody(b); for (let i = 0; i < 60; i++) w.step(1 / 60); log('cannon-es', 'ok y=' + b.position.y.toFixed(2)); } catch (e) { log('cannon-es', 'FAIL ' + e.message); }
+try { const RA = (await import(N + 'dimforge-rapier3d-compat-0.21.0/dist/rapier.mjs')).default; await RA.init(); const w = new RA.World({ x: 0, y: -9.81, z: 0 }); const b = w.createRigidBody(RA.RigidBodyDesc.dynamic()); w.createCollider(RA.ColliderDesc.capsule(0.5, 0.2), b); for (let i = 0; i < 60; i++) w.step(); log('rapier', 'ok y=' + b.translation().y.toFixed(2) + ' rope=' + typeof RA.JointData.rope); } catch (e) { log('rapier', 'FAIL ' + e.message); }
+try { const J = await (await import(N + 'jolt-physics-1.1.0/dist/jolt-physics.wasm-compat.js')).default(); log('jolt', 'ok RagdollSettings=' + typeof J.RagdollSettings + ' SkeletonPose=' + typeof J.SkeletonPose); } catch (e) { log('jolt', 'FAIL ' + e.message); }
+try { const n = await import(N + 'nipplejs-1.0.4/dist/index.mjs'); const mgr = (n.default || n).create({ zone: document.body, mode: 'static', position: { left: '80px', bottom: '80px' } }); log('nipplejs', 'ok ' + typeof mgr.on); } catch (e) { log('nipplejs', 'FAIL ' + e.message); }
+try { const s = await import(N + 'pixiv-three-vrm-springbone-3.5.5/lib/three-vrm-springbone.module.js'); const a = new THREE.Bone(), b = new THREE.Bone(); a.add(b); b.position.y = -0.5; const sc = new THREE.Scene(); sc.add(a); sc.updateMatrixWorld(); const mgr = new s.VRMSpringBoneManager(); const j = new s.VRMSpringBoneJoint(a, b, { hitRadius: 0.05, stiffness: 0.5, gravityPower: 1, gravityDir: new THREE.Vector3(0, -1, 0), dragForce: 0.4 }); mgr.addJoint(j); mgr.setInitState(); mgr.update(1 / 60); log('vrm-springbone', 'ok'); } catch (e) { log('vrm-springbone', 'FAIL ' + e.message); }
+try { const y = await import(N + 'yuka-0.7.8/build/yuka.module.js'); const sm = new y.StateMachine({}); log('yuka', 'ok ' + typeof sm.changeTo); } catch (e) { log('yuka', 'FAIL ' + e.message); }
+try { await import(N + 'three-to-cannon-5.0.2/dist/three-to-cannon.modern.js'); log('three-to-cannon', 'ok'); } catch (e) { log('three-to-cannon', 'FAIL ' + e.message); }
+// audio decode
+const ac = new OfflineAudioContext(2, 44100, 44100); const S = '/assets/misc/sounds/';
+const snd = (window.__SOUNDS || []);
+let okc = 0, bad = [];
+for (const s of snd) { try { const buf = await (await fetch(S + s)).arrayBuffer(); const d = await ac.decodeAudioData(buf); if (d.duration > 0) okc++; else bad.push(s); } catch (e) { bad.push(s + ':' + e.message); } }
+log('audio', { decoded: okc, total: snd.length, bad });
+document.getElementById('o').textContent = JSON.stringify(R, null, 1); window.__R = R;
+</script></body></html>

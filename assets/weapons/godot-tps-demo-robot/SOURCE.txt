@@ -1,0 +1,4 @@
+Source: https://github.com/godotengine/tps-demo (player/model/player.glb + player/textures)
+License: CC-BY 3.0 - credit 'Juan Linietsky, Fernando Miguel Calabro' (LICENSE.md)
+Downloaded: 2026-09-29
+Notes: Robot with arm-cannon, custom rig (not humanoid-Mixamo). Textures are separate PNGs (GLB has none embedded).

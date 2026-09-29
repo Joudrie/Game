@@ -1,0 +1,4 @@
+Source: https://opengameart.org/content/energy-sword (ova-xen)
+License: CC0
+Downloaded: 2026-09-29
+Notes: Static glowing blade; closest CC0 'lightsaber'.

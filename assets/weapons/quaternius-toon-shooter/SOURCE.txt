@@ -1,0 +1,4 @@
+Source: https://quaternius.com/packs/toonshootergamekit.html (Drive 1-BDs_EIyd6uiF2XuoyiZEcqnMQIJrE0C)
+License: CC0 1.0 (quaternius.com license page)
+Downloaded: 2026-09-29
+Notes: .gltf repacked to .glb; FBX/OBJ/Blends removed.

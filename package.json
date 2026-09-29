@@ -1,0 +1,19 @@
+{
+  "name": "game",
+  "private": true,
+  "type": "module",
+  "description": "Third-person movement prototype (three.js) and its asset pipeline",
+  "scripts": {
+    "pack": "node tools/pack.mjs",
+    "bake": "node tools/bake_soldier.mjs && node tools/bake_cmu.mjs && node tools/bake_m2m.mjs",
+    "build": "python3 tools/build2.py"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "^4.2.0",
+    "@gltf-transform/extensions": "^4.2.0",
+    "@gltf-transform/functions": "^4.2.0",
+    "playwright": "^1.56.1",
+    "sharp": "^0.34.0",
+    "three": "0.186.1"
+  }
+}

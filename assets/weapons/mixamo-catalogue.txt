@@ -1,0 +1,580 @@
+# Mixamo catalogue scraped 2026-09-29 from mixamo.com/api/v1/products (public search, no login). Format: Name :: Description
+
+## Motion packs
+- Basic Shooter Pack (16): rifle run, toss grenade, strafe, rifle aiming idle, walking, strafe, strafe right, run backwards, walking backwards, strafe left, reloading, rifle jump, turning right 45 degrees, hit reaction, turn left, firing rifle
+- Great Sword Pack (51): great sword idle, great sword walk, great sword walk, great sword strafe, great sword strafe, great sword 180 turn, great sword turn, great sword turn, great sword run, great sword run, great sword 180 turn, great sword strafe, great sword strafe, great sword jump, great sword jump, great sword slash, great sword slash, great sword slash, great sword slash, great sword blocking, great sword blocking, great sword blocking, great sword impact, great sword impact, great sword impact, great sword crouching, great sword crouching, great sword crouching, great sword slash, great sword crouching, great sword crouching, great sword crouching, great sword impact, great sword impact, great sword jump attack, great sword slide attack, great sword high spin attack, great sword kick, great sword kick, great sword idle, great sword idle, great sword idle, great sword idle, great sword casting, great s
+- Lite Longbow Pack (7): standing draw arrow, standing equip bow, standing idle, standing idle unarmed, standing run forward, standing disarm bow, standing walk forward
+- Lite Rifle Pack (14): run forward, idle, turn 90 left, idle crouching, run backward, run left, run right, run forward right, run forward left, run backward left, run backward right, idle aiming, turn 90 right, death from front headshot
+- Lite Sword and Shield Pack (17): sword and shield run, sword and shield strafe, sword and shield strafe, sword and shield run, sword and shield block, sword and shield block idle, sword and shield block, sword and shield attack, sword and shield attack, sword and shield attack, sword and shield attack, sword and shield death, sword and shield turn, sword and shield turn, sword and shield idle, draw sword 1, sheath sword 1
+- Longbow Aiming Pack (8): standing draw arrow, standing idle, standing aim overdraw, standing aim recoil, standing aim walk back, standing aim walk forward, standing aim walk left, standing aim walk right
+- Longbow Locomotion Pack (12): standing run forward stop, standing idle, standing run back, standing run forward, standing run left, standing run right, standing turn 90 left, standing turn 90 right, standing walk back, standing walk forward, standing walk left, standing walk right
+- Pistol/Handgun Locomotion Pack (20): pistol idle, pistol jump, pistol run, pistol jump, pistol walk, pistol run backward, pistol walk backward, pistol strafe, pistol strafe, pistol walk arc, pistol walk arc, pistol run arc, pistol run arc, pistol run backward arc, pistol run backward arc, pistol stand to kneel, pistol kneeling idle, pistol kneel to stand, pistol walk backward arc, pistol walk backward arc
+- Pro Longbow Pack (39): standing draw arrow, standing block, standing death backward, standing death forward, standing dive forward, standing equip bow, standing run forward stop, standing idle, standing idle looking, standing idle examine, standing idle unarmed, fall loop, land to standing idle, land to run forward, standing dodge backward, standing dodge forward, standing dodge left, standing dodge right, standing melee kick, standing aim overdraw, standing melee punch, standing react from headshot, standing react from front, standing aim recoil, standing run back, standing run forward, standing disarm bow, standing run left, standing run right, standing turn 90 left, standing turn 90 right, standing walk back, standing aim walk back, standing walk forward, standing aim walk forward, standing walk left, standing aim walk left, standing walk right, standing aim walk right
+- Pro Melee Axe Pack (47): crouch idle, crouch to standing idle, standing block idle, standing block react large, standing disarm underarm, standing disarm over shoulder, standing idle, standing idle looking ver. 1, standing idle looking ver. 2, standing melee attack backhand, standing melee attack downward, standing melee attack horizontal, standing melee attack 360 high, standing melee attack 360 low, standing melee attack kick ver. 1, standing melee attack kick ver. 2, standing melee combo attack ver. 1, standing melee combo attack ver. 2, standing melee combo attack ver. 3, standing melee run jump attack, standing react large from left, standing react large from right, standing react large gut, standing run back, standing run forward, standing taunt battlecry, standing taunt chest thump, standing turn left 90, standing turn right 90, standing walk back, standing walk forward, standing walk left, standing walk 
+- Pro Rifle Pack (49): sprint forward, run forward, walk crouching forward right, idle, turn 90 left, idle crouching, run backward, run left, run right, run forward right, run forward left, run backward left, run backward right, sprint forward right, sprint forward left, sprint right, sprint left, sprint backward, sprint backward right, sprint backward left, walk forward, walk forward right, walk forward left, walk right, walk left, walk backward, walk backward right, walk backward left, walk crouching forward, walk crouching right, walk crouching left, walk crouching forward left, walk crouching backward, walk crouching backward left, walk crouching backward right, idle aiming, turn 90 right, crouching turn 90 left, crouching turn 90 right, jump up, jump loop, jump down, death from front headshot, death from right, death crouching headshot front, death from back headshot, death from the back, death from the f
+- Pro Sword and Shield Pack (51): sword and shield walk, sword and shield run, sword and shield jump, sword and shield jump, sword and shield strafe, sword and shield strafe, sword and shield walk, sword and shield 180 turn, sword and shield strafe, sword and shield strafe, sword and shield 180 turn, sword and shield run, sword and shield slash, sword and shield slash, sword and shield slash, sword and shield slash, sword and shield block, sword and shield block idle, sword and shield block, sword and shield impact, sword and shield impact, sword and shield impact, sword and shield crouch, sword and shield crouching, sword and shield crouch idle, sword and shield slash, sword and shield crouch block, sword and shield crouch block idle, sword and shield crouching, sword and shield crouch block, sword and shield crouching, sword and shield attack, sword and shield attack, sword and shield attack, sword and shield idle, swo
+- Rifle 8-Way Locomotion Pack (49): sprint forward, run forward, walk crouching forward right, idle, turn 90 left, idle crouching, run backward, run left, run right, run forward right, run forward left, run backward left, run backward right, sprint forward right, sprint forward left, sprint right, sprint left, sprint backward, sprint backward right, sprint backward left, walk forward, walk forward right, walk forward left, walk right, walk left, walk backward, walk backward right, walk backward left, walk crouching forward, walk crouching right, walk crouching left, walk crouching forward left, walk crouching backward, walk crouching backward left, walk crouching backward right, idle aiming, turn 90 right, crouching turn 90 left, crouching turn 90 right, jump up, jump loop, jump down, death from front headshot, death from right, death crouching headshot front, death from back headshot, death from the back, death from the f
+- Shooter Pack (15): rifle run, strafe, rifle aiming idle, start walking, walking, strafe, stop walking, firing rifle, start walking backwards, walk backwards stop, run backwards, jump backward, jump forward, walking backwards, walking to dying
+- Slim Shooter Pack (7): rifle run, strafe, rifle aiming idle, walking, strafe, reloading, firing rifle
+- Sword and Shield Pack (49): sword and shield walk, sword and shield run, sword and shield jump, sword and shield jump, sword and shield strafe, sword and shield strafe, sword and shield walk, sword and shield 180 turn, sword and shield strafe, sword and shield strafe, sword and shield 180 turn, sword and shield run, sword and shield slash, sword and shield slash, sword and shield slash, sword and shield slash, sword and shield block, sword and shield block idle, sword and shield block, sword and shield impact, sword and shield impact, sword and shield impact, sword and shield crouch, sword and shield crouching, sword and shield crouch idle, sword and shield slash, sword and shield crouch block, sword and shield crouch block idle, sword and shield crouching, sword and shield crouch block, sword and shield crouching, sword and shield attack, sword and shield attack, sword and shield attack, sword and shield idle, swo
+
+## Individual motions (search terms: rifle, reload, pistol, shotgun, sword, draw, sheath, holster, equip, block, combo, stab, slash...)
+- 2hand Idle :: Two Handed Weapon Stance
+- Aim Pistol :: Aim Pistol While Sitting
+- Aiming Gun :: Picking Up Gun From Ground To Aiming
+- Back Flip To Uppercut :: Back Flip To Uppercut Combo
+- Backwards Rifle Run :: Running Backwards With Rifle Down
+- Backwards Rifle Walk :: Walking Backwards With Rifle Down
+- Bayonet Stab :: Advancing And Stabbing With Rifle Bayonet Or Spear
+- Block :: Blocking The Chest Area With Both Arms
+- Block With Rifle :: Blocking With Rifle
+- Blocking :: Blocking Inward
+- Blocking :: Blocking Outward
+- Blocking Attack :: Blocking An Attack From Above While Sitting
+- Body Block :: Blocking Body With Arms
+- Boxing :: Boxing Jab Cross Combo
+- Breakdance Ending 1 :: Breakdance Finishing Combo Var 1
+- Breakdance Ending 2 :: Breakdance Finishing Combo Var 2
+- Breakdance Ending 3 :: Breakdance Finishing Combo Var 3
+- Breakdance Freezes :: Breakdance Freeze Combo
+- Cautious Backward Walk :: Cautious Walk Backward Start To Stop With An Aimed Rifle
+- Center Block :: High Center Block
+- Center Block :: Low Center Block
+- Check Shoe :: Check Shoe While Holding Rifle
+- Combo Punch :: Eight Punch Combo
+- Counting :: Counting To Five On One Hand
+- Crouch Idle 01 :: Crouching With Bow
+- Crouch Idle 02 Looking Around :: Crouching Looking Around With Bow
+- Crouch Idle :: Crouch Idle With Axe
+- Crouch Idle :: Crouching Holding A Rifle
+- Crouch Rapid Fire :: Rapid Fire While In Crouch Posistion
+- Crouch Run Backwards :: Running Backwards Crouched While Aiming Rifle
+- Crouch Running :: Crouch To Running While Aiming Rifle
+- Crouch Stop Walking :: Stops Crouched Walking While Aiming Rifle
+- Crouch Strafe Run Left :: Crouched Strafe Run Left While Aiming Rifle
+- Crouch To Stand :: Crouch To Stand With Pistol
+- Crouch To Stand :: Crouch To Stand With Rifle
+- Crouch To Standing :: Transition From Crouching To Standing With Bow
+- Crouch To Standing With Rifle :: Standing Up From A Crouched Position With An Aimed Rifle
+- Crouch Turn Right 90 :: Turning 90 Degrees Right With Bow
+- Crouch Walk Back :: Walking Backwards With Bow
+- Crouch Walk Backwards Stop :: Crouched Walk Backwards While Aiming Rifle To Stopping
+- Crouch Walk Forward :: Walking Forward With Bow
+- Crouch Walk Left :: Walking Left With Bow
+- Crouch Walk Strafe Left :: Crouched Rifle Walk Strafe Left
+- Crouch Walk Strafe Right :: Crouched Rifle Walk Strafe Right
+- Crouch Walking :: Crouched Walking While Aiming Rifle
+- Crouch Walking Backwards :: Crouched Walking Backwards While Aiming Rifle
+- Crouched Run :: Running Crouched With Rifle
+- Crouched Strafe Run :: Run Crouched Strafe Right With Rifle
+- Crouched Walking :: Crouched Walk With Rifle
+- Crouching Turn 90 Left :: Rifle Crouched Turn 90 Left
+- Crouching Turn 90 Right :: Rifle Crouched Turn 90 Left
+- Dancing :: Female "African Rainbow" Dance
+- Death Crouching Headshot Front :: Rifle Death Crouched From Headshot Front
+- Death From Back Headshot :: Rifle Death From Back Headshot
+- Death From Front Headshot :: Rifle Death From Front Headshot
+- Death From Right :: Rifle Death From Right Side
+- Death From The Back :: Rifle Death From The Back
+- Death From The Front :: Rifle Death From The Front
+- Disarmed :: Disarmed While Holding A Pistol
+- Dive Roll :: Dive Roll While Holding Rifle
+- Dodging :: Dodging While Holding Rifle
+- Double Dagger Stab :: Static Double Dagger Stab With Outward Grip
+- Draw A Great Sword 1 :: Transition From Standing To Drawing Great Sword
+- Draw A Great Sword 2 :: Transition From Standing To Drawing A Great Sword
+- Draw Sword 1 :: Transition From Standing To Drawing Sword
+- Draw Sword 2 :: Transition From Standing To Drawing Sword
+- Drawing Gun :: Drawing Gun From Lower Back
+- Dual Weapon Combo :: Dual Weapon Combo Attack
+- Elbow Punch :: Illegal Elbow Rear Arm With Forward Step
+- Elbow Punching :: Male Elbow Punch
+- Elbow Uppercut Combo :: Elbow-Uppercut Strike Combo
+- Emerging :: Emerging Right From Cover To Aimed Rifle Walk
+- Fall B Loop :: Fall B Idle With Bow
+- Fall Over :: Frantically Fall Over With Rifle
+- Female Action Pose :: Holding Bow
+- Female Peek And Aim :: Female Turnaround Gun Aim
+- Femme Peek Around Corner :: Female Peek Around Corner With Gun
+- Fire Rifle :: Fire Rifle While Crouched
+- Fireball :: Street Fighter Hadouken
+- Firing Rifle :: Firing A Rifle While Standing
+- Firing Rifle :: Firing While Walking With Rifle
+- Firing Rifle :: Repeatedly Firing A Rifle While Crouch Walking
+- Firing Rifle :: Repeatedly Firing While Running With Rifle
+- Firing Rifle :: Repeatedly Firing While Walking At Medium Speed With Rifle
+- Firing Rifle :: Repeatedly Firing While Walking At Slow Speed With Rifle
+- Firing Rifle :: Repeatedly Firing While Walking With Rifle
+- Flying Knee Punch Combo :: Jumping Knee Followed By A Punch
+- Football Catch :: Jump And Catch With One Hand
+- Goalkeeper Body Block :: Goalkeeper Left Body Block
+- Goalkeeper Body Block :: Goalkeeper Right Body Block
+- Grab And Put Back Rifle :: Grabbing Rifle From Shoulder And Putting Away
+- Grab Rifle And Put Back :: Grabbing Rifle From Back And Putting Away
+- Grab Rifle From Back :: Standing To Ready Pose Grabbing Rifle From The Back
+- Grab Rifle From Behind Shoulder :: Grabbing Rifle From Behind The Shoulder
+- Grab Rifle From The Side :: Standing To Ready Pose Grabbing Rifle From Side
+- Grab Rifle From The Side And Put Back :: Grabbing Rifle From Side And Putting Back
+- Grabbing Pistol :: Quickly Grabbing A Pistol On The Floor And Taking Aim
+- Great Sword 180 Turn :: Great Sword Run 180 Turn
+- Great Sword 180 Turn :: Great Sword Walk 180 Turn
+- Great Sword Attack :: Great Sword Hilt Melee
+- Great Sword Blocking :: Great Sword Block To Standing
+- Great Sword Blocking :: Great Sword Blocking Idle
+- Great Sword Blocking :: Great Sword Standing To Block
+- Great Sword Casting :: Great Sword Spell Casting
+- Great Sword Crouching :: Great Sword Block To Crouch
+- Great Sword Crouching :: Great Sword Crouch Idle
+- Great Sword Crouching :: Great Sword Crouch To Block
+- Great Sword Crouching :: Great Sword Crouch To Stand
+- Great Sword Crouching :: Great Sword Crouching Block Idle
+- Great Sword Crouching :: Great Sword Stand To Crouch
+- Great Sword High Spin Attack :: Great Sword High Spin Attack From Run
+- Great Sword Idle :: Great Sword Admiring Idle
+- Great Sword Idle :: Great Sword Idle
+- Great Sword Idle :: Great Sword Look Around Idle
+- Great Sword Idle :: Great Sword Strike A Pose Idle
+- Great Sword Impact :: Great Sword Blocked Impact
+- Great Sword Impact :: Great Sword Crouching Blocked Impact
+- Great Sword Impact :: Great Sword Crouching Unblocked Impact
+- Great Sword Impact :: Great Sword Head Impact
+- Great Sword Impact :: Great Sword Unblocked Impact
+- Great Sword Jump :: Great Sword Jump
+- Great Sword Jump :: Great Sword Running Jump
+- Great Sword Jump Attack :: Great Sword Jump Attack From Run
+- Great Sword Kick :: Great Sword Side Kick
+- Great Sword Kick :: Great Sword Spin Kick
+- Great Sword Power Up :: Great Sword Powering Up
+- Great Sword Run :: Great Sword Bacward Run
+- Great Sword Run :: Great Sword Run
+- Great Sword Slash :: Great Sword Combo Slash
+- Great Sword Slash :: Great Sword Crouching Slash
+- Great Sword Slash :: Great Sword Downward Slash
+- Great Sword Slash :: Great Sword Low Slash
+- Great Sword Slash :: Great Sword Power Slash
+- Great Sword Slide Attack :: Great Sword Low Slide Attack From Run
+- Great Sword Strafe :: Great Sword Strafe Left Run
+- Great Sword Strafe :: Great Sword Strafe Left Walk
+- Great Sword Strafe :: Great Sword Strafe Right Run
+- Great Sword Strafe :: Great Sword Strafe Right Walk
+- Great Sword Turn :: Great Sword 90 Degree Left Turn
+- Great Sword Turn :: Great Sword 90 Degree Right Turn
+- Great Sword Walk :: Great Sword Backward Walk
+- Great Sword Walk :: Great Sword Walk
+- Gunplay :: Cover To Shooting
+- Gunplay :: Duck And Look Around Apprehensively
+- Gunplay :: Gunplay With Remington Shotgun
+- Gunplay :: Male Kneeling Fantasy Gunplay With Hand Cannon
+- Gunplay :: Male Standing Fantasy Gunplay With Hand Cannon
+- Gunplay :: Shooting
+- Gunplay :: Standing Shooting Rapid Fire
+- Hands Forward Gesture :: Two Handed Forward Gesture
+- Heavy Weapon Swing :: Two Handed Heavy Weapon Swing
+- Hit Reaction :: Hit Reaction From Rifle Crouched
+- Hit Reaction :: Hit Reaction When Running With Rifle
+- Hit Reaction :: Hit Reaction While Holding A Pistol
+- Hit Reaction :: Hit Reaction While Holding A Rifle
+- Hit Reaction :: Holding Rifle
+- Hit Reaction :: Left Reaction To Front Hit Holding A Rifle
+- Hit Reaction :: Reaction To Getting Hit To The Left While Holding A Pistol
+- Idle :: Rifle Standing Idle
+- Idle Aiming :: Rifle Standing Idle Aiming
+- Idle Crouching :: Rifle Crouched Idle
+- Idle Crouching Aiming :: Rifle Crouched Idle Aiming
+- Idle To Running :: Start Running While Aiming Rifle
+- Inspecting :: Looking At Rifle
+- Inward Block :: Inward Block
+- Jab To Elbow Punch :: Jab To Elbow Combo
+- Jump :: Jump While Walking And Aiming Rifle
+- Jump Backward :: Jumping While Running And Holding A Rifle
+- Jump Down :: Rifle Jump Down
+- Jump Forward :: Jumping While Running And Holding A Rifle
+- Jump Loop :: Rifle Jump Idle
+- Jump Up :: Rifle Jump Up
+- Jumping :: Male Jumping Down From 4ft And Crouching On One Hand
+- Jumping :: Male Jumping Down From 4ft With A Rifle
+- Jumping Down :: Jump Down With One Foot While Holding Rifle
+- Jumping Down :: Jump Down With Two Feet While Holding Rifle
+- Knee Jab :: Swing Club And Triple Knee Kicks
+- Knee Jabs To Uppercut :: Triple Knee Jabs To Uppercut Combo
+- Kneel :: Kneeling Warming Hands Over Campfire
+- Left Block :: High Left Block
+- Left Block :: Low Left Block
+- Left Cover Sneak W/ Rifle :: Left Standing Sneak Behind Cover W/ Rifle
+- Left Turn :: Turning Left With Rifle
+- Looking Around :: Looking Around With Duel Wielded Pistols
+- Lower Pistol :: Lower Pistol While Sitting
+- Magic Heal :: Casting A Healing Spell With One Hand
+- Magic Spell Casting :: Casting A Spell With One Hand
+- Moving Backward In Crawl Position :: Moving Backward In Crawl Position With Rifle
+- Moving Backward In Prone Position :: Moving Backward In Prone Position With Rifle
+- Northern Soul Floor Combo :: Northern Soul Dance Spin And Floor Work
+- Northern Soul Spin Combo :: Northern Soul Dance Spin Dip And Splits
+- One Hand Club Combo :: One Handed Club Combo Attack
+- One Hand Sword Combo :: One Handed Sword Combo Attack
+- Opening A Filing Cabinet :: Using The Bottom Drawer Of A Filing Cabinet
+- Outward Block :: Blocking With Arm
+- Picking Up Object :: Picking Up An Object With One Hand
+- Pistol :: Pistol Workout
+- Pistol Aim :: Pistol Aim To Holster Idle
+- Pistol Idle :: Idle Holding Pistol, Kicking Out And Shaking Legs
+- Pistol Idle :: Idle With Aimed Pistol
+- Pistol Idle :: Ready Alert Two Hand Pistol Grip
+- Pistol Jump :: Running Jump With A Pistol
+- Pistol Jump :: Standing Jump With Aimed Pistol
+- Pistol Kneel To Stand :: Pistol Kneeling To Standing
+- Pistol Kneeling Idle :: Kneeling Idle With Aimed Pistol
+- Pistol Run :: Running With A Pistol
+- Pistol Run :: Running With Aimed Pistol
+- Pistol Run Arc :: Run Arc Left With An Aimed Pistol
+- Pistol Run Arc :: Run Arc Right With An Aimed Pistol
+- Pistol Run Backward :: Running Backward With An Aimed Pistol
+- Pistol Run Backward Arc :: Run Backward Arc Left With An Aimed Pistol
+- Pistol Run Backward Arc :: Run Backward Arc Right With An Aimed Pistol
+- Pistol Stand To Kneel :: Pistol Standing To Kneeling
+- Pistol Start :: Start Pistol Workout From Fitness Idle
+- Pistol Strafe :: Strafe Left With An Aimed Pistol
+- Pistol Strafe :: Strafe Right With An Aimed Pistol
+- Pistol To Idle :: Trasition From Pistol To Fitness Idle
+- Pistol Walk :: Walking With An Aimed Pistol
+- Pistol Walk Arc :: Walk Arc Left With An Aimed Pistol
+- Pistol Walk Arc :: Walk Arc Right With An Aimed Pistol
+- Pistol Walk Backward :: Walking Backward With An Aimed Pistol
+- Pistol Walk Backward Arc :: Walk Backward Arc Left With An Aimed Pistol
+- Pistol Walk Backward Arc :: Walk Backward Arc Right With An Aimed Pistol
+- Pistol Whip :: Overhand Strike With Pistol
+- Prone Firing Rifle :: Firing A Rifle While Prone
+- Prone Firing Rifle :: Prone Fire Rifle Upper Body
+- Prone Idle :: Lying Down Prone With Rifle
+- Prone Reloading :: Reloading Rifle In Prone
+- Prone Roll :: Rifle Prone Rolling Right
+- Prone Roll :: Rifle Prone Rolling Right Game Blend
+- Punch Combo :: Four Punch Combo
+- Punch To Elbow Combo :: Vertical Elbow And Solar Plexus Strike
+- Put Back Rifle :: Ready Pose To Standing Putting Back The Rifle
+- Put Back Rifle :: Ready Pose To Standing Putting Back The Rifle To The Side
+- Put Back Rifle Behind Shoulder :: Putting Rifle Away Behind The Shoulder
+- Quad Punch :: Quad Punch Combo
+- Reload :: Reload Rifle While In Crouch Position
+- Reload :: Run While Reloading Rifle
+- Reload :: Walk While Reloading Rifle
+- Reloading :: Gun Reload While Walking
+- Reloading :: Reloading Rifle While Standing
+- Restrain :: Block And Restraining A Larger Person
+- Rifle Aim To Down :: Rifle Aiming To Down
+- Rifle Aim To Kneel :: Rifle Aiming And Kneeling
+- Rifle Aiming Idle :: Rifle Standing Aiming Idle
+- Rifle Backward Run To Stop :: Rifle Running Backward To Standing
+- Rifle Backward Walk To Stop :: Rifle Walking Backward To Standing
+- Rifle Block :: Blocking With A Rifle
+- Rifle Crouch Backward Walk :: Rifle Walking Backward Crouched
+- Rifle Crouch Idle To Walk :: Rifle Crouch Idle To Crouch Walk
+- Rifle Crouch Turn :: 135 Degree Left Turn
+- Rifle Crouch Turn :: 135 Degree Right Turn
+- Rifle Crouch Turn :: 180 Degree Left Turn
+- Rifle Crouch Turn :: 180 Degree Right Turn
+- Rifle Crouch Turn :: 45 Degree Left Turn
+- Rifle Crouch Turn :: 45 Degree Right Turn
+- Rifle Crouch Turn :: 90 Degree Left Turn
+- Rifle Crouch Turn :: 90 Degree Right Turn
+- Rifle Crouch Walk :: Rifle Walking Crouched
+- Rifle Crouch Walk :: Rifle Walking Right Crouched
+- Rifle Crouch Walk To Idle :: Rifle Crouch Walking To Idle
+- Rifle Crouch Walk To Kneel :: Rifle Crouch Walking To Kneel Idle
+- Rifle Death :: Dying Reaction While Standing Holding A Rifle
+- Rifle Down To Aim :: Rifle Down To Aiming
+- Rifle Hit To Back :: Rifle Getting Hit To Ground
+- Rifle Idle :: Idle Holding A Rifle While Shaking Legs
+- Rifle Idle :: Rifle Idle
+- Rifle Idle :: Rifle Idle Looking Around
+- Rifle Idle :: Two Hand Lowered Gun Rifle Idle
+- Rifle Idle :: Two Hand Rifle Idle
+- Rifle Idle To Crouch :: Rifle Idle To Crouch Walk
+- Rifle Jump :: Standing Jumping
+- Rifle Jump :: Standing Jumping Game Blend
+- Rifle Jump In Place :: Standing Jumping In Place
+- Rifle Kneel Hit To Back :: Rifle Kneeling Getting Hit To Back
+- Rifle Kneel Idle :: Rifle Kneeling Idle
+- Rifle Kneel To Aim :: Rifle Kneeling And Aiming
+- Rifle Kneel To Prone :: Rifle Kneeling To Prone
+- Rifle Kneel To Stand :: Rifle Kneeling To Standing
+- Rifle Prone Hit Reaction :: Rifle Prone Hit Reaction
+- Rifle Prone To Kneel :: Rifle Prone To Kneeling
+- Rifle Pull Out :: Pulling Out Rifle
+- Rifle Punch :: Advancing And Punching With Butt Of A Rifle
+- Rifle Put Away :: Putting Rifle Away
+- Rifle Rubbing Eyes :: Rifle Rubbing Debris From Eyes
+- Rifle Run :: Running With Rifle Aimed
+- Rifle Run :: Running With Rifle Down
+- Rifle Run To Dying :: Getting Shot While Running With An Aimed Rifle
+- Rifle Run To Stop :: Rifle Running To Standing
+- Rifle Shielding Face :: Rifle Shielding Face From Debris
+- Rifle Side Step :: Rifle Left Side Step
+- Rifle Side Step :: Rifle Right Side Step
+- Rifle Stand To Kneel :: Rifle Standing To Kneeling
+- Rifle Start Run :: Starting To Run With A Aimed Rifle
+- Rifle Turn :: 135 Degree Left Turn
+- Rifle Turn :: 135 Degree Right Turn
+- Rifle Turn :: 180 Degree Left Turn
+- Rifle Turn :: 180 Degree Right Turn
+- Rifle Turn :: 45 Degree Left Turn
+- Rifle Turn :: 45 Degree Right Turn
+- Rifle Turn :: 90 Degree Left Turn
+- Rifle Turn :: 90 Degree Right Turn
+- Rifle Turn And Kick :: Rifle Turn And Kick In Door
+- Rifle Walk :: Walking With Rifle Down
+- Rifle Walk To Stop :: Rifle Walking To Standing
+- Right Block :: High Right Block
+- Right Block :: Low Right Block
+- Right Cover Sneak W/ Rifle :: Right Standing Sneak Behind Cover W/ Rifle
+- Right Turn :: Turning Right With Rifle
+- Rockin' Shackle B :: Attempt To Stab Then Get Beat Down
+- Roll Left :: Rolling Left While Aiming Rifle
+- Roll Left :: Rolling Left While Aiming Rifle Game Blend
+- Run Backward :: Rifle Run Backward
+- Run Backward Left :: Rifle Run Backward Left
+- Run Backward Right :: Rifle Run Backward Right
+- Run Backwards :: Running Backwards While Aiming Rifle
+- Run Forward :: Rifle Run Forward
+- Run Forward Left :: Rifle Run Forward Left
+- Run Forward Right :: Rifle Run Forward Right
+- Run Left :: Rifle Run Left
+- Run Right :: Rifle Run Right
+- Run With Sword :: Running With A Sword In The Right Hand
+- Running Dive Roll :: Rifle Run Dive Roll To Stopped
+- Running To Stop :: Stop Running To Aiming Rifle Idle
+- Searching Files High :: Searching The Top Drawer Of A File Cabinet
+- Sheath A Great Sword 1 :: Transition From Idle To Sheathing A Great Sword
+- Sheath A Great Sword 2 :: Transition From Idle To Sheathing A Great Sword
+- Sheath Sword 1 :: Combat To Sheathing Sword
+- Sheath Sword 2 :: Sheath Pose To Standing
+- Sheathing Sword :: Sheathing A Sword
+- Shoot Rifle :: Running While Firing Rifle
+- Shooting :: Firing A Gun
+- Shooting Arrow :: Shooting With Bow And Arrow
+- Shooting Gun :: Shooting Handgun
+- Shooting Pistol :: Shooting A Pistol From Behind Cover
+- Single Step Right :: Single Step To The Right While Aiming Rifle
+- Sitting Swinging Weapon :: Swinging Melee Weapon While Sitting
+- Sitting Weapon Grab :: Grab Melee Weapon While Sitting
+- Slash Advance :: Slashing Forward With A Bayonet
+- Smash :: Smash With Back Of Rifle Or Staff
+- Spell Cast :: Spell Casting With A Two Handed Sword
+- Spit Reaction :: Getting Spit In Face And Drawing Weapon
+- Sprint Backward :: Rifle Sprint Backward
+- Sprint Backward Left :: Rifle Sprint Backward Left
+- Sprint Backward Right :: Rifle Sprint Backward Right
+- Sprint Forward :: Rifle Sprint Forward
+- Sprint Forward Left :: Rifle Sprint Forward Left
+- Sprint Forward Right :: Rifle Sprint Forward Right
+- Sprint Left :: Rifle Sprint Left
+- Sprint Right :: Rifle Sprint Right
+- Stabbing :: Male Knife Stab With Lead Hand And Fore Grip
+- Stabbing :: Male Knife Stab With The Rear Hand And Fore Grip
+- Stabbing :: Male Knife Stab With The Rear Hand And Reverse Grip
+- Stable Sword Inward Slash :: Inward Slashing With A Sword Standing Stable
+- Stable Sword Outward Slash :: Outward Slashing With A Sword Standing Stable
+- Standing 1H Cast Spell 01 :: One Handed Casting Spell Upwards
+- Standing 1H Magic Attack 01 :: One Handed Casting Spell Fowards
+- Standing 1H Magic Attack 02 :: One Handed Casting Spell Sweep Right To Left
+- Standing 1H Magic Attack 03 :: One Handed Casting Spell Upward Sweep
+- Standing 2H Cast Spell 01 :: Two Handed Casting Spell Upward Pull
+- Standing 2H Magic Area Attack 01 :: Two Handed Casting Spell Towards Ground
+- Standing 2H Magic Area Attack 02 :: Two Handed Casting Spell Pull In Blast Out
+- Standing 2H Magic Attack 01 :: Two Handed Casting Spell Fowards
+- Standing 2H Magic Attack 02 :: Two Handed Casting Spell Fowards
+- Standing 2H Magic Attack 03 :: Two Handed Casting Spell Forwards Sustained
+- Standing 2H Magic Attack 04 :: Two Handed Casting Spell Forwards Sustained
+- Standing 2H Magic Attack 05 :: Two Handed Casting Spell Pull Up And Clap Hands
+- Standing Aim Idle 02 Looking :: Aiming Idle Looking Around With Bow
+- Standing Aim Overdraw :: Charging Bow For Powershot
+- Standing Aim Recoil :: Standing Aim Fire Arrow
+- Standing Aim Walk Back :: Walking Backwards While Aiming With Bow
+- Standing Aim Walk Forward :: Walking Forward While Aiming With Bow
+- Standing Aim Walk Left :: Walking Left While Aiming With Bow
+- Standing Aim Walk Right :: Walking Right While Aiming With Bow
+- Standing Block :: Blocking An Attack With Bow
+- Standing Block End :: Transition From Block Idle To Standing Idle
+- Standing Block Idle :: Blocking An Attack With Axe
+- Standing Block Idle :: Blocking With Both Arms Out
+- Standing Block React Large :: Block Reaction
+- Standing Block React Large :: Large Block Reaction With Axe
+- Standing Block Start :: Transition From Standing Idle To Block Idle
+- Standing Death Backward 01 :: Death Reaction Falling Backwards With Bow
+- Standing Death Right 01 :: Death Reaction Falling Right With Bow
+- Standing Death Right 02 :: Death Reaction Falling Right With Bow
+- Standing Disarm Bow :: Disarming Bow
+- Standing Disarm Over Shoulder :: Disarming Axe Over The Shoulder
+- Standing Disarm Underarm :: Disarming Axe Underarm
+- Standing Dodge Forward :: Dodge Forward With Bow
+- Standing Dodge Left :: Dodge Left With Bow
+- Standing Draw Arrow :: Reloading Bow
+- Standing Equip Bow :: Equipping Bow
+- Standing Idle 01 :: Standing Idle With Bow
+- Standing Idle 02 Looking :: Looking Around With Bow
+- Standing Idle 03 Examine :: Examining Bow
+- Standing Idle :: Standing Idle With Axe
+- Standing Idle Looking Ver. 1 :: Looking Around With Axe
+- Standing Idle Looking Ver. 2 :: Looking Around With Axe
+- Standing Jump :: Jumping And Landing In Place With Axe
+- Standing Jump :: Jumping And Landing In Place With Bow
+- Standing Melee Attack 360 High :: Left To Right Spin Attack With Axe
+- Standing Melee Attack 360 Low :: Left To Right Spin Attack With Axe
+- Standing Melee Attack Backhand :: Backhanded Upward Attack With Axe
+- Standing Melee Attack Downward :: Downward Attack With Axe
+- Standing Melee Attack Horizontal :: Right To Left Attack With Axe
+- Standing Melee Attack Kick Ver. 1 :: Kick With Right Foot Holding Axe
+- Standing Melee Attack Kick Ver. 2 :: Kick With Right Foot Holding Axe
+- Standing Melee Combo Attack Ver. 1 :: Two Hit Combo Attack With Axe
+- Standing Melee Combo Attack Ver. 2 :: Three Hit Combo Attack With Axe
+- Standing Melee Combo Attack Ver. 3 :: Two Hit Combo Attack With Axe
+- Standing Melee Kick :: Kick Attack With Bow
+- Standing Melee Punch :: Punch Attack With Bow
+- Standing Melee Run Jump Attack :: Running Jump With Attack With Axe
+- Standing React Large From Left :: Hit Reaction From The Left With Axe
+- Standing React Large From Left :: Hit Reaction From The Left With Bow
+- Standing React Large From Right :: Hit Reaction From The Right With Axe
+- Standing React Large Gut :: Hit Reaction From Gut Shot With Axe
+- Standing React Small From Back :: Hit Reaction From Behind With Bow
+- Standing React Small From Front 02 :: Hit Reaction From The Front With Bow
+- Standing React Small From Headshot :: Hit Reaction From Headshot With Bow
+- Standing Run Back :: Running Backwards With Axe
+- Standing Run Back :: Running Backwards With Bow
+- Standing Run Forward :: Running Forward With Axe
+- Standing Run Forward Stop :: Running Forward Stop With Bow
+- Standing Run Left :: Running Left With Bow
+- Standing Run Right :: Running Right With Bow
+- Standing Sprint Forward :: Sprinting Forward With Bow
+- Standing Taunt Battlecry :: Battlecry With Axe
+- Standing Taunt Chest Thump :: Banging Axe On Chest
+- Standing Torch Light Torch From Fire :: Lighting Torch From Ground
+- Standing Torch Melee Attack 03 :: Two Hit Combo Attack With Torch
+- Standing Torch Melee Attack 04 :: Two Hit Combo Attack With Torch
+- Standing Torch Melee Attack 05 :: Two Hit Combo Attack With Torch
+- Standing Torch Melee Attack Stab :: Forward Stab Attack With Torch
+- Standing Turn 90 Left :: Turning 90 Degrees Left With Bow
+- Standing Turn Left 90 :: Turning 90 Degrees Left With Axe
+- Standing Turn Right 90 :: Turning 90 Degrees Right With Axe
+- Standing Walk Back :: Walking Backwards With Axe
+- Standing Walk Forward :: Walking Forward With Axe
+- Standing Walk Forward :: Walking Forward With Bow
+- Standing Walk Left :: Walking Left With Axe
+- Standing Walk Left :: Walking Left With Bow
+- Standing Walk Right :: Walking Right With Axe
+- Standing Walk Right :: Walking Right With Bow
+- Start Walking :: Standing To Start Walking With Rifle
+- Start Walking :: Start Walking While Aiming
+- Start Walking Backwards :: Start Walking Backwards While Aiming Rifle
+- Stepping Backward :: Taking A Step Backward With Aiming Rifle
+- Stepping Forward :: Taking A Step Forward With Aiming Rifle
+- Stepping Left :: Taking A Step To The Left While Aiming Rifle
+- Stop Walking :: Stops Walking While Aiming Rifle
+- Stop Walking With Rifle :: Walking With A Rifle To A Stop
+- Strafe :: Strafe Left While Aiming Rifle
+- Strafe :: Strafe Right With Rifle
+- Strafe Left :: Rifle Walk Strafe Left
+- Strafe Right :: Rifle Walk Strafe Right
+- Strafing :: Rifle Standing To Start Run Strafing Right
+- Superhuman Choke Lift :: Superhuman One Hand Choke Lift
+- Sword And Shield 180 Turn :: Sword And Shield Run 180 Turn
+- Sword And Shield 180 Turn :: Sword And Shield Walk 180 Turn
+- Sword And Shield Attack :: Sword And Shield High Attack
+- Sword And Shield Attack :: Sword And Shield Hilt Melee
+- Sword And Shield Attack :: Sword And Shield Jump Attack
+- Sword And Shield Attack :: Sword And Shield Low Attack
+- Sword And Shield Block :: Sword And Shield Block To Idle
+- Sword And Shield Block :: Sword And Shield Idle To Block
+- Sword And Shield Block Idle :: Sword And Shield Block Idle
+- Sword And Shield Casting :: Sword And Shield Spell Casting
+- Sword And Shield Crouch :: Sword And Shield Stand To Crouch
+- Sword And Shield Crouch Block :: Sword And Shield Blocked Impact
+- Sword And Shield Crouch Block :: Sword And Shield Left Crouch  To Block
+- Sword And Shield Crouch Block Idle :: Sword And Shield Crouch Block Idle
+- Sword And Shield Crouch Idle :: Sword And Shield Left Crouch Idle- Loop
+- Sword And Shield Crouching :: Sword And Shield Block To Crouch
+- Sword And Shield Crouching :: Sword And Shield Crouch To Stand
+- Sword And Shield Crouching :: Sword And Shield Unblocked Impact
+- Sword And Shield Death :: Sword And Shield Falling Back Death
+- Sword And Shield Death :: Sword And Shield Falling Forward Death
+- Sword And Shield Idle :: Sword And Shield Idle
+- Sword And Shield Idle :: Sword And Shield Look Around Idle
+- Sword And Shield Idle :: Sword And Shield Stretch Idle
+- Sword And Shield Idle :: Sword And Shield Sword Play Idle
+- Sword And Shield Impact :: Sword And Shield Blocked Impact
+- Sword And Shield Impact :: Sword And Shield Head Impact
+- Sword And Shield Impact :: Sword And Shield Unblocked Impact
+- Sword And Shield Jump :: Sword And Shield Jump From Idle
+- Sword And Shield Jump :: Sword And Shield Running Jump
+- Sword And Shield Kick :: Sword And Shield Sparta Kick
+- Sword And Shield Power Up :: Sword And Shield Powering Up
+- Sword And Shield Run :: Sword And Shield Backward Run
+- Sword And Shield Run :: Sword And Shield Run
+- Sword And Shield Slash :: Sword And Shield Cross Slash
+- Sword And Shield Slash :: Sword And Shield Crouch Slash
+- Sword And Shield Slash :: Sword And Shield Downward Slash
+- Sword And Shield Slash :: Sword And Shield Power Slash
+- Sword And Shield Slash :: Sword And Shield Slash Combo
+- Sword And Shield Strafe :: Sword And Shield Left Run Strafe
+- Sword And Shield Strafe :: Sword And Shield Left Strafe Walk
+- Sword And Shield Strafe :: Sword And Shield Right Run Strafe
+- Sword And Shield Strafe :: Sword And Shield Right Strafe Walk
+- Sword And Shield Turn :: Sword And Shield 90 Degree Left Turn
+- Sword And Shield Turn :: Sword And Shield 90 Degree Right Turn
+- Sword And Shield Walk :: Sword And Shield Backward Walk
+- Sword And Shield Walk :: Sword And Shield Walk
+- Sword Fight One :: Person A - Winner
+- Sword Fight One :: Person B - Loser
+- Taking Cover :: Taking Cover Against A Wall With Rifle
+- Taking Cover Idle :: Cover Idle Against A Wall With Rifle
+- Talking :: Asking A Question With One Hand
+- Talking :: Asking A Question With Two Hands
+- Thrust Slash :: Thrust And Slash With Blade
+- Toss Grenade :: Throwing Something Holding Rifle Aimed
+- Turn 90 Left :: Rifle Turn 90 Left
+- Turn 90 Right :: Rifle Turn 90 Right
+- Turn Left 45 Degrees :: Turn Left 45 Degrees While Aiming Rifle
+- Turn Left :: Turn Left While Aiming
+- Turning :: Male Walk Then Turn With A Rifle
+- Turning Right 45 Degrees :: 45 Degree Right Turn While Aiming A Rifle
+- Turning Right 45 Degrees :: 45 Degree Right Turn While Aiming A Rifle Game Blend
+- Turning Right 90 Degrees :: 90 Degree Right Turn While Aiming A Rifle
+- Two Hand Club Combo :: Two Handed Club Combo Attack
+- Two Hand Spell Casting :: Casting A Spell With Two Hands
+- Two Hand Sword Combo :: Two Handed Sword Combo Attack
+- Two Handed Sword Death :: Falling Back Death
+- Two Handed Sword Death :: Falling Forward Death
+- Unarmed Equip Over Shoulder :: Equipping Axe Over The Shoulder
+- Unarmed Equip Torch 01 :: Equipping Torch
+- Unarmed Equip Torch 02 :: Equipping Torch And Lighting With Right Hand
+- Unarmed Equip Underarm :: Equipping Axe Underarm
+- Uppercut Jab :: Uppercut Jab And Open Palm Strike Combo
+- Upward Rifle Butt Strike :: Upward Rifle Butt Strike While Sitting
+- Upward Thrust :: Upward Weapon Thrust
+- Using A Filing Cabinet :: Using The Top Drawer Of A Filing Cabinet
+- Walk Backward :: Rifle Walk Backward
+- Walk Backward Left :: Rifle Walk Backward Left
+- Walk Backward Right :: Rifle Walk Backward Right
+- Walk Backwards Stop :: Walking Backwards While Aiming Rifle To Stopping
+- Walk Crouching Backward :: Rifle Crouched Walk Backward
+- Walk Crouching Backward Left :: Rifle Crouched Walk Backward Left
+- Walk Crouching Backward Right :: Rifle Crouched Walk Backward Right
+- Walk Crouching Forward :: Rifle Crouched Walk Forward
+- Walk Crouching Forward Left :: Rifle Crouched Walk Forward Left
+- Walk Crouching Forward Right :: Rifle Crouched Walk Forward Right
+- Walk Crouching Left :: Rifle Crouched Walk Left
+- Walk Crouching Right :: Rifle Crouched Walk Right
+- Walk Forward :: Rifle Walk Forward
+- Walk Forward Left :: Rifle Walk Forward Left
+- Walk Forward Right :: Rifle Walk Forward Right
+- Walk Left :: Rifle Walk Left
+- Walk Right :: Rifle Walk Right
+- Walk With Rifle :: Quickly Walk Forward With Rifle
+- Walk With Rifle :: Walking With Rifle At Waist Level
+- Walk With Rifle :: Walking With Rifle At Waist Level 3 Cycle
+- Walking :: Cautiously Taking A Couple Steps With Rifle
+- Walking :: Walking While Aiming Rifle
+- Walking Backwards :: Walking Backwards While Aiming Rifle
+- Walking Hit Reaction :: Hit Reaction When Walking While Aiming Rifle
+- Walking To Dying :: Walking While Aiming Rifle To Dying
+- Walking To Dying :: Walking While Aiming Rifle To Immediate Dying
+- Withdrawing Sword :: Withdrawing A Sword

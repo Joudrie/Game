@@ -1,0 +1,4 @@
+Source: https://quaternius.com/packs/scifimodularguns.html (Drive 1P5j8xZyIEmZGHjGYmIgYCev9SVmB-IHC)
+License: CC0 1.0 (License.txt)
+Downloaded: 2026-09-29
+Notes: .gltf (embedded) repacked to .glb with gltf-transform copy.

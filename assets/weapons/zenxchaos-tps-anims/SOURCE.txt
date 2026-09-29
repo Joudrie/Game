@@ -1,0 +1,4 @@
+Source: https://github.com/ZenXChaos/ThirdPersonShooter-AnimationSets
+License: Unlicense (public domain) as stated by repo; ORIGINAL PROVENANCE UNVERIFIED
+Downloaded: 2026-09-29
+Notes: Animation-only GLBs converted from FBX (bake 30fps). Custom mocap skeleton (Pelvis/Spine1/L_Arm/L_Weapon...), not Mixamo; needs retargeting.

@@ -1,0 +1,4 @@
+Source: https://opengameart.org/content/cc0-flat-guns-east (pichuliru)
+License: CC0
+Downloaded: 2026-09-29
+Notes: 10 guns, each rigged with Bolt/Magazine/Trigger/Selector bones + attachment sockets - good for procedural reload/charging-handle.
