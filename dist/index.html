@@ -64,6 +64,8 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #pad { flex-wrap: wrap; justify-content: flex-end; max-width: 176px; }
 #pad .armed-only { display: none; }
 body.armed #pad .armed-only { display: inline-block; }
+#pad .gun-only { display: none; }
+body.gun #pad .gun-only { display: inline-block; }
 body.armed #readout { bottom: calc(196px + env(safe-area-inset-bottom, 0px)); }
 .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
 .swatches button { display: flex; align-items: center; gap: var(--s2); min-height: 40px; }
@@ -115,6 +117,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 <div id="joy" hidden><i></i></div>
 <div id="pad" class="hud">
   <button type="button" id="blockbtn" class="armed-only">Block</button>
+  <button type="button" id="aimbtn" class="gun-only">Aim</button>
   <button type="button" id="atkbtn" class="armed-only">Attack</button>
   <button type="button" id="slidebtn">Slide</button>
   <button type="button" id="jumpbtn">Jump</button>
@@ -341,7 +344,11 @@ async function boot() {
       cal[v.id] = r;
     }
   }
+  for (const id of STRAFE_CLIPS) { const c = clips.get(id); if (c) { const r = analyzeClip(hero, c); strafeProbe[id] = +r.speed.toFixed(3); if (r.speed > 0.2 && r.speed < 9) cal[id] = r; } }
   const f = cal.Walk_Loop?.fwd || new V3(0, 0, 1);
+  // travel angle of each clip relative to forward (+ = character's left), measured from its planted foot
+  const f0 = Math.atan2(f.x, f.z);
+  for (const [id, c] of Object.entries(cal)) c.angle = wrapAngle(Math.atan2(c.fwd.x, c.fwd.z) - f0);
   hero.rotation.y = -Math.atan2(f.x, f.z);
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
@@ -349,7 +356,7 @@ async function boot() {
   computeMounts(); rebuildSabers(); buildRifle(); buildPistol();
   mixer = new THREE.AnimationMixer(hero);
   mixer.addEventListener('finished', onFinished);
-  window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, +v.speed.toFixed(2)]));
+  window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
   $('loading').hidden = true;
   renderClass(); buildMoves();
   start();
@@ -563,6 +570,8 @@ function setGear(g, instant) {
   if (instant) { ignite = igniteTarget; if (!inHand && armed) { armed = false; placeSabers(); } }
   placeRifle(); placePistol();
   document.body.classList.toggle('armed', g === 'lit');
+  document.body.classList.toggle('gun', g === 'pistol');
+  if (g !== 'pistol') aimHeld = false;
   $('gearbtn').textContent = 'Gear: ' + { none: 'none', hilt: 'hilt', lit: 'saber', pistol: 'pistol' }[g];
   $('gearlbl').textContent = GEARS[g];
   document.querySelectorAll('[data-gear]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.gear === g)));
@@ -606,7 +615,7 @@ function masked(id, mask) {
 // combat: tap chain A → B → C, hold for heavy, hold block. Your rules: no attacking while sprinting,
 // no sprinting while blocking, no jumping while blocking.
 const CHAIN = ['A', 'B', 'C'];
-let atk = null, blocking = false, blockAct = null, atkHeld = false, atkHeldT = 0;
+let atk = null, blocking = false, blockAct = null, atkHeld = false, atkHeldT = 0, guardBlend = 0;
 function canFight() { return gear === 'lit' && ignite > 0.9 && !movesOpen && mode === 'ground'; }
 function attackPress() {
   atkHeld = true; atkHeldT = 0;
@@ -634,16 +643,41 @@ function heavyAttack() {
 }
 function blockPress() {
   if (!canFight() || atk) return;
-  blocking = true;
-  blockAct = playOvr('Sword_Block', { speed: 1.3, fade: 0.1, then: () => { blockAct = null; if (!blocking) stopOvr(0.2); } });
+  blocking = true; log('block');
 }
-function blockRelease() { if (!blocking) return; blocking = false; if (blockAct) blockAct.timeScale = 1.3; else stopOvr(0.2); }
+function blockRelease() { blocking = false; }
 function updateCombat(dt) {
   if (atkHeld) {
     atkHeldT += dt;
     if (atkHeldT > 0.35 && atk && !atk.heavy && atk.i === 0 && !atk.rec) heavyAttack();
   }
-  if (blocking && blockAct && blockAct.time >= 0.45) blockAct.timeScale = 0; // hold the guard pose
+  guardBlend = moveTo(guardBlend, blocking || (gear === 'pistol' && aimHeld) ? 1 : 0, dt / 0.12);
+}
+
+// ---------------- strafing (aim / guard) ----------------
+// While aiming the pistol or guarding with the saber the body keeps facing the camera and the legs
+// blend the two clips whose measured travel direction is closest to where you push.
+const STRAFE_CLIPS = ['M2M_Walk_Backwards', 'M2M_Strafe_left', 'M2M_Strafe_right', 'SW_Run_Back', 'SW_Run_Left', 'SW_Run_Right'];
+let aimHeld = false, moveYaw = 0, strafeAngle = 0;
+const strafeProbe = {};
+const isStrafing = () => mode === 'ground' && ((gear === 'pistol' && aimHeld) || (gear === 'lit' && blocking));
+function strafeWeights(C) {
+  // walk-speed set and run-speed set; each entry: clip id with its measured angle
+  const walkSet = [cur.walk, 'M2M_Walk_Backwards', 'M2M_Strafe_left', 'M2M_Strafe_right'].filter((id) => cal[id]);
+  const runSet = [cur.jog, 'SW_Run_Back', 'SW_Run_Left', 'SW_Run_Right'].filter((id) => cal[id]);
+  const pick = (set) => {
+    // two nearest clips around the wanted angle, linearly weighted
+    const byGap = set.map((id) => ({ id, gap: wrapAngle(strafeAngle - (cal[id].angle || 0)) })).sort((a, b) => Math.abs(a.gap) - Math.abs(b.gap));
+    const a = byGap[0], b = byGap.find((x) => Math.sign(x.gap) !== Math.sign(a.gap) && x !== a) || byGap[1] || a;
+    const span = Math.abs(a.gap) + Math.abs(b.gap);
+    const wa = span < 1e-3 ? 1 : 1 - Math.abs(a.gap) / span;
+    return [[a.id, wa], [b.id, 1 - wa]];
+  };
+  const t = clamp((speed - C.walk) / Math.max(C.jog - C.walk, 0.1), 0, 1);
+  const out = [];
+  for (const [id, w] of pick(walkSet)) out.push([id, w * (1 - t)]);
+  if (t > 0 && runSet.length > 1) for (const [id, w] of pick(runSet)) out.push([id, w * t]);
+  return out;
 }
 
 // ---------------- T-pose watchdog and reports ----------------
@@ -729,9 +763,9 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyE') setGear(gear === 'lit' ? 'none' : 'lit');
   if (/^Digit[1-4]$/.test(e.code)) setGear(GEAR_ORDER[+e.code.slice(5) - 1]);
   if (e.code === 'KeyF') attackPress();
-  if (e.code === 'KeyQ') blockPress();
+  if (e.code === 'KeyQ') { if (gear === 'pistol') aimHeld = true; else blockPress(); }
 });
-addEventListener('keyup', (e) => { keys.delete(e.code); if (e.code === 'KeyC') slideHeld = false; if (e.code === 'KeyF') attackRelease(); if (e.code === 'KeyQ') blockRelease(); });
+addEventListener('keyup', (e) => { keys.delete(e.code); if (e.code === 'KeyC') slideHeld = false; if (e.code === 'KeyF') attackRelease(); if (e.code === 'KeyQ') { aimHeld = false; blockRelease(); } });
 addEventListener('blur', () => { keys.clear(); slideHeld = false; });
 
 let toastTimer = 0;
@@ -748,6 +782,8 @@ $('slidebtn').addEventListener('pointerup', () => { slideHeld = false; });
 $('slidebtn').addEventListener('pointercancel', () => { slideHeld = false; });
 press($('atkbtn'), attackPress);
 press($('blockbtn'), blockPress);
+press($('aimbtn'), () => { aimHeld = true; });
+for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('aimbtn').addEventListener(ev, () => { aimHeld = false; });
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) { $('atkbtn').addEventListener(ev, attackRelease); $('blockbtn').addEventListener(ev, blockRelease); }
 $('gearbtn').addEventListener('click', () => { const g = GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + 1) % GEAR_ORDER.length]; setGear(g); toast('Gear: ' + GEARS[g], 1200); });
 $('reportbtn').addEventListener('click', () => report('manual', 'Report sent from the Moves screen', true));
@@ -761,12 +797,13 @@ canvas.addEventListener('pointerdown', (e) => {
   canvas.focus();
   if (e.pointerType === 'mouse') {
     if (!movesOpen && gear === 'lit' && isLocked()) { if (e.button === 0) attackPress(); if (e.button === 2) blockPress(); return; }
+    if (!movesOpen && gear === 'pistol' && isLocked() && e.button === 2) { aimHeld = true; return; }
     if (!movesOpen && !isLocked()) { try { const p = canvas.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (_) {} }
     dragging = true; return;
   }
   touchStart(e);
 });
-addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') { dragging = false; if (e.button === 0) attackRelease(); if (e.button === 2) blockRelease(); } else touchEnd(e); });
+addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') { dragging = false; if (e.button === 0) attackRelease(); if (e.button === 2) { blockRelease(); aimHeld = false; } } else touchEnd(e); });
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 addEventListener('pointercancel', (e) => { if (e.pointerType !== 'mouse') touchEnd(e); });
 addEventListener('pointermove', (e) => {
@@ -819,7 +856,8 @@ function readInput(dt) {
     if (b(1) && !padPrev[1]) slideQueued = true;
     slideHeld = slideHeld || b(1);
     if (b(2) && !padPrev[2]) attackPress(); if (!b(2) && padPrev[2]) attackRelease();
-    if (b(4) && !padPrev[4]) blockPress(); if (!b(4) && padPrev[4]) blockRelease();
+    if (b(4) && !padPrev[4]) { if (gear === 'pistol') aimHeld = true; else blockPress(); }
+    if (!b(4) && padPrev[4]) { aimHeld = false; blockRelease(); }
     if (b(3) && !padPrev[3]) setGear(GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + 1) % GEAR_ORDER.length]);
     padPrev = [b(0), b(1), b(2), b(3), b(4)];
     break;
@@ -899,7 +937,13 @@ function step(dt) {
   // facing
   const prevYaw = yaw;
   let diff = 0;
-  if (inp.mag > 0.01) {
+  const strafing = isStrafing();
+  if (strafing) {
+    // face where the camera looks; move toward the stick; walk-to-jog speeds only
+    yaw = wrapAngle(yaw + wrapAngle(camYaw - yaw) * (1 - Math.exp(-12 * dt)));
+    if (inp.mag > 0.01) { moveYaw = Math.atan2(wx, wz); strafeAngle = wrapAngle(moveYaw - yaw); }
+    target = Math.min(target, gear === 'pistol' ? C.jog * 0.75 : C.walk * 1.2);
+  } else if (inp.mag > 0.01) {
     diff = wrapAngle(Math.atan2(wx, wz) - yaw);
     let sharp = lerp(11, 6, clamp((speed - C.jog) / (C.sprint - C.jog), 0, 1));
     if (mode === 'air') sharp *= 0.3;
@@ -934,8 +978,9 @@ function step(dt) {
     speed = slideSpeed * (1 - 0.55 * k * k);
     if (slideT >= slideDur) endSlide();
   }
-  player.position.x += Math.sin(yaw) * speed * dt;
-  player.position.z += Math.cos(yaw) * speed * dt;
+  if (!strafing) moveYaw = yaw;
+  player.position.x += Math.sin(moveYaw) * speed * dt;
+  player.position.z += Math.cos(moveYaw) * speed * dt;
   if (mode === 'air') {
     vy -= 14 * dt; player.position.y += vy * dt;
     if (player.position.y <= 0) land();
@@ -976,8 +1021,14 @@ function animateLoco(dt, C) {
   }
   const wts = new Map();
   let rate = 1;
+  const strafing = isStrafing() && speed > 0.05;
   const add = (id, w) => { if (w > 0.001) wts.set(id, (wts.get(id) || 0) + w); };
-  if (crouch) {
+  if (strafing) {
+    const sw = strafeWeights(C); rate = 0;
+    const idleT = clamp(1 - speed / (C.walk * 0.5), 0, 1);
+    add(cur.idle, idleT);
+    for (const [id, w] of sw) { add(id, w * (1 - idleT)); rate += w * cyc(id, Math.max(speed, C.walk * 0.6)); }
+  } else if (crouch) {
     const t = clamp(speed / 1.8, 0, 1);
     add('Crouch_Idle_Loop', 1 - t); add(cur.crouch, t);
     rate = cyc(cur.crouch, Math.max(speed, 0.9));
@@ -997,11 +1048,13 @@ function animateLoco(dt, C) {
   for (const a of locoActive) a.setEffectiveWeight(0);
   // upper body: saber stance when lit, rifle stance with the rifle, hand closed round the hilt when unlit
   const upper = gear === 'lit' ? (cur.stance || 'Sword_Idle') : gear === 'pistol' ? (cur.rstance || 'SW_Idle_Gun') : null;
+  const guardUpper = gear === 'lit' ? 'STANCE_HighGuard' : 'SW_Idle_Gun_Pointing';
   const split = upper && !crouch;
   const gripOnly = gear === 'hilt';
   // Standing: the whole upper body holds the stance. Moving: only the weapon arm holds it,
   // so the torso bobs and the free arm swings with the run (m blends between the two).
-  const m = split ? clamp(speed / (C.walk * 0.8), 0, 1) : 0;
+  // guarding or aiming locks the whole upper body into the guard/aim pose (no arm-only blend)
+  const m = split ? clamp(speed / (C.walk * 0.8), 0, 1) * (1 - guardBlend) : 0;
   const layer = (id, w) => {
     if (w <= 0.001) return;
     const a = useLoop(id); if (!a) return;
@@ -1009,7 +1062,11 @@ function animateLoco(dt, C) {
     else a.timeScale = 1;
     a.setEffectiveWeight(a.getEffectiveWeight() + w);
   };
-  if (split) { layer(masked(upper, 'upper'), (1 - m) * locoW); layer(masked(upper, 'arm'), m * locoW); }
+  if (split) {
+    const g = guardBlend;
+    layer(masked(upper, 'upper'), (1 - m) * (1 - g) * locoW); layer(masked(upper, 'arm'), m * locoW);
+    layer(masked(guardUpper, 'upper'), (1 - m) * g * locoW);
+  }
   if (gripOnly) layer(masked('Sword_Idle', 'grip'), locoW);
   for (const [rawId, w] of wts) {
     if (split) { layer(masked(rawId, 'lower'), w * (1 - m) * locoW); layer(masked(rawId, 'noarm'), w * m * locoW); }
@@ -1021,6 +1078,7 @@ function animateLoco(dt, C) {
 let debugTpose = false;
 
 const camPos = new V3(), right = new V3();
+let aimZoom = 0;
 function updateCamera(dt, C) {
   const sprintT = clamp((speed - C.jog) / (C.sprint - C.jog), 0, 1);
   const h = mode === 'slide' ? 1.05 : crouch ? 1.15 : 1.55;
@@ -1028,7 +1086,8 @@ function updateCamera(dt, C) {
   pivot.z = damp(pivot.z, player.position.z, 14, dt);
   pivot.y = damp(pivot.y, player.position.y + h, mode === 'air' ? 5 : 10, dt);
   const narrow = clamp(camera.aspect, 0.45, 1);
-  const dist = (camDist + 0.6 * sprintT) * (1 + (1 - narrow) * 0.9);
+  aimZoom = damp(aimZoom, isStrafing() && gear === 'pistol' ? 1 : 0, 8, dt);
+  const dist = (camDist + 0.6 * sprintT - 0.6 * aimZoom) * (1 + (1 - narrow) * 0.9);
   const cp = Math.cos(camPitch), sp = Math.sin(camPitch);
   const lx = Math.sin(camYaw) * cp, ly = -sp, lz = Math.cos(camYaw) * cp;
   right.set(-Math.cos(camYaw), 0, Math.sin(camYaw)).multiplyScalar(0.42 * narrow * narrow);
@@ -1043,7 +1102,7 @@ let hudN = 0;
 function hud(C) {
   if ((hudN += 1) % 6) return;
   $('spd').textContent = speed.toFixed(1);
-  const g = blocking ? 'Block' : atk ? (atk.heavy ? 'Heavy attack' : 'Attack ' + (atk.i + 1)) :
+  const g = isStrafing() ? (gear === 'pistol' ? 'Aim' : 'Guard') + (speed > 0.1 ? ' · strafe' : '') : blocking ? 'Block' : atk ? (atk.heavy ? 'Heavy attack' : 'Attack ' + (atk.i + 1)) :
     mode === 'air' ? (jumps === 2 ? 'Double jump' : 'Airborne') : mode === 'slide' ? 'Slide' :
     { idle: 'Idle', walk: 'Walk', jog: 'Run', sprint: 'Sprint', crouch: 'Crouch', crouchwalk: 'Crouch' }[gait];
   const el = $('gait'); el.textContent = g; el.classList.toggle('hot', g === 'Sprint' || g === 'Slide' || g === 'Double jump');
@@ -1213,7 +1272,7 @@ function start() {
     renderer.render(scene, camera);
   });
   setGear(gear, true);
-  window.__game = { simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
+  window.__game = { strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
     setClass(k) { klass = k; renderClass(); }, openMoves, closeMoves };
 }
 </script>
