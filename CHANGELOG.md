@@ -1,6 +1,20 @@
 # Changelog
 
-Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v8 · …"`), so we can tell which version you were playing.
+Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v9 · …"`), so we can tell which version you were playing.
+
+## v9: momentum, combo flow, air moves, clipping list, menu tabs
+- **Slide momentum:**
+  - Your entry speed carries into the slide. Sprinting in adds up to 25% more, and a faster slide lasts longer, up to 1.7× the class's slide time.
+  - Force class: 6.2 m/s from a jog versus 14.7 m/s from a sprint.
+- **Jump into slide:** press Slide in the air. The character drops fast and lands straight into a slide at 10% extra speed.
+- **Infinite jumps (testing):** tap Jump in the air as often as you like, for every class. The switch is in Menu → Setup and starts on. The default extra jump is the quick CMU backflip, the Lego Star Wars-style flip.
+- **Block in the air:** the high guard is laid over whatever jump or flip is playing. You can also jump while blocking.
+- **Five-hit saber combo:** A → B → C → spin slash → lunge. A buffered tap cuts each hit at its cancel point so they flow together, and the lunge flows back into hit 1. Hold still heavy-attacks, and pausing still plays the recovery.
+- **Crouch transition:** standing to crouching blends over about 0.3 s instead of snapping.
+- **Saber clipping:**
+  - The game measures the blades against a body model every few frames while lit. It notes each animation where a blade cuts in (Menu → Tests → Noticed while playing), and those notes ride along in every report.
+  - **Check saber clipping** plays every animation with the sabers lit, lists the ones that cut into the body, and sends the list as a report. See `SABER_CLIPPING.md`.
+- **Menu for phone testing:** four tabs (Setup, Moves, Library, Tests), an Expand button for a taller sheet, and larger touch targets. Report a problem, the clipping check and the reporting status live under Tests.
 
 ## v8: freeze logging, dual sabers in fists
 - **Freezes are logged and reported.** The watchdog now catches three more problems, each with a banner and a report:
