@@ -2,7 +2,7 @@ import { NodeIO } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { prune, textureCompress, resample, dedup } from '@gltf-transform/functions';
 import sharp from 'sharp';
-const L='./assets/locomotion', OUT='./build';
+const L='/home/user/game/assets/locomotion', OUT='/home/user/game/build';
 import fs from 'fs'; fs.mkdirSync(OUT,{recursive:true});
 const io = new NodeIO().registerExtensions(ALL_EXTENSIONS);
 
@@ -14,8 +14,8 @@ await ch.transform(
 await io.write(`${OUT}/hero.glb`, ch);
 
 const KEEP = {
-  ual1: ['Idle_Loop','Walk_Loop','Walk_Formal_Loop','Jog_Fwd_Loop','Sprint_Loop','Jump_Start','Jump_Loop','Jump_Land','Roll','Crouch_Idle_Loop','Crouch_Fwd_Loop','Sword_Idle','Sword_Attack','Pistol_Idle_Loop','Pistol_Shoot','Pistol_Reload','Punch_Jab','Punch_Cross','Death01','Hit_Chest','Idle_Talking_Loop','Dance_Loop','Spell_Simple_Shoot'],
-  ual2: ['Slide_Start','Slide_Loop','Slide_Exit','NinjaJump_Start','NinjaJump_Idle_Loop','NinjaJump_Land','ClimbUp_1m','Idle_FoldArms_Loop','Sword_Block','Sword_Dash','Sword_Regular_A','Sword_Regular_B','Sword_Regular_C','Sword_Regular_Combo','Sword_Heavy_Combo','Melee_Hook','OverhandThrow','Hit_Knockback','Shield_Dash'],
+  ual1: ['Idle_Loop','Walk_Loop','Walk_Formal_Loop','Jog_Fwd_Loop','Sprint_Loop','Jump_Start','Jump_Loop','Jump_Land','Roll','Crouch_Idle_Loop','Crouch_Fwd_Loop','Sword_Idle','Sword_Attack','Pistol_Idle_Loop','Pistol_Shoot','Pistol_Reload','Punch_Jab','Punch_Cross','Death01','Hit_Chest','Hit_Head','Idle_Talking_Loop','Dance_Loop','Spell_Simple_Shoot'],
+  ual2: ['Slide_Start','Slide_Loop','Slide_Exit','NinjaJump_Start','NinjaJump_Idle_Loop','NinjaJump_Land','ClimbUp_1m','Idle_FoldArms_Loop','Sword_Block','Sword_Dash','Sword_Regular_A','Sword_Regular_A_Rec','Sword_Regular_B','Sword_Regular_B_Rec','Sword_Regular_C','Sword_Regular_Combo','Sword_Heavy_Combo','Melee_Hook','Melee_Hook_Rec','OverhandThrow','Hit_Knockback','Shield_Dash','LayToIdle','Idle_No_Loop'],
 };
 for (const [k, list] of Object.entries(KEEP)) {
   const d = await io.read(`${L}/quaternius_${k}/${k.toUpperCase()}_Standard.glb`);
