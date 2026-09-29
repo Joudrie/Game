@@ -1,0 +1,618 @@
+=== slide
+total 117
+  Great Sword Slide Attack     | Great Sword Low Slide Attack From Run
+  Running Slide                | Running To Slide And Back To Running
+  Slide Hip Hop Walk           | Slide Hip Hop Walk
+  Slide Hip Hop Dance          | Slide Hip Hop Dance Variation One
+  Corkscrew Kip Up             | Male Sliding Corkscrew To Kip Up
+  Soccer Tackle                | Soccer Slide Tackle
+  Hip Hop Dancing              | Female Hip Hop 'Slide Step' Dancing
+  Edge Slip                    | Slipping Off An Edge Then Regaining Balance
+  Falling                      | Falling In The Air Idle
+  Hit To Side Of Body          | Hit To Side Of The Body With Object While Running
+  Falling Flat Impact          | Falling Flat On Face
+  Getting Thrown               | Being Thrown To The Side
+  Falling                      | Getting Scare And Goes Over A Cliff
+  Falling                      | Falling Over A Rope Down To The Floor
+  Falling Into Pool            | Losing Balance And Falling Sideways Into A Pool
+  Falling From Losing Balance  | Losing Balance And Falling Off An Edge
+  Falling Idle                 | Mid-Air Falling Idle
+  Fall Flat                    | Falling Flat On Face From A Hit To The Back While Running
+  Hit To Head                  | Hit To The Back Of Head With Object While Running
+  Hit To The Legs              | Hit To The Legs With Object While Running
+  Soccer Tackle                | Running Fall Over A Soccer Slide Tackle
+  Soccer Tackle                | Standing Fall Over A Soccer Slide Tackle
+  Falling Into Pool            | Losing Balance And Falling Forward Into A Pool
+  Female Action Pose           | Sliding
+  Moonwalk                     | Walking Backwards Sliding Feet
+  Great Sword Pack             | great sword idle, great sword walk, great sword walk, great sword strafe, great sword strafe, great sword 180 turn, great sword turn, great sword turn, great sword run, great sword run, great sword 180 turn, great sword strafe, great sword strafe, great sword jump, great sword jump, great sword slash, great sword slash, great sword slash, great sword slash, great sword blocking, great sword blocking, great sword blocking, great sword impact, great sword impact, great sword impact, great sword crouching, great sword crouching, great sword crouching, great sword slash, great sword crouching, great sword crouching, great sword crouching, great sword impact, great sword impact, great sword jump attack, great sword slide attack, great sword high spin attack, great sword kick, great sword kick, great sword idle, great sword idle, great sword idle, great sword idle, great sword casting, great sword power up, great sword attack, two handed sword death, draw a great sword 1, draw a great sword 2, two handed sword death, spell cast, great sword run [PACK]
+  Action Adventure Pack        | idle, falling idle, idle, idle, running, stand to cover, walking, stand to cover, run to stop, left turn, right turn, jumping up, falling to roll, hard landing, cover to stand, idle, crouched sneaking left, crouched sneaking right, left cover sneak, right cover sneak, idle, cover to stand [PACK]
+  Ginga Sideways 1             | Capoeira Step To The Side
+  Short Right Side Step        | Short Right Boxing Side Step
+  Goalkeeper Sidestep          | Goalkeeper Left Sidestep
+  Macaco Side                  | Capoeira Side Step Flip Escape
+  Rifle Side Step              | Rifle Right Side Step
+  Big Side Hit                 | Receiving A Big Hit In The Side
+  Short Left Side Step         | Short Left Boxing Side Step
+  Grab Rifle From The Side     | Standing To Ready Pose Grabbing Rifle From Side
+  Ginga Sideways To Au         | Capoeira Step To Cartwheel
+  Side Step                    | Side Step
+  Side Kick                    | Side Kick
+  Goalkeeper Sidestep          | Goalkeeper Right Sidestep
+=== sprint
+total 207
+  Sprint Backward              | Rifle Sprint Backward
+  Sprint Forward               | Rifle Sprint Forward
+  Sprint                       | Standard Sprint
+  Standing Sprint Forward      | Sprinting Forward With Bow
+  Sprint Forward Right         | Rifle Sprint Forward Right
+  Crouched To Sprinting        | Crouch To Sprinting
+  Sprint To Backslide          | Sprint To Backslide
+  Standing Sprint Forward      | Sprinting Forward
+  Sprint Right                 | Rifle Sprint Right
+  Sprint Turn                  | Turning While Sprinting
+  Sprint To Wall Climb         | Sprint To Wall Climb To Crouch Idle
+  Sprint Left                  | Rifle Sprint Left
+  Sprinting Forward Roll       | Sprint To Forward Roll To Sprinting
+  Two Cycle Sprint             | Full Speed Sprint For Two Cycles
+  Sprint Forward Left          | Rifle Sprint Forward Left
+  Sprint Backward Left         | Rifle Sprint Backward Left
+  Sprint Backward Right        | Rifle Sprint Backward Right
+  Idle To Sprint               | Start Sprint From Action Idle
+  Female Locomotion Pose       | Sprinting
+  Rifle 8-Way Locomotion Pack  | sprint forward, run forward, walk crouching forward right, idle, turn 90 left, idle crouching, run backward, run left, run right, run forward right, run forward left, run backward left, run backward right, sprint forward right, sprint forward left, sprint right, sprint left, sprint backward, sprint backward right, sprint backward left, walk forward, walk forward right, walk forward left, walk right, walk left, walk backward, walk backward right, walk backward left, walk crouching forward, walk crouching right, walk crouching left, walk crouching forward left, walk crouching backward, walk crouching backward left, walk crouching backward right, idle aiming, turn 90 right, crouching turn 90 left, crouching turn 90 right, jump up, jump loop, jump down, death from front headshot, death from right, death crouching headshot front, death from back headshot, death from the back, death from the front, idle crouching aiming [PACK]
+  Pro Rifle Pack               | sprint forward, run forward, walk crouching forward right, idle, turn 90 left, idle crouching, run backward, run left, run right, run forward right, run forward left, run backward left, run backward right, sprint forward right, sprint forward left, sprint right, sprint left, sprint backward, sprint backward right, sprint backward left, walk forward, walk forward right, walk forward left, walk right, walk left, walk backward, walk backward right, walk backward left, walk crouching forward, walk crouching right, walk crouching left, walk crouching forward left, walk crouching backward, walk crouching backward left, walk crouching backward right, idle aiming, turn 90 right, crouching turn 90 left, crouching turn 90 right, jump up, jump loop, jump down, death from front headshot, death from right, death crouching headshot front, death from back headshot, death from the back, death from the front, idle crouching aiming [PACK]
+  Running Jump                 | Jumping From A Sprint
+  Strafe                       | Running Sideways Facing Forward
+  Run Backward                 | Happy Run Backward
+  Run Forward                  | Female Run Forward
+  Running Backward             | Backwards Running
+  Run Forward                  | Happy Run Forward
+  Standard Run                 | Standard Running
+  Running Backward Arc         | Female Run Backward Arc
+  Medium Run                   | Medium Speed Running
+  Change Direction             | Change Direction 180 Degrees While Running
+  Run                          | Run Forward Facing Sideways
+  Backward Right Turn          | Backward Run Turning Right
+  Run Look Back                | Running Looking Back
+  Running Right Turn           | Turning Right While Running
+  Running Backward             | Female Run Backward
+  Running                      | Running Leaning Back Or Forth
+  Slow Run                     | Slow Run Forward
+  Fast Run                     | Running Fast
+=== fast run
+total 55
+  Fast Run                     | Running Fast
+  Run To Stop                  | Fast Stop From Full Run
+  Running To Turn              | Fast Run To 180 Degree Turn
+  Sprint                       | Standard Sprint
+  Crouched To Sprinting        | Crouch To Sprinting
+  Two Cycle Sprint             | Full Speed Sprint For Two Cycles
+  Sprint Turn                  | Turning While Sprinting
+  Treadmill Running            | Running On A Treadmill From Slow To Fast
+  Running Jump                 | Fast Run To Jump Up Onto Higher Level
+  Pro Magic Pack               | standing 1H cast spell 01, standing idle, Standing 1H Magic Attack 01, Standing 1H Magic Attack 02, Standing 1H Magic Attack 03, Standing 2H Cast Spell 01, Standing 2H Magic Area Attack 01, Standing 2H Magic Area Attack 02, Standing 2H Magic Attack 01, Standing 2H Magic Attack 02, Standing 2H Magic Attack 03, Standing 2H Magic Attack 04, Standing 2H Magic Attack 05, standing idle 02, Crouch Idle, Crouch To Standing Idle, Crouch Turn Left 90, Crouch Turn Right 90, Crouch Walk Back, Crouch Walk Forward, Crouch Walk Left, Crouch Walk Right, Standing Block Idle, Standing Block React Large, Standing Block End, Standing Block Start, Standing Idle 03, Standing Idle 04, Standing Idle To Crouch, Standing Jump, Standing Jump Running, Standing Jump Running Landing, Standing Land To Standing Idle, Standing React Death Backward, Standing React Death Forward, Standing React Death Left, Standing React Death Right, Standing React Large From Back, Standing React Large From Front, Standing React Large From Left, Standing React Large From Right, Standing React Small From Back, Standing React Small From Front, Standing React Small From Left, Standing React Small From Right, Standing Run Back, Standing Run Forward, Standing Run Left, Standing Run Right, Standing Sprint Forward, Standing Turn Left 90, Standing Turn Right 90, Standing Walk Back, Standing Walk Forward, Standing Walk Left, Standing Walk Right [PACK]
+  Great Sword Pack             | great sword idle, great sword walk, great sword walk, great sword strafe, great sword strafe, great sword 180 turn, great sword turn, great sword turn, great sword run, great sword run, great sword 180 turn, great sword strafe, great sword strafe, great sword jump, great sword jump, great sword slash, great sword slash, great sword slash, great sword slash, great sword blocking, great sword blocking, great sword blocking, great sword impact, great sword impact, great sword impact, great sword crouching, great sword crouching, great sword crouching, great sword slash, great sword crouching, great sword crouching, great sword crouching, great sword impact, great sword impact, great sword jump attack, great sword slide attack, great sword high spin attack, great sword kick, great sword kick, great sword idle, great sword idle, great sword idle, great sword idle, great sword casting, great sword power up, great sword attack, two handed sword death, draw a great sword 1, draw a great sword 2, two handed sword death, spell cast, great sword run [PACK]
+  Pro Sword and Shield Pack    | sword and shield walk, sword and shield run, sword and shield jump, sword and shield jump, sword and shield strafe, sword and shield strafe, sword and shield walk, sword and shield 180 turn, sword and shield strafe, sword and shield strafe, sword and shield 180 turn, sword and shield run, sword and shield slash, sword and shield slash, sword and shield slash, sword and shield slash, sword and shield block, sword and shield block idle, sword and shield block, sword and shield impact, sword and shield impact, sword and shield impact, sword and shield crouch, sword and shield crouching, sword and shield crouch idle, sword and shield slash, sword and shield crouch block, sword and shield crouch block idle, sword and shield crouching, sword and shield crouch block, sword and shield crouching, sword and shield attack, sword and shield attack, sword and shield attack, sword and shield idle, sword and shield idle, sword and shield idle, sword and shield kick, sword and shield casting, sword and shield attack, sword and shield power up, sword and shield death, sword and shield death, sword and shield turn, sword and shield turn, sword and shield idle, sword and shield casting, draw sword 1, draw sword 2, sheath sword 1, sheath sword 2 [PACK]
+  Sword and Shield Pack        | sword and shield walk, sword and shield run, sword and shield jump, sword and shield jump, sword and shield strafe, sword and shield strafe, sword and shield walk, sword and shield 180 turn, sword and shield strafe, sword and shield strafe, sword and shield 180 turn, sword and shield run, sword and shield slash, sword and shield slash, sword and shield slash, sword and shield slash, sword and shield block, sword and shield block idle, sword and shield block, sword and shield impact, sword and shield impact, sword and shield impact, sword and shield crouch, sword and shield crouching, sword and shield crouch idle, sword and shield slash, sword and shield crouch block, sword and shield crouch block idle, sword and shield crouching, sword and shield crouch block, sword and shield crouching, sword and shield attack, sword and shield attack, sword and shield attack, sword and shield idle, sword and shield idle, sword and shield idle, sword and shield kick, sword and shield casting, sword and shield attack, sword and shield power up, sword and shield death, sword and shield death, sword and shield turn, sword and shield turn, sword and shield idle, sword and shield casting, sheath sword 1, sheath sword 2 [PACK]
+  Magic Locomotion Pack        | standing idle, Standing Jump, Standing Jump Running, Standing Jump Running Landing, Standing Land To Standing Idle, Standing Run Back, Standing Run Forward, Standing Run Left, Standing Run Right, Standing Sprint Forward, Standing Turn Left 90, Standing Turn Right 90, Standing Walk Back, Standing Walk Forward, Standing Walk Left, Standing Walk Right [PACK]
+  Standing Run Left            | Running Left
+  Standing Jump Running        | Jumping While Running
+  Sword And Shield Run         | Sword And Shield Backward Run
+  Lite Magic Pack              | standing idle, Standing 1H Magic Attack 01, Standing 2H Magic Area Attack 02, standing idle 02, Standing Jump, Standing React Death Backward, Standing React Large From Front, Standing React Small From Front, Standing Run Back, Standing Run Forward, Standing Turn Left 90, Standing Turn Right 90, Standing Walk Back, Standing Walk Forward [PACK]
+  Great Sword Jump             | Great Sword Running Jump
+  Sword And Shield Strafe      | Sword And Shield Right Run Strafe
+  Sword And Shield 180 Turn    | Sword And Shield Run 180 Turn
+  Longbow Locomotion Pack      | standing run forward stop, standing idle, standing run back, standing run forward, standing run left, standing run right, standing turn 90 left, standing turn 90 right, standing walk back, standing walk forward, standing walk left, standing walk right [PACK]
+  Great Sword Run              | Great Sword Bacward Run
+  Sword And Shield Run         | Sword And Shield Run
+  Standing Jump Running To Run Forward | Running Jump To Run Forward
+  Look Behind Run              | Running While Looking Behind
+  Great Sword 180 Turn         | Great Sword Run 180 Turn
+  Standing Run Back            | Running Backwards
+  Standing Run Right           | Running Right
+  Standing Run Forward         | Running Forwards
+  Standing Jump Running Landing | Landing From Running  Jump Into Run Forward
+  Sword And Shield Strafe      | Sword And Shield Left Run Strafe
+  Gunplay                      | Male Standing Fantasy Gunplay With Hand Cannon
+  Standing Run Forward         | Running Forward With Bow
+  Sword And Shield Jump        | Sword And Shield Running Jump
+  Standing Run Right           | Running Right With Bow
+  Standing Run Back            | Running Backwards With Bow
+  Catwalk Walk Stop            | Male Walk Forward To Idle
+  Catwalk Idle To Walk Forward | Male Idle To Walk Forward
+=== run
+total 365
+  Run                          | Run Forward Facing Sideways
+  Standing Jump Running To Run Forward | Running Jump To Run Forward
+  Injured Run                  | Injured Running
+  Running Backward             | Female Run Backward
+  Fast Run                     | Running Fast
+  Run                          | Female Ninja Run
+  Drunk Run Forward            | Running Forward While Drunk
+  Slow Run                     | Slow Run Forward
+  Run Look Back                | Running Looking Back
+  Running                      | Running Leaning Back Or Forth
+  Unarmed Run Forward          | Running Forward
+  Unarmed Run Back             | Running Backwards
+  Run Forward                  | Rifle Run Forward
+  Running Right Turn           | Turning Right While Running
+  Running Up Stairs            | Running Up Stairs
+  Run Left                     | Rifle Run Left
+  Run Right                    | Rifle Run Right
+  Great Sword Run              | Great Sword Bacward Run
+  Zombie Run                   | Zombie Running
+  Pistol Run                   | Running With Aimed Pistol
+  Standing Run Left            | Running Left
+  Crouched Run                 | Running Crouched With Rifle
+  Running Arc                  | Female Ninja Run Arc Right
+  Running                      | Running Forward Quickly
+  Running                      | Male Weighted Run
+  Run Backwards                | Run Backwards To Crouched Stop
+  Running Arc                  | Female Ninja Run Arc Left
+  Running                      | Running With Intention
+  Wall Run                     | Wall Run To Jump Pose
+  Running Slide                | Running To Slide And Back To Running
+  Run Backward                 | Rifle Run Backward
+  Running Backward             | Backwards Running
+  Standard Run                 | Standard Running
+  Sword And Shield Run         | Sword And Shield Run
+  Running                      | Running While Carrying Someone
+  Running Backward             | Female Ninja Run Backward
+  Run Backwards                | Crouch To Run Backwards
+  Run To Dive                  | Diving From A Run Pose
+  Standing Run Forward         | Running Forward With Bow
+=== jog
+total 298
+  Jogging Stumble              | Brief Stumble While Jogging
+  Jog Backward Diagonal        | Soccer Jog Diagonal Backward Right
+  Jog Forward Diagonal         | Soccer Jog Diagonal Forward Left
+  Jogging                      | Jogging
+  Jog Forward Diagonal         | Soccer Jog Diagonal Forward Right
+  Jog Backward Diagonal        | Soccer Jog Diagonal Backward Left
+  Jog Forward                  | Soccer Jog Forward
+  Jog Backward                 | Soccer Jog Backward
+  Slow Jog                     | Jogging Slowly Varying Angles Of Twist
+  Injured Jog                  | Jogging While Holding And Checking Injured Arm
+  Jogging With Box             | Jogging While Carrying A Box
+  Jog In Circle                | Jog In A Circle
+  Strike Foward Jog            | Jogging And Kicking A Soccerball Forward
+  Slow Jog Backwards           | Jogging Slowly In Reverse Varying Angles Of Twist
+  Soccer Game Pack             | goalkeeper idle, goalkeeper sidestep, goalkeeper sidestep, goalkeeper scoop, goalkeeper catch, goalkeeper catch, goalkeeper idle, goalkeeper catch, goalkeeper body block, goalkeeper body block, goalkeeper pass, goalkeeper placing ball, goalkeeper overhand throw, goalkeeper drop kick, goalkeeper placing ball, goalkeeper directing, goalkeeper directing, goalkeeper catch, goalkeeper miss, goalkeeper diving save, goalkeeper diving save, offensive idle, throw in, receive soccerball, kick up soccerball, kick soccerball, kick soccerball, kneeing soccerball, kneeing soccerball, header soccerball, stall soccerball, stall soccerball, stall soccerball, stall soccerball, header soccerball, transition, soccer penalty kick, soccer tackle, soccer trip, scissor kick, soccer tackle, soccer tackle, strike foward jog, fallen idle, standing up, jog forward, jog backward, jog strafe left, jog strafe right, jog forward diagonal, jog forward diagonal, jog backward diagonal, jog backward diagonal, goalkeeper body block [PACK]
+  Jog Strafe Left              | Soccer Strafe Left
+  Jog Strafe Right             | Soccer Strafe Right
+  Chip                         | Soccer Chip Shot While Jogging
+  Entry                        | Jogging Around Ring Entry Sequence
+  Dribble                      | Forward Jog Dribbling Soccer Ball
+  Running                      | Running Leaning Back Or Forth
+  Strafe                       | Running Sideways Facing Forward
+  Run Backward                 | Happy Run Backward
+  Run Forward                  | Female Run Forward
+  Running Backward             | Backwards Running
+  Run Forward                  | Happy Run Forward
+  Standard Run                 | Standard Running
+  Running Backward Arc         | Female Run Backward Arc
+  Medium Run                   | Medium Speed Running
+  Slow Run                     | Slow Run Forward
+  Fast Run                     | Running Fast
+  Running                      | Running Forward Quickly
+  Running                      | Male Weighted Run
+  Running Right Turn           | Turning Right While Running
+  Running Backward             | Female Run Backward
+  Change Direction             | Change Direction 180 Degrees While Running
+  Run                          | Run Forward Facing Sideways
+  Backward Right Turn          | Backward Run Turning Right
+  Goofy Running                | Feminine Scared Cartoon-Like Goofy Run
+=== walk
+total 391
+  Walker Walk                  | Walking With Walker
+  Walking                      | Female Sexy Walk
+  Walking                      | Feminine Walk Forward
+  Crouched Walking             | Crouched Walk
+  Walking                      | Male Injured Walk
+  Walking Backwards            | Male Walk Backwards
+  Walking                      | Walking With A Swagger
+  Walking                      | Careful Walk
+  Walking                      | Boxing Left Side Step Walk
+  Walking                      | Male Brutal Walk
+  Catwalk Walk                 | Model Walking Down The Catwalk
+  Happy Walk Backward          | Backward Happy Walk
+  Walk In Circle               | Female Walking Counter Clockwise
+  Sneak Walk                   | Male Ninja Sneak Walk
+  Orc Walk                     | Female Orc Walk Forward
+  Dwarf Walk                   | Male Dwarf Walk Forward
+  Walk Backward                | Walking Backward In A Sad Disposition
+  Walk                         | Female Walk
+  Drunk Walk Backwards         | Walking While Drunk Backwards
+  Walking Left Turn            | Turning Left While Walking
+  Walking                      | Male Drunk Walk - Two Cycle Loop
+  Walk With Briefcase          | Male Walk With Briefcase
+  Walking Turn 180             | Turning 180 Degrees While Walking
+  Female Start Walking         | Female Start Walking
+  Walking Backwards            | Walking Backwards While Aiming Rifle
+  Crouched Walking             | Crouched Walk With Rifle
+  Great Sword Walk             | Great Sword Walk
+  Walking With Shopping Bag    | Male Walking With Shopping Bag
+  Walking                      | Male Happy Walk
+  Standing Walk Forward        | Walking Forwards
+  Iv Pole Walking              | Walking With An Iv Pole
+  Standing Walk Left           | Walking Left
+  Brutal To Happy Walking      | Brutal To Happy Walk
+  Strut Walking                | Male Strut Walk
+  Mutant Walking               | Mutant Brutal Walk
+  Walking Backwards            | Female Walk Backwards
+  Unarmed Walk Back            | Walking Backwards
+  Dwarf Walk                   | Female Dwarf Walk Forward
+  Sneak Walk                   | Female Ninja Sneak Walk
+=== jump
+total 164
+  Jump                         | Backward Running Jump
+  Mutant Jumping               | Mutant Eagle Jump
+  Jumping                      | Male Jumping Down From 4 Feet
+  Jumping                      | Jumping From Action Idle
+  Jumping Down                 | Male Frog Style Jump Down
+  Jump Backward                | Female Jump Running Backward
+  Jumping Up                   | Jumping Up From Action Idle
+  Big Jump                     | Big Jump To Roll
+  Jump                         | Jumping In Place
+  Great Sword Jump             | Great Sword Jump
+  Jump                         | Jump In Place
+  Rifle Jump                   | Standing Jumping Game Blend
+  Mutant Jumping               | Mutant Eagle Jump Game Blend
+  Jumping Down                 | Male Hulking Giant Jump Down
+  Jump                         | Female Forward Running Jump
+  Standing Jump Running        | Jumping While Running
+  Standing Jump                | Jumping And Landing In Place
+  Jumping Down                 | Jumping Down Over A Railing
+  Jumping Jacks                | Standard Jumping Jacks
+  Jumping Down                 | Male Cape Jump Down
+  Jumping Down                 | Male Menacing Jump Down
+  Jumping Rope                 | Jumping Rope
+  Running Jump                 | Jumping From A Sprint
+  Jumping                      | Step Up To Jump Over Object
+  Jump                         | Forward Running Jump
+  Jumping                      | Male Jumping Onto Platform
+  Run Strafing Jump            | Jumping While Run Strafing Right
+  Left Strafe Jump             | Jumping While Strafing Left- Loop
+  Jumping Down                 | Male Half Frog Style Jump Down
+  Forward Jump                 | Jumping Forward
+  Jumping                      | Male Jumping Over An Obstacle With 1 Hand Planted
+  Standing Jump                | Female Standing Jump In Place
+  Backward Jump                | Jumping While Walking Backwards
+  Strafing Jump                | Jumping While Strafing Right
+  Jumping Down                 | Squatting Jump Down To Squatting
+  Jumping                      | Jump Up
+  Joyful Jump                  | Ecstatic Jumping With Both Legs And Arms
+  Jump Away                    | Jumping Away To Avoid Explosion
+  Unarmed Jump                 | Jumping And Landing In Place
+=== double jump
+total 0
+=== flip
+total 36
+  Front Flip                   | Big Front Flip
+  Run To Flip                  | Running To Flip Off Wall
+  Front Twist Flip             | Run To Twist Flip To Run
+  Flip Kick                    | Flipping Backwards To Kick
+  Pilot Flips Switches         | Pilot Flips High Switches In A Helicopter
+  Pilot Flips Switches         | Pilot Flips Low Switches In A Helicopter
+  Back Flip To Uppercut        | Back Flip To Uppercut Combo
+  Running Forward Flip         | Doing A Forward Flip While Running
+  Flip Kick                    | Front Flip To Kick
+  Spin Flip Kick               | Spinning Flip Kick
+  Getting Hit Backwards        | Getting Hit And Flipping Backwards
+  Macaco Side                  | Capoeira Side Step Flip Escape
+  Stylish Flip                 | Aerial Backflip To Land
+  Esquiva 1                    | Capoeira Flip Escape
+  Backflip                     | Backflip Moving Backward
+  Free Test Pack               | samba dancing, back flip to uppercut, skinning test, left strafe walking, right strafe walking, idle, jump, walking, right turn 90, left turn 90, gangnam style [PACK]
+  Backflip                     | Standing Backflip
+  Capoeira Pack                | capoeira, capoeira, capoeira, armada to esquiva, armada, au, au to role, bencao, chapa 2, chapa giratoria 2, chapa-giratoria, chapaeu de couro, esquiva 3, esquiva 5, ginga backward, ginga forward, ginga sideways 1, ginga sideways 2, ginga variation 1, ginga variation 2, ginga variation 3, macaco side, martelo 2, martelo 3, martelo do chau sem mao, meia lua de compasso back, meia lua de compasso, meia lua de frente, pontera, queshada 1, rasteira 2, ginga sideways to au, queshada 2, rasteira 1, esquiva 1, esquiva 2, esquiva 4, martelo do chau, troca 1 [PACK]
+  Slipping                     | Frantically Slip And Fall To Stomach
+  Edge Slip                    | Slipping Off An Edge Then Regaining Balance
+  Stumble Backwards            | Slip And Fall Backwards
+  Shoved Reaction With Spin    | Reaction To Getting Clipped While Walking Unaware
+  Throw                        | Throwing An Object From A Standard Pose
+  Flying Shoulder Throw        | Lucha Libre Style Aerial Shoulder Throw
+  Throwing Dice                | Throwing Dice From A Sitting Position
+  Piloting                     | Pilot Flies Helicopter
+  Zombie Reaction Hit          | Zombie Reaction Hit Flinches
+  Throw Object                 | Picking Up Object And Throwing
+  Run And Throw Grenade        | Throw Grenade While Running
+  Teeter                       | Short Teetering On An Edge
+  Teeter                       | Long Teetering On An Edge
+  Falling Flat Impact          | Falling Flat On Face
+  Falling                      | Getting Scare And Goes Over A Cliff
+  Wobbling                     | Wobbling On A Ledge
+  Hit To Head                  | Hit To The Back Of Head With Object While Running
+  Hit To The Legs              | Hit To The Legs With Object While Running
+=== somersault
+total 0
+=== vault
+total 1
+  Vault Over Box               | Vault Over Box And Hide
+=== parkour
+total 42
+  Run To Flip                  | Running To Flip Off Wall
+  Wall Run                     | Male Runs Up A Wall Onto A Platform
+  Falling To Roll              | Mid-Air Falling Into A Roll Game Blend
+  Jump From Wall               | Hanging On Wall To Jump Off
+  Climbing Down Wall           | Climbing Down A Wall
+  Hard Landing                 | Mid-Air Falling To A Hard Landing
+  Jumping                      | Male Jumping Over An Obstacle With 1 Hand Planted
+  Climbing                     | Run To Start Climbing
+  Swinging                     | Male Two Arm Swing Onto Platform
+  Falling To Roll              | Mid-Air Falling Into A Roll
+  Run To Stop                  | Run To Stop Against Object
+  Running Slide                | Running To Slide And Back To Running
+  Jumping                      | Male Jumping Over And Obstacle Out To A Spin
+  Flip Kick                    | Flipping Backwards To Kick
+  Wall Run                     | Wall Run To Jump Pose
+  Running Jump                 | Fast Run To Jump Up Onto Higher Level
+  Sprint To Wall Climb         | Sprint To Wall Climb To Crouch Idle
+  Climbing Up Wall             | Climbing Up A Wall
+  Sprint To Backslide          | Sprint To Backslide
+  Jumping Down                 | Jumping Down From Higher Level
+  Two Cycle Sprint             | Full Speed Sprint For Two Cycles
+  Front Flip                   | Big Front Flip
+  Corkscrew Kip Up             | Male Sliding Corkscrew To Kip Up
+  Front Twist Flip             | Run To Twist Flip To Run
+  Jump Over                    | Flying Jump Rolling To Run
+  Big Jump                     | Big Jump To Roll
+  Falling To Landing           | Landing From Falling Idle
+  Hanging Idle                 | Hanging By Hands Against Wall
+  Quick Roll To Run            | Quick Roll Eveade To Run
+  Sprint                       | Standard Sprint
+  Jumping                      | Male Jumping Over An Obstacle With 2 Hands Planted
+  Idle To Sprint               | Start Sprint From Action Idle
+  Jumping Up                   | Jumping Up From Action Idle
+  Running Forward Flip         | Doing A Forward Flip While Running
+  Crouched To Sprinting        | Crouch To Sprinting
+  Run To Stop                  | Fast Stop From Full Run
+  Diagonal Wall Run            | Diagonal Wall Run To Jumping
+  Sprinting Forward Roll       | Sprint To Forward Roll To Sprinting
+  Flip Kick                    | Front Flip To Kick
+=== roll
+total 31
+  Stand To Roll                | Dive Roll From Standing
+  Dive Roll                    | Dive Roll From Standing
+  Run To Rolling               | Run Ro Roll Eveade To Run
+  Falling To Roll              | Mid-Air Falling Into A Roll Game Blend
+  Falling To Roll              | Mid-Air Falling Into A Roll
+  Running Dive Roll            | Rifle Run Dive Roll To Stopped
+  Prone Roll                   | Rifle Prone Rolling Right
+  Roll Left                    | Rolling Left While Aiming Rifle
+  Dive Roll                    | Dive Roll While Holding Rifle
+  Sprinting Forward Roll       | Sprint To Forward Roll To Sprinting
+  Quick Roll To Run            | Quick Roll Eveade To Run
+  Prone Roll                   | Rifle Prone Rolling Right Game Blend
+  Roll Left                    | Rolling Left While Aiming Rifle Game Blend
+  Roll Kicking                 | Roll Kick Landing On Hands And Knees
+  Skateboarding                | Skateboarding Idle
+  Skateboarding                | Skateboard Kick Push
+  Au To Role                   | Capoeira Cartwheel To Roll Escape
+  Action Adventure Pack        | idle, falling idle, idle, idle, running, stand to cover, walking, stand to cover, run to stop, left turn, right turn, jumping up, falling to roll, hard landing, cover to stand, idle, crouched sneaking left, crouched sneaking right, left cover sneak, right cover sneak, idle, cover to stand [PACK]
+  Jump Over                    | Flying Jump Rolling To Run
+  Running                      | Action Move Running And Rolling
+  Neck Stretching              | Stretching Neck Rolling Side To Side
+  Goalkeeper Pass              | Goalkeeper Rolling Pass
+  Goalkeeper Scoop             | Goalkeeper Scooping The Ball From A Roll
+  Big Jump                     | Big Jump To Roll
+  Rallying                     | Rallying The Crowd To Make Them Cheer
+  Wall Crash                   | Swing To Crashing Into A Wall
+  Gathering Objects            | Squatting Down To Gather Objects
+  Flying Knee Punch Combo      | Jumping Knee Followed By A Punch
+  Military Signaling           | Military Signaling "Follow" While Crouched
+  Shaking Dice                 | Collecting Dice In Cup And Shaking Them
+  Capoeira Pack                | capoeira, capoeira, capoeira, armada to esquiva, armada, au, au to role, bencao, chapa 2, chapa giratoria 2, chapa-giratoria, chapaeu de couro, esquiva 3, esquiva 5, ginga backward, ginga forward, ginga sideways 1, ginga sideways 2, ginga variation 1, ginga variation 2, ginga variation 3, macaco side, martelo 2, martelo 3, martelo do chau sem mao, meia lua de compasso back, meia lua de compasso, meia lua de frente, pontera, queshada 1, rasteira 2, ginga sideways to au, queshada 2, rasteira 1, esquiva 1, esquiva 2, esquiva 4, martelo do chau, troca 1 [PACK]
+=== strafe
+total 72
+  Left Strafe                  | Running Strafe To The Left
+  Strafe Right                 | Start Strafe Walk Right
+  Pistol Strafe                | Strafe Left With An Aimed Pistol
+  Great Sword Strafe           | Great Sword Strafe Left Run
+  Sword And Shield Strafe      | Sword And Shield Left Strafe Walk
+  Crouch Walk Strafe Right     | Crouched Rifle Walk Strafe Right
+  Sword And Shield Strafe      | Sword And Shield Left Run Strafe
+  Right Strafe                 | Running Strafe To The Right
+  Crouch Strafe Run Left       | Crouched Strafe Run Left While Aiming Rifle
+  Strafe                       | Strafe Right With Rifle
+  Strafe                       | Left Male Strafe
+  Strafe                       | Right Male Strafe
+  Strafe                       | Strafe Left While Aiming Rifle
+  Jog Strafe Left              | Soccer Strafe Left
+  Jog Strafe Right             | Soccer Strafe Right
+  Left Strafe Walk             | Walking Strafe To The Left
+  Strafe Left                  | Rifle Walk Strafe Left
+  Left Strafe Walking          | Strafe Walking To The Left
+  Right Strafe Walk            | Walking Strafe To The Right
+  Walk Strafe Left             | Walking Strafe To The Left
+  Right Strafe Walking         | Strafe Walking To The Right
+  Walk Strafe Right            | Walking Strafe To The Right
+  Strafe Right                 | Rifle Walk Strafe Right
+  Strafe Right                 | Crouched Idle To Strafe Walk Right
+  Pistol Strafe                | Strafe Right With An Aimed Pistol
+  Strafe Right Stop            | Stop Strafe Walk Right
+  Great Sword Strafe           | Great Sword Strafe Left Walk
+  Great Sword Strafe           | Great Sword Strafe Right Run
+  Crouched Strafe Run          | Run Crouched Strafe Right With Rifle
+  Great Sword Strafe           | Great Sword Strafe Right Walk
+  Sword And Shield Strafe      | Sword And Shield Right Strafe Walk
+  Crouch Walk Strafe Left      | Crouched Rifle Walk Strafe Left
+  Sword And Shield Strafe      | Sword And Shield Right Run Strafe
+  Left Strafe Jump             | Jumping While Strafing Left- Loop
+  Female Locomotion Pack       | left strafe, right strafe, running, jump, idle, left strafe walk, left turn, right strafe walk, right turn, walking [PACK]
+  Female Basic Locomotion Pack | left strafe, right strafe, running, jump, idle, left strafe walk, left turn, right strafe walk, right turn, left turn, walking, right turn [PACK]
+  Male Locomotion Pack         | left strafe walking, right strafe walking, left strafe, right strafe, idle, jump, walking, right turn 90, left turn 90, standard run [PACK]
+  Locomotion Pack              | left strafe walking, right strafe walking, left strafe, left turn, right strafe, right turn, idle, jump, running, walking, right turn 90, left turn 90 [PACK]
+  Basic Locomotion Pack        | left strafe walking, right strafe walking, idle, jump, walking, right turn 90, left turn 90 [PACK]
+=== crouch
+total 175
+  Walk Crouching Right         | Rifle Crouched Walk Right
+  Crouching                    | Crouching From Standing Position
+  Crouch To Stand              | Crouch To Stand With Pistol
+  Crouch Turn To Stand         | Crouch Turn 180 To Stand
+  Crouched Run                 | Running Crouched With Rifle
+  Idle Crouching               | Rifle Crouched Idle
+  Crouching Idle               | Low Crouching Idle
+  Crouch Idle                  | Crouching Holding A Rifle
+  Crouch Idle                  | Crouch Idle
+  Idle Crouching Aiming        | Rifle Crouched Idle Aiming
+  Crouch Idle                  | Crouch Idle With Axe
+  Crouched Sneaking Left       | Crouched Cover Sneaking Left
+  Crouch Walk Forward          | Walking Forward While Crouched
+  Crouch Walk Back             | Walking Backwards While Crouched
+  Crouch Walk Right            | Walking Right While Crouched
+  Crouch Walk Left             | Walking Left While Crouched
+  Rifle Crouch Walk            | Rifle Walking Crouched
+  Great Sword Crouching        | Great Sword Crouch To Stand
+  Walk Crouching Backward      | Rifle Crouched Walk Backward
+  Walk Crouching Left          | Rifle Crouched Walk Left
+  Crouched To Standing         | Crouch To Stand Transition
+  Crouch Idle 03 Looking Over  | Crouching Looking Over Object With Bow
+  Crouch Walking               | Crouched Walking While Aiming Rifle
+  Crouched Walking             | Crouched Walk
+  Great Sword Crouching        | Great Sword Stand To Crouch
+  Crouch Cover Turn            | Changing Direction In Crouch Cover
+  Walk Crouching Forward Right | Rifle Crouched Walk Forward Right
+  Walk Crouching Forward Left  | Rifle Crouched Walk Forward Left
+  Great Sword Crouching        | Great Sword Crouch To Block
+  Crouch Torch Walk Back       | Walking Backwards While Crouched
+  Rifle Crouch Walk            | Rifle Walking Right Crouched
+  Crouch Torch Idle 01         | Crouch Idle
+  Crouched Walking             | Crouched Walk With Rifle
+  Crouch Walk                  | Crouched Against Wall To Crouch Walk
+  Crouch To Standing           | Transition From Crouching To Standing With Bow
+  Crouch Torch Walk Right      | Walking Right While Crouched
+  Crouch Torch Walk Left       | Walking Left While Crouched
+  Rifle Crouch Idle To Walk    | Rifle Crouch Idle To Crouch Walk
+  Rifle Crouch Backward Walk   | Rifle Walking Backward Crouched
+=== idle
+total 507
+  Fight Idle To Standing Idle  | Transition From Fight Idle To Standing Idle
+  Action Idle To Fight Idle    | Transition From Action Idle To Fight Idle
+  Action Idle To Standing Idle | Transition From Action Idle To Standing Idle
+  Standing Idle To Fight Idle  | Transition From Standing Idle To Fight Idle
+  Idle                         | Standing Idle
+  Idle                         | Standing Short Idle
+  Idle                         | Weight Shift Idle
+  Breathing Idle               | Breathing Idle
+  Kneeling Idle                | Kneeling Idle
+  Standing Idle                | Standing Idle
+  Sad Idle                     | Sad Idle Variation 1
+  Neutral Idle                 | Neutral Idle
+  Orc Idle                     | Female Orc Standing Idle
+  Happy Idle                   | Happy Idle Variation 2
+  Great Sword Idle             | Great Sword Idle
+  Dwarf Idle                   | Female Dwarf Idle Var. 3
+  Orc Idle                     | Male Orc Standing Idle
+  Hanging Idle                 | Hanging From A Ledge Idle
+  Great Sword Idle             | Great Sword Admiring Idle
+  Defeat Idle                  | Big Vegas Defeat Idle
+  Ninja Idle                   | Female Ninja Idle
+  Happy Idle                   | Happy Idle Variation 1
+  Ninja Idle                   | Female Ninja Idle Var. 3
+  Ninja Idle                   | Female Ninja Idle Var. 2
+  Rifle Idle                   | Rifle Idle
+  Dwarf Idle                   | Female Dwarf Standing Idle
+  Catwalk Idle To Twist R      | Female Idle To Twist Right Idle
+  Laying Idle                  | Laying On A Bed Idle
+  Mutant Idle                  | Mutant Stretching Idle
+  Old Man Idle                 | Old Man Standing Idle
+  Victory Idle                 | Big Vegas Victory Idle
+  Unarmed Idle                 | Standing Idle- Loop
+  Ninja Idle                   | Female Ninja Idle Var. 1
+  Great Sword Idle             | Great Sword Strike A Pose Idle
+  Injured Idle                 | Injured Standard Idle
+  Great Sword Idle             | Great Sword Look Around Idle
+  Unarmed Idle 01              | Unarmed Idle
+  Rifle Idle                   | Rifle Idle Looking Around
+  Idle                         | Male Boxing Idle
+=== landing
+total 24
+  Standing Jump Running Landing | Landing From Running  Jump Into Run Forward
+  Hard Landing                 | Mid-Air Falling To A Hard Landing Game Blend
+  Hard Landing                 | Mid-Air Falling To A Hard Landing
+  Falling To Landing           | Landing From Falling Idle
+  Landing                      | Landing From Jump
+  Standing Land To Standing Idle | Landing From Running Jump Into Standing Idle
+  Magic Locomotion Pack        | standing idle, Standing Jump, Standing Jump Running, Standing Jump Running Landing, Standing Land To Standing Idle, Standing Run Back, Standing Run Forward, Standing Run Left, Standing Run Right, Standing Sprint Forward, Standing Turn Left 90, Standing Turn Right 90, Standing Walk Back, Standing Walk Forward, Standing Walk Left, Standing Walk Right [PACK]
+  Action Adventure Pack        | idle, falling idle, idle, idle, running, stand to cover, walking, stand to cover, run to stop, left turn, right turn, jumping up, falling to roll, hard landing, cover to stand, idle, crouched sneaking left, crouched sneaking right, left cover sneak, right cover sneak, idle, cover to stand [PACK]
+  Standing Jump                | Jumping And Landing In Place With Bow
+  Fall A Land To Run Forward   | Land From Fall A To Run Forward
+  Standing Jump                | Jumping And Landing In Place
+  Unarmed Jump Running         | Running Jump And Landing
+  Fall A Land To Standing Idle 01 | Land From Fall A To Standing Idle
+  Swing To Land                | Swing Backflip To Crouched Land
+  Swing To Land                | Poor Swing In To Crouched Land
+  Swing To Land                | High Leg Swing To Crouched Land
+  Swing To Land                | Swing Backflip To Superhero Pose
+  Swing Into Wall              | Swing In Hit Wall To Crouched Land
+  Unarmed Jump                 | Jumping And Landing In Place
+  Standing Jump                | Jumping And Landing In Place With Axe
+  Roll Kicking                 | Roll Kick Landing On Hands And Knees
+  Standing Torch Jump          | Jumping And Landing In Place With Torch
+  Pro Magic Pack               | standing 1H cast spell 01, standing idle, Standing 1H Magic Attack 01, Standing 1H Magic Attack 02, Standing 1H Magic Attack 03, Standing 2H Cast Spell 01, Standing 2H Magic Area Attack 01, Standing 2H Magic Area Attack 02, Standing 2H Magic Attack 01, Standing 2H Magic Attack 02, Standing 2H Magic Attack 03, Standing 2H Magic Attack 04, Standing 2H Magic Attack 05, standing idle 02, Crouch Idle, Crouch To Standing Idle, Crouch Turn Left 90, Crouch Turn Right 90, Crouch Walk Back, Crouch Walk Forward, Crouch Walk Left, Crouch Walk Right, Standing Block Idle, Standing Block React Large, Standing Block End, Standing Block Start, Standing Idle 03, Standing Idle 04, Standing Idle To Crouch, Standing Jump, Standing Jump Running, Standing Jump Running Landing, Standing Land To Standing Idle, Standing React Death Backward, Standing React Death Forward, Standing React Death Left, Standing React Death Right, Standing React Large From Back, Standing React Large From Front, Standing React Large From Left, Standing React Large From Right, Standing React Small From Back, Standing React Small From Front, Standing React Small From Left, Standing React Small From Right, Standing Run Back, Standing Run Forward, Standing Run Left, Standing Run Right, Standing Sprint Forward, Standing Turn Left 90, Standing Turn Right 90, Standing Walk Back, Standing Walk Forward, Standing Walk Left, Standing Walk Right [PACK]
+  Pro Longbow Pack             | standing draw arrow, standing block, standing death backward, standing death forward, standing dive forward, standing equip bow, standing run forward stop, standing idle, standing idle looking, standing idle examine, standing idle unarmed, fall loop, land to standing idle, land to run forward, standing dodge backward, standing dodge forward, standing dodge left, standing dodge right, standing melee kick, standing aim overdraw, standing melee punch, standing react from headshot, standing react from front, standing aim recoil, standing run back, standing run forward, standing disarm bow, standing run left, standing run right, standing turn 90 left, standing turn 90 right, standing walk back, standing aim walk back, standing walk forward, standing aim walk forward, standing walk left, standing aim walk left, standing walk right, standing aim walk right [PACK]
+=== cartwheel
+total 5
+  Cartwheel                    | Male Doing A Cartwheel
+  Au                           | Capoeira Cartwheel Move
+  Ginga Sideways To Au         | Capoeira Step To Cartwheel
+  Au To Role                   | Capoeira Cartwheel To Roll Escape
+  Capoeira Pack                | capoeira, capoeira, capoeira, armada to esquiva, armada, au, au to role, bencao, chapa 2, chapa giratoria 2, chapa-giratoria, chapaeu de couro, esquiva 3, esquiva 5, ginga backward, ginga forward, ginga sideways 1, ginga sideways 2, ginga variation 1, ginga variation 2, ginga variation 3, macaco side, martelo 2, martelo 3, martelo do chau sem mao, meia lua de compasso back, meia lua de compasso, meia lua de frente, pontera, queshada 1, rasteira 2, ginga sideways to au, queshada 2, rasteira 1, esquiva 1, esquiva 2, esquiva 4, martelo do chau, troca 1 [PACK]
+=== wall run
+total 13
+  Wall Run                     | Wall Run To Jump Pose
+  Diagonal Wall Run            | Diagonal Wall Run To Jumping
+  Wall Run                     | Male Runs Up A Wall Onto A Platform
+  Run To Flip                  | Running To Flip Off Wall
+  Fall A Land To Run Forward   | Land From Fall A To Run Forward
+  Fall Flat                    | Falling Flat On Face From A Hit To The Back While Running
+  Action Adventure Pack        | idle, falling idle, idle, idle, running, stand to cover, walking, stand to cover, run to stop, left turn, right turn, jumping up, falling to roll, hard landing, cover to stand, idle, crouched sneaking left, crouched sneaking right, left cover sneak, right cover sneak, idle, cover to stand [PACK]
+  Hit To Head                  | Hit To The Back Of Head With Object While Running
+  Hit To The Legs              | Hit To The Legs With Object While Running
+  Hit To Side Of Body          | Hit To Side Of The Body With Object While Running
+  Goalkeeper Catch             | Goalkeeper Running Jump Catch Ball High Height
+  Soccer Tackle                | Running Fall Over A Soccer Slide Tackle
+  Soccer Game Pack             | goalkeeper idle, goalkeeper sidestep, goalkeeper sidestep, goalkeeper scoop, goalkeeper catch, goalkeeper catch, goalkeeper idle, goalkeeper catch, goalkeeper body block, goalkeeper body block, goalkeeper pass, goalkeeper placing ball, goalkeeper overhand throw, goalkeeper drop kick, goalkeeper placing ball, goalkeeper directing, goalkeeper directing, goalkeeper catch, goalkeeper miss, goalkeeper diving save, goalkeeper diving save, offensive idle, throw in, receive soccerball, kick up soccerball, kick soccerball, kick soccerball, kneeing soccerball, kneeing soccerball, header soccerball, stall soccerball, stall soccerball, stall soccerball, stall soccerball, header soccerball, transition, soccer penalty kick, soccer tackle, soccer trip, scissor kick, soccer tackle, soccer tackle, strike foward jog, fallen idle, standing up, jog forward, jog backward, jog strafe left, jog strafe right, jog forward diagonal, jog forward diagonal, jog backward diagonal, jog backward diagonal, goalkeeper body block [PACK]
+=== dash
+total 191
+  Strafe                       | Running Sideways Facing Forward
+  Run Backward                 | Happy Run Backward
+  Run Forward                  | Female Run Forward
+  Running Backward             | Backwards Running
+  Run Forward                  | Happy Run Forward
+  Standard Run                 | Standard Running
+  Running Backward Arc         | Female Run Backward Arc
+  Medium Run                   | Medium Speed Running
+  Running                      | Running Leaning Back Or Forth
+  Change Direction             | Change Direction 180 Degrees While Running
+  Run                          | Run Forward Facing Sideways
+  Slow Run                     | Slow Run Forward
+  Fast Run                     | Running Fast
+  Backward Right Turn          | Backward Run Turning Right
+  Running Right Turn           | Turning Right While Running
+  Running Backward             | Female Run Backward
+  Run Look Back                | Running Looking Back
+  Running                      | Running Forward Quickly
+  Running                      | Male Weighted Run
+  Slow Jog                     | Jogging Slowly Varying Angles Of Twist
+  Goofy Running                | Feminine Scared Cartoon-Like Goofy Run
+  Run Backward                 | Running Backward In A Sad Disposition
+  Run Forward                  | Running Forward In A Sad Disposition
+  Run Arc Left                 | Female Run Arc Left
+  Treadmill Running            | Running On A Treadmill From Slow To Fast
+  Drunk Run Backward           | Running Backward While Drunk
+  Injured Run Right Turn       | Injured Running Turning Right
+  Injured Run Left Turn        | Injured Running Turning Left
+  Running Backward Arc         | Female Ninja Run Backward Arc Right
+  Running                      | Silly Run
+  Injured Run                  | Injured Running
+  Drunk Run Forward            | Running Forward While Drunk
+  Run To Dive                  | Diving From A Run Pose
+  Mutant Run                   | Mutant Running
+  Injured Run Backwards Left Turn | Injured Running Backwards Turning Left
+  Running                      | Running With Intention
+  Great Sword Strafe           | Great Sword Strafe Right Run
+  Right Strafe                 | Running Strafe To The Right
+  Standing Torch Run Left      | Running Left With Torch
