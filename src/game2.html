@@ -44,6 +44,8 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 @media (max-width: 1500px) { #help { display: none; } }
 #alert { top: calc(64px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); z-index: 6; width: min(420px, calc(100vw - 32px)); padding: var(--s3); border-color: var(--signal); display: grid; gap: var(--s1); }
 #alert b { color: var(--signal); font-size: 13px; }
+#reportnote { width: 100%; box-sizing: border-box; font: 400 14px/1.4 var(--font-ui); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: var(--s2); resize: vertical; -webkit-user-select: text; user-select: text; }
+#reportnote:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
 #alert span { color: var(--ink-soft); overflow-wrap: anywhere; }
 #alert .row2 { display: flex; gap: var(--s2); margin-top: var(--s1); }
 #toast { top: calc(64px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); padding: var(--s2) var(--s3); max-width: calc(100vw - 32px); text-align: center; }
@@ -683,14 +685,17 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v4 · 2026-09-29';
+const BUILD = 'v7 · 2026-09-29';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
-let db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
-(async () => {
+let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
+async function connectDb() {
   for (let i = 0; i < 50 && !window.claude?.use; i++) await new Promise((r) => setTimeout(r, 200));
-  try { db = window.claude?.use ? await window.claude.use('db') : null; } catch (_) { db = null; }
-})();
+  if (!window.claude?.use) { dbState = 'no-runtime (window.claude missing in this viewer)'; return; }
+  try { db = await window.claude.use('db'); dbState = db ? 'ready' : 'unavailable (use("db") returned null)'; }
+  catch (e) { db = null; dbState = 'error: ' + (e?.code || e?.message || e); }
+}
+connectDb();
 const trackSets = new WeakMap();
 const tracksOf = (c) => { let s = trackSets.get(c); if (!s) { s = new Set(c.tracks.map((t) => t.name)); trackSets.set(c, s); } return s; };
 function snapshot(kind, detail) {
@@ -702,7 +707,7 @@ function snapshot(kind, detail) {
       overrides: [...ovr.keys()].map(desc), loops: [...locoActive].filter((a) => a.getEffectiveWeight() > 0.001).map(desc),
       pose: { deviationFromTpose: +lastDev.toFixed(3), legCoverage: +lastLeg.toFixed(2), armCoverage: +lastArm.toFixed(2) } };
   } catch (e) { st = { stateError: String(e) }; }
-  return { at: new Date().toISOString(), kind, detail: String(detail).slice(0, 800), build: BUILD, device: navigator.userAgent, screen: `${innerWidth}x${innerHeight}`, ...st, events: events.slice(-25) };
+  return { at: new Date().toISOString(), kind, detail: String(detail).slice(0, 800), build: BUILD, dbState, device: navigator.userAgent, screen: `${innerWidth}x${innerHeight}`, ...st, events: events.slice(-25) };
 }
 const sentAt = {};
 async function report(kind, detail, force) {
@@ -712,10 +717,13 @@ async function report(kind, detail, force) {
   const r = snapshot(kind, detail); lastReport = r;
   console.warn('[report]', r);
   let sent = false;
-  try { if (db) { await db.collection('reports').add(r); sent = true; } } catch (e) { r.sendError = e?.code || String(e); }
+  if (!db && !/^no-runtime/.test(dbState)) await connectDb();
+  r.dbState = dbState;
+  try { if (db) { await db.collection('reports').add(r); sent = true; } } catch (e) { r.sendError = e?.code || e?.message || String(e); }
+  r.sent = sent;
   const titles = { tpose: 'T-pose caught', coverage: 'Pose gap caught', 'missing-clip': 'Missing animation', error: 'Script error', manual: 'Report' };
   $('alerttitle').textContent = titles[kind] || kind;
-  $('alerttext').textContent = `${detail}. ${sent ? 'Sent to Claude.' : 'Could not send from here. Tap Copy report and paste it in the chat.'}`;
+  $('alerttext').textContent = `${detail}. ${sent ? 'Sent to Claude.' : `Could not send from here (${r.sendError || dbState}). Tap Copy report and paste it in the chat.`}`;
   $('alert').hidden = false;
 }
 function watchdog(dt) {
@@ -751,6 +759,7 @@ const keys = new Set();
 let walkToggle = false, jumpQueued = false, slideQueued = false, slideHeld = false;
 const GAME_KEYS = ['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','ShiftLeft','ShiftRight','KeyC'];
 addEventListener('keydown', (e) => {
+  if (e.target instanceof HTMLTextAreaElement) return;
   if (movesOpen) { if (e.code === 'Escape') closeMoves(); return; }
   if (GAME_KEYS.includes(e.code)) e.preventDefault();
   if (e.repeat) return;
@@ -786,7 +795,13 @@ press($('aimbtn'), () => { aimHeld = true; });
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('aimbtn').addEventListener(ev, () => { aimHeld = false; });
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) { $('atkbtn').addEventListener(ev, attackRelease); $('blockbtn').addEventListener(ev, blockRelease); }
 $('gearbtn').addEventListener('click', () => { const g = GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + 1) % GEAR_ORDER.length]; setGear(g); toast('Gear: ' + GEARS[g], 1200); });
-$('reportbtn').addEventListener('click', () => report('manual', 'Report sent from the Moves screen', true));
+const manualReport = () => {
+  const note = ($('reportnote')?.value || '').trim();
+  report('manual', note || 'Report sent from the Moves screen (no note)', true);
+  if ($('reportnote')) $('reportnote').value = '';
+};
+$('reportbtn').addEventListener('click', manualReport);
+document.addEventListener('click', (e) => { if (e.target.closest('#reportsend')) manualReport(); });
 
 let camYaw = Math.PI, camPitch = 0.28, camDist = 3.4;
 const canvas = renderer.domElement;
@@ -1126,7 +1141,7 @@ function openMoves() {
   speed = 0; mode = 'ground'; crouch = false; player.position.y = 0; stopOvr(0.1);
   savedCam = { camYaw, camPitch, camDist };
   const wide = innerWidth >= 820;
-  camYaw = yaw + Math.PI; camPitch = 0.1; camDist = wide ? 3.8 : 5.4;
+  camYaw = yaw + Math.PI; camPitch = 0.1; camDist = wide ? 3.8 : 6.2;
   viewShift = wide ? { x: 200 / innerWidth, y: 0 } : { x: 0, y: 0.28 };
   resize();
   const last = previewing || { kind: 'slot', slot: 'sprint', id: pool.sprint[0] };
@@ -1173,6 +1188,9 @@ function preview(p) {
 function buildMoves() {
   const body = $('movesbody');
   const h = [];
+  h.push(`<h3>Report a problem</h3><label for="reportnote" class="note" style="display:block;margin:0 0 8px">What looked wrong? Preview it first, then send. The report includes what the character was doing.</label>` +
+    `<textarea id="reportnote" rows="2" placeholder="e.g. arms twist backwards in Run right"></textarea>` +
+    `<button type="button" id="reportsend" style="margin-top:8px">Send report</button>`);
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p><p class="note">Everything ticked below is for <b id="movesfor">${CLASSES[klass].label}</b>. Each class keeps its own set.</p>`);

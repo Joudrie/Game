@@ -162,6 +162,11 @@ From Joudrie/lego: 884 entries, 44 with full-body paintings. The paintings match
   - **Clips:** Mesh2Motion walk-backwards and sidesteps for walk speed; SWAT run-strafes for faster aiming.
   - **Saber guard:** holds the high-guard pose over moving legs. Walk speed only, no jumping.
   - **Pistol aim:** holds the aimed pose, eases the camera closer, and allows up to 75% of run speed.
+- **v7: reports:**
+  - The Moves screen has a **"What looked wrong?"** note that goes with Send report.
+  - Reports record why sending failed (`dbState`, `sendError`).
+  - Your first manual report from the iPhone app could not reach the database, so it was pasted by hand. The next report will say why.
+  - Phone previews are framed wider.
 - **Next, in order:**
   1. Your 3D characters (needs `HF_TOKEN`).
   2. Mixamo downloads for the gaps above.
