@@ -156,6 +156,12 @@ From Joudrie/lego: 884 entries, 44 with full-body paintings. The paintings match
     - Heavy infantry: heavy stride walk, soldier run, and a hard-jog sprint matched to 5.8 m/s so the feet don't slide.
     - Force users: the anime dash sprint.
     - Light infantry: the standard set.
+- **v6: strafing:**
+  - **Controls:** hold **Aim** with the pistol (right mouse, `Q` or LB), or **Block** with the saber lit.
+  - **Movement:** the character keeps facing the camera and walks sideways or backwards, blending the two clips closest to where you push. Each clip's travel direction is measured from its planted foot rather than taken from its name. Mesh2Motion's "Strafe_left" actually moves right.
+  - **Clips:** Mesh2Motion walk-backwards and sidesteps for walk speed; SWAT run-strafes for faster aiming.
+  - **Saber guard:** holds the high-guard pose over moving legs. Walk speed only, no jumping.
+  - **Pistol aim:** holds the aimed pose, eases the camera closer, and allows up to 75% of run speed.
 - **Next, in order:**
   1. Your 3D characters (needs `HF_TOKEN`).
   2. Mixamo downloads for the gaps above.
