@@ -150,6 +150,12 @@ From Joudrie/lego: 884 entries, 44 with full-body paintings. The paintings match
 
   - **Rifle:** no free two-handed rifle animations exist. The SWAT and Toon Shooter gun clips are all one-handed. The rifle waits for the Mixamo Rifle 8-Way pack.
   - **Unholster and draw:** no free assets. Mixamo has `Draw Sword 1`, `Draw Sword 2`, `Sheath Sword 1`, `Sheath Sword 2`, `Grab Rifle From Back` and `Put Back Rifle`.
+- **v5:**
+  - **Running with a weapon:** standing still, the whole upper body holds the stance. Once moving, only the weapon arm holds it (both arms for dual or staff), so the torso bobs and the free arm swings.
+  - **Each class keeps its own ticked moves in the Moves screen:**
+    - Heavy infantry: heavy stride walk, soldier run, and a hard-jog sprint matched to 5.8 m/s so the feet don't slide.
+    - Force users: the anime dash sprint.
+    - Light infantry: the standard set.
 - **Next, in order:**
   1. Your 3D characters (needs `HF_TOKEN`).
   2. Mixamo downloads for the gaps above.
