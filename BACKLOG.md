@@ -10,11 +10,15 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 ---
 
 ## 1. Enemies and combat testing
-- [ ] **About five enemy soldiers** (not zombies) within a close radius. They're aggressive and shoot at you, but do no damage. *[free assets: Quaternius SWAT, Toon Shooter soldiers, cyberpunk robots, all with shoot, hit and death clips]*
-- [ ] **Ragdoll on death, bodies staying 1–2 minutes** like Call of Duty. *[free assets: Rapier or Jolt physics, downloaded]*
-- [ ] **Hit reactions** on enemies. *[free assets]*
+- [x] ~~Five enemy soldiers, deaths by cause (head, torso, legs, explosion, push, wall impact), bodies staying 90 s, hit reactions.~~ Done in v12.
+- [ ] **Physics ragdoll** on top of the death animations, so bodies slump over steps, roofs and each other. *[free assets: Rapier or Jolt physics, downloaded]*
+- [ ] **Enemies that look like enemies.** They use your hero's body with a darker tint for now. The SWAT soldier model is on disk, but its body doesn't fit our skeleton's proportions. *[free assets]*
+- [ ] **More death variety:**
+  - Mixamo has exact matches for your rules: `Death From Front Headshot`, `Hit To The Legs`, `Flying Back Death`, `Swing Into Wall`. The full list is in `assets/deaths/mixamo_death_hit_names.txt`. *[needs you: Mixamo login]*
+  - The 27 openmw endorphin deaths are the best free set but have no licence. *[needs you: ask the author or skip]*
+- [ ] **Death direction:** fall away from the shot. Needs the clips sorted by which way they fall, and mirrored copies.
 - [ ] **Health per class,** using your rules: Force lowest, heavy highest. The current numbers are placeholders and unused.
-- [ ] **Saber hits connect with enemies:** damage, hit stop, sparks.
+- [ ] **Saber hits on enemies:** they already do damage (55 per hit, 90 for a heavy). Still to do: hit stop, sparks, and saber-specific deaths.
 - [ ] **Blocking stops incoming shots and attacks;** parry timing.
 - [ ] **Enemy AI:** approach, take cover, shoot. *[free assets: Yuka]*
 
@@ -41,7 +45,7 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
   *[needs you: Mixamo `Reloading`; the variants come from procedural bolt and magazine motion]*
 - [ ] **Weapon switching** between rifle and saber.
 - [ ] **First-person mode:** arms, aim down sights, reloads. *[free assets: CC0 FPS rifle hands; better: Sketchfab ccransh FPS hands, CC-BY]*
-- [ ] **Pistol shooting:** muzzle flash, recoil, hit markers. The aim stance exists already. *[free assets]*
+- [ ] **Pistol feel:** the shot, flash, tracer and hit marker work (v12). Still to do: recoil animation, sound, ammo and reload.
 - [ ] **Shotgun.** *[later]*
 
 ## 4. Grappling hook
@@ -60,9 +64,9 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 - [ ] **The Second's green trail** when he bursts forward, and a Force dash.
 
 ## 6. Gadgets and abilities
-- [ ] **Impact grenade** you can throw. *[free assets: throw clips, explosion sounds]*
+- [x] ~~Impact grenade.~~ Done in v12. Still to do: a grenade model, sound, and a count per life.
 - [ ] **Ability pool assigned per character** as each one is added. Examples: wrist grapple, Force push, dash, grenades.
-- [ ] **Force moves:** push, pull, levitate. *[free assets: Two-hand Blast, Power Up, Levitate clips]*
+- [ ] **Force moves:** push is done (v12); pull and levitate still to do. *[free assets: Power Up, Levitate clips]*
 
 ## 7. Your characters
 - [ ] **Turn the paintings into 3D models,** starting with The Second (turnaround ready). *[needs you: `HF_TOKEN` in the environment settings]*

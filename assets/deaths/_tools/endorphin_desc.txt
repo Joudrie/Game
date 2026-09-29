@@ -1,0 +1,27 @@
+2_Death_Back.bvh	3.68	falls backward (starts ~0.47s, on ground ~0.93s), ends on its side; head travels 1.5 body-heights back; passes through kneel/crouch height before ground
+2_Death_Back_Far.bvh	4.12	falls backward (starts ~0.47s, on ground ~0.70s), ends face-down; head travels 2.3 body-heights back (thrown far)
+2_Death_Back_Far2.bvh	3.88	falls to its left (starts ~0.70s, on ground ~0.93s), ends face-up; head travels 1.2 body-heights back; passes through kneel/crouch height before ground
+2_Death_Back_Far_Flip.bvh	2.98	falls forward (starts ~0.47s, on ground ~0.93s), ends face-down; head travels 0.7 body-heights back; passes through kneel/crouch height before ground
+2_Death_Down.bvh	3.25	falls to its left (starts ~0.47s, on ground ~2.10s), ends on its side; head travels 0.8 body-heights back; slow collapse (1.6s from first sag to ground); passes through kneel/crouch height before ground
+2_Death_Down_Left.bvh	3.08	falls to its right (starts ~0.47s, on ground ~0.93s), ends face-down; head travels 0.7 body-heights sideways; passes through kneel/crouch height before ground
+2_Death_Down_Right.bvh	1.68	falls to its left (starts ~0.47s, on ground ~0.70s), ends face-up; head travels 0.7 body-heights sideways; passes through kneel/crouch height before ground
+2_Death_Down_Right2.bvh	3.12	falls to its left (starts ~0.47s, on ground ~1.63s), ends face-up; head travels 1.1 body-heights sideways; slow collapse (1.2s from first sag to ground); passes through kneel/crouch height before ground
+2_Death_Forward_Far.bvh	3.58	falls forward (starts ~0.47s, on ground ~0.93s), ends face-up; body twists/rolls after landing (forward -> backward); head travels 1.6 body-heights forward; passes through kneel/crouch height before ground
+2_Death_Forward_Med.bvh	4.12	falls forward (starts ~0.70s, on ground ~0.93s), ends face-down; head travels 1.2 body-heights forward
+2_Death_Left_Far.bvh	1.75	falls to its right (starts ~0.47s, on ground ~0.70s), ends face-down; body twists/rolls after landing (to its right -> backward); head travels 1.3 body-heights back; passes through kneel/crouch height before ground
+2_Death_Right_Far.bvh	6.48	falls to its left (starts ~0.47s, on ground ~0.70s), ends face-down; body twists/rolls after landing (to its left -> backward); head travels 1.4 body-heights sideways; passes through kneel/crouch height before ground
+2_Stumble_Back.bvh	2.72	falls to its left (starts ~0.93s, on ground ~1.63s), ends on its side; head travels 1.6 body-heights back
+2_Stumble_Left.bvh	3.05	falls to its right (starts ~0.70s, on ground ~1.63s), ends face-down; head travels 1.6 body-heights forward; passes through kneel/crouch height before ground
+2_Stumble_Left2.bvh	2.82	falls to its right (starts ~0.70s, on ground ~1.40s), ends on its side; head travels 2.0 body-heights sideways (thrown far); passes through kneel/crouch height before ground
+2_Stumble_Right.bvh	1.92	falls backward (starts ~1.40s, on ground ~1.87s), ends on its side; head travels 1.3 body-heights back; passes through kneel/crouch height before ground
+2_Stumble_Right2.bvh	3.58	falls to its left (starts ~0.70s, on ground ~1.17s), ends face-down; head travels 1.3 body-heights back; passes through kneel/crouch height before ground
+Knock Back High Face.bvh	16.78	falls backward (starts ~0.00s, on ground ~1.17s), ends face-up; head travels 1.5 body-heights back
+Knock Back High.bvh	8.28	falls backward (starts ~0.00s, on ground ~1.17s), ends face-up; head travels 1.4 body-heights back; passes through kneel/crouch height before ground
+Knock Back.bvh	4.08	falls backward (starts ~0.70s, on ground ~0.93s), ends face-up; head travels 1.9 body-heights back (thrown far); passes through kneel/crouch height before ground
+Knock Down Left 2.bvh	3.85	falls to its right (starts ~0.47s, on ground ~0.70s), ends face-up; head travels 0.9 body-heights back; passes through kneel/crouch height before ground
+Knock Down Left.bvh	2.35	falls to its right (starts ~0.47s, on ground ~0.93s), ends face-down; head travels 1.0 body-heights sideways; passes through kneel/crouch height before ground
+Knock Forward.bvh	4.98	falls backward (starts ~0.23s, on ground ~1.17s), ends on its side; head travels 1.6 body-heights forward
+Stagger Back.bvh	3.18	falls backward (starts ~0.47s, on ground ~1.63s), ends face-up; head travels 1.0 body-heights back; slow collapse (1.2s from first sag to ground); passes through kneel/crouch height before ground
+Stagger left.bvh	8.15	falls to its right (starts ~0.47s, on ground ~3.03s), ends face-down; head travels 1.4 body-heights sideways; slow collapse (2.6s from first sag to ground)
+Stagger longer left.bvh	1.92	falls to its right (starts ~0.47s, on ground ~1.40s), ends face-down; head travels 1.6 body-heights sideways; passes through kneel/crouch height before ground
+Stagger right.bvh	7.38	falls to its left (starts ~0.70s, on ground ~0.93s), ends face-up; head travels 0.9 body-heights sideways

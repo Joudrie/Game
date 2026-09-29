@@ -1,0 +1,3 @@
+Source: ACCAD Open Motion Project, The Ohio State University https://accad.osu.edu/research/motion-lab/mocap-system-and-data (Male1_bvh.zip, Male2_bvh.zip, Female1_bvh.zip)
+License: CC BY 3.0 - credit 'ACCAD, The Ohio State University'.
+30 fps.

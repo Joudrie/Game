@@ -1,0 +1,3 @@
+Source: https://opengameart.org/content/animated-human-low-poly (zip 'Animated Human by @Quaternius_0.zip'; same pack as https://quaternius.com/packs/animatedman.html)
+License: CC0 1.0 (License.txt)
+GLB converted from FBX/Animated Human.fbx with FBX2glTF.

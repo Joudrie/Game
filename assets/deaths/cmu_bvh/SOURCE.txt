@@ -1,0 +1,3 @@
+Source: CMU Graphics Lab Motion Capture Database (mocap.cs.cmu.edu), cgspeed Motionbuilder-friendly BVH conversion, via https://github.com/una-dinosauria/cmu-mocap (data/NNN/NN_NN.bvh)
+License: free for any use incl. commercial (CMU: 'You may include this data in commercially-sold products'); credit appreciated.
+Note: frame 0 of each file is a T-pose reference frame; 120 fps. Subject 77_16..19 are byte-identical to 139_16..19 in this mirror (duplicates removed).

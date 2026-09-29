@@ -47,7 +47,7 @@ Every character can: walk, run, sprint, jump and slide. Sprint is unlimited (no 
 - Weapon switching between rifle and saber.
 - **Maybe a first-person mode** for guns. That needs first-person arms with the same set of actions.
 
-## 4. Test enemies
+## 4. Test enemies (built in v12; see CHANGELOG)
 - About 5 enemy soldiers (not zombies) within a close radius.
 - They're aggressive and shoot at you but can't do damage.
 - When killed they ragdoll, and the bodies stay for 1–2 minutes, like Call of Duty.

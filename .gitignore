@@ -3,3 +3,4 @@ dist/three/
 dist/preview*.html
 *.png
 !assets/**/*.png
+assets/deaths/_UNLICENSED_*/

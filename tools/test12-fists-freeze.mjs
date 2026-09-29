@@ -17,7 +17,7 @@ await p.tap('#movesbtn'); await p.waitForTimeout(300);
 await p.evaluate(() => document.querySelector('[data-lib="M2M_Levitate_Idle"]').click()); await p.waitForTimeout(600); await st('preview levitate'); await p.screenshot({ path: `${OUT}/v12-preview.png` });
 await p.evaluate(() => document.getElementById('movesclose').click()); await p.waitForTimeout(400);
 // stuck: push the stick while the character ignores input
-await p.evaluate(() => __game.forceStuck()); await p.keyboard.down('KeyW'); await p.waitForTimeout(1200); await p.keyboard.up('KeyW');
+await p.evaluate(() => __game.forceStuck()); await p.keyboard.down('KeyW'); await p.waitForTimeout(3000); await p.keyboard.up('KeyW');
 const r = await p.evaluate(() => __game.lastReport);
 console.log('stuck report:', r && r.kind, '|', r && r.detail, '| input', r && JSON.stringify(r.input), '| events tail', r && JSON.stringify(r.events.slice(-4)));
 await b.close();

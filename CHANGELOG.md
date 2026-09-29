@@ -2,6 +2,40 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v12: enemies, deaths by cause, Force push, grenades
+- **Five enemy soldiers** close in on you. They run at you from far off, back away if you get closer than 7 m, and strafe and shoot in between. The shots always miss and do no damage, but you see the tracer and the muzzle flash. When one dies, a replacement arrives every 3 s to keep five alive.
+- **Hit zones:**
+  - A pistol shot is checked against the head, torso (arms count as torso) and legs.
+  - The head wins whenever the shot passes through it, so a raised gun arm doesn't eat a headshot.
+  - Damage: head 100 (one shot), torso 34, legs 26.
+  - Non-fatal hits play a flinch.
+- **Death by cause, using your rules:**
+  - **Headshot:** the killing bullet hit the head.
+  - **Leg death:** at least half of all the damage taken, including the killing shot, was in the legs. Otherwise the death is a **torso death**.
+  - **Explosion:** the grenade throws the body; the death plays in the air, and it lands in the final pose.
+  - **Force push:** a push that kills throws the body back.
+  - **Wall impact:** a pushed or blasted soldier who hits a wall faster than 7 m/s dies on impact and crumples down it.
+  - Each cause picks from its own pool and never plays the same death twice in a row:
+    - torso: 7 variants
+    - explosion: 6
+    - push: 5
+    - head: 4
+    - legs: 4
+    - impact: 4
+  - The kill feed (top right) shows the cause and the clip.
+- **Bodies stay 90 seconds,** then fade out. At most 12 bodies at once; the oldest goes first.
+- **Force push** (Force class only: the **Push** button or `T`): a two-hand blast that knocks back everyone in a 14 m cone in front of you. Closer soldiers fly further. Survivors get back up.
+- **Impact grenade** (the **Grenade** button or `X`): thrown toward the crosshair; it goes off on first contact. 7 m blast; up close it kills.
+- **New death clips:**
+  - CMU mocap falls: fall flat on the back, fall face-down, two crash landings.
+  - KayKit: a drop-to-the-knees death and two hit reactions.
+  - These were picked from what the search found (`assets/deaths/REPORT.json`) and checked by eye on a contact sheet. Rejected: a slip fall and the Quaternius human death (arms too close to a T-pose), and a KayKit death that ends propped on its arms. The openmw endorphin deaths have no licence, so they stay out of the game.
+- **Fixed: dead bodies standing back up.**
+  - Four death clips (SW_Death and Mesh2Motion Death A, B and C) ended on a keyframe that snapped back to standing, so a corpse would pop upright.
+  - `tools/trim_snap.py` cuts that last frame from every one-shot clip (deaths, landings, dodges, throws, jumps).
+- **Tests tab:** a switch for enemies, Respawn all, Clear bodies, and a count of deaths by cause.
+- **Automated test:** `tools/test17-enemies.mjs` checks spawning, every death rule, a lethal push, a wall impact and a grenade.
+
 ## v11: long, fast grapple and slide canceling
 - **Grappling hook range: 70 m → 1000 m.** The fog is pushed back so far buildings stay visible. A ring of 12 tall towers (40–90 m) stands 220–450 m out for long-range grapples.
 - **Faster grapple:** the hook flies at 260 m/s (was 90), and the pull tops out at 55 m/s (was 24). Arriving on a roof keeps half your speed.
