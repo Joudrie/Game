@@ -1,13 +1,22 @@
 # Changelog
 
-Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v10 · …"`), so we can tell which version you were playing.
+Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
+
+## v11: long, fast grapple and slide canceling
+- **Grappling hook range: 70 m → 1000 m.** The fog is pushed back so far buildings stay visible. A ring of 12 tall towers (40–90 m) stands 220–450 m out for long-range grapples.
+- **Faster grapple:** the hook flies at 260 m/s (was 90), and the pull tops out at 55 m/s (was 24). Arriving on a roof keeps half your speed.
+- **Slide canceling:**
+  - Tap Slide or Jump during a slide to cancel it and keep its speed.
+  - Speed above sprint bleeds off slowly, so you can chain slides.
+  - Chained slides are capped at 1.8× the class's sprint (19 m/s for Force).
+- **Backlog:** everything still to do is listed in sections in `BACKLOG.md`.
 
 ## v10: buildings and grappling hook
 - **City blocks:** 38 plain grey boxes, 1.4 m to 32 m tall, scattered with wide streets between them. Three low ones sit near the start for hopping and grappling practice.
   - You can't pass through them. You stop at the wall and slide along it.
   - You can stand on roofs, and walking off an edge makes you fall.
   - The camera pulls in rather than going through a wall.
-- **Grappling hook:** press **Grapple** (touch button, `R`, or gamepad RT) while the centre crosshair lights up on a building within 70 m.
+- **Grappling hook:** press **Grapple** (touch button, `R`, or gamepad RT) while the centre crosshair lights up on a building (range raised to 1000 m in v11).
   1. **Fire:** the hook flies from the left wrist on a rope.
   2. **Pull:** once it attaches, the rope reels you in.
   3. **Arrive:** reaching a roof edge puts you on the roof; hitting a wall drops you from it.

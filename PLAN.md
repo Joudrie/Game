@@ -170,6 +170,7 @@ From Joudrie/lego: 884 entries, 44 with full-body paintings. The paintings match
 - **v8:** freeze logging and reports, touch fixes for the joystick, dual sabers held in closed fists in every animation. See `CHANGELOG.md`.
 - **v9:** slide momentum, jump into slide, infinite jumps (test switch), block in the air, five-hit combo that loops, crouch transition, saber clipping checks (`SABER_CLIPPING.md`), menu tabs. See `CHANGELOG.md`.
 - **v10:** city blocks with collision, roofs and ledge falls; grappling hook (fire, pull, arrive), with pickable animations for each step. See `CHANGELOG.md`.
+- **v11:** 1000 m grapple, faster hook and pull, far towers, slide canceling. The full to-do list is now `BACKLOG.md`.
 - **Next, in order:**
   1. Your 3D characters (needs `HF_TOKEN`).
   2. Mixamo downloads for the gaps above.
