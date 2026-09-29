@@ -126,15 +126,23 @@ From Joudrie/lego: 884 entries, 44 with full-body paintings. The paintings match
   - A Moves screen that previews every variant. Tick variants for rotation.
   - Long-sprint slide variant.
   - Phone controls: pushing the stick to the edge sprints; Jump and Slide buttons.
+- **Lightsaber (v3):**
+  - Controls: **Saber** button, `E` or gamepad Y ignites and holsters it.
+  - Styles: single, dual or staff. Grip: normal or reverse (Ahsoka). Six blade colours.
+  - Holstered on the hip, or across the back for the staff.
+  - Three saber stances.
+  - Legs keep running while the arms hold the stance.
+  - Attacks: tap for the A → B → C chain; hold for the heavy combo; hold Block to guard.
+  - Your rules are enforced: no sprinting while blocking, no attacking while sprinting (the swing ends the sprint), no jumping while blocking or mid-swing.
+  - Still missing: an unholster animation (the blade just ignites), a clash effect and saber sounds.
 - **Next, in order:**
   1. Your 3D characters (needs `HF_TOKEN`).
   2. Mixamo downloads for the gaps above.
   3. Rifle.
-  4. Lightsaber.
-  5. Test enemies and ragdoll.
-  6. Gadgets.
-  7. Sound.
-  8. Lighting.
+  4. Test enemies and ragdoll.
+  5. Gadgets.
+  6. Sound.
+  7. Lighting.
 
 ## Decide
 - Heavy infantry: who's in it, and how much slower they are.

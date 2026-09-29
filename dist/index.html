@@ -39,9 +39,9 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 
 #readout { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); left: var(--s4); font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; padding: var(--s2) var(--s3); }
 #readout .gait.hot { color: var(--signal); }
-#help { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); padding: var(--s2) var(--s3); color: var(--ink-soft); white-space: nowrap; }
+#help { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); right: var(--s4); padding: var(--s2) var(--s3); color: var(--ink-soft); white-space: nowrap; }
 #help kbd { font-family: var(--font-mono); font-size: 11px; color: var(--ink); background: var(--key); border: 1px solid var(--line); border-radius: 3px; padding: 0 var(--s1); }
-@media (max-width: 1000px) { #help { display: none; } }
+@media (max-width: 1240px) { #help { display: none; } }
 #toast { top: calc(64px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); padding: var(--s2) var(--s3); max-width: calc(100vw - 32px); text-align: center; }
 
 #loading { position: fixed; inset: 0; z-index: 9; display: grid; place-items: center; background: #ffffff; font-size: 13px; color: var(--ink-soft); padding: 0 var(--s4); text-align: center; }
@@ -56,8 +56,16 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #joy.sprint i { background: var(--signal); opacity: .9; }
 #pad { bottom: calc(var(--s6) + env(safe-area-inset-bottom, 0px)); right: var(--s4); display: none; gap: var(--s3); align-items: flex-end; }
 #pad button { width: 64px; height: 64px; border-radius: 50%; padding: 0; }
-#pad #jumpbtn { width: 76px; height: 76px; }
+#pad #jumpbtn, #pad #atkbtn { width: 76px; height: 76px; }
+#pad { flex-wrap: wrap; justify-content: flex-end; max-width: 176px; }
+#pad .armed-only { display: none; }
+body.armed #pad .armed-only { display: inline-block; }
+body.armed #readout { bottom: calc(196px + env(safe-area-inset-bottom, 0px)); }
+.swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
+.swatches button { display: flex; align-items: center; gap: var(--s2); min-height: 40px; }
+.swatches i { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--line); flex: none; }
 @media (pointer: coarse) { #pad { display: flex; } #readout { bottom: calc(112px + env(safe-area-inset-bottom, 0px)); } }
+@media (pointer: fine) { body.armed #readout { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); } }
 
 /* Moves sheet */
 #moves { position: fixed; z-index: 5; background: var(--panel); border-top: 1px solid var(--line); left: 0; right: 0; bottom: 0; height: 56%; display: flex; flex-direction: column; }
@@ -90,16 +98,19 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 <div id="top" class="hud">
   <button type="button" id="classchip" class="panel" aria-label="Change class"><b id="classname">Light infantry</b><span id="classstats"></span></button>
   <div class="spacer"></div>
+  <button type="button" id="saberbtn" aria-pressed="false">Saber</button>
   <button type="button" id="movesbtn">Moves</button>
   <button type="button" id="gridbtn" aria-pressed="false">Grid</button>
 </div>
 
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span></div>
-<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · <kbd>V</kbd> walk · click to steer camera</div>
+<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · <kbd>V</kbd> walk · <kbd>E</kbd> saber · click attack, hold for heavy · right-click or <kbd>Q</kbd> block</div>
 <div id="toast" class="hud panel" role="status" hidden></div>
 
 <div id="joy" hidden><i></i></div>
 <div id="pad" class="hud">
+  <button type="button" id="blockbtn" class="armed-only">Block</button>
+  <button type="button" id="atkbtn" class="armed-only">Attack</button>
   <button type="button" id="slidebtn">Slide</button>
   <button type="button" id="jumpbtn">Jump</button>
 </div>
@@ -173,6 +184,10 @@ const MOVES = {
     { id: 'jump_ual', label: 'Standard', src: SRC_UAL, seq: ['Jump_Start', 'Jump_Loop', 'Jump_Land'] } ] },
   crouch: { label: 'Crouch walk', when: 'Press C (or Slide) while standing still. Changes each time you move off', variants: [
     { id: 'Crouch_Fwd_Loop', label: 'Standard', src: SRC_UAL } ] },
+  stance: { label: 'Saber stance', when: 'Held while the saber is out. Changes each time you stop', variants: [
+    { id: 'Sword_Idle', label: 'One-handed ready', src: SRC_UAL },
+    { id: 'STANCE_HighGuard', label: 'High guard', src: SRC_UAL + ' (block pose, held)' },
+    { id: 'STANCE_Lunge', label: 'Low lunge', src: SRC_UAL + ' (dash pose, held)' } ] },
   djump:  { label: 'Double jump', when: 'Force users only. Rotates each use', variants: [
     { id: 'djump_ninja', label: 'Ninja flip', src: SRC_UAL, seq: ['NinjaJump_Start', 'NinjaJump_Idle_Loop', 'NinjaJump_Land'] } ] },
 };
@@ -306,6 +321,9 @@ async function boot() {
   const f = cal.Walk_Loop?.fwd || new V3(0, 0, 1);
   hero.rotation.y = -Math.atan2(f.x, f.z);
   lean.add(hero);
+  poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
+  poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
+  computeMounts(); rebuildSabers();
   mixer = new THREE.AnimationMixer(hero);
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, +v.speed.toFixed(2)]));
@@ -335,7 +353,7 @@ const ovr = new Map();   // action -> { w, target, fadeIn, fadeOut }
 const onDone = new Map(); // action -> callback when a LoopOnce finishes
 function playOvr(name, { from = 0, speed = 1, loop = false, fade = 0.12, then } = {}) {
   const a = act(name); if (!a) return null;
-  for (const [b, o] of ovr) if (b !== a) { o.target = 0; o.fadeOut = fade; }
+  for (const [b, o] of ovr) if (b !== a) { o.target = 0; o.fadeOut = fade; onDone.delete(b); }
   a.reset();
   a.setLoop(loop ? THREE.LoopRepeat : THREE.LoopOnce, Infinity);
   a.clampWhenFinished = true;
@@ -362,6 +380,155 @@ function updateOvr(dt) {
   return clamp(1 - sum, 0, 1);
 }
 
+// ---------------- lightsaber ----------------
+const SABER_COLORS = { Green: 0x35e06a, Blue: 0x3a8dff, Purple: 0x9b5cff, Red: 0xff3b30, Yellow: 0xffd33d, White: 0xf4f4f4 };
+const saberCfg = { style: 'single', grip: 'normal', color: 'Green' };
+try { Object.assign(saberCfg, JSON.parse(localStorage.getItem('saber') || '{}')); } catch (_) {}
+const saveSaber = () => { try { localStorage.setItem('saber', JSON.stringify(saberCfg)); } catch (_) {} };
+let armed = false, ignite = 0, igniteTarget = 0;
+const mounts = {}, sabers = [];
+const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+const glowMat1 = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.5, depthWrite: false });
+const glowMat2 = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.16, depthWrite: false });
+function setSaberColor() {
+  const c = new THREE.Color(SABER_COLORS[saberCfg.color] || SABER_COLORS.Green);
+  glowMat1.color.copy(c); glowMat2.color.copy(c); coreMat.color.copy(c).lerp(new THREE.Color(0xffffff), 0.75);
+}
+function makeSaber(staff) {
+  const root = new THREE.Group(), inner = new THREE.Group(); root.add(inner);
+  const hiltLen = staff ? 0.44 : 0.27;
+  const metal = new THREE.MeshStandardMaterial({ color: 0xa4a9ae, metalness: 0.85, roughness: 0.3 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x26282c, metalness: 0.4, roughness: 0.7 });
+  const hilt = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, hiltLen, 16), metal);
+  const grip = new THREE.Mesh(new THREE.CylinderGeometry(0.0205, 0.0205, hiltLen * 0.45, 16), dark);
+  hilt.castShadow = grip.castShadow = true; inner.add(hilt, grip);
+  const blades = [];
+  for (const sgn of staff ? [1, -1] : [1]) {
+    const emitter = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.019, 0.045, 16), metal);
+    emitter.position.y = sgn * (hiltLen / 2 - 0.022); emitter.castShadow = true; inner.add(emitter);
+    const b = new THREE.Group(); b.position.y = sgn * hiltLen / 2; if (sgn < 0) b.rotation.z = Math.PI;
+    const L = staff ? 0.85 : 0.95;
+    for (const [r, m] of [[0.011, coreMat], [0.024, glowMat1], [0.045, glowMat2]]) {
+      const g = new THREE.Mesh(new THREE.CapsuleGeometry(r, L, 4, 12), m); g.position.y = L / 2 + r; g.renderOrder = 2; b.add(g);
+    }
+    b.scale.y = 0.001; b.visible = false; blades.push(b); inner.add(b);
+  }
+  return { root, inner, blades };
+}
+// grip in each hand from the finger bones, holsters at the hips and across the back (all measured in the rest pose)
+function computeMounts() {
+  let sk = null; hero.traverse((o) => { if (!sk && o.isSkinnedMesh) sk = o; });
+  sk.skeleton.pose(); hero.updateMatrixWorld(true);
+  const P = (n) => boneByName(hero, n).getWorldPosition(new V3());
+  const mk = (boneName, pos, dir) => {
+    const bone = boneByName(hero, boneName);
+    const q = new THREE.Quaternion().setFromUnitVectors(new V3(0, 1, 0), dir.clone().normalize());
+    const m = bone.matrixWorld.clone().invert().multiply(new THREE.Matrix4().compose(pos, q, new V3(1, 1, 1)));
+    const o = { bone, p: new V3(), q: new THREE.Quaternion(), s: new V3() }; m.decompose(o.p, o.q, o.s); return o;
+  };
+  for (const side of ['r', 'l']) {
+    const h = P('hand_' + side), mid = P('middle_01_' + side), idx = P('index_01_' + side), pk = P('pinky_01_' + side);
+    mounts['hand_' + side] = mk('hand_' + side, h.clone().lerp(mid, 0.6).add(new V3(0, -0.025, 0)), idx.clone().sub(pk));
+    const th = P('thigh_' + side), pel = P('pelvis'), out = th.clone().sub(pel).setY(0).normalize();
+    mounts['hip_' + side] = mk('pelvis', th.clone().addScaledVector(out, 0.12).add(new V3(0, -0.05, 0.03)), new V3(0, -1, 0.3));
+  }
+  mounts.back = mk('spine_03', P('spine_03').add(new V3(0, 0, -0.17)), new V3(1, 1.2, 0));
+}
+function attach(sb, name) { const m = mounts[name]; m.bone.add(sb.root); sb.root.position.copy(m.p); sb.root.quaternion.copy(m.q); sb.root.scale.copy(m.s); }
+function placeSabers() {
+  const st = saberCfg.style;
+  sabers.forEach((sb, i) => attach(sb, armed ? (i ? 'hand_l' : 'hand_r') : st === 'staff' ? 'back' : (i ? 'hip_l' : 'hip_r')));
+  for (const sb of sabers) sb.inner.rotation.x = saberCfg.grip === 'reverse' && st !== 'staff' ? Math.PI : 0;
+}
+function rebuildSabers() {
+  for (const sb of sabers) sb.root.parent?.remove(sb.root);
+  sabers.length = 0;
+  const st = saberCfg.style;
+  sabers.push(makeSaber(st === 'staff'));
+  if (st === 'dual') sabers.push(makeSaber(false));
+  setSaberColor(); placeSabers(); showBlades();
+}
+function showBlades() { for (const sb of sabers) for (const b of sb.blades) { b.scale.y = Math.max(ignite, 0.001); b.visible = ignite > 0.01; } }
+function setArmed(on, instant) {
+  if (on) {
+    if (!armed) { armed = true; placeSabers(); }
+    igniteTarget = 1; if (instant) ignite = 1;
+  } else {
+    igniteTarget = 0; atk = null; blocking = false;
+    if (instant) { ignite = 0; armed = false; placeSabers(); }
+  }
+  document.body.classList.toggle('armed', on || armed);
+  $('saberbtn').setAttribute('aria-pressed', String(on));
+  showBlades();
+}
+function updateSaber(dt) {
+  const prev = ignite;
+  ignite = moveTo(ignite, igniteTarget, dt / (igniteTarget ? 0.22 : 0.16));
+  if (ignite !== prev) showBlades();
+  if (armed && igniteTarget === 0 && ignite === 0) { armed = false; placeSabers(); document.body.classList.remove('armed'); }
+}
+
+// held-pose clip sampled from a one-shot (used for extra stances)
+function poseClip(src, t, name) {
+  const c = clips.get(src); if (!c) return;
+  const tracks = c.tracks.map((tr) => { const v = Array.from(tr.createInterpolant().evaluate(t)); return new tr.constructor(tr.name, [0, 1], [...v, ...v]); });
+  clips.set(name, new THREE.AnimationClip(name, 1, tracks));
+}
+// lower-body / upper-body copies of a clip, so legs keep running while arms hold the stance
+const LOWER = /^(root|pelvis|spine_01|thigh_|calf_|foot_|ball_)/;
+function masked(id, lower) {
+  const key = id + (lower ? '#L' : '#U');
+  if (!clips.has(key)) {
+    const c = clips.get(id); if (!c) return id;
+    clips.set(key, new THREE.AnimationClip(key, c.duration, c.tracks.filter((t) => LOWER.test(t.name.split('.')[0]) === lower)));
+    if (cal[id]) cal[key] = cal[id];
+  }
+  return key;
+}
+
+// combat: tap chain A → B → C, hold for heavy, hold block. Your rules: no attacking while sprinting,
+// no sprinting while blocking, no jumping while blocking.
+const CHAIN = ['A', 'B', 'C'];
+let atk = null, blocking = false, blockAct = null, atkHeld = false, atkHeldT = 0;
+function canFight() { return armed && igniteTarget === 1 && !movesOpen && mode === 'ground'; }
+function attackPress() {
+  atkHeld = true; atkHeldT = 0;
+  if (!canFight() || blocking) return;
+  if (atk) { if (atk.heavy || atk.i === 2) return; if (atk.rec) startAttack(atk.i + 1); else atk.queued = true; return; }
+  const C = CLASSES[klass];
+  if (speed > C.jog + 0.1) speed = C.jog; // the swing ends the sprint
+  startAttack(0);
+}
+function attackRelease() { atkHeld = false; }
+function startAttack(i) {
+  atk = { i, queued: false, rec: false, heavy: false };
+  playOvr('Sword_Regular_' + CHAIN[i], { speed: 1.15, fade: 0.08, then: afterAttack });
+}
+function afterAttack() {
+  if (!atk) return;
+  if (atk.i === 2) { atk = null; stopOvr(0.25); return; }
+  if (atk.queued) { startAttack(atk.i + 1); return; }
+  atk.rec = true;
+  playOvr('Sword_Regular_' + CHAIN[atk.i] + '_Rec', { speed: 1.2, fade: 0.1, then: () => { atk = null; stopOvr(0.25); } });
+}
+function heavyAttack() {
+  atk = { i: 0, heavy: true, rec: false, queued: false };
+  playOvr('Sword_Heavy_Combo', { speed: 1.1, fade: 0.12, then: () => { atk = null; stopOvr(0.25); } });
+}
+function blockPress() {
+  if (!canFight() || atk) return;
+  blocking = true;
+  blockAct = playOvr('Sword_Block', { speed: 1.3, fade: 0.1, then: () => { blockAct = null; if (!blocking) stopOvr(0.2); } });
+}
+function blockRelease() { if (!blocking) return; blocking = false; if (blockAct) blockAct.timeScale = 1.3; else stopOvr(0.2); }
+function updateCombat(dt) {
+  if (atkHeld) {
+    atkHeldT += dt;
+    if (atkHeldT > 0.35 && atk && !atk.heavy && atk.i === 0 && !atk.rec) heavyAttack();
+  }
+  if (blocking && blockAct && blockAct.time >= 0.45) blockAct.timeScale = 0; // hold the guard pose
+}
+
 // ---------------- input ----------------
 const keys = new Set();
 let walkToggle = false, jumpQueued = false, slideQueued = false, slideHeld = false;
@@ -376,8 +543,11 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyV') { walkToggle = !walkToggle; toast(walkToggle ? 'Walk on' : 'Walk off', 1200); }
   if (e.code === 'KeyG') toggleGrid();
   if (e.code === 'KeyM') openMoves();
+  if (e.code === 'KeyE') setArmed(!(armed && igniteTarget));
+  if (e.code === 'KeyF') attackPress();
+  if (e.code === 'KeyQ') blockPress();
 });
-addEventListener('keyup', (e) => { keys.delete(e.code); if (e.code === 'KeyC') slideHeld = false; });
+addEventListener('keyup', (e) => { keys.delete(e.code); if (e.code === 'KeyC') slideHeld = false; if (e.code === 'KeyF') attackRelease(); if (e.code === 'KeyQ') blockRelease(); });
 addEventListener('blur', () => { keys.clear(); slideHeld = false; });
 
 let toastTimer = 0;
@@ -392,6 +562,10 @@ press($('jumpbtn'), () => { jumpQueued = true; });
 press($('slidebtn'), () => { slideQueued = true; slideHeld = true; });
 $('slidebtn').addEventListener('pointerup', () => { slideHeld = false; });
 $('slidebtn').addEventListener('pointercancel', () => { slideHeld = false; });
+press($('atkbtn'), attackPress);
+press($('blockbtn'), blockPress);
+for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) { $('atkbtn').addEventListener(ev, attackRelease); $('blockbtn').addEventListener(ev, blockRelease); }
+$('saberbtn').addEventListener('click', () => setArmed(!(armed && igniteTarget)));
 
 let camYaw = Math.PI, camPitch = 0.28, camDist = 3.4;
 const canvas = renderer.domElement;
@@ -401,12 +575,14 @@ function look(dx, dy, s) { camYaw -= dx * s; camPitch = clamp(camPitch + dy * s,
 canvas.addEventListener('pointerdown', (e) => {
   canvas.focus();
   if (e.pointerType === 'mouse') {
+    if (!movesOpen && armed && isLocked()) { if (e.button === 0) attackPress(); if (e.button === 2) blockPress(); return; }
     if (!movesOpen && !isLocked()) { try { const p = canvas.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (_) {} }
     dragging = true; return;
   }
   touchStart(e);
 });
-addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') dragging = false; else touchEnd(e); });
+addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') { dragging = false; if (e.button === 0) attackRelease(); if (e.button === 2) blockRelease(); } else touchEnd(e); });
+canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 addEventListener('pointercancel', (e) => { if (e.pointerType !== 'mouse') touchEnd(e); });
 addEventListener('pointermove', (e) => {
   if (e.pointerType === 'mouse') { if (isLocked() || dragging) look(e.movementX, e.movementY, movesOpen ? 0.006 : 0.0023); return; }
@@ -455,7 +631,10 @@ function readInput(dt) {
     if (b(0) && !padPrev[0]) jumpQueued = true;
     if (b(1) && !padPrev[1]) slideQueued = true;
     slideHeld = slideHeld || b(1);
-    padPrev = [b(0), b(1)];
+    if (b(2) && !padPrev[2]) attackPress(); if (!b(2) && padPrev[2]) attackRelease();
+    if (b(4) && !padPrev[4]) blockPress(); if (!b(4) && padPrev[4]) blockRelease();
+    if (b(3) && !padPrev[3]) setArmed(!(armed && igniteTarget));
+    padPrev = [b(0), b(1), b(2), b(3), b(4)];
     break;
   }
   let mag = Math.hypot(x, y); if (mag > 1) { x /= mag; y /= mag; mag = 1; }
@@ -471,7 +650,7 @@ const cur = { idle: null, walk: null, jog: null, sprint: null };
 const pivot = new V3(0, 1.55, 0);
 
 function pickGaitVariants(force) {
-  for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch']) if (force || !cur[s]) cur[s] = nextVariant(s).id;
+  for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch', 'stance']) if (force || !cur[s]) cur[s] = nextVariant(s).id;
 }
 
 function startJump(dbl) {
@@ -525,6 +704,10 @@ function step(dt) {
     } else target = inp.sprint ? C.sprint : walkToggle ? C.walk : C.jog;
   }
   if (crouch && (inp.sprint || jumpQueued)) crouch = false;
+  if (blocking) target = Math.min(target, C.walk);          // no sprinting while blocking
+  if (atk) target = Math.min(target, 1.0);                   // swings commit you
+  if (blocking || atk) { jumpQueued = false; slideQueued = false; } // no jumping while blocking or mid-swing
+  if (armed && crouch) crouch = false;
 
   // facing
   const prevYaw = yaw;
@@ -534,6 +717,7 @@ function step(dt) {
     let sharp = lerp(11, 6, clamp((speed - C.jog) / (C.sprint - C.jog), 0, 1));
     if (mode === 'air') sharp *= 0.3;
     if (mode === 'slide') sharp = 1.5;
+    if (atk) sharp = 4;
     yaw = wrapAngle(yaw + diff * (1 - Math.exp(-sharp * dt)));
     if (mode === 'ground') target *= clamp(Math.cos(diff) * 0.6 + 0.55, 0.3, 1);
   }
@@ -573,6 +757,8 @@ function step(dt) {
   roll = damp(roll, mode === 'ground' ? clamp(-yawVel * speed * 0.02, -0.14, 0.14) : 0, 8, dt);
   lean.rotation.z = roll;
 
+  updateCombat(dt);
+  updateSaber(dt);
   animateLoco(dt, C);
   updateCamera(dt, C);
   hud(C);
@@ -597,6 +783,7 @@ function animateLoco(dt, C) {
   if (gait !== prevGait) {
     const slot = gait === 'crouchwalk' ? 'crouch' : gait;
     if (gait === 'idle' || (order[gait] > order[prevGait] && MOVES[slot])) cur[slot] = nextVariant(slot).id;
+    if (gait === 'idle') cur.stance = nextVariant('stance').id;
     prevGait = gait;
   }
   const wts = new Map();
@@ -620,7 +807,13 @@ function animateLoco(dt, C) {
   phase = (phase + rate * dt) % 1;
   const locoW = updateOvr(dt);
   for (const a of locoActive) a.setEffectiveWeight(0);
-  for (const [id, w] of wts) {
+  const split = armed && !crouch;
+  if (split) {
+    const st = useLoop(masked(cur.stance || 'Sword_Idle', false));
+    if (st) { st.timeScale = 1; st.setEffectiveWeight(locoW); }
+  }
+  for (const [rawId, w] of wts) {
+    const id = split ? masked(rawId, true) : rawId;
     const a = useLoop(id); if (!a) continue;
     if (cal[id]) { a.timeScale = 0; a.time = ((phase + cal[id].strike) % 1) * cal[id].dur; }
     else a.timeScale = 1;
@@ -652,7 +845,8 @@ let hudN = 0;
 function hud(C) {
   if ((hudN += 1) % 6) return;
   $('spd').textContent = speed.toFixed(1);
-  const g = mode === 'air' ? (jumps === 2 ? 'Double jump' : 'Airborne') : mode === 'slide' ? 'Slide' :
+  const g = blocking ? 'Block' : atk ? (atk.heavy ? 'Heavy attack' : 'Attack ' + (atk.i + 1)) :
+    mode === 'air' ? (jumps === 2 ? 'Double jump' : 'Airborne') : mode === 'slide' ? 'Slide' :
     { idle: 'Idle', walk: 'Walk', jog: 'Run', sprint: 'Sprint', crouch: 'Crouch', crouchwalk: 'Crouch' }[gait];
   const el = $('gait'); el.textContent = g; el.classList.toggle('hot', g === 'Sprint' || g === 'Slide' || g === 'Double jump');
 }
@@ -664,10 +858,11 @@ function renderClass() {
   $('classstats').textContent = `${C.health} HP · sprint ${C.sprint} m/s${C.doubleJump ? ' · 2× jump' : ''}`;
 }
 
-let movesOpen = false, previewing = null, pvTimer = 0, savedCam = null;
+let movesOpen = false, previewing = null, pvTimer = 0, savedCam = null, movesWasArmed = false;
 function openMoves() {
   if (movesOpen) return;
   movesOpen = true; document.body.classList.add('moves-open');
+  movesWasArmed = armed && igniteTarget === 1; atk = null; blocking = false;
   $('moves').hidden = false;
   if (isLocked()) document.exitPointerLock?.();
   keys.clear(); joy.id = null; $('joy').hidden = true;
@@ -685,15 +880,19 @@ function closeMoves() {
   movesOpen = false; document.body.classList.remove('moves-open');
   $('moves').hidden = true; $('pvlabel').hidden = true;
   clearTimeout(pvTimer); stopOvr(0.2);
+  if (!movesWasArmed && armed) setArmed(false, true);
   if (savedCam) ({ camYaw, camPitch, camDist } = savedCam);
   viewShift = { x: 0, y: 0 }; resize();
-  for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch']) cur[s] = null;
+  for (const s of ['idle', 'walk', 'jog', 'sprint', 'crouch', 'stance']) cur[s] = null;
   pickGaitVariants(true);
 }
 
 // Play a move in place. Sequences (jump, slide) loop start → hold → end.
 function preview(p) {
   previewing = p;
+  const swordy = p.slot === 'stance' || /^(Sword|STANCE|M2M_Defend|M2M_Sword)/.test(p.id);
+  if (swordy) setArmed(true, true);
+  else if (!movesWasArmed && armed) setArmed(false, true);
   clearTimeout(pvTimer);
   document.querySelectorAll('[data-pv]').forEach((el) => el.classList.toggle(el.matches('.row') ? 'previewing' : 'on', el.dataset.pv === p.key));
   let label, seq;
@@ -705,7 +904,7 @@ function preview(p) {
     if (i >= seq.length) { pvTimer = setTimeout(() => once(0), 500); return; }
     const name = seq[i], c = clips.get(name);
     if (!c) return;
-    const isLoop = /_Loop$|Idle$|^M2M_(Run|Walk|Strafe|Glide|Flying|Levitate_Idle|Idle|Fighting)/.test(name) || (seq.length === 1 && !p.oneshot);
+    const isLoop = /_Loop$|Idle$|^STANCE_|^M2M_(Run|Walk|Strafe|Glide|Flying|Levitate_Idle|Idle|Fighting)/.test(name) || (seq.length === 1 && !p.oneshot);
     if (seq.length === 1 && isLoop) { playOvr(name, { loop: true, fade: 0.2 }); return; }
     if (isLoop) { playOvr(name, { loop: true, fade: 0.15 }); pvTimer = setTimeout(() => once(i + 1), 900); return; }
     playOvr(name, { fade: 0.12, then: () => once(i + 1) });
@@ -719,6 +918,13 @@ function buildMoves() {
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p>`);
+  h.push(`<h3>Saber <small>E / Saber button to ignite</small></h3><div class="seg" role="group" aria-label="Saber style">`);
+  for (const [k, l] of [['single', 'Single'], ['dual', 'Dual'], ['staff', 'Staff']]) h.push(`<button type="button" data-sstyle="${k}" aria-pressed="${saberCfg.style === k}">${l}</button>`);
+  h.push(`</div><div class="seg" role="group" aria-label="Grip" style="margin-top:8px;grid-template-columns:repeat(2,1fr)">`);
+  for (const [k, l] of [['normal', 'Normal grip'], ['reverse', 'Reverse grip (Ahsoka)']]) h.push(`<button type="button" data-sgrip="${k}" aria-pressed="${saberCfg.grip === k}">${l}</button>`);
+  h.push(`</div><div class="swatches" role="group" aria-label="Blade colour" style="margin-top:8px">`);
+  for (const [k, c] of Object.entries(SABER_COLORS)) h.push(`<button type="button" data-scolor="${k}" aria-pressed="${saberCfg.color === k}"><i style="background:#${c.toString(16).padStart(6, '0')}"></i>${k}</button>`);
+  h.push(`</div><p class="note">Tap Attack for a three-hit chain (A → B → C), hold it for the heavy combo, hold Block to guard. Previews below show the saber lit.</p>`);
   for (const [slot, m] of Object.entries(MOVES)) {
     h.push(`<h3>${m.label} <small>${m.variants.length} found</small></h3>`);
     for (const v of m.variants) {
@@ -734,6 +940,18 @@ function buildMoves() {
   body.innerHTML = h.join('');
   renderClassDetail();
   body.addEventListener('click', (e) => {
+    const sb = e.target.closest('[data-sstyle],[data-sgrip],[data-scolor]');
+    if (sb) {
+      if (sb.dataset.sstyle) saberCfg.style = sb.dataset.sstyle;
+      if (sb.dataset.sgrip) saberCfg.grip = sb.dataset.sgrip;
+      if (sb.dataset.scolor) saberCfg.color = sb.dataset.scolor;
+      saveSaber(); rebuildSabers();
+      for (const [attr, key] of [['sstyle', 'style'], ['sgrip', 'grip'], ['scolor', 'color']])
+        body.querySelectorAll(`[data-${attr}]`).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset[attr] === saberCfg[key])));
+      setArmed(true, true);
+      preview({ kind: 'slot', slot: 'stance', id: pool.stance[0], key: `stance:${pool.stance[0]}` });
+      return;
+    }
     const cb = e.target.closest('[data-class]');
     if (cb) { klass = cb.dataset.class; try { localStorage.setItem('moves-class', klass); } catch (_) {}
       body.querySelectorAll('[data-class]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.class === klass))); renderClass(); renderClassDetail(); return; }
@@ -767,6 +985,7 @@ function start() {
     timer.update(t);
     const dt = Math.min(timer.getDelta(), 0.05);
     if (movesOpen) {
+      updateSaber(dt);
       const locoW = updateOvr(dt);
       for (const a of locoActive) a.setEffectiveWeight(0);
       if (locoW > 0.01) { const a = useLoop(cur.idle); a.timeScale = 1; a.setEffectiveWeight(locoW); }
@@ -778,7 +997,7 @@ function start() {
     } else step(dt);
     renderer.render(scene, camera);
   });
-  window.__game = { get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
+  window.__game = { get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
     setClass(k) { klass = k; renderClass(); }, openMoves, closeMoves };
 }
 </script>
