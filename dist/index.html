@@ -19,11 +19,14 @@
   color-scheme: light;
 }
 html, body { height: 100%; }
-body { background: #ffffff; color: var(--ink); font-family: var(--font-ui); overflow: hidden; -webkit-user-select: none; user-select: none; }
+body { background: #ffffff; color: var(--ink); font-family: var(--font-ui); overflow: hidden; -webkit-user-select: none; user-select: none; touch-action: none; overscroll-behavior: none; }
+html { overscroll-behavior: none; }
 #stage { position: fixed; inset: 0; }
 #stage canvas { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
 
-.hud { position: fixed; z-index: 2; font-size: 12px; line-height: 1.5; }
+.hud { position: fixed; z-index: 2; font-size: 12px; line-height: 1.5; pointer-events: none; }
+/* only real controls take touches; the readout and hints let a thumb fall through to the joystick */
+.hud button, .hud label, .hud input, .hud textarea, #alert { pointer-events: auto; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); }
 button { font: 500 12px/1 var(--font-ui); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: var(--s2) var(--s3); cursor: pointer; touch-action: manipulation; }
 button:hover { border-color: var(--ink-soft); }
@@ -80,7 +83,7 @@ body.armed #readout { bottom: calc(196px + env(safe-area-inset-bottom, 0px)); }
 @media (min-width: 820px) { #moves { top: 0; left: auto; width: 400px; height: auto; border-top: 0; border-left: 1px solid var(--line); } }
 #moves header { display: flex; align-items: center; gap: var(--s2); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
 #moves header h2 { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin: 0; flex: 1; }
-#moves .body { overflow-y: auto; padding: 0 var(--s4) calc(var(--s6) + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
+#moves .body { touch-action: pan-y; overflow-y: auto; padding: 0 var(--s4) calc(var(--s6) + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
 #moves h3 { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin: var(--s5) 0 var(--s2); display: flex; justify-content: space-between; gap: var(--s2); }
 #moves h3 small { font: 400 11px var(--font-mono); letter-spacing: 0; text-transform: none; }
 .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
@@ -355,7 +358,7 @@ async function boot() {
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
   poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
-  computeMounts(); rebuildSabers(); buildRifle(); buildPistol();
+  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildFist();
   mixer = new THREE.AnimationMixer(hero);
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
@@ -434,10 +437,11 @@ function updateOvr(dt) {
 
 // ---------------- lightsaber ----------------
 const SABER_COLORS = { Green: 0x35e06a, Blue: 0x3a8dff, Purple: 0x9b5cff, Red: 0xff3b30, Yellow: 0xffd33d, White: 0xf4f4f4 };
-const saberCfg = { style: 'single', grip: 'normal', color: 'Green' };
+const saberCfg = { style: 'dual', grip: 'normal', color: 'Green' };
 try { Object.assign(saberCfg, JSON.parse(localStorage.getItem('saber') || '{}')); } catch (_) {}
 const saveSaber = () => { try { localStorage.setItem('saber', JSON.stringify(saberCfg)); } catch (_) {} };
-let armed = false, ignite = 0, igniteTarget = 0, gear = 'none';
+let armed = false, ignite = 0, igniteTarget = 0, gear = 'lit';
+try { const g = localStorage.getItem('gear'); if (g) gear = g; } catch (_) {}
 const GEARS = { none: 'no gear', hilt: 'hilt in hand', lit: 'saber lit', pistol: 'pistol' };
 const GEAR_ORDER = ['none', 'hilt', 'lit', 'pistol'];
 let rifleModel = null, rifle = null, pistolModel = null, pistol = null;
@@ -565,6 +569,7 @@ function setGear(g, instant) {
   if (!GEARS[g]) g = 'none';
   if (g !== gear) log('gear', g);
   gear = g;
+  try { if (!movesOpen) localStorage.setItem('gear', g); } catch (_) {}
   if (g !== 'lit') { if (atk || blocking) stopOvr(0.15); atk = null; blocking = false; }
   const inHand = g === 'hilt' || g === 'lit';
   if (inHand && !armed) { armed = true; placeSabers(); }
@@ -656,6 +661,33 @@ function updateCombat(dt) {
   guardBlend = moveTo(guardBlend, blocking || (gear === 'pistol' && aimHeld) ? 1 : 0, dt / 0.12);
 }
 
+// ---------------- closed fists ----------------
+// Whenever a hand holds something, its fingers are forced into a closed fist after the mixer runs,
+// so every clip (runs, flips, slides, previews) keeps a grip on the hilt.
+const FINGER = /^(thumb|index|middle|ring|pinky)_0\d_([lr])$/;
+let fist = null; // [{ bone, side, q }]
+function buildFist() {
+  const c = clips.get('Punch_Cross'); if (!c) return;
+  fist = [];
+  for (const t of c.tracks) {
+    const [name, prop] = t.name.split('.'); const m = FINGER.exec(name);
+    if (!m || prop !== 'quaternion') continue;
+    const bone = boneByName(hero, name); if (!bone) continue;
+    const v = t.createInterpolant().evaluate(0.1);
+    fist.push({ bone, side: m[2], q: new THREE.Quaternion(v[0], v[1], v[2], v[3]).normalize() });
+  }
+}
+function handsHolding() {
+  if (gear === 'pistol') return 'r';
+  if (!armed) return '';
+  return saberCfg.style === 'single' ? 'r' : 'lr';
+}
+function applyFists() {
+  if (!fist) return;
+  const h = handsHolding(); if (!h) return;
+  for (const f of fist) if (h.includes(f.side)) f.bone.quaternion.copy(f.q);
+}
+
 // ---------------- strafing (aim / guard) ----------------
 // While aiming the pistol or guarding with the saber the body keeps facing the camera and the legs
 // blend the two clips whose measured travel direction is closest to where you push.
@@ -685,7 +717,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v7 · 2026-09-29';
+const BUILD = 'v8 · 2026-09-29';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -705,7 +737,8 @@ function snapshot(kind, detail) {
     st = { klass, gear, mode, gait, speed: +speed.toFixed(2), crouch, jumps, movesOpen, atk: atk ? (atk.heavy ? 'heavy' : atk.i) : null, blocking,
       cur: JSON.parse(JSON.stringify(cur)), pool: JSON.parse(JSON.stringify(pool)), saber: { ...saberCfg },
       overrides: [...ovr.keys()].map(desc), loops: [...locoActive].filter((a) => a.getEffectiveWeight() > 0.001).map(desc),
-      pose: { deviationFromTpose: +lastDev.toFixed(3), legCoverage: +lastLeg.toFixed(2), armCoverage: +lastArm.toFixed(2) } };
+      pose: { deviationFromTpose: +lastDev.toFixed(3), legCoverage: +lastLeg.toFixed(2), armCoverage: +lastArm.toFixed(2) },
+      input: { joystick: joy.id !== null, joyX: +joy.x.toFixed(2), joyY: +joy.y.toFixed(2), push: +(lastInput.mag || 0).toFixed(2), keys: [...keys], lookTouch: lookT.id !== null, hands: handsHolding() } };
   } catch (e) { st = { stateError: String(e) }; }
   return { at: new Date().toISOString(), kind, detail: String(detail).slice(0, 800), build: BUILD, dbState, device: navigator.userAgent, screen: `${innerWidth}x${innerHeight}`, ...st, events: events.slice(-25) };
 }
@@ -721,10 +754,29 @@ async function report(kind, detail, force) {
   r.dbState = dbState;
   try { if (db) { await db.collection('reports').add(r); sent = true; } } catch (e) { r.sendError = e?.code || e?.message || String(e); }
   r.sent = sent;
-  const titles = { tpose: 'T-pose caught', coverage: 'Pose gap caught', 'missing-clip': 'Missing animation', error: 'Script error', manual: 'Report' };
+  const titles = { tpose: 'T-pose caught', coverage: 'Pose gap caught', 'missing-clip': 'Missing animation', error: 'Script error', manual: 'Report',
+    freeze: 'Game froze', stuck: "Character didn't move", 'frozen-pose': 'Animation froze' };
   $('alerttitle').textContent = titles[kind] || kind;
   $('alerttext').textContent = `${detail}. ${sent ? 'Sent to Claude.' : `Could not send from here (${r.sendError || dbState}). Tap Copy report and paste it in the chat.`}`;
   $('alert').hidden = false;
+}
+// Freezes: long frame gaps (the whole game stalled), pushing to move but not moving, or a moving body whose pose stops changing.
+let hiddenAt = -1e9, stuckT = 0, stillT = 0, lastPoseSum = 0, lastInput = { mag: 0 };
+document.addEventListener('visibilitychange', () => { hiddenAt = performance.now(); if (document.hidden) log('app hidden'); else log('app visible'); });
+function checkHitch(raw) {
+  if (raw < 0.4 || performance.now() - hiddenAt < 3000) return;
+  log(`hitch ${Math.round(raw * 1000)} ms`);
+  if (raw > 1.2) report('freeze', `The game stopped for ${raw.toFixed(1)} s`);
+}
+function checkStuck(dt, inp) {
+  lastInput = inp;
+  const wantsMove = inp.mag > 0.3 && mode === 'ground' && !atk && !movesOpen;
+  stuckT = wantsMove && speed < 0.3 ? stuckT + dt : 0;
+  if (stuckT > 0.6) { report('stuck', `Pushing to move (${Math.round(inp.mag * 100)}%) but the character stays at ${speed.toFixed(2)} m/s`); stuckT = 0; }
+  let sum = 0; for (const b of bindQ.keys()) sum += b.quaternion.x * 3 + b.quaternion.y * 5 + b.quaternion.z * 7;
+  stillT = speed > 0.8 && Math.abs(sum - lastPoseSum) < 1e-6 ? stillT + dt : 0;
+  lastPoseSum = sum;
+  if (stillT > 0.5) { report('frozen-pose', `Moving at ${speed.toFixed(1)} m/s but the body stopped animating`); stillT = 0; }
 }
 function watchdog(dt) {
   if (!bindQ || !mixer) return;
@@ -763,6 +815,7 @@ addEventListener('keydown', (e) => {
   if (movesOpen) { if (e.code === 'Escape') closeMoves(); return; }
   if (GAME_KEYS.includes(e.code)) e.preventDefault();
   if (e.repeat) return;
+  if (!keys.has(e.code) && /^(Key[WASD]|Arrow)/.test(e.code)) log('key', e.code);
   keys.add(e.code);
   if (e.code === 'Space') jumpQueued = true;
   if (e.code === 'KeyC') { slideQueued = true; slideHeld = true; }
@@ -816,11 +869,15 @@ canvas.addEventListener('pointerdown', (e) => {
     if (!movesOpen && !isLocked()) { try { const p = canvas.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (_) {} }
     dragging = true; return;
   }
+  try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
   touchStart(e);
 });
+// stop the app around the game from treating a drag as a scroll or swipe (that cancels the joystick)
+for (const ev of ['touchstart', 'touchmove']) canvas.addEventListener(ev, (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
+canvas.addEventListener('lostpointercapture', (e) => { if (e.pointerType !== 'mouse' && (e.pointerId === joy.id || e.pointerId === lookT.id)) { log('touch lost', e.pointerId === joy.id ? 'joystick' : 'look'); touchEnd(e); } });
 addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') { dragging = false; if (e.button === 0) attackRelease(); if (e.button === 2) { blockRelease(); aimHeld = false; } } else touchEnd(e); });
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-addEventListener('pointercancel', (e) => { if (e.pointerType !== 'mouse') touchEnd(e); });
+addEventListener('pointercancel', (e) => { if (e.pointerType !== 'mouse') { if (e.pointerId === joy.id) log('joystick cancelled by the browser'); touchEnd(e); } });
 addEventListener('pointermove', (e) => {
   if (e.pointerType === 'mouse') { if (isLocked() || dragging) look(e.movementX, e.movementY, movesOpen ? 0.006 : 0.0023); return; }
   touchMove(e);
@@ -830,7 +887,7 @@ canvas.addEventListener('wheel', (e) => { e.preventDefault(); camDist = clamp(ca
 const joy = { id: null, ox: 0, oy: 0, x: 0, y: 0 }, lookT = { id: null, x: 0, y: 0 }, JOY_R = 56;
 function touchStart(e) {
   if (!movesOpen && e.clientX < innerWidth * 0.5 && joy.id === null) {
-    Object.assign(joy, { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: 0, y: 0 });
+    Object.assign(joy, { id: e.pointerId, ox: e.clientX, oy: e.clientY, x: 0, y: 0 }); log('joystick down');
     const j = $('joy'); j.hidden = false; j.style.left = e.clientX + 'px'; j.style.top = e.clientY + 'px'; j.firstElementChild.style.transform = '';
   } else if (lookT.id === null) Object.assign(lookT, { id: e.pointerId, x: e.clientX, y: e.clientY });
 }
@@ -844,7 +901,7 @@ function touchMove(e) {
   } else if (e.pointerId === lookT.id) { look(e.clientX - lookT.x, e.clientY - lookT.y, 0.006); lookT.x = e.clientX; lookT.y = e.clientY; }
 }
 function touchEnd(e) {
-  if (e.pointerId === joy.id) { joy.id = null; joy.x = joy.y = 0; $('joy').hidden = true; }
+  if (e.pointerId === joy.id) { log('joystick up'); joy.id = null; joy.x = joy.y = 0; $('joy').hidden = true; }
   if (e.pointerId === lookT.id) lookT.id = null;
 }
 
@@ -932,6 +989,7 @@ function endSlide() {
 function step(dt) {
   const inp = readInput(dt);
   const C = CLASSES[klass];
+  if (bindQ) checkStuck(dt, inp);
   const fx = Math.sin(camYaw), fz = Math.cos(camYaw);
   const wx = fx * inp.y - fz * inp.x, wz = fz * inp.y + fx * inp.x;
 
@@ -944,6 +1002,7 @@ function step(dt) {
     } else target = inp.sprint ? C.sprint : walkToggle ? C.walk : C.jog;
   }
   if (crouch && (inp.sprint || jumpQueued)) crouch = false;
+  if (C._frozen) target = 0; // test hook: simulates a character that ignores input
   if (blocking) target = Math.min(target, C.walk);          // no sprinting while blocking
   if (atk) target = Math.min(target, 1.0);                   // swings commit you
   if (blocking || atk) { jumpQueued = false; slideQueued = false; } // no jumping while blocking or mid-swing
@@ -1088,7 +1147,7 @@ function animateLoco(dt, C) {
     else layer(gripOnly ? masked(rawId, 'nogrip') : rawId, w * locoW);
   }
   if (debugTpose) { let sk = null; hero.traverse((o) => { if (!sk && o.isSkinnedMesh) sk = o; }); sk.skeleton.pose(); return; }
-  mixer.update(dt);
+  mixer.update(dt); applyFists();
 }
 let debugTpose = false;
 
@@ -1269,14 +1328,15 @@ function start() {
   pickGaitVariants(true);
   renderer.setAnimationLoop((t) => {
     timer.update(t);
-    const dt = Math.min(timer.getDelta(), 0.05);
+    const raw = timer.getDelta(), dt = Math.min(raw, 0.05);
+    checkHitch(raw);
     try {
     if (movesOpen) {
       updateSaber(dt);
       const locoW = updateOvr(dt);
       for (const a of locoActive) a.setEffectiveWeight(0);
       if (locoW > 0.01) { const a = useLoop(cur.idle); a.timeScale = 1; a.setEffectiveWeight(locoW); }
-      mixer.update(dt);
+      mixer.update(dt); applyFists();
       pivot.set(player.position.x, 1.0, player.position.z);
       const cp = Math.cos(camPitch);
       camera.position.set(pivot.x - Math.sin(camYaw) * cp * camDist, pivot.y + Math.sin(camPitch) * camDist, pivot.z - Math.cos(camYaw) * cp * camDist);
@@ -1285,12 +1345,12 @@ function start() {
     watchdog(dt);
     } catch (err) {
       report('error', `${err.message} | ${(err.stack || '').split('\n').slice(1, 3).join(' ').trim()}`);
-      try { mixer.update(dt); } catch (_) {}
+      try { mixer.update(dt); applyFists(); } catch (_) {}
     }
     renderer.render(scene, camera);
   });
   setGear(gear, true);
-  window.__game = { strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
+  window.__game = { get fingers() { const b = boneByName(hero, 'index_02_l'), f = fist && fist.find((x) => x.bone === b); return f ? +b.quaternion.angleTo(f.q).toFixed(3) : null; }, forceStuck() { speed = 0; CLASSES[klass]._frozen = true; }, strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
     setClass(k) { klass = k; renderClass(); }, openMoves, closeMoves };
 }
 </script>
