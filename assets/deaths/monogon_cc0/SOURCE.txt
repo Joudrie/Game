@@ -1,0 +1,3 @@
+Source: https://maxparata.itch.io/cc0-animations (Free Essential Animation CC0 by maxparata / Monogon)
+License: CC0 (per itch page)
+GLBs converted from the FBX with FBX2glTF (animation-only, Mixamo bone names: Hips, Spine, Head, LeftArm...).

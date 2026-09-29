@@ -7,6 +7,8 @@ Most assets are CC0 (public domain) and need no credit. The ones below need cred
 - **Mesh2Motion**: human add-on animations (CC0). github.com/scottpetrovic/mesh2motion-app
 - **100STYLE dataset** (CC BY 4.0): I. Mason, S. Starke, T. Komura, "Real-Time Style Modelling of Human Locomotion via Feature-Wise Transformations and Local Motion Phases", 2022.
 - **CMU Graphics Lab Motion Capture Database** (free for any use): mocap.cs.cmu.edu. BVH conversion by cgspeed.
+- **KayKit Character Animations 1.1** by Kay Lousberg (CC0): kneel-and-fall death, two hit reactions. kaylousberg.itch.io
+- **Quaternius Swat** soldier animations (CC0): enemy run, strafe, shoot and death clips.
 - **three.js** example Soldier model (MIT repository; animations from Mixamo).
 
 ## In `assets/` (downloaded, not all used yet)
@@ -17,6 +19,8 @@ Most assets are CC0 (public domain) and need no credit. The ones below need cred
   - Michel Baradari: "2 HQ Explosions" and "2 Metal Weapon Clicks" (CC-BY 3.0, OpenGameArt).
   - Vincent Sevedge: "Gunshot Sounds" (CC-BY 3.0, OpenGameArt).
   - Gary (PARPG): "Handling Guns" (CC-BY-SA 3.0, OpenGameArt).
+- **openmw endorphin BVH deaths** (`assets/deaths/_UNLICENSED_reference_openmw_endorphin_bvh`): the repository has **no licence**, so these are reference only and are not in the game.
+- **ACCAD motion capture** (Ohio State, CC BY 3.0): crouch-to-lie and get-up clips, not used yet.
 - **zenxchaos-tps-anims**: listed as Unlicense by its repository. The original source of the animations is unverified.
 - Everything else (Kenney, Quaternius, OpenGameArt CC0, Freesound CC0, Free Firearm Sound Library) is CC0. Libraries (Rapier, Jolt, cannon-es, three-vrm, nipplejs, Yuka, Sketchbook, three-fps) are MIT or Apache-2.0.
 

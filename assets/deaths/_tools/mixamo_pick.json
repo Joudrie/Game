@@ -1,0 +1,639 @@
+[
+ {
+  "name": "Death From Front Headshot",
+  "duration": null,
+  "category": "headshot",
+  "description": "Rifle Death From Front Headshot",
+  "motion_id": "c9cea76f-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Death From Back Headshot",
+  "duration": null,
+  "category": "headshot",
+  "description": "Rifle Death From Back Headshot",
+  "motion_id": "c9cea9b8-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Death Crouching Headshot Front",
+  "duration": null,
+  "category": "headshot",
+  "description": "Rifle Death Crouched From Headshot Front",
+  "motion_id": "c9cea8f6-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying",
+  "duration": null,
+  "category": "headshot",
+  "description": "Dying Shot To The Head Falling On Two Knees",
+  "motion_id": "c9c62fce-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying",
+  "duration": null,
+  "category": "headshot",
+  "description": "Dying Shot To Back Of Head Falling On Two Knees",
+  "motion_id": "c9c62efe-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying",
+  "duration": null,
+  "category": "headshot",
+  "description": "Dying Front Head Impact To Two Knees",
+  "motion_id": "c9c630ac-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying",
+  "duration": null,
+  "category": "headshot",
+  "description": "Dying With Front Hit To The Head And Fall On One Knee",
+  "motion_id": "c9c62c97-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying",
+  "duration": null,
+  "category": "headshot",
+  "description": "Dying With Front Impact To The Head And Fall On One Knee",
+  "motion_id": "c9c62bc7-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Standing React Small From Headshot",
+  "duration": null,
+  "category": "headshot",
+  "description": "Hit Reaction From Headshot With Bow",
+  "motion_id": "c9cebd4c-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying Backwards",
+  "duration": null,
+  "category": "torso",
+  "description": "Shot To The Chest Falling Backwards",
+  "motion_id": "c9c6dcf2-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Falling Back Death",
+  "duration": null,
+  "category": "torso",
+  "description": "Dying Falling Backward",
+  "motion_id": "c9cdb40b-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Falling Forward Death",
+  "duration": null,
+  "category": "torso",
+  "description": "Dying Falling Forward",
+  "motion_id": "c9cdb289-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Standing React Death Backward",
+  "duration": null,
+  "category": "torso",
+  "description": "Death Falling Backwards",
+  "motion_id": "e13a58d8-0104-45a5-9837-03fc3c307632"
+ },
+ {
+  "name": "Standing React Death Forward",
+  "duration": null,
+  "category": "torso",
+  "description": "Death Falling Forwards",
+  "motion_id": "586a54c0-5dc8-4290-be1c-aeccd94645de"
+ },
+ {
+  "name": "Standing React Death Left",
+  "duration": null,
+  "category": "torso",
+  "description": "Death Falling To The Left",
+  "motion_id": "e916b410-6978-439c-af54-8377a9e79317"
+ },
+ {
+  "name": "Standing React Death Right",
+  "duration": null,
+  "category": "torso",
+  "description": "Death Falling To The Right",
+  "motion_id": "b45e7d54-42bc-43e2-8a2f-a5afe5e3d3ac"
+ },
+ {
+  "name": "Death From The Front",
+  "duration": null,
+  "category": "torso",
+  "description": "Rifle Death From The Front",
+  "motion_id": "c9ceab40-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Death From The Back",
+  "duration": null,
+  "category": "torso",
+  "description": "Rifle Death From The Back",
+  "motion_id": "c9ceaa7b-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Death From Right",
+  "duration": null,
+  "category": "torso",
+  "description": "Rifle Death From Right Side",
+  "motion_id": "c9cea835-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying",
+  "duration": null,
+  "category": "torso",
+  "description": "Dying Shot To The Chest Falling On Two Knees",
+  "motion_id": "c9c62e30-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying",
+  "duration": null,
+  "category": "torso",
+  "description": "Dying Rear Impact Falling On Two Knees",
+  "motion_id": "c9c63186-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying",
+  "duration": null,
+  "category": "torso",
+  "description": "Death Hit From The Back Falling On One Knee",
+  "motion_id": "c9c62d63-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Death",
+  "duration": null,
+  "category": "torso",
+  "description": "Death From Standing Idle",
+  "motion_id": "c9c899a0-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Rifle Death",
+  "duration": null,
+  "category": "torso",
+  "description": "Dying Reaction While Standing Holding A Rifle",
+  "motion_id": "c9c871f6-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Rifle Run To Dying",
+  "duration": null,
+  "category": "torso",
+  "description": "Getting Shot While Running With An Aimed Rifle",
+  "motion_id": "c9c8662e-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Walking To Dying",
+  "duration": null,
+  "category": "torso",
+  "description": "Walking While Aiming Rifle To Dying",
+  "motion_id": "c9c869e6-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Fall Flat",
+  "duration": null,
+  "category": "torso",
+  "description": "Falling Flat On Face From A Hit To The Back While Running",
+  "motion_id": "c9cd86bc-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Shoulder Hit And Fall",
+  "duration": null,
+  "category": "torso",
+  "description": "Hit In The Shoulder And Falls To The Ground",
+  "motion_id": "c9c8f331-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Standing Death Backward 01",
+  "duration": null,
+  "category": "torso",
+  "description": "Death Reaction Falling Backwards With Bow",
+  "motion_id": "3ab11171-f610-463d-84ad-addc22120a45"
+ },
+ {
+  "name": "Standing Death Forward 01",
+  "duration": null,
+  "category": "torso",
+  "description": "Death Reaction Falling Forwards With Bow",
+  "motion_id": "c9ceaf01-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Standing Death Left 01",
+  "duration": null,
+  "category": "torso",
+  "description": "Death Reaction Falling Left With Bow",
+  "motion_id": "1bd02904-09ce-44fe-9b6e-6180fa949765"
+ },
+ {
+  "name": "Standing Death Right 01",
+  "duration": null,
+  "category": "torso",
+  "description": "Death Reaction Falling Right With Bow",
+  "motion_id": "b8c87300-fb46-41b5-b4b0-27aff06137a4"
+ },
+ {
+  "name": "Crouch Death",
+  "duration": null,
+  "category": "torso",
+  "description": "Dying From A Crouched Position",
+  "motion_id": "c9c85edd-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Prone Death",
+  "duration": null,
+  "category": "torso",
+  "description": "Dying From A Prone Position",
+  "motion_id": "c9c8a3f3-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Zombie Stumbling",
+  "duration": null,
+  "category": "torso",
+  "description": "Zombie Stumble To The Right And Fall",
+  "motion_id": "c9c6b5d6-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Hit To The Legs",
+  "duration": null,
+  "category": "leg",
+  "description": "Hit To The Legs With Object While Running",
+  "motion_id": "c9cd88ef-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Hit On Legs",
+  "duration": null,
+  "category": "leg",
+  "description": "Hit On Back Of Legs With An Object While Running",
+  "motion_id": "c9cd85fa-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Sweep Fall",
+  "duration": null,
+  "category": "leg",
+  "description": "Getting Feet Swept Out From Underneath And Falling",
+  "motion_id": "c9c7f722-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Tripping",
+  "duration": null,
+  "category": "leg",
+  "description": "Walk To Tripping And Falling",
+  "motion_id": "c9cca21b-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Stumble Backwards",
+  "duration": null,
+  "category": "leg",
+  "description": "Slip And Fall Backwards",
+  "motion_id": "c9c8fe6e-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Injured Hurting Idle",
+  "duration": null,
+  "category": "leg",
+  "description": "Injured Holding Hurt Leg Idle",
+  "motion_id": "c9ce552b-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Injured Walk",
+  "duration": null,
+  "category": "leg",
+  "description": "Injury On Right Leg And Arm",
+  "motion_id": "c9c6eaa4-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Injured Stumble Idle",
+  "duration": null,
+  "category": "leg",
+  "description": "Injured Stumbling Idle",
+  "motion_id": "c9ce53ae-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Flying Back Death",
+  "duration": null,
+  "category": "explosion",
+  "description": "Dying Flying Backward",
+  "motion_id": "c9cdb4c8-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Dying",
+  "duration": null,
+  "category": "explosion",
+  "description": "Explosion From Behind",
+  "motion_id": "c9c6e758-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Getting Thrown",
+  "duration": null,
+  "category": "explosion",
+  "description": "Being Thrown To The Side",
+  "motion_id": "c9cacaed-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Getting Hit Backwards",
+  "duration": null,
+  "category": "explosion",
+  "description": "Getting Hit And Flipping Backwards",
+  "motion_id": "c9cacc74-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Hit By Car",
+  "duration": null,
+  "category": "explosion",
+  "description": "Getting Hit By A Car While Tired",
+  "motion_id": "c9c8d652-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Hard Landing",
+  "duration": null,
+  "category": "explosion",
+  "description": "Mid-Air Falling To A Hard Landing",
+  "motion_id": "c9c99c82-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Falling Flat Impact",
+  "duration": null,
+  "category": "explosion",
+  "description": "Falling Flat On Face",
+  "motion_id": "c9c79e98-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Jump Away",
+  "duration": null,
+  "category": "explosion",
+  "description": "Jumping Away To Avoid Explosion",
+  "motion_id": "c9c6d3d1-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Knocked Down",
+  "duration": null,
+  "category": "knockdown",
+  "description": "Knocked Down To Stomach",
+  "motion_id": "c9c8a565-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Knocked Out",
+  "duration": null,
+  "category": "knockdown",
+  "description": "Knocked Out Falling To Back",
+  "motion_id": "c9c725f7-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Knocked Out",
+  "duration": null,
+  "category": "knockdown",
+  "description": "Knocked Out Falling To Stomach",
+  "motion_id": "c9c7216e-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Falling Down",
+  "duration": null,
+  "category": "knockdown",
+  "description": "Knocked Over And Falling To The Ground",
+  "motion_id": "c9c91079-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Stunned",
+  "duration": null,
+  "category": "knockdown",
+  "description": "Male Knocked Down From A Punch",
+  "motion_id": "c9ca7f74-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Livershot Knockdown",
+  "duration": null,
+  "category": "knockdown",
+  "description": "Receiving A Hit To The Liver",
+  "motion_id": "c9cb4ff3-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Swing Into Wall",
+  "duration": null,
+  "category": "knockdown",
+  "description": "Swing In Hit Wall To Crouched Land",
+  "motion_id": "c9cac7d8-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Being Electrocuted",
+  "duration": null,
+  "category": "knockdown",
+  "description": "Being Electrocuted Into Unconciousness",
+  "motion_id": "c9ca56fe-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Slipping",
+  "duration": null,
+  "category": "knockdown",
+  "description": "Frantically Slip And Fall To Stomach",
+  "motion_id": "c9c8d0fc-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Getting Up",
+  "duration": null,
+  "category": "getup",
+  "description": "Getting Up From Back",
+  "motion_id": "c9c7276e-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Getting Up",
+  "duration": null,
+  "category": "getup",
+  "description": "Getting Up From Stomach",
+  "motion_id": "c9c71f39-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Getting Up",
+  "duration": null,
+  "category": "getup",
+  "description": "Getting Up From Being Knocked Down On The Ground",
+  "motion_id": "c9c90823-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Getting Up",
+  "duration": null,
+  "category": "getup",
+  "description": "Standing From A Lying Prone",
+  "motion_id": "c9cd89ad-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Stand Up",
+  "duration": null,
+  "category": "getup",
+  "description": "Standing Up From Back",
+  "motion_id": "c9c6d314-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Standing Up",
+  "duration": null,
+  "category": "getup",
+  "description": "Standing Up From Lying On Stomach",
+  "motion_id": "c9c6dc32-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Zombie Stand Up",
+  "duration": null,
+  "category": "getup",
+  "description": "Zombie Laying On Back To Standing Up",
+  "motion_id": "c9c6b165-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Zombie Stand Up",
+  "duration": null,
+  "category": "getup",
+  "description": "Zombie Laying On Stomach To Standing Up",
+  "motion_id": "c9c6b2ed-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Zombie Stand Up",
+  "duration": null,
+  "category": "getup",
+  "description": "Zombie Laying On Side To Standing Up",
+  "motion_id": "c9c6b22d-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Hit Reaction",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Hit Reaction",
+  "motion_id": "c9c947d0-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Hit Reaction",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Hit Reaction While Holding A Rifle",
+  "motion_id": "c9c6bd18-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Hit Reaction",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Hit Reaction While Holding A Pistol",
+  "motion_id": "c9c6bc60-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Head Hit",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Receiving A Big Hit To The Head From A Straight Punch",
+  "motion_id": "c9cb56e9-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Head Hit",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Receiving A Light Hit To The Head From A Left Punch",
+  "motion_id": "c9cb52f3-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Standing React Large From Front",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Large Hit Reaction From The Front",
+  "motion_id": "7c05dc7e-088a-48f8-a456-5722c6e9b853"
+ },
+ {
+  "name": "Standing React Large From Back",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Large Hit Reaction From The Back",
+  "motion_id": "deb3ef18-8cf1-48ae-a8e5-5bd3b9e81a7d"
+ },
+ {
+  "name": "Standing React Large From Left",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Large Hit Reaction From The Left",
+  "motion_id": "8e0cf713-44d4-4a6e-af01-64e83af3fbb5"
+ },
+ {
+  "name": "Standing React Large From Right",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Large Hit Reaction From The Right",
+  "motion_id": "9f1f301e-3b08-4403-ae42-7ebc34cee551"
+ },
+ {
+  "name": "Standing React Small From Front",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Small Hit Reaction From The Front",
+  "motion_id": "3faceec0-f022-4e81-8da2-5b0e38a66087"
+ },
+ {
+  "name": "Standing React Small From Back",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Small Hit Reaction From The Back",
+  "motion_id": "0b890d95-c50e-4ece-a663-56f1870cc4f4"
+ },
+ {
+  "name": "Standing React Small From Left",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Small Hit Reaction From The Left",
+  "motion_id": "63fd9933-26cb-40f9-b804-8f76768674dc"
+ },
+ {
+  "name": "Standing React Small From Right",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Small Hit Reaction From The Right",
+  "motion_id": "b099a412-5194-4a60-850f-2306308fba1e"
+ },
+ {
+  "name": "Stomach Hit",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Receiving A Hit In The Stomach",
+  "motion_id": "c9cafd3d-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Big Rib Hit",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Receiving A Big Hit In The Ribs",
+  "motion_id": "c9caf951-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Reaction",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Male Reaction Hit On The Left Side",
+  "motion_id": "c9c60e0e-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Reaction",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Male Reaction Hit On The Right Side",
+  "motion_id": "c9c60d2e-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Shove Reaction",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Standing Reaction To Shove",
+  "motion_id": "c9c687a7-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Shoved Reaction With Spin",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Reaction To Getting Clipped While Walking Unaware",
+  "motion_id": "c9c68950-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Jogging Stumble",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Brief Stumble While Jogging",
+  "motion_id": "c9cbf8c2-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Zombie Reaction Hit",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Zombie Reaction Hit Stumble Back",
+  "motion_id": "c9c68ad5-b96c-11e4-a802-0aaa78deedf9"
+ },
+ {
+  "name": "Walking Hit Reaction",
+  "duration": null,
+  "category": "hit_reaction",
+  "description": "Hit Reaction When Walking While Aiming Rifle",
+  "motion_id": "c9c88d6c-b96c-11e4-a802-0aaa78deedf9"
+ }
+]

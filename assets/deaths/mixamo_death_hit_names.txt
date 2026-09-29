@@ -1,0 +1,106 @@
+# Mixamo motions (exact product name :: description :: motion id), queried 2026-09-29 via mixamo.com/api/v1/products. Download needs a free Adobe ID; not redistributable raw.
+
+## headshot
+Death From Front Headshot :: Rifle Death From Front Headshot :: c9cea76f-b96c-11e4-a802-0aaa78deedf9
+Death From Back Headshot :: Rifle Death From Back Headshot :: c9cea9b8-b96c-11e4-a802-0aaa78deedf9
+Death Crouching Headshot Front :: Rifle Death Crouched From Headshot Front :: c9cea8f6-b96c-11e4-a802-0aaa78deedf9
+Dying :: Dying Shot To The Head Falling On Two Knees :: c9c62fce-b96c-11e4-a802-0aaa78deedf9
+Dying :: Dying Shot To Back Of Head Falling On Two Knees :: c9c62efe-b96c-11e4-a802-0aaa78deedf9
+Dying :: Dying Front Head Impact To Two Knees :: c9c630ac-b96c-11e4-a802-0aaa78deedf9
+Dying :: Dying With Front Hit To The Head And Fall On One Knee :: c9c62c97-b96c-11e4-a802-0aaa78deedf9
+Dying :: Dying With Front Impact To The Head And Fall On One Knee :: c9c62bc7-b96c-11e4-a802-0aaa78deedf9
+Standing React Small From Headshot :: Hit Reaction From Headshot With Bow :: c9cebd4c-b96c-11e4-a802-0aaa78deedf9
+
+## torso
+Dying Backwards :: Shot To The Chest Falling Backwards :: c9c6dcf2-b96c-11e4-a802-0aaa78deedf9
+Falling Back Death :: Dying Falling Backward :: c9cdb40b-b96c-11e4-a802-0aaa78deedf9
+Falling Forward Death :: Dying Falling Forward :: c9cdb289-b96c-11e4-a802-0aaa78deedf9
+Standing React Death Backward :: Death Falling Backwards :: e13a58d8-0104-45a5-9837-03fc3c307632
+Standing React Death Forward :: Death Falling Forwards :: 586a54c0-5dc8-4290-be1c-aeccd94645de
+Standing React Death Left :: Death Falling To The Left :: e916b410-6978-439c-af54-8377a9e79317
+Standing React Death Right :: Death Falling To The Right :: b45e7d54-42bc-43e2-8a2f-a5afe5e3d3ac
+Death From The Front :: Rifle Death From The Front :: c9ceab40-b96c-11e4-a802-0aaa78deedf9
+Death From The Back :: Rifle Death From The Back :: c9ceaa7b-b96c-11e4-a802-0aaa78deedf9
+Death From Right :: Rifle Death From Right Side :: c9cea835-b96c-11e4-a802-0aaa78deedf9
+Dying :: Dying Shot To The Chest Falling On Two Knees :: c9c62e30-b96c-11e4-a802-0aaa78deedf9
+Dying :: Dying Rear Impact Falling On Two Knees :: c9c63186-b96c-11e4-a802-0aaa78deedf9
+Dying :: Death Hit From The Back Falling On One Knee :: c9c62d63-b96c-11e4-a802-0aaa78deedf9
+Death :: Death From Standing Idle :: c9c899a0-b96c-11e4-a802-0aaa78deedf9
+Rifle Death :: Dying Reaction While Standing Holding A Rifle :: c9c871f6-b96c-11e4-a802-0aaa78deedf9
+Rifle Run To Dying :: Getting Shot While Running With An Aimed Rifle :: c9c8662e-b96c-11e4-a802-0aaa78deedf9
+Walking To Dying :: Walking While Aiming Rifle To Dying :: c9c869e6-b96c-11e4-a802-0aaa78deedf9
+Fall Flat :: Falling Flat On Face From A Hit To The Back While Running :: c9cd86bc-b96c-11e4-a802-0aaa78deedf9
+Shoulder Hit And Fall :: Hit In The Shoulder And Falls To The Ground :: c9c8f331-b96c-11e4-a802-0aaa78deedf9
+Standing Death Backward 01 :: Death Reaction Falling Backwards With Bow :: 3ab11171-f610-463d-84ad-addc22120a45
+Standing Death Forward 01 :: Death Reaction Falling Forwards With Bow :: c9ceaf01-b96c-11e4-a802-0aaa78deedf9
+Standing Death Left 01 :: Death Reaction Falling Left With Bow :: 1bd02904-09ce-44fe-9b6e-6180fa949765
+Standing Death Right 01 :: Death Reaction Falling Right With Bow :: b8c87300-fb46-41b5-b4b0-27aff06137a4
+Crouch Death :: Dying From A Crouched Position :: c9c85edd-b96c-11e4-a802-0aaa78deedf9
+Prone Death :: Dying From A Prone Position :: c9c8a3f3-b96c-11e4-a802-0aaa78deedf9
+Zombie Stumbling :: Zombie Stumble To The Right And Fall :: c9c6b5d6-b96c-11e4-a802-0aaa78deedf9
+
+## leg
+Hit To The Legs :: Hit To The Legs With Object While Running :: c9cd88ef-b96c-11e4-a802-0aaa78deedf9
+Hit On Legs :: Hit On Back Of Legs With An Object While Running :: c9cd85fa-b96c-11e4-a802-0aaa78deedf9
+Sweep Fall :: Getting Feet Swept Out From Underneath And Falling :: c9c7f722-b96c-11e4-a802-0aaa78deedf9
+Tripping :: Walk To Tripping And Falling :: c9cca21b-b96c-11e4-a802-0aaa78deedf9
+Stumble Backwards :: Slip And Fall Backwards :: c9c8fe6e-b96c-11e4-a802-0aaa78deedf9
+Injured Hurting Idle :: Injured Holding Hurt Leg Idle :: c9ce552b-b96c-11e4-a802-0aaa78deedf9
+Injured Walk :: Injury On Right Leg And Arm :: c9c6eaa4-b96c-11e4-a802-0aaa78deedf9
+Injured Stumble Idle :: Injured Stumbling Idle :: c9ce53ae-b96c-11e4-a802-0aaa78deedf9
+
+## explosion
+Flying Back Death :: Dying Flying Backward :: c9cdb4c8-b96c-11e4-a802-0aaa78deedf9
+Dying :: Explosion From Behind :: c9c6e758-b96c-11e4-a802-0aaa78deedf9
+Getting Thrown :: Being Thrown To The Side :: c9cacaed-b96c-11e4-a802-0aaa78deedf9
+Getting Hit Backwards :: Getting Hit And Flipping Backwards :: c9cacc74-b96c-11e4-a802-0aaa78deedf9
+Hit By Car :: Getting Hit By A Car While Tired :: c9c8d652-b96c-11e4-a802-0aaa78deedf9
+Hard Landing :: Mid-Air Falling To A Hard Landing :: c9c99c82-b96c-11e4-a802-0aaa78deedf9
+Falling Flat Impact :: Falling Flat On Face :: c9c79e98-b96c-11e4-a802-0aaa78deedf9
+Jump Away :: Jumping Away To Avoid Explosion :: c9c6d3d1-b96c-11e4-a802-0aaa78deedf9
+
+## knockdown
+Knocked Down :: Knocked Down To Stomach :: c9c8a565-b96c-11e4-a802-0aaa78deedf9
+Knocked Out :: Knocked Out Falling To Back :: c9c725f7-b96c-11e4-a802-0aaa78deedf9
+Knocked Out :: Knocked Out Falling To Stomach :: c9c7216e-b96c-11e4-a802-0aaa78deedf9
+Falling Down :: Knocked Over And Falling To The Ground :: c9c91079-b96c-11e4-a802-0aaa78deedf9
+Stunned :: Male Knocked Down From A Punch :: c9ca7f74-b96c-11e4-a802-0aaa78deedf9
+Livershot Knockdown :: Receiving A Hit To The Liver :: c9cb4ff3-b96c-11e4-a802-0aaa78deedf9
+Swing Into Wall :: Swing In Hit Wall To Crouched Land :: c9cac7d8-b96c-11e4-a802-0aaa78deedf9
+Being Electrocuted :: Being Electrocuted Into Unconciousness :: c9ca56fe-b96c-11e4-a802-0aaa78deedf9
+Slipping :: Frantically Slip And Fall To Stomach :: c9c8d0fc-b96c-11e4-a802-0aaa78deedf9
+
+## getup
+Getting Up :: Getting Up From Back :: c9c7276e-b96c-11e4-a802-0aaa78deedf9
+Getting Up :: Getting Up From Stomach :: c9c71f39-b96c-11e4-a802-0aaa78deedf9
+Getting Up :: Getting Up From Being Knocked Down On The Ground :: c9c90823-b96c-11e4-a802-0aaa78deedf9
+Getting Up :: Standing From A Lying Prone :: c9cd89ad-b96c-11e4-a802-0aaa78deedf9
+Stand Up :: Standing Up From Back :: c9c6d314-b96c-11e4-a802-0aaa78deedf9
+Standing Up :: Standing Up From Lying On Stomach :: c9c6dc32-b96c-11e4-a802-0aaa78deedf9
+Zombie Stand Up :: Zombie Laying On Back To Standing Up :: c9c6b165-b96c-11e4-a802-0aaa78deedf9
+Zombie Stand Up :: Zombie Laying On Stomach To Standing Up :: c9c6b2ed-b96c-11e4-a802-0aaa78deedf9
+Zombie Stand Up :: Zombie Laying On Side To Standing Up :: c9c6b22d-b96c-11e4-a802-0aaa78deedf9
+
+## hit_reaction
+Hit Reaction :: Hit Reaction :: c9c947d0-b96c-11e4-a802-0aaa78deedf9
+Hit Reaction :: Hit Reaction While Holding A Rifle :: c9c6bd18-b96c-11e4-a802-0aaa78deedf9
+Hit Reaction :: Hit Reaction While Holding A Pistol :: c9c6bc60-b96c-11e4-a802-0aaa78deedf9
+Head Hit :: Receiving A Big Hit To The Head From A Straight Punch :: c9cb56e9-b96c-11e4-a802-0aaa78deedf9
+Head Hit :: Receiving A Light Hit To The Head From A Left Punch :: c9cb52f3-b96c-11e4-a802-0aaa78deedf9
+Standing React Large From Front :: Large Hit Reaction From The Front :: 7c05dc7e-088a-48f8-a456-5722c6e9b853
+Standing React Large From Back :: Large Hit Reaction From The Back :: deb3ef18-8cf1-48ae-a8e5-5bd3b9e81a7d
+Standing React Large From Left :: Large Hit Reaction From The Left :: 8e0cf713-44d4-4a6e-af01-64e83af3fbb5
+Standing React Large From Right :: Large Hit Reaction From The Right :: 9f1f301e-3b08-4403-ae42-7ebc34cee551
+Standing React Small From Front :: Small Hit Reaction From The Front :: 3faceec0-f022-4e81-8da2-5b0e38a66087
+Standing React Small From Back :: Small Hit Reaction From The Back :: 0b890d95-c50e-4ece-a663-56f1870cc4f4
+Standing React Small From Left :: Small Hit Reaction From The Left :: 63fd9933-26cb-40f9-b804-8f76768674dc
+Standing React Small From Right :: Small Hit Reaction From The Right :: b099a412-5194-4a60-850f-2306308fba1e
+Stomach Hit :: Receiving A Hit In The Stomach :: c9cafd3d-b96c-11e4-a802-0aaa78deedf9
+Big Rib Hit :: Receiving A Big Hit In The Ribs :: c9caf951-b96c-11e4-a802-0aaa78deedf9
+Reaction :: Male Reaction Hit On The Left Side :: c9c60e0e-b96c-11e4-a802-0aaa78deedf9
+Reaction :: Male Reaction Hit On The Right Side :: c9c60d2e-b96c-11e4-a802-0aaa78deedf9
+Shove Reaction :: Standing Reaction To Shove :: c9c687a7-b96c-11e4-a802-0aaa78deedf9
+Shoved Reaction With Spin :: Reaction To Getting Clipped While Walking Unaware :: c9c68950-b96c-11e4-a802-0aaa78deedf9
+Jogging Stumble :: Brief Stumble While Jogging :: c9cbf8c2-b96c-11e4-a802-0aaa78deedf9
+Zombie Reaction Hit :: Zombie Reaction Hit Stumble Back :: c9c68ad5-b96c-11e4-a802-0aaa78deedf9
+Walking Hit Reaction :: Hit Reaction When Walking While Aiming Rifle :: c9c88d6c-b96c-11e4-a802-0aaa78deedf9

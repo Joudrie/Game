@@ -1,0 +1,1523 @@
+[
+ {
+  "path": "/home/user/game/assets/deaths/cmu_bvh",
+  "source": "https://github.com/una-dinosauria/cmu-mocap (raw data/NNN/NN_NN.bvh); index http://mocap.cs.cmu.edu",
+  "license": "CMU Graphics Lab Motion Capture Database: free for all uses incl. commercial (credit appreciated). cgspeed BVH conversion.",
+  "skeleton": "CMU/cgspeed 31-joint BVH (Hips, LHipJoint, LeftUpLeg..., Head), Y-up, 120 fps, frame 0 is a T-pose",
+  "clips": [
+   {
+    "name": "90_18",
+    "file": "cmu_bvh/90_18.bvh",
+    "duration": 3.29,
+    "category": "torso|headshot",
+    "description": "RugPullFall: feet yanked out, drops straight onto back in ~0.4s, lands flat face-up and stays down. Use 0.75-2.0s (frames ~90-240 @120fps) as a hard fall-backward / headshot snap-back crumple."
+   },
+   {
+    "name": "90_17",
+    "file": "cmu_bvh/90_17.bvh",
+    "duration": 5.05,
+    "category": "leg|knockdown",
+    "description": "BannanaPeelSlip: walks forward, feet slip out front, falls backward onto back (on ground ~3.5s), stays face-up. Use 1.75-4.0s (frames ~210-480) for leg-hit legs-out-from-under death or slip knockdown."
+   },
+   {
+    "name": "90_16",
+    "file": "cmu_bvh/90_16.bvh",
+    "duration": 6.04,
+    "category": "torso",
+    "description": "fall on face: small hop/stagger at 2.25-3.0s, then pitches forward onto hands and chest (face-down, head ~0.2 of height), stays down. Use 2.2-4.2s (frames ~265-505) as a stagger-then-fall-forward death."
+   },
+   {
+    "name": "90_12",
+    "file": "cmu_bvh/90_12.bvh",
+    "duration": 6.89,
+    "category": "explosion",
+    "description": "bck flp twst fall: backward flip with twist that fails and lands on the ground face-up (~4.75s). Use 3.4-5.5s (frames ~410-660) as an airborne spin + hard landing for blown-up deaths."
+   },
+   {
+    "name": "90_13",
+    "file": "cmu_bvh/90_13.bvh",
+    "duration": 7.75,
+    "category": "explosion",
+    "description": "bck flp twst fall (take 2): backward twisting flip, crashes to ground on side (~5.0s). Use 3.6-6.0s (frames ~430-720) as a thrown/spinning landing."
+   },
+   {
+    "name": "22_12",
+    "file": "cmu_bvh/22_12.bvh",
+    "duration": 2.54,
+    "category": "hit_reaction",
+    "description": "A stumbles into B: forward stumble 1.4 body-heights with a sway, stays on feet. Good hit-from-behind/push stagger forward."
+   },
+   {
+    "name": "23_12",
+    "file": "cmu_bvh/23_12.bvh",
+    "duration": 2.54,
+    "category": "hit_reaction",
+    "description": "Partner take of the same stumble: lurches forward 1.7 body-heights, recovers to standing."
+   },
+   {
+    "name": "91_59",
+    "file": "cmu_bvh/91_59.bvh",
+    "duration": 2.61,
+    "category": "hit_reaction",
+    "description": "360 smallStumble: small in-place stagger (head dips ~6%), recovers. Light stagger."
+   },
+   {
+    "name": "104_13",
+    "file": "cmu_bvh/104_13.bvh",
+    "duration": 4.59,
+    "category": "hit_reaction|leg",
+    "description": "StumbleWalk: drunken stumbling walk, lurches and dips (head to 0.85) twice, stays up. Use for dazed/stunned stagger locomotion."
+   },
+   {
+    "name": "85_07",
+    "file": "cmu_bvh/85_07.bvh",
+    "duration": 8.0,
+    "category": "knockdown",
+    "description": "KickFlipStumble: after a kick-flip the actor stumbles and drops to a crouch/hands (head 0.47 at ~5.5s) then recovers ~6.5s. Use 4.7-6.8s as stumble-to-knee-and-recover."
+   },
+   {
+    "name": "77_09",
+    "file": "cmu_bvh/77_09.bvh",
+    "duration": 8.24,
+    "category": "hit_reaction|explosion",
+    "description": "duck to avoid flying object: two sharp ducks/cowers (head drops to ~0.5) and recovers. Non-lethal flinch from a nearby blast or thrown object."
+   },
+   {
+    "name": "77_19",
+    "file": "cmu_bvh/77_19.bvh",
+    "duration": 8.34,
+    "category": "leg",
+    "description": "limping, hurt right leg (post leg-hit locomotion). Same data as 139_19 \"Walk Wounded Leg\"."
+   },
+   {
+    "name": "91_16",
+    "file": "cmu_bvh/91_16.bvh",
+    "duration": 15.77,
+    "category": "leg",
+    "description": "Limp: long limping walk (15.8s). Post leg-hit locomotion."
+   },
+   {
+    "name": "142_12",
+    "file": "cmu_bvh/142_12.bvh",
+    "duration": 39.19,
+    "category": "leg",
+    "description": "Painfulleftknee: long stylized walk favouring the left knee (39s). Post leg-hit locomotion."
+   },
+   {
+    "name": "140_01",
+    "file": "cmu_bvh/140_01.bvh",
+    "duration": 6.92,
+    "category": "getup",
+    "description": "Get Up Face Down: starts prone face-down, pushes up, standing by ~4.25s."
+   },
+   {
+    "name": "140_02",
+    "file": "cmu_bvh/140_02.bvh",
+    "duration": 7.82,
+    "category": "getup",
+    "description": "Get Up Face Down (take 2): prone face-down, standing by ~5.0s."
+   },
+   {
+    "name": "140_03",
+    "file": "cmu_bvh/140_03.bvh",
+    "duration": 8.53,
+    "category": "getup",
+    "description": "Get Up Laying on Side: starts on side, rolls to hands and knees, standing by ~6.0s."
+   },
+   {
+    "name": "140_04",
+    "file": "cmu_bvh/140_04.bvh",
+    "duration": 9.2,
+    "category": "getup",
+    "description": "Get Up Laying on Side (take 2): standing by ~6.75s."
+   },
+   {
+    "name": "140_08",
+    "file": "cmu_bvh/140_08.bvh",
+    "duration": 7.49,
+    "category": "getup",
+    "description": "Get Up From Ground Laying on Back: starts face-up, sits up, rolls over to a knee, standing by ~5.25s."
+   },
+   {
+    "name": "140_09",
+    "file": "cmu_bvh/140_09.bvh",
+    "duration": 6.8,
+    "category": "getup",
+    "description": "Get Up From Ground Laying on Back (take 2): standing by ~4.5s."
+   },
+   {
+    "name": "77_16",
+    "file": "cmu_bvh/77_16.bvh",
+    "duration": 5.45,
+    "category": "getup",
+    "description": "laying down, getting up (index text) = \"Get Up From Ground\" in subject 139 naming: starts face-down, standing by ~3.5s (fastest face-down get-up)."
+   },
+   {
+    "name": "77_17",
+    "file": "cmu_bvh/77_17.bvh",
+    "duration": 6.0,
+    "category": "getup",
+    "description": "Get Up From Ground (take 2): starts face-down, standing by ~5.25s."
+   },
+   {
+    "name": "77_18",
+    "file": "cmu_bvh/77_18.bvh",
+    "duration": 7.12,
+    "category": "getup",
+    "description": "Get Up From Ground Laying on Back: starts on back/side, standing by ~4.5s, ends in a careful ready pose."
+   },
+   {
+    "name": "111_06",
+    "file": "cmu_bvh/111_06.bvh",
+    "duration": 12.71,
+    "category": "getup",
+    "description": "Get up from floor: starts lying face-up, slow get-up, standing by ~10s (elderly/slow style)."
+   },
+   {
+    "name": "111_07",
+    "file": "cmu_bvh/111_07.bvh",
+    "duration": 16.45,
+    "category": "getup|torso",
+    "description": "Lies down (on ground 2.5s, face-up) then later gets up (standing ~14.3s). The 0.8-3.0s lie-down segment works as a slow controlled collapse onto the back."
+   },
+   {
+    "name": "111_08",
+    "file": "cmu_bvh/111_08.bvh",
+    "duration": 12.79,
+    "category": "getup",
+    "description": "Get up from floor: starts face-up, standing by ~10.5s (slow)."
+   },
+   {
+    "name": "113_08",
+    "file": "cmu_bvh/113_08.bvh",
+    "duration": 15.38,
+    "category": "getup|torso",
+    "description": "Lay down and get up: goes down via kneel (head 0.4 at 2s) onto back (4.0s), lies until 10.5s, stands by ~13.3s. 0.8-4.2s = kneel-then-collapse-onto-back."
+   },
+   {
+    "name": "114_02",
+    "file": "cmu_bvh/114_02.bvh",
+    "duration": 14.52,
+    "category": "getup",
+    "description": "Getting up from laying down: starts on side, standing by ~10s."
+   },
+   {
+    "name": "114_11",
+    "file": "cmu_bvh/114_11.bvh",
+    "duration": 29.02,
+    "category": "getup",
+    "description": "Laying down and getting up (29s): on ground 6.75-12.75s, standing by ~19.75s."
+   }
+  ],
+  "notes": "CMU has no scripted deaths; these are falls, stumbles, limps and get-ups. Time ranges exclude the T-pose frame (frame = t*120+1). Searched index for fall/die/death/stumble/get up/hit/shot/push/knock."
+ },
+ {
+  "path": "/home/user/game/assets/deaths/accad_bvh",
+  "source": "https://accad.osu.edu/research/motion-lab/mocap-system-and-data (Male1_bvh.zip, Male2_bvh.zip, Female1_bvh.zip)",
+  "license": "CC BY 3.0 (credit: ACCAD, The Ohio State University)",
+  "skeleton": "22-joint BVH (Hips, ToSpine, Spine, Spine1, Neck, Head, LeftShoulder...), 30 fps",
+  "clips": [
+   {
+    "name": "Male1_A8_CrouchToLie",
+    "file": "accad_bvh/Male1_A8_CrouchToLie.bvh",
+    "duration": 6.63,
+    "category": "torso|getup",
+    "description": "crouch, then lowers onto hands and slides down to lie prone face-down (on ground ~4s). Slow wounded collapse onto stomach."
+   },
+   {
+    "name": "Male2_A8_CrouchToLie",
+    "file": "accad_bvh/Male2_A8_CrouchToLie.bvh",
+    "duration": 5.77,
+    "category": "torso|getup",
+    "description": "crouch to lying prone (head bottoms out ~3.7s). Slow collapse to stomach."
+   },
+   {
+    "name": "Female1_A08_CrouchToLie",
+    "file": "accad_bvh/Female1_A08_CrouchToLie.bvh",
+    "duration": 6.47,
+    "category": "torso|getup",
+    "description": "crouch to lying prone face-down (on ground ~3.5s)."
+   },
+   {
+    "name": "Male1_A9_LieDown",
+    "file": "accad_bvh/Male1_A9_LieDown.bvh",
+    "duration": 8.3,
+    "category": "getup",
+    "description": "lying prone idle (8.3s) - dead/downed loop."
+   },
+   {
+    "name": "Male1_A10_LieToCrouch",
+    "file": "accad_bvh/Male1_A10_LieToCrouch.bvh",
+    "duration": 6.53,
+    "category": "getup",
+    "description": "prone face-down pushes up to a crouch (first half of a get-up; ends crouched ~0.73 height)."
+   },
+   {
+    "name": "Male2_A10_LieToCrouch",
+    "file": "accad_bvh/Male2_A10_LieToCrouch.bvh",
+    "duration": 4.6,
+    "category": "getup",
+    "description": "prone to crouch (ends ~0.8 height)."
+   },
+   {
+    "name": "Female1_A10_LieToCrouch",
+    "file": "accad_bvh/Female1_A10_LieToCrouch.bvh",
+    "duration": 4.4,
+    "category": "getup",
+    "description": "prone to crouch (ends ~0.6 height)."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/deaths/kaykit_1.1",
+  "source": "https://kaylousberg.itch.io/kaykit-character-animations (Free 1.1)",
+  "license": "CC0",
+  "skeleton": "KayKit Rig_Medium / Rig_Large (23 bones: root, hips, spine, chest, head, upperarm.l ...); Rig_Medium matches /home/user/game/assets/locomotion/kaykit_char_anims_1.1",
+  "clips": [
+   {
+    "name": "Death_A",
+    "file": "kaykit_1.1/Rig_Medium_General.glb",
+    "duration": 0.8,
+    "category": "torso|headshot",
+    "description": "fast death: falls straight backward onto back in ~0.3s, face-up (1.0 body-height back)."
+   },
+   {
+    "name": "Death_A_Pose",
+    "file": "kaykit_1.1/Rig_Medium_General.glb",
+    "duration": 0.0,
+    "category": "pose",
+    "description": "static end pose of Death_A (lying face-up)."
+   },
+   {
+    "name": "Death_B",
+    "file": "kaykit_1.1/Rig_Medium_General.glb",
+    "duration": 2.63,
+    "category": "torso",
+    "description": "slow death: sags, drops to its knees and slumps forward, ends kneeling/folded (head ~0.38) - drop-to-knees death."
+   },
+   {
+    "name": "Death_B_Pose",
+    "file": "kaykit_1.1/Rig_Medium_General.glb",
+    "duration": 0.0,
+    "category": "pose",
+    "description": "static end pose of Death_B."
+   },
+   {
+    "name": "Hit_A",
+    "file": "kaykit_1.1/Rig_Medium_General.glb",
+    "duration": 0.67,
+    "category": "hit_reaction",
+    "description": "small upper-body flinch, feet planted."
+   },
+   {
+    "name": "Hit_B",
+    "file": "kaykit_1.1/Rig_Medium_General.glb",
+    "duration": 0.87,
+    "category": "hit_reaction",
+    "description": "bigger flinch: head dips to 0.91 and recoils back 0.3, recovers."
+   },
+   {
+    "name": "Lie_Down",
+    "file": "kaykit_1.1/Rig_Medium_Simulation.glb",
+    "duration": 3.0,
+    "category": "getup|torso",
+    "description": "controlled lie-down from standing onto back/side (on ground ~1.25s)."
+   },
+   {
+    "name": "Lie_Idle",
+    "file": "kaykit_1.1/Rig_Medium_Simulation.glb",
+    "duration": 2.67,
+    "category": "getup",
+    "description": "lying idle loop (downed/dead loop)."
+   },
+   {
+    "name": "Lie_StandUp",
+    "file": "kaykit_1.1/Rig_Medium_Simulation.glb",
+    "duration": 2.33,
+    "category": "getup",
+    "description": "from lying on back to standing (2.3s)."
+   },
+   {
+    "name": "Skeletons_Death",
+    "file": "kaykit_1.1/Rig_Medium_Special.glb",
+    "duration": 2.0,
+    "category": "explosion|torso",
+    "description": "skeleton-style death: thrown backward ~2.3 body-heights and collapses face-up in 0.5s (reads as blown back)."
+   },
+   {
+    "name": "Skeletons_Awaken_Floor",
+    "file": "kaykit_1.1/Rig_Medium_Special.glb",
+    "duration": 2.3,
+    "category": "getup",
+    "description": "rises from lying on floor to standing (2.3s)."
+   },
+   {
+    "name": "Skeletons_Awaken_Floor_Long",
+    "file": "kaykit_1.1/Rig_Medium_Special.glb",
+    "duration": 3.83,
+    "category": "getup",
+    "description": "slower version of the floor get-up (3.8s)."
+   },
+   {
+    "name": "Skeletons_Death_Resurrect",
+    "file": "kaykit_1.1/Rig_Medium_Special.glb",
+    "duration": 2.7,
+    "category": "getup",
+    "description": "from the Skeletons_Death pose back up to standing (2.7s)."
+   },
+   {
+    "name": "Skeletons_Inactive_Floor_Pose",
+    "file": "kaykit_1.1/Rig_Medium_Special.glb",
+    "duration": 0.0,
+    "category": "pose",
+    "description": "lying on floor pose."
+   },
+   {
+    "name": "Melee_Block_Hit",
+    "file": "kaykit_1.1/Rig_Medium_CombatMelee.glb",
+    "duration": 1.07,
+    "category": "hit_reaction",
+    "description": "hit while blocking: recoils back 0.2, recovers."
+   },
+   {
+    "name": "Death_A",
+    "file": "kaykit_1.1/Rig_Large_General.glb",
+    "duration": 1.67,
+    "category": "torso",
+    "description": "Rig_Large (big character) death: sags then falls backward face-up (on ground ~1.25s)."
+   },
+   {
+    "name": "Hit_A",
+    "file": "kaykit_1.1/Rig_Large_General.glb",
+    "duration": 0.7,
+    "category": "hit_reaction",
+    "description": "Rig_Large flinch."
+   }
+  ],
+  "notes": "Also has Rig_Large_Special/Transform etc. (not relevant). Mannequin meshes are in the free zip too."
+ },
+ {
+  "path": "/home/user/game/assets/deaths/monogon_cc0",
+  "source": "https://maxparata.itch.io/cc0-animations",
+  "license": "CC0",
+  "skeleton": "Mixamo bone names (Hips, Spine, Spine1, Spine2, Neck, Head, LeftArm...), animation-only (no mesh)",
+  "clips": [
+   {
+    "name": "Death",
+    "file": "monogon_cc0/Death.glb (+Death.fbx)",
+    "duration": 2.29,
+    "category": "torso",
+    "description": "stands ~1s, twists and falls sideways-backward (toward its right), lands face-up at ~1.75s."
+   },
+   {
+    "name": "Hit",
+    "file": "monogon_cc0/Hit.glb (+Hit.fbx)",
+    "duration": 0.71,
+    "category": "hit_reaction",
+    "description": "torso flinch: recoils back 0.3 body-heights and returns."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/deaths/quaternius_animated_human",
+  "source": "https://opengameart.org/content/animated-human-low-poly (= quaternius.com/packs/animatedman.html)",
+  "license": "CC0",
+  "skeleton": "Quaternius old \"Human Armature\" (Hips, Spine, Head, LeftArm...), mesh included",
+  "clips": [
+   {
+    "name": "Human Armature|Death",
+    "file": "quaternius_animated_human/AnimatedHuman.glb (+.fbx)",
+    "duration": 3.5,
+    "category": "torso",
+    "description": "clutches/sags (1.0-1.5s), drops to its knees (head ~0.55), then topples forward face-down (on ground ~2.25s). Drop-to-knees-then-fall-forward."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/deaths/_UNLICENSED_reference_openmw_endorphin_bvh",
+  "source": "https://github.com/MaxYari/HitReactionsAnimatedOpenMW (Sources/bvh)",
+  "license": "NONE STATED - all rights reserved by default. Reference only; do not ship without permission from the author (MaxYari).",
+  "skeleton": "NaturalMotion Endorphin 28-joint BVH (root, LowerSpineJoint... UpperNeckJoint, LeftShoulderJoint, LeftHipJoint...), 60 fps",
+  "clips": [
+   {
+    "name": "2_Death_Back",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Back.bvh",
+    "duration": 3.68,
+    "category": "torso|headshot",
+    "description": "(auto) falls backward (starts ~0.47s, on ground ~0.93s), ends on its side; head travels 1.5 body-heights back; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Death_Back_Far",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Back_Far.bvh",
+    "duration": 4.12,
+    "category": "explosion|torso",
+    "description": "(auto) falls backward (starts ~0.47s, on ground ~0.70s), ends face-down; head travels 2.3 body-heights back (thrown far)"
+   },
+   {
+    "name": "2_Death_Back_Far2",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Back_Far2.bvh",
+    "duration": 3.88,
+    "category": "torso",
+    "description": "(auto) falls to its left (starts ~0.70s, on ground ~0.93s), ends face-up; head travels 1.2 body-heights back; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Death_Back_Far_Flip",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Back_Far_Flip.bvh",
+    "duration": 2.98,
+    "category": "explosion",
+    "description": "(auto) falls forward (starts ~0.47s, on ground ~0.93s), ends face-down; head travels 0.7 body-heights back; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Death_Down",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Down.bvh",
+    "duration": 3.25,
+    "category": "torso",
+    "description": "(auto) falls to its left (starts ~0.47s, on ground ~2.10s), ends on its side; head travels 0.8 body-heights back; slow collapse (1.6s from first sag to ground); passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Death_Down_Left",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Down_Left.bvh",
+    "duration": 3.08,
+    "category": "torso",
+    "description": "(auto) falls to its right (starts ~0.47s, on ground ~0.93s), ends face-down; head travels 0.7 body-heights sideways; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Death_Down_Right",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Down_Right.bvh",
+    "duration": 1.68,
+    "category": "torso",
+    "description": "(auto) falls to its left (starts ~0.47s, on ground ~0.70s), ends face-up; head travels 0.7 body-heights sideways; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Death_Down_Right2",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Down_Right2.bvh",
+    "duration": 3.12,
+    "category": "torso",
+    "description": "(auto) falls to its left (starts ~0.47s, on ground ~1.63s), ends face-up; head travels 1.1 body-heights sideways; slow collapse (1.2s from first sag to ground); passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Death_Forward_Far",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Forward_Far.bvh",
+    "duration": 3.58,
+    "category": "torso|explosion",
+    "description": "(auto) falls forward (starts ~0.47s, on ground ~0.93s), ends face-up; body twists/rolls after landing (forward -> backward); head travels 1.6 body-heights forward; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Death_Forward_Med",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Forward_Med.bvh",
+    "duration": 4.12,
+    "category": "torso",
+    "description": "(auto) falls forward (starts ~0.70s, on ground ~0.93s), ends face-down; head travels 1.2 body-heights forward"
+   },
+   {
+    "name": "2_Death_Left_Far",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Left_Far.bvh",
+    "duration": 1.75,
+    "category": "torso|explosion",
+    "description": "(auto) falls to its right (starts ~0.47s, on ground ~0.70s), ends face-down; body twists/rolls after landing (to its right -> backward); head travels 1.3 body-heights back; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Death_Right_Far",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Death_Right_Far.bvh",
+    "duration": 6.48,
+    "category": "torso|explosion",
+    "description": "(auto) falls to its left (starts ~0.47s, on ground ~0.70s), ends face-down; body twists/rolls after landing (to its left -> backward); head travels 1.4 body-heights sideways; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Stumble_Back",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Stumble_Back.bvh",
+    "duration": 2.72,
+    "category": "knockdown",
+    "description": "(auto) falls to its left (starts ~0.93s, on ground ~1.63s), ends on its side; head travels 1.6 body-heights back"
+   },
+   {
+    "name": "2_Stumble_Left",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Stumble_Left.bvh",
+    "duration": 3.05,
+    "category": "knockdown",
+    "description": "(auto) falls to its right (starts ~0.70s, on ground ~1.63s), ends face-down; head travels 1.6 body-heights forward; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Stumble_Left2",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Stumble_Left2.bvh",
+    "duration": 2.82,
+    "category": "knockdown",
+    "description": "(auto) falls to its right (starts ~0.70s, on ground ~1.40s), ends on its side; head travels 2.0 body-heights sideways (thrown far); passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Stumble_Right",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Stumble_Right.bvh",
+    "duration": 1.92,
+    "category": "knockdown",
+    "description": "(auto) falls backward (starts ~1.40s, on ground ~1.87s), ends on its side; head travels 1.3 body-heights back; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "2_Stumble_Right2",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/2_Stumble_Right2.bvh",
+    "duration": 3.58,
+    "category": "knockdown",
+    "description": "(auto) falls to its left (starts ~0.70s, on ground ~1.17s), ends face-down; head travels 1.3 body-heights back; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "Knock Back High Face",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Knock Back High Face.bvh",
+    "duration": 16.78,
+    "category": "explosion|knockdown",
+    "description": "(auto) falls backward (starts ~0.00s, on ground ~1.17s), ends face-up; head travels 1.5 body-heights back"
+   },
+   {
+    "name": "Knock Back High",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Knock Back High.bvh",
+    "duration": 8.28,
+    "category": "explosion|knockdown",
+    "description": "(auto) falls backward (starts ~0.00s, on ground ~1.17s), ends face-up; head travels 1.4 body-heights back; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "Knock Back",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Knock Back.bvh",
+    "duration": 4.08,
+    "category": "explosion|knockdown",
+    "description": "(auto) falls backward (starts ~0.70s, on ground ~0.93s), ends face-up; head travels 1.9 body-heights back (thrown far); passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "Knock Down Left 2",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Knock Down Left 2.bvh",
+    "duration": 3.85,
+    "category": "knockdown",
+    "description": "(auto) falls to its right (starts ~0.47s, on ground ~0.70s), ends face-up; head travels 0.9 body-heights back; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "Knock Down Left",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Knock Down Left.bvh",
+    "duration": 2.35,
+    "category": "knockdown",
+    "description": "(auto) falls to its right (starts ~0.47s, on ground ~0.93s), ends face-down; head travels 1.0 body-heights sideways; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "Knock Forward",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Knock Forward.bvh",
+    "duration": 4.98,
+    "category": "knockdown",
+    "description": "(auto) falls backward (starts ~0.23s, on ground ~1.17s), ends on its side; head travels 1.6 body-heights forward"
+   },
+   {
+    "name": "Stagger Back",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Stagger Back.bvh",
+    "duration": 3.18,
+    "category": "knockdown|torso",
+    "description": "(auto) falls backward (starts ~0.47s, on ground ~1.63s), ends face-up; head travels 1.0 body-heights back; slow collapse (1.2s from first sag to ground); passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "Stagger left",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Stagger left.bvh",
+    "duration": 8.15,
+    "category": "knockdown",
+    "description": "(auto) falls to its right (starts ~0.47s, on ground ~3.03s), ends face-down; head travels 1.4 body-heights sideways; slow collapse (2.6s from first sag to ground)"
+   },
+   {
+    "name": "Stagger longer left",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Stagger longer left.bvh",
+    "duration": 1.92,
+    "category": "knockdown",
+    "description": "(auto) falls to its right (starts ~0.47s, on ground ~1.40s), ends face-down; head travels 1.6 body-heights sideways; passes through kneel/crouch height before ground"
+   },
+   {
+    "name": "Stagger right",
+    "file": "_UNLICENSED_reference_openmw_endorphin_bvh/Stagger right.bvh",
+    "duration": 7.38,
+    "category": "knockdown",
+    "description": "(auto) falls to its left (starts ~0.70s, on ground ~0.93s), ends face-up; head travels 0.9 body-heights sideways"
+   }
+  ],
+  "notes": "Physics-simulated (Endorphin) deaths/knockdowns: the best variety found, but no licence. Left/Right in file names appear to be the hit side (analyzer sees Death_Left_Far fall toward the character right). Every clip ends lying on the ground (no get-up)."
+ },
+ {
+  "path": "/home/user/game/assets/weapons/mesh2motion-cc0/human-addon-animations.glb",
+  "source": "https://github.com/scottpetrovic/mesh2motion-app",
+  "license": "CC0",
+  "skeleton": "Mesh2Motion UE5-style human (pelvis, spine_01.., head, upperarm_l), same as Quaternius UAL naming",
+  "already_on_disk": true,
+  "clips": [
+   {
+    "name": "Death_A",
+    "duration": 4.5,
+    "category": "torso",
+    "description": "slow death: staggers ~2s, sags and folds forward to the ground face-down (on ground ~3.75s)."
+   },
+   {
+    "name": "Death_B",
+    "duration": 1.88,
+    "category": "torso",
+    "description": "steps back, spins/twists and falls onto its front (face-down, head toward where its back was) - spin-and-fall."
+   },
+   {
+    "name": "Death_C",
+    "duration": 2.21,
+    "category": "headshot|torso",
+    "description": "instant collapse straight backward onto back (ground in 0.5s), face-up - headshot crumple."
+   },
+   {
+    "name": "Idle Hurt",
+    "duration": 1.67,
+    "category": "hit_reaction",
+    "description": "hunched hurt idle loop."
+   },
+   {
+    "name": "Dizzy",
+    "duration": 2.42,
+    "category": "hit_reaction",
+    "description": "dazed swaying idle (stunned)."
+   },
+   {
+    "name": "Zombie_Rise",
+    "duration": 3.38,
+    "category": "getup",
+    "description": "rises from the ground to standing (3.4s)."
+   },
+   {
+    "name": "Kneeling Tired",
+    "duration": 0.83,
+    "category": "hit_reaction",
+    "description": "kneeling exhausted loop (wounded on knees)."
+   },
+   {
+    "name": "Land_Three_Point",
+    "duration": 1.38,
+    "category": "knockdown",
+    "description": "superhero three-point landing (hard landing)."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/weapons/mesh2motion-cc0/human-base-animations.glb",
+  "source": "https://github.com/scottpetrovic/mesh2motion-app",
+  "license": "CC0",
+  "skeleton": "Mesh2Motion human",
+  "already_on_disk": true,
+  "clips": [
+   {
+    "name": "Death_D",
+    "duration": 2.17,
+    "category": "torso",
+    "description": "sags ~1s then falls backward onto back, face-up."
+   },
+   {
+    "name": "Hit_Chest",
+    "duration": 0.42,
+    "category": "hit_reaction",
+    "description": "small chest flinch."
+   },
+   {
+    "name": "Hit_Head",
+    "duration": 0.54,
+    "category": "hit_reaction",
+    "description": "small head snap."
+   },
+   {
+    "name": "Hit_Knockback",
+    "duration": 0.83,
+    "category": "explosion|knockdown",
+    "description": "knocked backward onto back, rolls over backward and comes back up to a crouch/stand (0.8s)."
+   },
+   {
+    "name": "Hit_Knockback_RM",
+    "duration": 0.62,
+    "category": "explosion|knockdown",
+    "description": "root-motion version: travels ~5 body-heights backward."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/locomotion/quaternius_ual1/UAL1_Standard.glb",
+  "source": "https://quaternius.com/packs/universalanimationlibrary.html",
+  "license": "CC0",
+  "skeleton": "Quaternius UAL (UE5 mannequin names)",
+  "already_on_disk": true,
+  "clips": [
+   {
+    "name": "Death01",
+    "duration": 2.4,
+    "category": "torso",
+    "description": "falls backward onto back, face-up (ground ~1.0s)."
+   },
+   {
+    "name": "Hit_Chest",
+    "duration": 0.33,
+    "category": "hit_reaction",
+    "description": "chest flinch."
+   },
+   {
+    "name": "Hit_Head",
+    "duration": 0.43,
+    "category": "hit_reaction",
+    "description": "head snap."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/locomotion/quaternius_ual2/UAL2_Standard.glb",
+  "source": "https://quaternius.com/packs/universalanimationlibrary2.html",
+  "license": "CC0",
+  "skeleton": "Quaternius UAL",
+  "already_on_disk": true,
+  "clips": [
+   {
+    "name": "Hit_Knockback",
+    "duration": 0.83,
+    "category": "explosion|knockdown",
+    "description": "thrown backward onto its back (1.6 body-heights), ends lying face-up."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/misc/models/quaternius_toonshooter/Characters/glTF/Character_Enemy.gltf",
+  "source": "https://quaternius.com/packs/toonshootergamekit.html",
+  "license": "CC0",
+  "skeleton": "Quaternius Toon Shooter rig",
+  "already_on_disk": true,
+  "clips": [
+   {
+    "name": "Death",
+    "duration": 0.77,
+    "category": "torso",
+    "description": "quick fall backward, face-up (0.77s)."
+   },
+   {
+    "name": "HitReact",
+    "duration": 0.43,
+    "category": "hit_reaction",
+    "description": "recoil back 0.2."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/misc/models/quaternius_modular_chars/Individual Characters/glTF/Swat.gltf",
+  "source": "https://quaternius.com/packs/ultimatemodularcharacters.html",
+  "license": "CC0",
+  "skeleton": "Quaternius modular chars rig (same clips in quaternius_cyberpunk Character.gltf)",
+  "already_on_disk": true,
+  "clips": [
+   {
+    "name": "Death",
+    "duration": 1.07,
+    "category": "torso",
+    "description": "falls backward face-up via a knee buckle (1.07s)."
+   },
+   {
+    "name": "HitRecieve",
+    "duration": 0.57,
+    "category": "hit_reaction",
+    "description": "flinch."
+   },
+   {
+    "name": "HitRecieve_2",
+    "duration": 0.57,
+    "category": "hit_reaction",
+    "description": "flinch variant."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/locomotion/godot_demos/tps_player.glb",
+  "source": "Godot TPS demo",
+  "license": "CC-BY 3.0",
+  "skeleton": "Godot TPS demo robot rig",
+  "already_on_disk": true,
+  "clips": [
+   {
+    "name": "flinch1",
+    "duration": 0.42,
+    "category": "hit_reaction",
+    "description": "light flinch."
+   },
+   {
+    "name": "flinch2",
+    "duration": 0.42,
+    "category": "hit_reaction",
+    "description": "light flinch variant."
+   },
+   {
+    "name": "flinch_heavy",
+    "duration": 0.42,
+    "category": "hit_reaction",
+    "description": "heavy flinch."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/misc/models/threejs_examples/RobotExpressive.glb",
+  "source": "three.js examples (RobotExpressive by Tomas Laulhe)",
+  "license": "CC0",
+  "skeleton": "RobotExpressive rig",
+  "already_on_disk": true,
+  "clips": [
+   {
+    "name": "Death",
+    "duration": 0.96,
+    "category": "explosion|torso",
+    "description": "thrown backward 1.7 body-heights, lands face-up in 0.5s."
+   }
+  ]
+ },
+ {
+  "path": "/home/user/game/assets/locomotion/kenney/mini/character-male-a.glb",
+  "source": "https://kenney.nl (Mini Characters)",
+  "license": "CC0",
+  "skeleton": "Kenney mini rig (chibi)",
+  "already_on_disk": true,
+  "clips": [
+   {
+    "name": "die",
+    "duration": 0.33,
+    "category": "torso",
+    "description": "0.33s tip-over backward (chibi)."
+   }
+  ]
+ },
+ {
+  "path": null,
+  "source": "https://www.mixamo.com (search API /api/v1/products, no login needed to search; download needs a free Adobe ID)",
+  "license": "Adobe Mixamo terms: free to use in games/projects; raw files may not be redistributed as standalone assets",
+  "skeleton": "Mixamo (mixamorig:Hips ...)",
+  "clips": [
+   {
+    "name": "Death From Front Headshot",
+    "duration": null,
+    "category": "headshot",
+    "description": "Rifle Death From Front Headshot",
+    "motion_id": "c9cea76f-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Death From Back Headshot",
+    "duration": null,
+    "category": "headshot",
+    "description": "Rifle Death From Back Headshot",
+    "motion_id": "c9cea9b8-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Death Crouching Headshot Front",
+    "duration": null,
+    "category": "headshot",
+    "description": "Rifle Death Crouched From Headshot Front",
+    "motion_id": "c9cea8f6-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying",
+    "duration": null,
+    "category": "headshot",
+    "description": "Dying Shot To The Head Falling On Two Knees",
+    "motion_id": "c9c62fce-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying",
+    "duration": null,
+    "category": "headshot",
+    "description": "Dying Shot To Back Of Head Falling On Two Knees",
+    "motion_id": "c9c62efe-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying",
+    "duration": null,
+    "category": "headshot",
+    "description": "Dying Front Head Impact To Two Knees",
+    "motion_id": "c9c630ac-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying",
+    "duration": null,
+    "category": "headshot",
+    "description": "Dying With Front Hit To The Head And Fall On One Knee",
+    "motion_id": "c9c62c97-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying",
+    "duration": null,
+    "category": "headshot",
+    "description": "Dying With Front Impact To The Head And Fall On One Knee",
+    "motion_id": "c9c62bc7-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Standing React Small From Headshot",
+    "duration": null,
+    "category": "headshot",
+    "description": "Hit Reaction From Headshot With Bow",
+    "motion_id": "c9cebd4c-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying Backwards",
+    "duration": null,
+    "category": "torso",
+    "description": "Shot To The Chest Falling Backwards",
+    "motion_id": "c9c6dcf2-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Falling Back Death",
+    "duration": null,
+    "category": "torso",
+    "description": "Dying Falling Backward",
+    "motion_id": "c9cdb40b-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Falling Forward Death",
+    "duration": null,
+    "category": "torso",
+    "description": "Dying Falling Forward",
+    "motion_id": "c9cdb289-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Standing React Death Backward",
+    "duration": null,
+    "category": "torso",
+    "description": "Death Falling Backwards",
+    "motion_id": "e13a58d8-0104-45a5-9837-03fc3c307632"
+   },
+   {
+    "name": "Standing React Death Forward",
+    "duration": null,
+    "category": "torso",
+    "description": "Death Falling Forwards",
+    "motion_id": "586a54c0-5dc8-4290-be1c-aeccd94645de"
+   },
+   {
+    "name": "Standing React Death Left",
+    "duration": null,
+    "category": "torso",
+    "description": "Death Falling To The Left",
+    "motion_id": "e916b410-6978-439c-af54-8377a9e79317"
+   },
+   {
+    "name": "Standing React Death Right",
+    "duration": null,
+    "category": "torso",
+    "description": "Death Falling To The Right",
+    "motion_id": "b45e7d54-42bc-43e2-8a2f-a5afe5e3d3ac"
+   },
+   {
+    "name": "Death From The Front",
+    "duration": null,
+    "category": "torso",
+    "description": "Rifle Death From The Front",
+    "motion_id": "c9ceab40-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Death From The Back",
+    "duration": null,
+    "category": "torso",
+    "description": "Rifle Death From The Back",
+    "motion_id": "c9ceaa7b-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Death From Right",
+    "duration": null,
+    "category": "torso",
+    "description": "Rifle Death From Right Side",
+    "motion_id": "c9cea835-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying",
+    "duration": null,
+    "category": "torso",
+    "description": "Dying Shot To The Chest Falling On Two Knees",
+    "motion_id": "c9c62e30-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying",
+    "duration": null,
+    "category": "torso",
+    "description": "Dying Rear Impact Falling On Two Knees",
+    "motion_id": "c9c63186-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying",
+    "duration": null,
+    "category": "torso",
+    "description": "Death Hit From The Back Falling On One Knee",
+    "motion_id": "c9c62d63-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Death",
+    "duration": null,
+    "category": "torso",
+    "description": "Death From Standing Idle",
+    "motion_id": "c9c899a0-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Rifle Death",
+    "duration": null,
+    "category": "torso",
+    "description": "Dying Reaction While Standing Holding A Rifle",
+    "motion_id": "c9c871f6-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Rifle Run To Dying",
+    "duration": null,
+    "category": "torso",
+    "description": "Getting Shot While Running With An Aimed Rifle",
+    "motion_id": "c9c8662e-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Walking To Dying",
+    "duration": null,
+    "category": "torso",
+    "description": "Walking While Aiming Rifle To Dying",
+    "motion_id": "c9c869e6-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Fall Flat",
+    "duration": null,
+    "category": "torso",
+    "description": "Falling Flat On Face From A Hit To The Back While Running",
+    "motion_id": "c9cd86bc-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Shoulder Hit And Fall",
+    "duration": null,
+    "category": "torso",
+    "description": "Hit In The Shoulder And Falls To The Ground",
+    "motion_id": "c9c8f331-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Standing Death Backward 01",
+    "duration": null,
+    "category": "torso",
+    "description": "Death Reaction Falling Backwards With Bow",
+    "motion_id": "3ab11171-f610-463d-84ad-addc22120a45"
+   },
+   {
+    "name": "Standing Death Forward 01",
+    "duration": null,
+    "category": "torso",
+    "description": "Death Reaction Falling Forwards With Bow",
+    "motion_id": "c9ceaf01-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Standing Death Left 01",
+    "duration": null,
+    "category": "torso",
+    "description": "Death Reaction Falling Left With Bow",
+    "motion_id": "1bd02904-09ce-44fe-9b6e-6180fa949765"
+   },
+   {
+    "name": "Standing Death Right 01",
+    "duration": null,
+    "category": "torso",
+    "description": "Death Reaction Falling Right With Bow",
+    "motion_id": "b8c87300-fb46-41b5-b4b0-27aff06137a4"
+   },
+   {
+    "name": "Crouch Death",
+    "duration": null,
+    "category": "torso",
+    "description": "Dying From A Crouched Position",
+    "motion_id": "c9c85edd-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Prone Death",
+    "duration": null,
+    "category": "torso",
+    "description": "Dying From A Prone Position",
+    "motion_id": "c9c8a3f3-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Zombie Stumbling",
+    "duration": null,
+    "category": "torso",
+    "description": "Zombie Stumble To The Right And Fall",
+    "motion_id": "c9c6b5d6-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Hit To The Legs",
+    "duration": null,
+    "category": "leg",
+    "description": "Hit To The Legs With Object While Running",
+    "motion_id": "c9cd88ef-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Hit On Legs",
+    "duration": null,
+    "category": "leg",
+    "description": "Hit On Back Of Legs With An Object While Running",
+    "motion_id": "c9cd85fa-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Sweep Fall",
+    "duration": null,
+    "category": "leg",
+    "description": "Getting Feet Swept Out From Underneath And Falling",
+    "motion_id": "c9c7f722-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Tripping",
+    "duration": null,
+    "category": "leg",
+    "description": "Walk To Tripping And Falling",
+    "motion_id": "c9cca21b-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Stumble Backwards",
+    "duration": null,
+    "category": "leg",
+    "description": "Slip And Fall Backwards",
+    "motion_id": "c9c8fe6e-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Injured Hurting Idle",
+    "duration": null,
+    "category": "leg",
+    "description": "Injured Holding Hurt Leg Idle",
+    "motion_id": "c9ce552b-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Injured Walk",
+    "duration": null,
+    "category": "leg",
+    "description": "Injury On Right Leg And Arm",
+    "motion_id": "c9c6eaa4-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Injured Stumble Idle",
+    "duration": null,
+    "category": "leg",
+    "description": "Injured Stumbling Idle",
+    "motion_id": "c9ce53ae-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Flying Back Death",
+    "duration": null,
+    "category": "explosion",
+    "description": "Dying Flying Backward",
+    "motion_id": "c9cdb4c8-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Dying",
+    "duration": null,
+    "category": "explosion",
+    "description": "Explosion From Behind",
+    "motion_id": "c9c6e758-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Getting Thrown",
+    "duration": null,
+    "category": "explosion",
+    "description": "Being Thrown To The Side",
+    "motion_id": "c9cacaed-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Getting Hit Backwards",
+    "duration": null,
+    "category": "explosion",
+    "description": "Getting Hit And Flipping Backwards",
+    "motion_id": "c9cacc74-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Hit By Car",
+    "duration": null,
+    "category": "explosion",
+    "description": "Getting Hit By A Car While Tired",
+    "motion_id": "c9c8d652-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Hard Landing",
+    "duration": null,
+    "category": "explosion",
+    "description": "Mid-Air Falling To A Hard Landing",
+    "motion_id": "c9c99c82-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Falling Flat Impact",
+    "duration": null,
+    "category": "explosion",
+    "description": "Falling Flat On Face",
+    "motion_id": "c9c79e98-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Jump Away",
+    "duration": null,
+    "category": "explosion",
+    "description": "Jumping Away To Avoid Explosion",
+    "motion_id": "c9c6d3d1-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Knocked Down",
+    "duration": null,
+    "category": "knockdown",
+    "description": "Knocked Down To Stomach",
+    "motion_id": "c9c8a565-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Knocked Out",
+    "duration": null,
+    "category": "knockdown",
+    "description": "Knocked Out Falling To Back",
+    "motion_id": "c9c725f7-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Knocked Out",
+    "duration": null,
+    "category": "knockdown",
+    "description": "Knocked Out Falling To Stomach",
+    "motion_id": "c9c7216e-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Falling Down",
+    "duration": null,
+    "category": "knockdown",
+    "description": "Knocked Over And Falling To The Ground",
+    "motion_id": "c9c91079-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Stunned",
+    "duration": null,
+    "category": "knockdown",
+    "description": "Male Knocked Down From A Punch",
+    "motion_id": "c9ca7f74-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Livershot Knockdown",
+    "duration": null,
+    "category": "knockdown",
+    "description": "Receiving A Hit To The Liver",
+    "motion_id": "c9cb4ff3-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Swing Into Wall",
+    "duration": null,
+    "category": "knockdown",
+    "description": "Swing In Hit Wall To Crouched Land",
+    "motion_id": "c9cac7d8-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Being Electrocuted",
+    "duration": null,
+    "category": "knockdown",
+    "description": "Being Electrocuted Into Unconciousness",
+    "motion_id": "c9ca56fe-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Slipping",
+    "duration": null,
+    "category": "knockdown",
+    "description": "Frantically Slip And Fall To Stomach",
+    "motion_id": "c9c8d0fc-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Getting Up",
+    "duration": null,
+    "category": "getup",
+    "description": "Getting Up From Back",
+    "motion_id": "c9c7276e-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Getting Up",
+    "duration": null,
+    "category": "getup",
+    "description": "Getting Up From Stomach",
+    "motion_id": "c9c71f39-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Getting Up",
+    "duration": null,
+    "category": "getup",
+    "description": "Getting Up From Being Knocked Down On The Ground",
+    "motion_id": "c9c90823-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Getting Up",
+    "duration": null,
+    "category": "getup",
+    "description": "Standing From A Lying Prone",
+    "motion_id": "c9cd89ad-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Stand Up",
+    "duration": null,
+    "category": "getup",
+    "description": "Standing Up From Back",
+    "motion_id": "c9c6d314-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Standing Up",
+    "duration": null,
+    "category": "getup",
+    "description": "Standing Up From Lying On Stomach",
+    "motion_id": "c9c6dc32-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Zombie Stand Up",
+    "duration": null,
+    "category": "getup",
+    "description": "Zombie Laying On Back To Standing Up",
+    "motion_id": "c9c6b165-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Zombie Stand Up",
+    "duration": null,
+    "category": "getup",
+    "description": "Zombie Laying On Stomach To Standing Up",
+    "motion_id": "c9c6b2ed-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Zombie Stand Up",
+    "duration": null,
+    "category": "getup",
+    "description": "Zombie Laying On Side To Standing Up",
+    "motion_id": "c9c6b22d-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Hit Reaction",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Hit Reaction",
+    "motion_id": "c9c947d0-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Hit Reaction",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Hit Reaction While Holding A Rifle",
+    "motion_id": "c9c6bd18-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Hit Reaction",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Hit Reaction While Holding A Pistol",
+    "motion_id": "c9c6bc60-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Head Hit",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Receiving A Big Hit To The Head From A Straight Punch",
+    "motion_id": "c9cb56e9-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Head Hit",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Receiving A Light Hit To The Head From A Left Punch",
+    "motion_id": "c9cb52f3-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Standing React Large From Front",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Large Hit Reaction From The Front",
+    "motion_id": "7c05dc7e-088a-48f8-a456-5722c6e9b853"
+   },
+   {
+    "name": "Standing React Large From Back",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Large Hit Reaction From The Back",
+    "motion_id": "deb3ef18-8cf1-48ae-a8e5-5bd3b9e81a7d"
+   },
+   {
+    "name": "Standing React Large From Left",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Large Hit Reaction From The Left",
+    "motion_id": "8e0cf713-44d4-4a6e-af01-64e83af3fbb5"
+   },
+   {
+    "name": "Standing React Large From Right",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Large Hit Reaction From The Right",
+    "motion_id": "9f1f301e-3b08-4403-ae42-7ebc34cee551"
+   },
+   {
+    "name": "Standing React Small From Front",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Small Hit Reaction From The Front",
+    "motion_id": "3faceec0-f022-4e81-8da2-5b0e38a66087"
+   },
+   {
+    "name": "Standing React Small From Back",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Small Hit Reaction From The Back",
+    "motion_id": "0b890d95-c50e-4ece-a663-56f1870cc4f4"
+   },
+   {
+    "name": "Standing React Small From Left",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Small Hit Reaction From The Left",
+    "motion_id": "63fd9933-26cb-40f9-b804-8f76768674dc"
+   },
+   {
+    "name": "Standing React Small From Right",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Small Hit Reaction From The Right",
+    "motion_id": "b099a412-5194-4a60-850f-2306308fba1e"
+   },
+   {
+    "name": "Stomach Hit",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Receiving A Hit In The Stomach",
+    "motion_id": "c9cafd3d-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Big Rib Hit",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Receiving A Big Hit In The Ribs",
+    "motion_id": "c9caf951-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Reaction",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Male Reaction Hit On The Left Side",
+    "motion_id": "c9c60e0e-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Reaction",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Male Reaction Hit On The Right Side",
+    "motion_id": "c9c60d2e-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Shove Reaction",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Standing Reaction To Shove",
+    "motion_id": "c9c687a7-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Shoved Reaction With Spin",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Reaction To Getting Clipped While Walking Unaware",
+    "motion_id": "c9c68950-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Jogging Stumble",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Brief Stumble While Jogging",
+    "motion_id": "c9cbf8c2-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Zombie Reaction Hit",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Zombie Reaction Hit Stumble Back",
+    "motion_id": "c9c68ad5-b96c-11e4-a802-0aaa78deedf9"
+   },
+   {
+    "name": "Walking Hit Reaction",
+    "duration": null,
+    "category": "hit_reaction",
+    "description": "Hit Reaction When Walking While Aiming Rifle",
+    "motion_id": "c9c88d6c-b96c-11e4-a802-0aaa78deedf9"
+   }
+  ],
+  "notes": "Not downloaded. Names are exact Mixamo product names; desc is the Mixamo description; motion_id for direct lookup."
+ }
+]
