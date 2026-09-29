@@ -11,12 +11,12 @@ await p.waitForFunction(() => window.__game, null, { timeout: 90000 });
 const st = () => p.evaluate(() => ({ gear: __game.gear, gait: __game.gait, s: +__game.speed.toFixed(1), pose: Object.fromEntries(Object.entries(__game.pose).map(([k, v]) => [k, +v.toFixed(2)])), report: __game.lastReport && __game.lastReport.kind }));
 await p.click('#movesbtn'); await p.waitForTimeout(300); await p.click('[data-tab="moves"]');
 for (const [slot, id] of [['walk', 'Walk_Loop'], ['sprint', 'Sprint_Loop'], ['idle', 'Idle_Loop'], ['jog', 'Jog_Fwd_Loop']]) { await p.click(`.pv[data-slot="${slot}"][data-id="${id}"]`); await p.waitForTimeout(250); }
-await p.click('[data-tab="setup"]');
-for (const k of ['heavy', 'force', 'light']) { await p.click(`[data-class="${k}"]`); await p.waitForTimeout(150); }
-await p.click('#movesclose'); await p.waitForTimeout(400);
+await p.click('#movesclose'); await p.waitForTimeout(300);
+// class buttons live in the Weapon panel since v14
+await p.click('#gearbtn'); for (const k of ['heavy', 'force', 'light']) { await p.click(`[data-class="${k}"]`); await p.waitForTimeout(150); } await p.click('#weaponclose'); await p.waitForTimeout(300);
 console.log('after moves', JSON.stringify(await st()));
 for (const [k, g] of [['light','none'],['heavy','hilt'],['force','lit'],['light','pistol']]) {
-  await p.click('#movesbtn'); await p.waitForTimeout(200); await p.click('[data-tab="setup"]'); await p.click(`[data-class="${k}"]`); await p.click('#movesclose'); await p.waitForTimeout(200);
+  await p.click('#gearbtn'); await p.waitForTimeout(150); await p.click(`[data-class="${k}"]`); await p.click('#weaponclose'); await p.waitForTimeout(200);
   await p.evaluate((g) => __game.setGear(g, true), g); await p.waitForTimeout(200);
   await p.keyboard.down('KeyV'); await p.keyboard.up('KeyV');           // walk
   await p.keyboard.down('KeyW'); await p.waitForTimeout(900); console.log(g, 'walk', JSON.stringify(await st())); await p.screenshot({ path: `${OUT}/v9-${k}-${g}-walk.png` });

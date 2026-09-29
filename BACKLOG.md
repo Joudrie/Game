@@ -11,7 +11,7 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 
 ## 1. Enemies and combat testing
 - [x] ~~Five enemy soldiers, deaths by cause (head, torso, legs, explosion, push, wall impact), bodies staying 90 s, hit reactions.~~ Done in v12.
-- [ ] **Physics ragdoll** on top of the death animations, so bodies slump over steps, roofs and each other. *[free assets: Rapier or Jolt physics, downloaded]*
+- [ ] **Physics ragdoll** on top of the death animations, so bodies slump over steps, roofs and each other. v14 fakes the flight (clip stretched to the flight, head-over-heels flips). *[free assets: Rapier or Jolt physics, downloaded]*
 - [ ] **Enemies that look like enemies.** They use your hero's body with a darker tint for now. The SWAT soldier model is on disk, but its body doesn't fit our skeleton's proportions. *[free assets]*
 - [ ] **More death variety:**
   - Mixamo has exact matches for your rules: `Death From Front Headshot`, `Hit To The Legs`, `Flying Back Death`, `Swing Into Wall`. The full list is in `assets/deaths/mixamo_death_hit_names.txt`. *[needs you: Mixamo login]*
@@ -27,7 +27,7 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 - [ ] **More combat moves:** air slash combos, a dash strike, a grapple yank (pull the enemy to you instead), a finisher on stunned soldiers.
 
 ## 2. Lightsaber
-- [ ] **Draw and holster animations.** *[needs you: Mixamo `Draw Sword 1`/`2`, `Sheath Sword 1`/`2`]*
+- [ ] **Draw and holster animations.** v14 does it with live arm IK. Mixamo clips would look better. *[needs you: Mixamo `Draw Sword 1`/`2`, `Sheath Sword 1`/`2`]*
 - [ ] **Many more combos,** simple but plentiful, Fortnite-style. *[needs you: Mixamo Great Sword Pack, `One Hand Sword Combo`, `Two Hand Sword Combo`]*
 - [ ] **Dual-wield attacks for The Second.** *[needs you: Mixamo `Dual Weapon Combo`]*
 - [ ] **More stances,** including a proper reverse-grip set (Ahsoka). *[needs you: Mixamo Great Sword idles, `Stabbing (Reverse Grip)`]*
@@ -69,6 +69,7 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 - [ ] **The Second's green trail** when he bursts forward, and a Force dash.
 
 ## 6. Gadgets and abilities
+- [x] ~~Jetpack~~ (v14). Still to do: fuel, a proper model and sound, and hover animations from Mixamo (`Flying`).
 - [x] ~~Impact grenade.~~ Done in v12. Still to do: a grenade model, sound, and a count per life.
 - [ ] **Ability pool assigned per character** as each one is added. Examples: wrist grapple, Force push, dash, grenades.
 - [ ] **Force moves:** push is done (v12); pull and levitate still to do. *[free assets: Power Up, Levitate clips]*
@@ -96,6 +97,7 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 - [ ] Building detail beyond grey boxes.
 
 ## 10. Testing and tools
+- [ ] **Your v14 play test**, especially: swing then move, aim + fire, draw/holster, jetpack, pushing bodies.
 - [ ] **Reports sending by themselves from the iPhone app.** The next report will show why they failed (`dbState`).
 - [ ] **A play test on a real iPhone** of the latest version.
 - [ ] **Turn infinite jumps off** (Menu → Setup) once the double-jump rules matter again.

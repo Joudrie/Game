@@ -2,6 +2,63 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v14: combat feel, pistol rework, draw and holster, jetpack, bodies you can move, new look, Weapon panel
+**Fixes from your PC play test**
+- **No more freezing after a saber swing.**
+  - A swing commits you until its cancel point. After that, moving, jumping or sliding ends it on the spot, and a recovery move always ends when you move.
+  - Also covers the single saber's "freeze at each end point".
+- **Aim and fire together.** Holding right-click to aim swallowed the left click: browsers don't send a second "pointer down" while one button is held. Mouse buttons now use mouse events.
+- **Pistol:**
+  - The stance is back to the default two-handed pistol idle, from the same pack as the run and walk. The old one held the gun low, pointing at the ground, and twisted the shoulders.
+  - The whole upper body keeps the gun up while you run.
+  - Aiming follows the camera, up and down, using the pack's three aim poses.
+  - Firing from the hip raises the gun toward the crosshair for a moment and turns you to face it.
+  - Each shot kicks the arms up a little.
+- **Grapple:**
+  - Hooking a spot on the roof you're standing on no longer leaves you hanging sideways: roof-top hooks bring your feet onto the roof.
+  - Any pull that stops getting closer ends by itself.
+  - Much shorter skid when you land on a roof.
+  - Enemies are easier to hook.
+  - Grappling from the air was already allowed; confirmed working.
+- **Thrown soldiers don't freeze in mid-air.**
+  - The death or knockback clip is stretched to last the whole flight.
+  - A long, high throw flips the body head over heels, landing on its back.
+  - This is a stand-in for real physics ragdoll, which is still to come.
+- **The dance-like pistol stance** is reset to the default for every class.
+
+**New**
+- **Fists:** with no gear (or an unlit hilt), Attack throws jab, cross, kick, hook. The kick and hook knock soldiers back. The kick is KayKit (CC0), baked onto our skeleton.
+- **Dual-saber combo:** mixes KayKit's dual-wield slice and chop into the five hits.
+- **Soft lock-on:** an attack turns you toward the nearest soldier within 3.5 m in front of the camera.
+- **Draw and holster:**
+  - The hand reaches to the holster, takes the weapon, and brings it up. Sabers come from the hips (a single saber is drawn across from the left hip; the staff from the back) and ignite once in hand.
+  - Holstering the pistol spins it twice around the trigger finger first, Red Dead style.
+  - There are no draw clips in the free packs, so the arm reach is worked out live (two-bone IK) over whatever you're doing, including running.
+- **Blocking bullets:** guard with a lit saber facing a shooter, and most shots spark off the blade and deflect away. Cosmetic: you still can't be hurt.
+- **Jetpack** (on by default; switch in the Weapon panel):
+  - In the air, hold Jump to fly up, and hold C (or Slide) to hover in place.
+  - Sprint to fly flat out, Mandalorian style, at up to 24 m/s.
+  - Let go and you drift down. A tap of Jump is still a double jump.
+- **Bodies react:**
+  - Grenades always shove bodies on the ground; Force push does too (switch in the Weapon panel).
+  - A grenade that strikes a soldier directly goes off on him; with dismemberment on, he comes apart.
+  - A grenade at a soldier's feet takes the feet off (dismemberment on).
+- **Dust clouds** where heavy things land: thrown bodies, the ground pound, grenades, and you after a big fall.
+- **Faster sprint:** light 8.4, Force 12.5, heavy 7.0 m/s (was 7, 10.5, 5.8).
+- **Higher double jump:** Force 8.2 (was 6), light 6.8, heavy 5.6.
+
+**Look and menus**
+- Pale blue sky, sand ground, grey buildings, and the grid is always on. The Grid button is gone.
+- **Weapon** (top right, or Tab) opens a small panel over the running game:
+  - class, equipment, and saber style, grip and colour
+  - settings: jetpack, dismemberment (now off by default), Force push moves bodies, infinite jumps
+  - a controls list
+- **Menu** now holds Moves, Library and Tests, and opens on Moves. Each slot marks the variant recommended for your class (heavy infantry, for example, gets the arms-folded idle and the high-guard saber stance).
+
+**Also**
+- Stance clips added from the free pack: pistol aim up, aim neutral, aim down; `Interact` and `Spell_Simple_Enter` are packed too.
+- Automated test: `tools/test19-v14.mjs` covers swing then move, fists, and aim + fire with real mouse events. test9 is updated for the Weapon panel.
+
 ## v13: grapple strikes, ground pound, dismemberment, combo freeze fixed, skin shows on phones
 - **Fixed: stuck mid saber combo.**
   - Hits 1 and 2 end in a recovery move (`Sword_Regular_A_Rec`, `Sword_Regular_B_Rec`). Those clips were never packed into the game, so if you stopped tapping after hit 1 or 2, the swing froze at full strength while you walked. That was your "Animation froze" report.

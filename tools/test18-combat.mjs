@@ -7,7 +7,7 @@ p.on('pageerror', e => console.log('pageerror:', e.message));
 await p.goto(URL); await p.waitForFunction(() => window.__game, null, { timeout: 90000 });
 const ev = (f, a) => p.evaluate(f, a);
 const E = () => ev(() => __game.enemies().filter((e) => e.state !== 'dead'));
-await ev(() => { __game.setClass('force'); __game.setGear('lit', true); __game.fillEnemies(); __game.advance(1.5); });
+await ev(() => { __game.setGore(true); __game.setClass('force'); __game.setGear('lit', true); __game.fillEnemies(); __game.advance(1.5); });
 
 // 1. grapple onto an enemy 15 m ahead
 await ev(() => { __game.place(0, 0); __game.look(0, 0.05); for (let i = 1; i < 5; i++) __game.moveEnemy(i, 60 + i * 3, 60); __game.moveEnemy(0, 0, 15, Math.PI); __game.advance(0.3); });
