@@ -1,0 +1,447 @@
+{
+ "style": "dual",
+ "grip": "normal",
+ "checked": 186,
+ "cutting": [
+  {
+   "anim": "Idle_FoldArms_Loop",
+   "frames": 100,
+   "parts": [
+    "chest",
+    "head"
+   ]
+  },
+  {
+   "anim": "ST_Run_Roadrunner",
+   "frames": 100,
+   "parts": [
+    "left thigh",
+    "right thigh",
+    "left shin",
+    "torso"
+   ]
+  },
+  {
+   "anim": "Punch_Cross",
+   "frames": 100,
+   "parts": [
+    "chest",
+    "head",
+    "neck"
+   ]
+  },
+  {
+   "anim": "M2M_Defend",
+   "frames": 100,
+   "parts": [
+    "left forearm"
+   ]
+  },
+  {
+   "anim": "ST_Run_Neutral",
+   "frames": 95,
+   "parts": [
+    "head",
+    "chest",
+    "neck"
+   ]
+  },
+  {
+   "anim": "ST_Walk_Neutral",
+   "frames": 90,
+   "parts": [
+    "right thigh",
+    "left thigh"
+   ]
+  },
+  {
+   "anim": "M2M_Run_Anime",
+   "frames": 85,
+   "parts": [
+    "chest",
+    "neck",
+    "head"
+   ]
+  },
+  {
+   "anim": "ST_Run_HighKnees",
+   "frames": 75,
+   "parts": [
+    "right thigh",
+    "left thigh",
+    "left shin"
+   ]
+  },
+  {
+   "anim": "MX_Walk",
+   "frames": 70,
+   "parts": [
+    "left thigh",
+    "left shin",
+    "right thigh",
+    "right shin"
+   ]
+  },
+  {
+   "anim": "Punch_Jab",
+   "frames": 70,
+   "parts": [
+    "chest",
+    "head"
+   ]
+  },
+  {
+   "anim": "ST_Run_Rushed",
+   "frames": 65,
+   "parts": [
+    "head",
+    "chest",
+    "neck",
+    "left shin",
+    "right thigh",
+    "left thigh"
+   ]
+  },
+  {
+   "anim": "M2M_Dodge_left",
+   "frames": 55,
+   "parts": [
+    "chest",
+    "head",
+    "right upper arm",
+    "left thigh"
+   ]
+  },
+  {
+   "anim": "M2M_Dodge_right",
+   "frames": 55,
+   "parts": [
+    "chest",
+    "head",
+    "left upper arm",
+    "right thigh"
+   ]
+  },
+  {
+   "anim": "SW_Run_Right",
+   "frames": 55,
+   "parts": [
+    "torso",
+    "left thigh",
+    "right thigh",
+    "right shin"
+   ]
+  },
+  {
+   "anim": "ST_Walk_Rushed",
+   "frames": 50,
+   "parts": [
+    "right thigh",
+    "left thigh"
+   ]
+  },
+  {
+   "anim": "Slide_Exit",
+   "frames": 50,
+   "parts": [
+    "left thigh",
+    "left shin",
+    "chest",
+    "head"
+   ]
+  },
+  {
+   "anim": "Roll",
+   "frames": 50,
+   "parts": [
+    "left thigh",
+    "left shin",
+    "head",
+    "chest",
+    "neck",
+    "right upper arm"
+   ]
+  },
+  {
+   "anim": "MX_Run",
+   "frames": 45,
+   "parts": [
+    "head",
+    "chest",
+    "torso"
+   ]
+  },
+  {
+   "anim": "ClimbUp_1m",
+   "frames": 45,
+   "parts": [
+    "head",
+    "left shin",
+    "right thigh",
+    "right shin",
+    "left thigh"
+   ]
+  },
+  {
+   "anim": "M2M_Throw_Object",
+   "frames": 45,
+   "parts": [
+    "torso",
+    "chest",
+    "right upper arm"
+   ]
+  },
+  {
+   "anim": "walk: M2M_Walk_Stealth + STANCE_HighGuard (moving, saber lit)",
+   "frames": 45,
+   "parts": [
+    "left thigh",
+    "left shin"
+   ]
+  },
+  {
+   "anim": "CMU_Backflip_A",
+   "frames": 40,
+   "parts": [
+    "left thigh",
+    "right thigh",
+    "right shin",
+    "left shin"
+   ]
+  },
+  {
+   "anim": "ST_Walk_Proud",
+   "frames": 35,
+   "parts": [
+    "right thigh",
+    "left thigh"
+   ]
+  },
+  {
+   "anim": "ST_Run_BigSteps",
+   "frames": 35,
+   "parts": [
+    "right thigh",
+    "left thigh",
+    "left shin"
+   ]
+  },
+  {
+   "anim": "ST_Run_Proud",
+   "frames": 35,
+   "parts": [
+    "right thigh"
+   ]
+  },
+  {
+   "anim": "Sprint_Loop",
+   "frames": 35,
+   "parts": [
+    "head"
+   ]
+  },
+  {
+   "anim": "Slide_Start",
+   "frames": 35,
+   "parts": [
+    "head",
+    "chest",
+    "neck",
+    "right upper arm",
+    "torso"
+   ]
+  },
+  {
+   "anim": "Sword_Regular_B",
+   "frames": 35,
+   "parts": [
+    "right upper arm",
+    "chest",
+    "right thigh",
+    "right shin"
+   ]
+  },
+  {
+   "anim": "Sword_Heavy_Combo",
+   "frames": 30,
+   "parts": [
+    "chest",
+    "right upper arm",
+    "left shin",
+    "left thigh",
+    "torso"
+   ]
+  },
+  {
+   "anim": "walk: M2M_Walk_Large + STANCE_HighGuard (moving, saber lit)",
+   "frames": 30,
+   "parts": [
+    "left thigh",
+    "left shin"
+   ]
+  },
+  {
+   "anim": "Jog_Fwd_Loop",
+   "frames": 25,
+   "parts": [
+    "head"
+   ]
+  },
+  {
+   "anim": "CMU_SideFlip",
+   "frames": 25,
+   "parts": [
+    "left thigh",
+    "left shin",
+    "right thigh"
+   ]
+  },
+  {
+   "anim": "M2M_Dodge_back",
+   "frames": 20,
+   "parts": [
+    "chest"
+   ]
+  },
+  {
+   "anim": "CMU_Backflip_B",
+   "frames": 15,
+   "parts": [
+    "left thigh",
+    "left shin",
+    "right thigh",
+    "right shin"
+   ]
+  },
+  {
+   "anim": "M2M_Death_B",
+   "frames": 15,
+   "parts": [
+    "head",
+    "chest"
+   ]
+  },
+  {
+   "anim": "jog: Jog_Fwd_Loop + STANCE_HighGuard (moving, saber lit)",
+   "frames": 15,
+   "parts": [
+    "right shin",
+    "right thigh"
+   ]
+  },
+  {
+   "anim": "sprint: Jog_Fwd_Loop + STANCE_HighGuard (moving, saber lit)",
+   "frames": 15,
+   "parts": [
+    "right shin",
+    "right thigh"
+   ]
+  },
+  {
+   "anim": "sprint: M2M_Run_Anime + STANCE_HighGuard (moving, saber lit)",
+   "frames": 15,
+   "parts": [
+    "left thigh",
+    "right shin"
+   ]
+  },
+  {
+   "anim": "Sword_Dash",
+   "frames": 10,
+   "parts": [
+    "chest"
+   ]
+  },
+  {
+   "anim": "NinjaJump_Land",
+   "frames": 10,
+   "parts": [
+    "right thigh",
+    "right shin"
+   ]
+  },
+  {
+   "anim": "M2M_Backflip",
+   "frames": 10,
+   "parts": [
+    "right upper arm",
+    "right thigh"
+   ]
+  },
+  {
+   "anim": "M2M_Land_Three_Point",
+   "frames": 10,
+   "parts": [
+    "chest",
+    "left thigh",
+    "left shin"
+   ]
+  },
+  {
+   "anim": "Melee_Hook",
+   "frames": 10,
+   "parts": [
+    "chest",
+    "head"
+   ]
+  },
+  {
+   "anim": "sprint: Sprint_Loop + STANCE_HighGuard (moving, saber lit)",
+   "frames": 10,
+   "parts": [
+    "right shin"
+   ]
+  },
+  {
+   "anim": "M2M_Run_Stealth",
+   "frames": 5,
+   "parts": [
+    "right thigh"
+   ]
+  },
+  {
+   "anim": "ST_Walk_Crouched",
+   "frames": 5,
+   "parts": [
+    "left thigh"
+   ]
+  },
+  {
+   "anim": "Sword_Regular_C",
+   "frames": 5,
+   "parts": [
+    "chest"
+   ]
+  },
+  {
+   "anim": "NinjaJump_Start",
+   "frames": 5,
+   "parts": [
+    "right thigh",
+    "right shin"
+   ]
+  },
+  {
+   "anim": "Sword_Block",
+   "frames": 5,
+   "parts": [
+    "left thigh",
+    "left shin"
+   ]
+  },
+  {
+   "anim": "Sword_Regular_Combo",
+   "frames": 5,
+   "parts": [
+    "chest"
+   ]
+  },
+  {
+   "anim": "OverhandThrow",
+   "frames": 5,
+   "parts": [
+    "left shin"
+   ]
+  }
+ ]
+}

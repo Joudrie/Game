@@ -168,6 +168,7 @@ From Joudrie/lego: 884 entries, 44 with full-body paintings. The paintings match
   - Your first manual report from the iPhone app could not reach the database, so it was pasted by hand. The next report will say why.
   - Phone previews are framed wider.
 - **v8:** freeze logging and reports, touch fixes for the joystick, dual sabers held in closed fists in every animation. See `CHANGELOG.md`.
+- **v9:** slide momentum, jump into slide, infinite jumps (test switch), block in the air, five-hit combo that loops, crouch transition, saber clipping checks (`SABER_CLIPPING.md`), menu tabs. See `CHANGELOG.md`.
 - **Next, in order:**
   1. Your 3D characters (needs `HF_TOKEN`).
   2. Mixamo downloads for the gaps above.

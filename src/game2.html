@@ -83,6 +83,17 @@ body.armed #readout { bottom: calc(196px + env(safe-area-inset-bottom, 0px)); }
 @media (min-width: 820px) { #moves { top: 0; left: auto; width: 400px; height: auto; border-top: 0; border-left: 1px solid var(--line); } }
 #moves header { display: flex; align-items: center; gap: var(--s2); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
 #moves header h2 { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin: 0; flex: 1; }
+#moves .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s1); padding: var(--s2) var(--s4); border-bottom: 1px solid var(--line); }
+#moves .tabs button { min-height: 40px; padding: 0 var(--s1); }
+#moves .tabs button[aria-selected="true"] { border-color: var(--ink); background: var(--key); font-weight: 700; }
+#moves [data-panel][hidden] { display: none; }
+#moves.tall { height: 88%; }
+@media (min-width: 820px) { #movesexpand { display: none; } }
+.lib button { min-height: 40px; }
+.switch { display: flex; align-items: center; gap: var(--s3); padding: var(--s3); border: 1px solid var(--line); border-radius: var(--r); font-size: 13px; }
+.switch input { width: 20px; height: 20px; accent-color: var(--ink); margin: 0; }
+.results { margin: var(--s2) 0 0; padding-left: var(--s4); font-size: 12px; line-height: 1.5; color: var(--ink-soft); }
+.results b { color: var(--ink); font-weight: 500; overflow-wrap: anywhere; }
 #moves .body { touch-action: pan-y; overflow-y: auto; padding: 0 var(--s4) calc(var(--s6) + env(safe-area-inset-bottom, 0px)); -webkit-overflow-scrolling: touch; }
 #moves h3 { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin: var(--s5) 0 var(--s2); display: flex; justify-content: space-between; gap: var(--s2); }
 #moves h3 small { font: 400 11px var(--font-mono); letter-spacing: 0; text-transform: none; }
@@ -110,7 +121,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
   <button type="button" id="classchip" class="panel" aria-label="Change class"><b id="classname">Light infantry</b><span id="classstats"></span></button>
   <div class="spacer"></div>
   <button type="button" id="gearbtn">Gear: none</button>
-  <button type="button" id="movesbtn">Moves</button>
+  <button type="button" id="movesbtn">Menu</button>
   <button type="button" id="gridbtn" aria-pressed="false">Grid</button>
 </div>
 
@@ -129,7 +140,11 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 </div>
 
 <section id="moves" hidden aria-label="Moves">
-  <header><h2>Moves</h2><button type="button" id="reportbtn">Send report</button><button type="button" id="movesclose">Done</button></header>
+  <header><h2>Test menu</h2><button type="button" id="movesexpand" aria-pressed="false">Expand</button><button type="button" id="movesclose">Done</button></header>
+  <nav class="tabs" role="tablist" aria-label="Menu sections">
+    <button type="button" role="tab" data-tab="setup">Setup</button><button type="button" role="tab" data-tab="moves">Moves</button>
+    <button type="button" role="tab" data-tab="library">Library</button><button type="button" role="tab" data-tab="tests">Tests</button>
+  </nav>
   <div class="body" id="movesbody"></div>
 </section>
 <div id="pvlabel" class="hud panel" hidden></div>
@@ -205,6 +220,8 @@ const MOVES = {
   rstance: { label: 'Pistol stance', when: 'Held while the pistol is out. Changes each time you stop', variants: [
     { id: 'SW_Idle_Gun', label: 'Low ready', src: 'Quaternius SWAT · CC0' },
     { id: 'SW_Idle_Gun_Pointing', label: 'Shouldered, aimed', src: 'Quaternius SWAT · CC0' } ] },
+  combo:  { label: 'Saber combo', when: 'Tap Attack to chain the hits. Each hit can flow into the next, and the finisher flows back into hit 1', variants: [
+    { id: 'combo5', label: 'Five hits: A, B, C, spin slash, lunge', src: SRC_UAL, seq: ['Sword_Regular_A', 'Sword_Regular_B', 'Sword_Regular_C', 'Sword_Attack', 'Sword_Dash'] } ] },
   djump:  { label: 'Double jump', when: 'Force users only. Rotates each use', variants: [
     { id: 'djump_ninja', label: 'Ninja flip', src: SRC_UAL, seq: ['NinjaJump_Start', 'NinjaJump_Idle_Loop', 'NinjaJump_Land'] } ] },
 };
@@ -222,9 +239,9 @@ LIBRARY.push(...(EXTRA.library || []));
 // Each class has its own ticked set. Defaults match each class's speeds so feet stay planted:
 // heavy gets the heavy stride and a hard jog for its 5.8 m/s sprint, Force users get the dash sprint.
 const CLASS_DEFAULTS = {
-  light: {},
-  force: { sprint: ['M2M_Run_Anime'] },
-  heavy: { walk: ['M2M_Walk_Large'], jog: ['MX_Run'], sprint: ['Jog_Fwd_Loop'] },
+  light: { djump: ['dj_back_b'] },
+  force: { sprint: ['M2M_Run_Anime'], djump: ['dj_back_b'] },
+  heavy: { walk: ['M2M_Walk_Large'], jog: ['MX_Run'], sprint: ['Jog_Fwd_Loop'], djump: ['dj_back_b'] },
 };
 const pools = {};
 let saved = {};
@@ -240,6 +257,10 @@ for (const k of Object.keys(CLASSES)) {
 const savePool = () => { try { localStorage.setItem('moves-pools', JSON.stringify(pools)); } catch (_) {} };
 let klass = 'light';
 try { const k = localStorage.getItem('moves-class'); if (CLASSES[k]) klass = k; } catch (_) {}
+// switches for play testing
+const testCfg = { infiniteJumps: true };
+try { Object.assign(testCfg, JSON.parse(localStorage.getItem('testcfg') || '{}')); } catch (_) {}
+const saveTest = () => { try { localStorage.setItem('testcfg', JSON.stringify(testCfg)); } catch (_) {} };
 let pool = pools[klass];
 const rot = {};  // rotation cursor per slot
 function nextVariant(slot) {
@@ -358,7 +379,7 @@ async function boot() {
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
   poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
-  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildFist();
+  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildFist(); buildGuardPose();
   mixer = new THREE.AnimationMixer(hero);
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
@@ -470,7 +491,7 @@ function makeSaber(staff) {
     for (const [r, m] of [[0.011, coreMat], [0.024, glowMat1], [0.045, glowMat2]]) {
       const g = new THREE.Mesh(new THREE.CapsuleGeometry(r, L, 4, 12), m); g.position.y = L / 2 + r; g.renderOrder = 2; b.add(g);
     }
-    b.scale.y = 0.001; b.visible = false; blades.push(b); inner.add(b);
+    b.userData.L = L; b.scale.y = 0.001; b.visible = false; blades.push(b); inner.add(b);
   }
   return { root, inner, blades };
 }
@@ -621,35 +642,48 @@ function masked(id, mask) {
 
 // combat: tap chain A → B → C, hold for heavy, hold block. Your rules: no attacking while sprinting,
 // no sprinting while blocking, no jumping while blocking.
-const CHAIN = ['A', 'B', 'C'];
+// Five hits. A buffered tap starts the next hit as soon as the current one passes its cancel point,
+// so hits flow together; after the finisher the chain wraps back to hit 1 the same way.
+const HITS = [
+  { clip: 'Sword_Regular_A', speed: 1.15, cancel: 0.55, rec: 'Sword_Regular_A_Rec' },
+  { clip: 'Sword_Regular_B', speed: 1.15, cancel: 0.55, rec: 'Sword_Regular_B_Rec' },
+  { clip: 'Sword_Regular_C', speed: 1.2, cancel: 0.42 },
+  { clip: 'Sword_Attack', speed: 1.3, cancel: 0.5 },
+  { clip: 'Sword_Dash', speed: 1.25, cancel: 0.58 },
+];
 let atk = null, blocking = false, blockAct = null, atkHeld = false, atkHeldT = 0, guardBlend = 0;
 function canFight() { return gear === 'lit' && ignite > 0.9 && !movesOpen && mode === 'ground'; }
+function canBlock() { return gear === 'lit' && ignite > 0.9 && !movesOpen && mode !== 'slide'; }
+const nextHit = (i) => (i + 1) % HITS.length;
 function attackPress() {
   atkHeld = true; atkHeldT = 0;
   if (!canFight() || blocking) return;
-  if (atk) { if (atk.heavy || atk.i === 2) return; if (atk.rec) startAttack(atk.i + 1); else atk.queued = true; return; }
+  if (atk) { if (atk.heavy) return; if (atk.rec) startAttack(nextHit(atk.i)); else atk.queued = true; return; }
   const C = CLASSES[klass];
   if (speed > C.jog + 0.1) speed = C.jog; // the swing ends the sprint
   startAttack(0);
 }
 function attackRelease() { atkHeld = false; }
 function startAttack(i) {
-  atk = { i, queued: false, rec: false, heavy: false };
-  playOvr('Sword_Regular_' + CHAIN[i], { speed: 1.15, fade: 0.08, then: afterAttack });
+  const h = HITS[i];
+  atk = { i, queued: false, rec: false, heavy: false, act: null };
+  atk.act = playOvr(h.clip, { speed: h.speed, fade: i === 0 ? 0.1 : 0.12, then: afterAttack });
+  log('hit', i + 1);
 }
 function afterAttack() {
   if (!atk) return;
-  if (atk.i === 2) { atk = null; stopOvr(0.25); return; }
-  if (atk.queued) { startAttack(atk.i + 1); return; }
+  if (atk.queued) { startAttack(nextHit(atk.i)); return; }
+  const rec = HITS[atk.i].rec;
+  if (!rec) { atk = null; stopOvr(0.25); return; }
   atk.rec = true;
-  playOvr('Sword_Regular_' + CHAIN[atk.i] + '_Rec', { speed: 1.2, fade: 0.1, then: () => { atk = null; stopOvr(0.25); } });
+  playOvr(rec, { speed: 1.2, fade: 0.1, then: () => { atk = null; stopOvr(0.25); } });
 }
 function heavyAttack() {
   atk = { i: 0, heavy: true, rec: false, queued: false };
   playOvr('Sword_Heavy_Combo', { speed: 1.1, fade: 0.12, then: () => { atk = null; stopOvr(0.25); } });
 }
 function blockPress() {
-  if (!canFight() || atk) return;
+  if (!canBlock() || atk) return;
   blocking = true; log('block');
 }
 function blockRelease() { blocking = false; }
@@ -657,6 +691,11 @@ function updateCombat(dt) {
   if (atkHeld) {
     atkHeldT += dt;
     if (atkHeldT > 0.35 && atk && !atk.heavy && atk.i === 0 && !atk.rec) heavyAttack();
+  }
+  // flow: a buffered tap cuts the current hit at its cancel point
+  if (atk && !atk.heavy && !atk.rec && atk.queued && atk.act) {
+    const h = HITS[atk.i];
+    if (atk.act.time >= h.cancel * atk.act.getClip().duration) startAttack(nextHit(atk.i));
   }
   guardBlend = moveTo(guardBlend, blocking || (gear === 'pistol' && aimHeld) ? 1 : 0, dt / 0.12);
 }
@@ -688,6 +727,112 @@ function applyFists() {
   for (const f of fist) if (h.includes(f.side)) f.bone.quaternion.copy(f.q);
 }
 
+// guard in the air: the high-guard upper body is laid over whatever jump or flip is playing
+let guardPose = null;
+function buildGuardPose() {
+  const c = clips.get('STANCE_HighGuard'); if (!c) return;
+  guardPose = [];
+  for (const t of c.tracks) {
+    const [name, prop] = t.name.split('.');
+    if (prop !== 'quaternion' || LOWER.test(name) || FINGER.test(name)) continue;
+    const bone = boneByName(hero, name); if (!bone) continue;
+    const v = t.createInterpolant().evaluate(0);
+    guardPose.push({ bone, q: new THREE.Quaternion(v[0], v[1], v[2], v[3]).normalize() });
+  }
+}
+function applyAirGuard(w) { if (guardPose) for (const g of guardPose) g.bone.quaternion.slerp(g.q, w); }
+
+// ---------------- saber clipping ----------------
+// The body is a set of capsules between bones; each lit blade is a segment. A blade closer to a capsule
+// than its radius cuts into the body. The holding forearm is skipped (the hilt sits in that hand).
+const BODY = [['pelvis', 'spine_02', 0.13, 'torso'], ['spine_02', 'neck_01', 0.14, 'chest'], ['neck_01', 'Head', 0.05, 'neck'], ['Head', 'Head', 0.11, 'head'],
+  ['thigh_l', 'calf_l', 0.075, 'left thigh'], ['calf_l', 'foot_l', 0.05, 'left shin'], ['thigh_r', 'calf_r', 0.075, 'right thigh'], ['calf_r', 'foot_r', 0.05, 'right shin'],
+  ['upperarm_l', 'lowerarm_l', 0.045, 'left upper arm'], ['lowerarm_l', 'hand_l', 0.035, 'left forearm'],
+  ['upperarm_r', 'lowerarm_r', 0.045, 'right upper arm'], ['lowerarm_r', 'hand_r', 0.035, 'right forearm']];
+let bodyCaps = null;
+const _p = new V3(), _q = new V3(), _a = new V3(), _b = new V3(), _c = new V3(), _d = new V3();
+function segDist(p1, q1, p2, q2) {
+  const d1 = _a.subVectors(q1, p1), d2 = _b.subVectors(q2, p2), r = _c.subVectors(p1, p2);
+  const a = d1.dot(d1), e = d2.dot(d2), f = d2.dot(r);
+  let s = 0, t = 0;
+  if (a <= 1e-9 && e <= 1e-9) return r.length();
+  if (a <= 1e-9) t = clamp(f / e, 0, 1);
+  else {
+    const c = d1.dot(r);
+    if (e <= 1e-9) s = clamp(-c / a, 0, 1);
+    else { const b = d1.dot(d2), den = a * e - b * b; s = den > 1e-9 ? clamp((b * f - c * e) / den, 0, 1) : 0; t = (b * s + f) / e;
+      if (t < 0) { t = 0; s = clamp(-c / a, 0, 1); } else if (t > 1) { t = 1; s = clamp((b - c) / a, 0, 1); } }
+  }
+  return _d.copy(p1).addScaledVector(d1, s).sub(_p.copy(p2).addScaledVector(d2, t)).length();
+}
+function bladeHits() {
+  if (!bodyCaps) bodyCaps = BODY.map(([a, b, r, name]) => ({ a: boneByName(hero, a), b: boneByName(hero, b), r, name, head: a === b }));
+  const out = new Set();
+  const up = new V3();
+  sabers.forEach((sb, i) => {
+    const skip = saberCfg.style === 'staff' ? 'right forearm' : i ? 'left forearm' : 'right forearm';
+    for (const bl of sb.blades) {
+      const L = bl.userData.L || 0.95;
+      const base = bl.localToWorld(new V3(0, 0.06, 0)), tip = bl.localToWorld(new V3(0, L, 0));
+      for (const c of bodyCaps) {
+        if (c.name === skip) continue;
+        const pa = c.a.getWorldPosition(new V3());
+        let pb;
+        if (c.head) { const n = boneByName(hero, 'neck_01').getWorldPosition(new V3()); pa.add(up.subVectors(pa, n).normalize().multiplyScalar(0.09)); pb = pa; }
+        else pb = c.b.getWorldPosition(new V3());
+        if (segDist(base, tip, pa, pb) < c.r + 0.015) out.add(c.name);
+      }
+    }
+  });
+  return [...out];
+}
+// live notes while playing
+const clipNotes = new Map(); // animation -> Set(body parts)
+function dominantAnim() {
+  let best = null, bw = 0;
+  for (const [a, o] of ovr) if (o.w > bw) { bw = o.w; best = a.getClip().name.replace(' (one-shot)', ''); }
+  if (best && bw > 0.5) return best;
+  let lb = null, lw = 0;
+  for (const a of locoActive) { const w = a.getEffectiveWeight(); if (w > lw) { lw = w; lb = a.getClip().name; } }
+  return `${gait} (${(lb || '').replace(/#.*/, '')}, saber lit${blocking ? ', guard' : ''})`;
+}
+function noteSaberClipping() {
+  const hits = bladeHits(); if (!hits.length) return;
+  const k = dominantAnim(); let set = clipNotes.get(k);
+  if (!set) { set = new Set(); clipNotes.set(k, set); log('saber cuts', hits.join('+'), 'in', k); }
+  hits.forEach((h) => set.add(h));
+  renderClipNotes();
+}
+// full sweep: every clip full-body, plus every run/walk/idle under every saber stance, with the current saber style
+function sweepSaberClipping() {
+  const prevGear = gear; setGear('lit', true); ignite = 1; showBlades();
+  const tmp = new THREE.AnimationMixer(hero);
+  const results = [];
+  const sample = (label, layers) => {
+    const acts = []; let dur = 0;
+    for (const [id, w] of layers) { const c = clips.get(id); if (!c) return; const a = tmp.clipAction(c); a.play(); a.setEffectiveWeight(w); acts.push(a); dur = Math.max(dur, c.duration); }
+    const N = 20; let n = 0; const parts = new Set();
+    for (let i = 0; i < N; i++) { tmp.setTime((dur * i) / N); applyFists(); hero.updateMatrixWorld(true); const h = bladeHits(); if (h.length) { n++; h.forEach((x) => parts.add(x)); } }
+    for (const a of acts) { a.stop(); tmp.uncacheAction(a.getClip()); }
+    if (n) results.push({ anim: label, frames: Math.round((n / N) * 100), parts: [...parts] });
+  };
+  const seen = new Set();
+  for (const [slot, m] of Object.entries(MOVES)) for (const v of m.variants) for (const id of (v.seq || [v.id])) if (!seen.has(id)) { seen.add(id); sample(id, [[id, 1]]); }
+  for (const id of LIBRARY) if (!seen.has(id)) { seen.add(id); sample(id, [[id, 1]]); }
+  const stances = MOVES.stance.variants.map((v) => v.id);
+  for (const slot of ['walk', 'jog', 'sprint']) for (const v of MOVES[slot].variants) for (const st of stances)
+    sample(`${slot}: ${v.id} + ${st} (moving, saber lit)`, [[masked(v.id, 'noarm'), 1], [masked(st, 'arm'), 1]]);
+  for (const v of MOVES.idle.variants) for (const st of stances) sample(`idle: ${v.id} + ${st} (standing, saber lit)`, [[masked(v.id, 'lower'), 1], [masked(st, 'upper'), 1]]);
+  tmp.stopAllAction(); tmp.uncacheRoot(hero);
+  setGear(prevGear, true);
+  results.sort((a, b) => b.frames - a.frames);
+  return { style: saberCfg.style, grip: saberCfg.grip, checked: seen.size + 3 * (MOVES.walk.variants.length + MOVES.jog.variants.length + MOVES.sprint.variants.length + MOVES.idle.variants.length), cutting: results };
+}
+function renderClipNotes() {
+  const el = $('clipnotes'); if (!el) return;
+  el.innerHTML = clipNotes.size ? [...clipNotes].map(([k, v]) => `<li><b>${k}</b>: ${[...v].join(', ')}</li>`).join('') : '<li>None noticed yet while playing.</li>';
+}
+
 // ---------------- strafing (aim / guard) ----------------
 // While aiming the pistol or guarding with the saber the body keeps facing the camera and the legs
 // blend the two clips whose measured travel direction is closest to where you push.
@@ -717,7 +862,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v8 · 2026-09-29';
+const BUILD = 'v9 · 2026-09-29';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -743,11 +888,13 @@ function snapshot(kind, detail) {
   return { at: new Date().toISOString(), kind, detail: String(detail).slice(0, 800), build: BUILD, dbState, device: navigator.userAgent, screen: `${innerWidth}x${innerHeight}`, ...st, events: events.slice(-25) };
 }
 const sentAt = {};
-async function report(kind, detail, force) {
+async function report(kind, detail, force, extra) {
   const now = performance.now();
   if (!force && sentAt[kind] && now - sentAt[kind] < 15000) return;
   sentAt[kind] = now;
   const r = snapshot(kind, detail); lastReport = r;
+  if (extra) r.extra = extra;
+  if (clipNotes.size) r.saberClippingSeen = Object.fromEntries([...clipNotes].map(([k, v]) => [k, [...v]]));
   console.warn('[report]', r);
   let sent = false;
   if (!db && !/^no-runtime/.test(dbState)) await connectDb();
@@ -755,7 +902,7 @@ async function report(kind, detail, force) {
   try { if (db) { await db.collection('reports').add(r); sent = true; } } catch (e) { r.sendError = e?.code || e?.message || String(e); }
   r.sent = sent;
   const titles = { tpose: 'T-pose caught', coverage: 'Pose gap caught', 'missing-clip': 'Missing animation', error: 'Script error', manual: 'Report',
-    freeze: 'Game froze', stuck: "Character didn't move", 'frozen-pose': 'Animation froze' };
+    freeze: 'Game froze', stuck: "Character didn't move", 'frozen-pose': 'Animation froze', 'saber-clipping': 'Saber clipping check' };
   $('alerttitle').textContent = titles[kind] || kind;
   $('alerttext').textContent = `${detail}. ${sent ? 'Sent to Claude.' : `Could not send from here (${r.sendError || dbState}). Tap Copy report and paste it in the chat.`}`;
   $('alert').hidden = false;
@@ -811,7 +958,7 @@ const keys = new Set();
 let walkToggle = false, jumpQueued = false, slideQueued = false, slideHeld = false;
 const GAME_KEYS = ['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','ShiftLeft','ShiftRight','KeyC'];
 addEventListener('keydown', (e) => {
-  if (e.target instanceof HTMLTextAreaElement) return;
+  if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
   if (movesOpen) { if (e.code === 'Escape') closeMoves(); return; }
   if (GAME_KEYS.includes(e.code)) e.preventDefault();
   if (e.repeat) return;
@@ -853,7 +1000,7 @@ const manualReport = () => {
   report('manual', note || 'Report sent from the Moves screen (no note)', true);
   if ($('reportnote')) $('reportnote').value = '';
 };
-$('reportbtn').addEventListener('click', manualReport);
+$('reportbtn')?.addEventListener('click', manualReport);
 document.addEventListener('click', (e) => { if (e.target.closest('#reportsend')) manualReport(); });
 
 let camYaw = Math.PI, camPitch = 0.28, camDist = 3.4;
@@ -941,6 +1088,7 @@ function readInput(dt) {
 // ---------------- simulation ----------------
 let yaw = Math.PI, speed = 0, vy = 0, yawVel = 0, roll = 0;
 let mode = 'ground';       // ground | air | slide
+let slideOnLand = false, crouchBlend = 0;
 let jumps = 0, crouch = false, sprintTime = 0, slideT = 0, slideDur = 1, slideSpeed = 0, slideVar = null, jumpVar = null, airVar = null;
 let gait = 'idle', prevGait = 'idle', phase = 0;
 const cur = { idle: null, walk: null, jog: null, sprint: null };
@@ -952,8 +1100,9 @@ function pickGaitVariants(force) {
 
 function startJump(dbl) {
   const C = CLASSES[klass];
+  slideOnLand = false;
   if (dbl) {
-    vy = C.djump; jumps = 2; airVar = nextVariant('djump');
+    vy = C.djump ?? C.jump * 1.1; jumps += 1; airVar = nextVariant('djump');
     const [s0, s1] = airVar.seq;
     playOvr(s0, { from: airVar.from ?? 0.05, speed: airVar.speed ?? 1.25, fade: 0.08, then: () => { if (mode === 'air') playOvr(s1, { loop: true, fade: 0.2 }); } });
   } else {
@@ -965,17 +1114,23 @@ function startJump(dbl) {
 }
 function land() {
   mode = 'ground'; vy = 0; player.position.y = 0; jumps = 0;
+  if (slideOnLand) { slideOnLand = false; log('land into slide'); startSlide(true); return; }
   const landClip = airVar?.seq?.[2];
   if (speed > CLASSES[klass].walk * 1.2 || !landClip) stopOvr(0.15);
   else playOvr(landClip, { from: 0.25, speed: 1.4, fade: 0.08, then: () => stopOvr(0.25) });
 }
-function startSlide() {
+// Slide momentum: entry speed carries in; sprinting in adds up to +25%, landing into it adds +10%,
+// and a faster slide lasts longer (up to 1.7x the class's slide time).
+function startSlide(fromAir) {
   const C = CLASSES[klass];
   const p = pool.slide;
   const id = p.length > 1 && sprintTime > 3 ? p[1] : p[0];
   slideVar = variantById('slide', id);
-  mode = 'slide'; slideT = 0; slideDur = C.slideTime;
-  slideSpeed = Math.max(speed, C.jog) * C.slideBoost;
+  mode = 'slide'; slideT = 0; crouch = false;
+  const sprintIn = speed > C.jog + 0.3 ? 0.15 + 0.1 * clamp((speed - C.jog) / (C.sprint - C.jog), 0, 1) : 0;
+  slideSpeed = Math.max(speed, C.jog) * (C.slideBoost + sprintIn + (fromAir ? 0.1 : 0));
+  slideDur = C.slideTime * clamp(slideSpeed / (C.jog * C.slideBoost), 1, 1.7);
+  log('slide speed', slideSpeed.toFixed(1), 'for', slideDur.toFixed(2) + 's');
   const [s0, s1] = slideVar.seq;
   playOvr(s0, { speed: 1.3, fade: 0.1, then: () => { if (mode === 'slide') playOvr(s1, { loop: true, fade: 0.15 }); } });
 }
@@ -1005,7 +1160,8 @@ function step(dt) {
   if (C._frozen) target = 0; // test hook: simulates a character that ignores input
   if (blocking) target = Math.min(target, C.walk);          // no sprinting while blocking
   if (atk) target = Math.min(target, 1.0);                   // swings commit you
-  if (blocking || atk) { jumpQueued = false; slideQueued = false; } // no jumping while blocking or mid-swing
+  if (atk) { jumpQueued = false; slideQueued = false; } // swings commit you
+  if (blocking) slideQueued = false;                     // you can block in the air, but not slide while guarding
   if ((gear === 'lit' || gear === 'pistol') && crouch) crouch = false;
 
   // facing
@@ -1031,13 +1187,14 @@ function step(dt) {
   // actions
   if (slideQueued) {
     slideQueued = false;
-    if (mode === 'ground' && speed > C.jog * 0.8) { log('slide'); startSlide(); }
+    if (mode === 'ground' && speed > C.jog * 0.8) { log('slide'); startSlide(false); }
+    else if (mode === 'air') { slideOnLand = true; vy = Math.min(vy, -9); log('air to slide'); } // drop fast, slide on landing
     else if (mode === 'ground' && speed < C.walk) crouch = !crouch;
   }
   if (jumpQueued) {
     jumpQueued = false;
     if (mode === 'ground' || mode === 'slide') { crouch = false; log('jump'); startJump(false); }
-    else if (mode === 'air' && C.doubleJump && jumps < 2) startJump(true);
+    else if (mode === 'air' && (testCfg.infiniteJumps || (C.doubleJump && jumps < 2))) { log('air jump', jumps + 1); startJump(true); }
   }
 
   // speed
@@ -1102,10 +1259,6 @@ function animateLoco(dt, C) {
     const idleT = clamp(1 - speed / (C.walk * 0.5), 0, 1);
     add(cur.idle, idleT);
     for (const [id, w] of sw) { add(id, w * (1 - idleT)); rate += w * cyc(id, Math.max(speed, C.walk * 0.6)); }
-  } else if (crouch) {
-    const t = clamp(speed / 1.8, 0, 1);
-    add('Crouch_Idle_Loop', 1 - t); add(cur.crouch, t);
-    rate = cyc(cur.crouch, Math.max(speed, 0.9));
   } else if (speed < C.walk) {
     const t = speed / C.walk; add(cur.idle, 1 - t); add(cur.walk, t);
     rate = cyc(cur.walk, Math.max(speed, C.walk * 0.6));
@@ -1115,6 +1268,15 @@ function animateLoco(dt, C) {
   } else {
     const t = clamp((speed - C.jog) / (C.sprint - C.jog), 0, 1); add(cur.jog, 1 - t); add(cur.sprint, t);
     rate = lerp(cyc(cur.jog, speed), cyc(cur.sprint, speed), t);
+  }
+  // standing <-> crouching blends over ~0.3 s instead of snapping
+  crouchBlend = moveTo(crouchBlend, crouch ? 1 : 0, dt / 0.3);
+  if (crouchBlend > 0.001 && !strafing) {
+    const cb = crouchBlend * crouchBlend * (3 - 2 * crouchBlend);
+    for (const [k, v] of wts) wts.set(k, v * (1 - cb));
+    const t = clamp(speed / 1.8, 0, 1);
+    add('Crouch_Idle_Loop', (1 - t) * cb); add(cur.crouch, t * cb);
+    rate = lerp(rate, cyc(cur.crouch, Math.max(speed, 0.9)), cb);
   }
   if (mode === 'air') rate *= 0.35;
   phase = (phase + rate * dt) % 1;
@@ -1147,9 +1309,12 @@ function animateLoco(dt, C) {
     else layer(gripOnly ? masked(rawId, 'nogrip') : rawId, w * locoW);
   }
   if (debugTpose) { let sk = null; hero.traverse((o) => { if (!sk && o.isSkinnedMesh) sk = o; }); sk.skeleton.pose(); return; }
-  mixer.update(dt); applyFists();
+  mixer.update(dt);
+  if (guardBlend > 0 && mode !== 'ground') applyAirGuard(guardBlend);
+  applyFists();
+  if (gear === 'lit' && armed && ignite > 0.95 && (clipCheckN = (clipCheckN + 1) % 3) === 0) noteSaberClipping();
 }
-let debugTpose = false;
+let debugTpose = false, clipCheckN = 0;
 
 const camPos = new V3(), right = new V3();
 let aimZoom = 0;
@@ -1247,9 +1412,7 @@ function preview(p) {
 function buildMoves() {
   const body = $('movesbody');
   const h = [];
-  h.push(`<h3>Report a problem</h3><label for="reportnote" class="note" style="display:block;margin:0 0 8px">What looked wrong? Preview it first, then send. The report includes what the character was doing.</label>` +
-    `<textarea id="reportnote" rows="2" placeholder="e.g. arms twist backwards in Run right"></textarea>` +
-    `<button type="button" id="reportsend" style="margin-top:8px">Send report</button>`);
+  h.push(`<section data-panel="setup">`);
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p><p class="note">Everything ticked below is for <b id="movesfor">${CLASSES[klass].label}</b>. Each class keeps its own set.</p>`);
@@ -1262,7 +1425,9 @@ function buildMoves() {
   for (const [k, l] of [['normal', 'Normal grip'], ['reverse', 'Reverse grip (Ahsoka)']]) h.push(`<button type="button" data-sgrip="${k}" aria-pressed="${saberCfg.grip === k}">${l}</button>`);
   h.push(`</div><div class="swatches" role="group" aria-label="Blade colour" style="margin-top:8px">`);
   for (const [k, c] of Object.entries(SABER_COLORS)) h.push(`<button type="button" data-scolor="${k}" aria-pressed="${saberCfg.color === k}"><i style="background:#${c.toString(16).padStart(6, '0')}"></i>${k}</button>`);
-  h.push(`</div><p class="note">Tap Attack for a three-hit chain (A → B → C), hold it for the heavy combo, hold Block to guard. Previews below show the saber lit.</p>`);
+  h.push(`</div><p class="note">Tap Attack to chain five hits (the finisher flows back into hit 1), hold it for the heavy combo, hold Block to guard, even in the air.</p>`);
+  h.push(`<h3>Test switches</h3><label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>`);
+  h.push(`</section><section data-panel="moves">`);
   for (const [slot, m] of Object.entries(MOVES)) {
     h.push(`<h3>${m.label} <small>${m.variants.length} found</small></h3>`);
     for (const v of m.variants) {
@@ -1272,10 +1437,43 @@ function buildMoves() {
     }
     h.push(`<p class="note">${m.when}.</p>`);
   }
+  h.push(`</section><section data-panel="library">`);
   h.push(`<h3>Library <small>preview only, not on controls yet</small></h3><div class="lib">`);
   for (const id of LIBRARY) if (clips.has(id)) h.push(`<button type="button" data-lib="${id}" data-pv="lib:${id}">${id.replace(/^M2M_/, '').replace(/_Loop$/, '').replace(/_/g, ' ')}</button>`);
   h.push(`</div><p class="note">Sword, pistol, throw and hit clips are here for the lightsaber, rifle and grenade work later. More variants (knee slide, extra sprints, flips) come from Mixamo once you download them. The list is in the plan.</p>`);
+  h.push(`</section><section data-panel="tests">`);
+  h.push(`<h3>Report a problem</h3><label for="reportnote" class="note" style="display:block;margin:0 0 8px">What looked wrong? Preview it first, then send. The report includes what the character was doing.</label>` +
+    `<textarea id="reportnote" rows="3" placeholder="e.g. arms twist backwards in Run right"></textarea>` +
+    `<button type="button" id="reportsend" style="margin-top:8px">Send report</button>`);
+  h.push(`<h3>Saber clipping</h3><p class="note" style="margin-top:0">Plays every animation with the current sabers lit and lists each one where a blade cuts into the body. The result is sent as a report.</p>` +
+    `<button type="button" id="clipsweep">Check saber clipping</button><p class="note" id="clipsummary" role="status"></p><ol class="results" id="clipresults"></ol>` +
+    `<h3>Noticed while playing</h3><ul class="results" id="clipnotes"></ul>`);
+  h.push(`<h3>Status</h3><p class="stats" id="teststatus"></p>`);
+  h.push(`</section>`);
   body.innerHTML = h.join('');
+  renderClipNotes();
+  const showTab = (t) => {
+    body.querySelectorAll('[data-panel]').forEach((sec) => { sec.hidden = sec.dataset.panel !== t; });
+    document.querySelectorAll('#moves [data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+    try { localStorage.setItem('menutab', t); } catch (_) {}
+    body.scrollTop = 0;
+    if (t === 'tests') $('teststatus').textContent = `Build ${BUILD}. Reports: ${dbState}. Last report: ${lastReport ? lastReport.kind + ' at ' + lastReport.at.slice(11, 19) : 'none'}.`;
+  };
+  let tab = 'setup'; try { tab = localStorage.getItem('menutab') || 'setup'; } catch (_) {}
+  showTab(tab);
+  document.querySelectorAll('#moves [data-tab]').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  $('movesexpand').addEventListener('click', () => { const on = $('moves').classList.toggle('tall'); $('movesexpand').setAttribute('aria-pressed', String(on)); });
+  body.addEventListener('change', (e) => { if (e.target.id === 'infjumps') { testCfg.infiniteJumps = e.target.checked; saveTest(); log('infinite jumps', testCfg.infiniteJumps); } });
+  body.addEventListener('click', (e) => {
+    if (!e.target.closest('#clipsweep')) return;
+    $('clipsummary').textContent = 'Checking…';
+    setTimeout(() => {
+      const res = sweepSaberClipping();
+      $('clipsummary').textContent = `${res.cutting.length} of ${res.checked} animations cut into the body with ${res.style} sabers.`;
+      $('clipresults').innerHTML = res.cutting.map((r) => `<li><b>${r.anim}</b>: ${r.parts.join(', ')} (${r.frames}% of frames)</li>`).join('');
+      report('saber-clipping', `${res.cutting.length} of ${res.checked} animations cut into the body (${res.style} sabers)`, true, res);
+    }, 30);
+  });
   renderClassDetail();
   body.addEventListener('click', (e) => {
     const gb = e.target.closest('[data-gear]');
@@ -1350,7 +1548,7 @@ function start() {
     renderer.render(scene, camera);
   });
   setGear(gear, true);
-  window.__game = { get fingers() { const b = boneByName(hero, 'index_02_l'), f = fist && fist.find((x) => x.bone === b); return f ? +b.quaternion.angleTo(f.q).toFixed(3) : null; }, forceStuck() { speed = 0; CLASSES[klass]._frozen = true; }, strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
+  window.__game = { sweepSaberClipping, get slide() { return { speed: +slideSpeed.toFixed(2), dur: +slideDur.toFixed(2) }; }, get crouchBlend() { return crouchBlend; }, get guardBlend() { return guardBlend; }, testCfg, get fingers() { const b = boneByName(hero, 'index_02_l'), f = fist && fist.find((x) => x.bone === b); return f ? +b.quaternion.angleTo(f.q).toFixed(3) : null; }, forceStuck() { speed = 0; CLASSES[klass]._frozen = true; }, strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
     setClass(k) { klass = k; renderClass(); }, openMoves, closeMoves };
 }
 </script>
