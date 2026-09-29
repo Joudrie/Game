@@ -1,0 +1,4 @@
+Source: https://opengameart.org/content/universal-animation-library + https://opengameart.org/content/universal-animation-library-2 (Quaternius, Standard/free tiers)
+License: CC0 1.0
+Downloaded: 2026-09-29
+Notes: Only the Godot/Unreal GLBs kept; Unity/Unreal FBX + .blend removed to save space.

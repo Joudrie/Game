@@ -1,0 +1,4 @@
+Source: https://opengameart.org/content/fps-arms-rigged-only (para)
+License: CC0
+Downloaded: 2026-09-29
+Notes: Rigged arms (Rigify-style names), no real anims. fps_arms*.glb converted from FBX; skin 'skeleton' validator warning is harmless.

@@ -1,0 +1,4 @@
+Source: https://quaternius.com/packs/animatedguns.html (Google Drive folder 1ICYTdMXQqhkhrh8Fzjx9D0ozJuONwtC4)
+License: CC0 1.0
+Downloaded: 2026-09-29
+Notes: GLB/ converted from FBX/ with FBX2glTF (npm fbx2gltf). Gun-only mechanical anims (mag, slide, trigger).

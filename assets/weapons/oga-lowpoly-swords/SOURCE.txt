@@ -1,0 +1,4 @@
+Source: https://opengameart.org/content/3d-swords-lowpol-cc0 (cc0-game-assets)
+License: CC0
+Downloaded: 2026-09-29
+Notes: Draco compression removed with gltf-transform so no DRACOLoader needed.

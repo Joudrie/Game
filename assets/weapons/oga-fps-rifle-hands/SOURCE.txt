@@ -1,0 +1,4 @@
+Source: https://opengameart.org/content/low-poly-fps-rifle-and-hands (robin-lamb)
+License: CC0
+Downloaded: 2026-09-29
+Notes: Rifle + hands, single 'fire' clip.

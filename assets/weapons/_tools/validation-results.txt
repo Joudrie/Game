@@ -1,0 +1,370 @@
+godot-tps-demo-robot/player.glb	validatorErrors=0	three=ok	clips=56
+kenney-blaster-kit/Models/GLB format/blaster-a.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-b.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-c.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-d.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-e.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-f.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-g.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-h.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-i.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-j.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-k.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-l.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-m.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-n.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-o.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-p.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-q.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/blaster-r.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/bullet-foam-thick.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/bullet-foam-tip-thick.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/bullet-foam-tip.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/bullet-foam.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/clip-large.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/clip-small.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/crate-medium.glb	validatorErrors=0	three=ok	clips=3	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/crate-small.glb	validatorErrors=0	three=ok	clips=3	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/crate-wide.glb	validatorErrors=0	three=ok	clips=3	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/grenade-a.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/grenade-b.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/scope-large-a.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/scope-large-b.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/scope-small.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/silencer-larger.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/silencer-small.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/smoke.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/target-detail.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/target-fragment-large.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/target-fragment-small.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/target-large.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+kenney-blaster-kit/Models/GLB format/target-small.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+mesh2motion-cc0/human-addon-animations.glb	validatorErrors=0	three=ok	clips=75	(texture decode skipped in node)
+mesh2motion-cc0/human-base-animations.glb	validatorErrors=50	three=ok	clips=87	(texture decode skipped in node)
+oga-energy-sword/Energy Sword/Energy Sword.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-flat-guns-east/Flat Guns East/GLB/Pistol_Compact_East.glb	validatorErrors=0	three=ok	clips=0
+oga-flat-guns-east/Flat Guns East/GLB/Pistol_Full_East.glb	validatorErrors=0	three=ok	clips=0
+oga-flat-guns-east/Flat Guns East/GLB/Rifle_Assault_East.glb	validatorErrors=0	three=ok	clips=0
+oga-flat-guns-east/Flat Guns East/GLB/Rifle_Battle_East.glb	validatorErrors=0	three=ok	clips=0
+oga-flat-guns-east/Flat Guns East/GLB/SMG_Compact_East.glb	validatorErrors=0	three=ok	clips=0
+oga-flat-guns-east/Flat Guns East/GLB/SMG_Full_East.glb	validatorErrors=0	three=ok	clips=0
+oga-flat-guns-east/Flat Guns East/GLB/Shotgun_Auto_East.glb	validatorErrors=0	three=ok	clips=0
+oga-flat-guns-east/Flat Guns East/GLB/Shotgun_Pump_East.glb	validatorErrors=0	three=ok	clips=0
+oga-flat-guns-east/Flat Guns East/GLB/Sniper_Material_East.glb	validatorErrors=0	three=ok	clips=0
+oga-flat-guns-east/Flat Guns East/GLB/Sniper_Rifle_East.glb	validatorErrors=0	three=ok	clips=0
+oga-fps-arms-rigged/fps_arms.glb	validatorErrors=1	three=ok	clips=0
+oga-fps-arms-rigged/fps_arms_test.glb	validatorErrors=1	three=ok	clips=1
+oga-fps-rifle-hands/rifle/rifle.glb	validatorErrors=0	three=ok	clips=1
+oga-lowpoly-swords/Sword115.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword121.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword123.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword132.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword134.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword138.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword154.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword172.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword228.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword249.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword275.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword283.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword289.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword317.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword343.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword358.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword374.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword38.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword403.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword472.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword474.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword476.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword488.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword493.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword503.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword543.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword6.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword606.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword618.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword621.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword626.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword628.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword640.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword653.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword825.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword864.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword868.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword903.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword906.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword941.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword944.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword961.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword973.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword977.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword984.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword986.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+oga-lowpoly-swords/Sword996.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+quaternius-animated-guns/Animated FPS Guns - Jun 2018/GLB/P90.glb	validatorErrors=0	three=ok	clips=2
+quaternius-animated-guns/Animated FPS Guns - Jun 2018/GLB/Pistol.glb	validatorErrors=0	three=ok	clips=3
+quaternius-animated-guns/Animated FPS Guns - Jun 2018/GLB/Revolver.glb	validatorErrors=0	three=ok	clips=2
+quaternius-animated-guns/Animated FPS Guns - Jun 2018/GLB/Rifle.glb	validatorErrors=0	three=ok	clips=3
+quaternius-animated-guns/Animated FPS Guns - Jun 2018/GLB/Shotgun.glb	validatorErrors=0	three=ok	clips=3
+quaternius-animated-guns/Animated FPS Guns - Jun 2018/GLB/SniperRifle.glb	validatorErrors=0	three=ok	clips=3
+quaternius-medieval-weapons/GLB/Arrow.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Axe.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Axe_Double.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Axe_Small.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Bow_Evil.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Bow_Golden.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Bow_Wooden.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Bow_Wooden2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Claymore.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Dagger.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Dagger_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Hammer_Double.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Hammer_Small.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Scythe.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Shield_Celtic_Golden.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Shield_Heater.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Shield_Heater_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Shield_Round.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Shield_Round_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Spear.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Sword.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Sword_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Sword_Big.glb	validatorErrors=0	three=ok	clips=0
+quaternius-medieval-weapons/GLB/Sword_Golden.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-gun/GLB/Lightning Gun.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-gun/GLB/LongPistol.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-gun/GLB/LongPistol_small.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-gun/GLB/Pistol.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-gun/GLB/Ray Gun.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-gun/GLB/Rifle.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-gun/GLB/Sniper rifle.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/AR_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/AR_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/AR_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/AR_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/AR_5.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/AR_6.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Crossbow_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Crossbow_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Grenade.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Grenade_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Grenade_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Grenade_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Pistol_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Pistol_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Pistol_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/SMG_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/SMG_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Sniper_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Sniper_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Guns/GLB/Sniper_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Accessory_Pistol_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Barrel_AR_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Barrel_AR_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Barrel_Grenade_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Barrel_Pistol_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Barrel_Pistol_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Barrel_Single.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Barrel_Sniper_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Barrel_Sniper_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_AR4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_AR_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_AR_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_AR_5.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_AR_6.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Crossbow_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Crossbow_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Front_Sniper_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Front_Sniper_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Grenade_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Grenade_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Grenade_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Pistol_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Pistol_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Pistol_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_SMG_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_SMG_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Sniper_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Sniper_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Body_Sniper_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_AR_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_AR_6.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_Grenade_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_Grenade_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_Grenade_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_Pistol_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_Pistol_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_SMG_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_Sniper_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Grip_Sniper_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Handguard_Pistol_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Magazine_AR.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Magazine_SMG_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Magazine_Sniper_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Scope_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Scope_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Sight_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Sight_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Sight_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_AR_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_AR_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_AR_6.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_Grenade_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_Grenade_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_Pistol_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_SMG_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_Sniper_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-scifi-modular-guns/Modular Parts/GLB/Stock_Sniper_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Characters/GLB/Character_Enemy.glb	validatorErrors=0	three=ok	clips=17
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Characters/GLB/Character_Hazmat.glb	validatorErrors=0	three=ok	clips=17
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Characters/GLB/Character_Soldier.glb	validatorErrors=0	three=ok	clips=17
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Barrier_Fixed.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Barrier_Large.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Barrier_Single.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Barrier_Trash.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/BearTrap_Closed.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/BearTrap_Open.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/BrickWall_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/BrickWall_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/CardboardBoxes_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/CardboardBoxes_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/CardboardBoxes_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/CardboardBoxes_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Container_Long.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Container_Small.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Crate.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Debris_BrokenCar.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Debris_Papers_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Debris_Papers_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Debris_Papers_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Debris_Pile.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Debris_Tires.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/ExplodingBarrel.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/ExplodingBarrel_Spilled.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Fence.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Fence_Long.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/GasCan.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/GasTank.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Health.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Key.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Landmine.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/MetalFence.glb	validatorErrors=0	three=ok	clips=0	(texture decode skipped in node)
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Pallet.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Pallet_Broken.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Pipes.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/SackTrench.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/SackTrench_Small.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Sign.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Sofa.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Sofa_Small.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/StreetLight.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Structure_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Structure_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Structure_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Structure_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Tank.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/TrafficCone.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/TrashContainer.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/TrashContainer_Open.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Environment/GLB/Tree_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/AK.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/FireGrenade.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Grenade.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/GrenadeLauncher.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Knife_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Knife_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Pistol.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Revolver.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Revolver_Small.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/RocketLauncher.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/SMG.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/ShortCannon.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Shotgun.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Shovel.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Sniper.glb	validatorErrors=0	three=ok	clips=0
+quaternius-toon-shooter/Toon Shooter Game Kit - Dec 2022/Guns/GLB/Sniper_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ual/Animation Library[Standard]/Godot/AnimationLibrary_Godot_Standard.glb	validatorErrors=0	three=ok	clips=46
+quaternius-ual/Universal Animation Library 2 [Standard]/Female Mannequin/Unreal-Godot/Mannequin_F.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ual/Universal Animation Library 2 [Standard]/Unreal-Godot/UAL2_Standard.glb	validatorErrors=0	three=ok	clips=43
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/AssaultRifle2_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/AssaultRifle2_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/AssaultRifle2_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/AssaultRifle2_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/AssaultRifle_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/AssaultRifle_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/AssaultRifle_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/AssaultRifle_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/AssaultRifle_5.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Bayonet.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Bayonet_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Bipod.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Bullpup_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Bullpup_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Bullpup_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Flashlight.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Grip.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Pistol_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Pistol_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Pistol_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Pistol_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Pistol_5.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Pistol_6.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Revolver_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Revolver_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Revolver_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Revolver_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Revolver_5.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Scope_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Scope_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Scope_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Shotgun_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Shotgun_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Shotgun_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Shotgun_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Shotgun_SawedOff.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Shotgun_ShortStock.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Silencer_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Silencer_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Silencer_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Silencer_Short.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Silencer_long.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SniperRifle_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SniperRifle_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SniperRifle_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SniperRifle_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SniperRifle_5.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SniperRifle_6.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Stock.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SubmachineGun_1.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SubmachineGun_2.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SubmachineGun_3.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SubmachineGun_4.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/SubmachineGun_5.glb	validatorErrors=0	three=ok	clips=0
+quaternius-ultimate-guns/Ultimate Gun Pack - July 2019/GLB/Tripod.glb	validatorErrors=0	three=ok	clips=0
+zenxchaos-tps-anims/RevolverAimIdle.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverAimShoot.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverAimWalk.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverAimWalkBackTurnAround.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverAimWalkTurnAround.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverCrouchAimIdle.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverCrouchAimReloadEnd.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverCrouchAimReloadInit.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverCrouchAimReloadLoop.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverCrouchAimWalk.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverIdleL_CC.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverIdleL_CD.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverIdleL_CU.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverIdleL_LC.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverIdleL_LD.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverIdleL_LU.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverIdleL_RC.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverIdleL_RD.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverIdleL_RU.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverReloadEnd.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverReloadInit.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverReloadLoop.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/RevolverSearchAmmo.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/ShotgunAimIdle.glb	validatorErrors=0	three=ok	clips=1
+zenxchaos-tps-anims/ShotgunAimWalk.glb	validatorErrors=0	three=ok	clips=1

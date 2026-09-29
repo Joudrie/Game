@@ -1,0 +1,4 @@
+Source: https://github.com/scottpetrovic/mesh2motion-app static/animations/
+License: CC0 (README: art assets CC0; code MIT)
+Downloaded: 2026-09-29
+Notes: Quaternius UAL1+UAL2 clips re-targeted to one UE5-style skeleton + extra clips. gltf-validator flags ANIMATION_DUPLICATE_TARGETS (harmless; three.js loads fine).

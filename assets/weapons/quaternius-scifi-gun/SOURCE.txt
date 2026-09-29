@@ -1,0 +1,4 @@
+Source: https://quaternius.com/packs/scifigun.html (Drive 1jaszGQ7QN2KIWFFoOVYy8y8qFe27yVL2)
+License: CC0 1.0 (quaternius.com license page)
+Downloaded: 2026-09-29
+Notes: GLB/ converted from FBX with FBX2glTF.
