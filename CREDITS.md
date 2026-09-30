@@ -8,6 +8,7 @@ Most assets are CC0 (public domain) and need no credit. The ones below need cred
 - **100STYLE dataset** (CC BY 4.0): I. Mason, S. Starke, T. Komura, "Real-Time Style Modelling of Human Locomotion via Feature-Wise Transformations and Local Motion Phases", 2022.
 - **CMU Graphics Lab Motion Capture Database** (free for any use): mocap.cs.cmu.edu. BVH conversion by cgspeed.
 - **KayKit Character Animations 1.1** by Kay Lousberg (CC0): kneel-and-fall death, two hit reactions. kaylousberg.itch.io
+- **"Boba Fett/Mandalorian Jet Pack"** by Jace1969 on Printables (CC BY 4.0): the jetpack model. printables.com/model/23735
 - **Quaternius Swat** soldier animations (CC0): enemy run, strafe, shoot and death clips.
 - **three.js** example Soldier model (MIT repository; animations from Mixamo).
 

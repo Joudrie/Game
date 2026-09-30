@@ -252,6 +252,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 window.__booted = true;
 
@@ -530,6 +531,7 @@ async function boot() {
   for (const j of (EXTRA.clips || [])) { const c = THREE.AnimationClip.parse(j); clips.set(c.name, c); }
   fillMissingTracks();
   try { rifleModel = (await parseGLB(A.rifle)).scene; pistolModel = (await parseGLB(A.pistol)).scene; } catch (e) { report('error', 'Weapon model failed: ' + e.message); }
+  try { if (A.jetpack) jetpackModel = new OBJLoader().parse(new TextDecoder().decode(decodeB64(A.jetpack))); } catch (e) { report('error', 'Jetpack model failed: ' + e.message); }
   hero = h.scene;
   hero.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
   lf = boneByName(hero, 'ball_l') || boneByName(hero, 'foot_l'); rf = boneByName(hero, 'ball_r') || boneByName(hero, 'foot_r');
@@ -734,29 +736,48 @@ function buildRifle() {
   placeRifle();
 }
 const RIFLE_FLIP = false;
-// jetpack: a plain box with two nozzles on the upper back; flames grow with thrust
-let jetpack = null;
+// jetpack: the Mandalorian-style pack (missile on top, twin fuel tanks, a thruster low on each side) from
+// "Boba Fett/Mandalorian Jet Pack" by Jace1969 on Printables (CC BY). Flames come out of its two thrusters.
+let jetpack = null, jetpackModel = null;
+const JET_H = 0.72; // metres tall, missile included
 function buildJetpack() {
   const root = new THREE.Group();
-  const metal = new THREE.MeshStandardMaterial({ color: 0x5b6068, roughness: 0.5, metalness: 0.4 });
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.36, 0.13), metal); body.castShadow = true; root.add(body);
   const flames = [];
-  for (const x of [-0.09, 0.09]) {
-    const nz = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.045, 0.08, 10), metal); nz.position.set(x, -0.22, -0.01); root.add(nz);
-    const f = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.4, 10, 1, true), new THREE.MeshBasicMaterial({ color: 0xffb347, transparent: true, opacity: 0.85, depthWrite: false }));
-    f.rotation.x = Math.PI; f.position.set(x, -0.26, -0.01); root.add(f); flames.push(f);
+  const flameMat = new THREE.MeshBasicMaterial({ color: 0xffb347, transparent: true, opacity: 0.85, depthWrite: false });
+  if (jetpackModel) {
+    // the file stands upright with its tanks on +X and the flat mounting plate on -X; turn it so the plate faces the wearer's back
+    const g = jetpackModel, box = new THREE.Box3().setFromObject(g), size = box.getSize(new V3()), c = box.getCenter(new V3());
+    const k = JET_H / size.y;
+    const beskar = new THREE.MeshStandardMaterial({ color: 0xcfd4da, metalness: 0.35, roughness: 0.38, flatShading: true, side: THREE.DoubleSide }); // silver (no reflection map, so low metalness)
+    g.traverse((o) => { if (o.isMesh) { o.material = beskar; o.geometry.computeVertexNormals(); o.castShadow = true; } });
+    g.position.set(-c.x, -c.y, -c.z); // centred on its middle
+    const inner = new THREE.Group(); inner.add(g); inner.rotation.y = Math.PI / 2; inner.scale.setScalar(k);
+    root.add(inner);
+    // thrusters: the cone nozzles hanging at the bottom corners, 0.275 either side of the middle in the file's units
+    for (const side of [1, -1]) {
+      const f = new THREE.Mesh(new THREE.ConeGeometry(0.045, 0.4, 10, 1, true), flameMat.clone());
+      f.rotation.x = Math.PI; f.position.set(side * 0.275 * k, -JET_H / 2 - 0.01, 0); root.add(f); flames.push(f);
+    }
+  } else { // fallback: a plain box
+    const metal = new THREE.MeshStandardMaterial({ color: 0x5b6068, roughness: 0.5, metalness: 0.4 });
+    root.add(new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.26, 0.1), metal));
+    for (const x of [-0.065, 0.065]) { const f = new THREE.Mesh(new THREE.ConeGeometry(0.035, 0.3, 10, 1, true), flameMat.clone()); f.rotation.x = Math.PI; f.position.set(x, -0.19, 0); root.add(f); flames.push(f); }
   }
+  for (const f of flames) f.userData.y0 = f.position.y;
   jetpack = { root, flames };
-  const m = mounts.jetpack; m.bone.add(root); root.position.copy(m.p); root.quaternion.copy(m.q); root.scale.copy(m.s).multiplyScalar(0.72);
+  const m = mounts.jetpack; m.bone.add(root); root.position.copy(m.p); root.quaternion.copy(m.q); root.scale.copy(m.s);
+  jetpack.fit = new THREE.Group(); // tilt the bottom in so the plate sits flush on the sloping upper back
+  root.parent.add(jetpack.fit); jetpack.fit.position.copy(root.position); jetpack.fit.quaternion.copy(root.quaternion); jetpack.fit.scale.copy(root.scale);
+  jetpack.fit.add(root); root.position.set(0, 0, 0.04); root.quaternion.identity(); root.scale.set(1, 1, 1); root.rotation.x = -0.28;
 }
 function updateJetpackLook() {
   if (!jetpack) return;
-  jetpack.root.visible = !!gadgets.jetpack;
+  (jetpack.fit || jetpack.root).visible = !!gadgets.jetpack;
   const on = mode === 'jet', k = on ? jet.thrust : 0;
   for (const f of jetpack.flames) {
     f.visible = k > 0.05;
     const flick = 0.85 + Math.random() * 0.3, len = (0.35 + 0.9 * k) * flick;
-    f.scale.set(0.7 + 0.5 * k, len, 0.7 + 0.5 * k); f.position.y = -0.26 - 0.2 * (len - 1);
+    f.scale.set(0.7 + 0.5 * k, len, 0.7 + 0.5 * k); f.position.y = f.userData.y0 - 0.2 * (len - 1);
   }
 }
 function placeRifle() {
@@ -2009,7 +2030,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v17 · 2026-09-30';
+const BUILD = 'v18 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;

@@ -2,6 +2,13 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v18: a real Mandalorian jetpack
+- **The jetpack is now a downloaded model:** "Boba Fett/Mandalorian Jet Pack" by Jace1969 on Printables (CC BY, credited in `CREDITS.md`). Source file and notes are in `assets/jetpack/`.
+  - It's the classic look: a missile up the middle, twin fuel tanks, and a cone thruster hanging off each lower corner.
+  - Silver finish. It sits flush on the upper back: the flat mounting plate against the body, the bottom tilted in.
+  - The flames now come out of its two thrusters.
+- Scaled to 0.72 m tall, missile included. If the model ever fails to load, the old plain box is used instead.
+
 ## v17: better icons, pistol magazine and reload
 - **Better item icons:**
   - The lightsaber, pistol and frag grenade icons are pictures of their actual 3D models, rendered when the game loads. The saber icon shows your blade colour and updates when you change it.
