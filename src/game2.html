@@ -2733,7 +2733,7 @@ function playerDie(kind, push, blownApart) {
   hero.visible = false;
   body.rag = makeRag(body.g, (n) => body.root.getObjectByName(n), push || new V3(0, 1, 0), blownApart ? 1.6 : 0.8);
   if (blownApart) { // like anyone else: two to four pieces come off
-    const list = [...LIMB_SETS.blast].sort(() => Math.random() - 0.5).slice(0, 2 + Math.floor(Math.random() * 3));
+    const list = ['Head', 'upperarm_l', 'upperarm_r', 'thigh_l', 'thigh_r'].sort(() => Math.random() - 0.5).slice(0, 2 + Math.floor(Math.random() * 3)); // limbs that don't overlap, so each is its own piece
     for (const n of list) sever(body, n, push.clone().multiplyScalar(0.8).add(new V3((Math.random() - 0.5) * 7, Math.random() * 4, (Math.random() - 0.5) * 7)));
   }
   dead = { t: 0, kind, body, focus: body.rag ? body.rag.P.pelvis.p.clone() : player.position.clone() };
