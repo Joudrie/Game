@@ -148,7 +148,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
 <div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
-<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>1</kbd>–<kbd>4</kbd> weapons · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
+<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · scroll or <kbd>1</kbd>–<kbd>4</kbd> weapons · <kbd>Shift</kbd>+scroll zoom · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
 <div id="toast" class="hud panel" role="status" hidden></div>
 <div id="feed" class="hud" aria-live="polite"></div>
 
@@ -1286,9 +1286,9 @@ function pullGrapple(dt) {
 let enemyTemplate = null;
 const enemies = [];
 const ENEMY_COUNT = 5, CORPSE_TIME = 90, MAX_CORPSES = 12;
-const enemyCfg = { on: true, gore: false, pushBodies: true };
+const enemyCfg = { on: true, gore: true, pushBodies: true };
 try { Object.assign(enemyCfg, JSON.parse(localStorage.getItem('enemycfg') || '{}')); } catch (_) {}
-try { if (!localStorage.getItem('v14-gore')) { enemyCfg.gore = false; localStorage.setItem('v14-gore', '1'); localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } } catch (_) {}
+enemyCfg.gore = true; // dismemberment is always on (v14.1)
 const saveEnemyCfg = () => { try { localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } catch (_) {} };
 const killFeed = [], deathCounts = {};
 // Death pools by cause. Each entry: clip, where to start (0..1), playback speed. Picked at random, never the same twice in a row.
@@ -1856,7 +1856,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v14 · 2026-09-29';
+const BUILD = 'v14.1 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -2038,7 +2038,21 @@ addEventListener('pointermove', (e) => {
   if (e.pointerType === 'mouse') { if (isLocked() || dragging) look(e.movementX, e.movementY, movesOpen ? 0.006 : 0.0023); return; }
   touchMove(e);
 });
-canvas.addEventListener('wheel', (e) => { e.preventDefault(); camDist = clamp(camDist * Math.exp(e.deltaY * 0.001), 1.6, 7); }, { passive: false });
+// Scroll wheel: next or previous weapon. Shift + scroll: camera zoom.
+// (Windows turns Shift + wheel into a sideways scroll, so deltaX counts too.)
+let wheelAcc = 0, wheelT = 0;
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const d = e.deltaY || e.deltaX;
+  if (e.shiftKey) { camDist = clamp(camDist * Math.exp(d * 0.001), 1.6, 7); return; }
+  if (movesOpen) return;
+  wheelAcc += d;
+  const now = performance.now();
+  if (Math.abs(wheelAcc) < 40 || now - wheelT < 180) return; // one weapon per notch, trackpads included
+  const step = Math.sign(wheelAcc); wheelAcc = 0; wheelT = now;
+  const g = GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + step + GEAR_ORDER.length) % GEAR_ORDER.length];
+  setGear(g); toast('Weapon: ' + GEARS[g], 900);
+}, { passive: false });
 
 const joy = { id: null, ox: 0, oy: 0, x: 0, y: 0 }, lookT = { id: null, x: 0, y: 0 }, JOY_R = 56;
 function touchStart(e) {
@@ -2517,7 +2531,7 @@ function buildMoves() {
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p><p class="note">Everything ticked below is for <b id="movesfor">${CLASSES[klass].label}</b>. Each class keeps its own set.</p>`);
-  h.push(`<h3>Equipment <small>keys 1–4 on a keyboard</small></h3><div class="seg" role="group" aria-label="Equipment" style="grid-template-columns:repeat(2,1fr)">`);
+  h.push(`<h3>Equipment <small>scroll wheel or keys 1–4</small></h3><div class="seg" role="group" aria-label="Equipment" style="grid-template-columns:repeat(2,1fr)">`);
   for (const g of GEAR_ORDER) h.push(`<button type="button" data-gear="${g}" aria-pressed="${gear === g}">${GEARS[g][0].toUpperCase() + GEARS[g].slice(1)}</button>`);
   h.push(`</div><p class="note">No gear or hilt: jab, cross, kick, hook. Saber lit: the five-hit combo (dual sabers mix in dual-wield chops). Pistol: two hands, right-click or Aim to aim, fire from the hip or while aiming. Switching plays a draw or holster; the pistol gets a spin before it goes back.</p>`);
   h.push(`<h3>Saber</h3><div class="seg" role="group" aria-label="Saber style">`);
@@ -2529,10 +2543,9 @@ function buildMoves() {
   h.push(`</div><p class="note">Tap Attack to chain five hits (the finisher flows back into hit 1), hold it for the heavy combo, hold Block to guard, even in the air.</p>`);
   h.push(`<h3>Settings</h3>` +
     `<label class="switch"><input type="checkbox" id="jeton" ${gadgets.jetpack ? 'checked' : ''}> Jetpack: hold Jump in the air to fly, hold C (or Slide) to hover, sprint to fly flat out</label>` +
-    `<label class="switch"><input type="checkbox" id="goreon" ${enemyCfg.gore ? 'checked' : ''}> Dismemberment: saber kills, headshots, leg kills and blasts cut limbs off</label>` +
     `<label class="switch"><input type="checkbox" id="pushbodies" ${enemyCfg.pushBodies ? 'checked' : ''}> Force push moves bodies (grenades always do)</label>` +
     `<label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>`);
-  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, <kbd>1</kbd>–<kbd>4</kbd> or <kbd>E</kbd> weapons, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
+  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, scroll wheel, <kbd>1</kbd>–<kbd>4</kbd> or <kbd>E</kbd> weapons, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
   h.push(`</section>`);
   $('weaponbody').innerHTML = h.join(''); h.length = 0;
   h.push(`<section data-panel="moves">`);
@@ -2580,7 +2593,6 @@ function buildMoves() {
   });
   const wb = $('weaponbody');
   wb.addEventListener('change', (e) => {
-    if (e.target.id === 'goreon') { enemyCfg.gore = e.target.checked; saveEnemyCfg(); }
     if (e.target.id === 'pushbodies') { enemyCfg.pushBodies = e.target.checked; saveEnemyCfg(); }
     if (e.target.id === 'jeton') { gadgets.jetpack = e.target.checked; saveGadgets(); if (!gadgets.jetpack && mode === 'jet') mode = 'air'; }
   });

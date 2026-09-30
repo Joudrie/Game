@@ -90,4 +90,3 @@ Batch 1 alone is a good first drop; send more whenever you like.
 - **Heavy infantry:** which of your characters are heavy, and whether they carry the minigun.
 - **Health numbers** for each class, for when enemies start doing damage.
 - **Jetpack:** unlimited, or with fuel that recharges on the ground?
-- **Dismemberment:** keep it as a switch (off by default), or only for zombies later?
