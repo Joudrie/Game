@@ -2,6 +2,30 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v26: roadmap batch 4 (enemies that think, your health, ragdolls, takedowns, cover)
+- **Soldiers start on patrol.** They stroll between spots near their post and stop to idle.
+  - **They notice you:** a **?** over a soldier's head means he's seen something; he stops and looks. It fills faster the closer you are, and slower if you crouch or sit in cover. Walking up behind him is fine; running up isn't.
+  - **Spotted:** a **!** and he turns on you and shouts. The shout takes about a second. **Kill him before it ends and nobody knows.** When it ends, everyone within 40 m joins the fight.
+  - **Panic:** a calm soldier who sees someone die nearby flinches for a moment, then shouts.
+  - **Noise:** gunfire carries (pistol 35 m, AK and shotgun 50 m, sniper 70 m, grenades 60 m) and alerts anyone calm in range. **The saber and the Force are silent.** Soldiers' own shots alert their friends, so fights spread. (Suppressors come with the attachments in batch 5; the noise rule is ready for them.)
+  - **In a fight:** a soldier only shoots when he can see you. When he can't, he closes in; on Hard and Extreme he comes round the side. After 20 s without seeing you he goes back to patrolling.
+- **Stealth takedowns:** get behind a soldier who hasn't seen you (or one who's panicking) and press **F**. With the saber lit: saber through the back. Otherwise: a strike to the head. It's silent; only someone who sees it panics.
+- **You can be hurt now.** Blaster bolts that reach you and AK bullets (which can't be blocked) take health.
+  - **Difficulty** (Weapon panel, top): Sandbox (can't be hurt), Easy (about 12 hits), Normal (about 7), Hard (about 4; soldiers flank), Extreme (2 hits; sharp eyes, quick shouts). Harder levels also mean better aim and faster fire.
+  - **Health comes back slowly** after 4 s without a hit. A thin bar above the hotbar and a red edge show it.
+- **Dying:** your body goes **limp (a real ragdoll)** and the camera watches it. Press **Enter** or **Respawn** to start again at the spawn point. Soldiers calm down when you respawn.
+  - **Your own grenade** at your feet (within about 2.6 m) **blows you apart** like anyone else. Further out it hurts.
+- **Ragdoll soldiers:** soldiers killed by a grenade, a Force push, a grapple strike, a ground pound or a wall now go limp instead of playing a death clip, and later blasts toss the bodies about. Switch it off in the Weapon panel (Ragdoll deaths). The ragdoll is written for this game (15 points joined by sticks, steering the skeleton), so it adds nothing to the download.
+- **Cover: Q** next to a wall or a crate.
+  - Low cover: you crouch behind it with your back to it. Tall cover: you stand.
+  - **A/D** slide along it.
+  - **Right-click peeks**: over low cover you stand up and aim; at the end of tall cover you lean round the corner.
+  - **Firing without aiming is blind fire** (wild spread). Reloading works as usual.
+  - Q again, jump, sprint or walking away leaves cover.
+  - Cover and crouching also hide you from patrols.
+- **Q changed:** it used to duplicate the right mouse button (aim or block). Right-click still does both.
+- **Automated test:** `tools/test30-batch4.mjs` covers patrols, spotting and the shout, silent kills mid-shout, panic, gunfire noise, takedowns (and none from the front), health and regeneration, bolt hits, death and respawn, your own grenade, ragdoll soldiers, cover sliding and peeking, and Sandbox. Build 15.75 MB.
+
 ## v25: roadmap batch 3 (the Force, saber throw, saber feel, saber + blaster, triple jump, wall run)
 - **The Force is an item** (Lego Star Wars style). With it selected your saber stays lit, and **a red ring marks the one soldier you're looking at**; switch the ring off in the Weapon panel if you like.
   - **Left click: Force pull.** He flies to about 1.4 m in front of you, and if your saber is lit **it swings as he arrives: pulled onto the blade.**
