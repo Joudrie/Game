@@ -2,6 +2,44 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v30: fixes from your PC play test of v29
+- **Rifles:**
+  - **Reloading keeps the gun in your hands.** It used to vanish because the hands played the pistol reload in mid-air. Now the left hand goes from the fore-grip to the magazine, down to your belt and back, while the gun tilts.
+  - **Both hands grip** (the left hand was open and hovering), and the low-ready carry is less droopy.
+  - **The camera** puts you further left of the screen with a rifle, more so when aiming, so you can see down the gun.
+- **Fire grenade:**
+  - **The freeze is gone:** each new fire added a light, which made three.js recompile every material for 1–2 s. Three fire lights now exist from the start.
+  - **Real flames:** Kenney's CC0 flame sprites, as rising orange particles with smoke, all in one cheap draw. They're capped in size, so standing close no longer lags.
+  - **Soldiers steer round burning ground,** and patrols don't walk into it.
+- **Saber:**
+  - **The glow is toned down** (fainter halo, a softer and smaller light on you).
+  - **The trail only shows when you swing, throw or dash;** running made it flare into a huge ribbon.
+- **Juggernauts, duellists and shield soldiers need a real swing:** walking into them with the blade does nothing. Ordinary soldiers still get cut if they walk into it.
+- **Grapple:** a shield soldier's shield bounces you off, and a duellist cuts your line.
+- **Force:**
+  - **The target marker** is thinner and see-through.
+  - **Choke:** he claws at his throat and kicks, it lasts 4.5 s, and **a click while choking swings your saber**, so you can walk up and strike him down.
+- **Saber + blaster:** the blaster sits in your **left fist, facing where you aim**, and the saber stays in your right hand. **Left click fires the blaster, right click swings the saber.** Six shots before it overheats.
+- **Sniper:** a chest kill blows the chest open.
+- **Throwables:**
+  - **A dashed arc and a landing ring show where it will land** while one is in your hand. A click winds up, then throws (X is still the quick throw).
+  - **The teleport orb shoves soldiers** next to where you arrive. Teleporting mid-jump no longer leaves you stuck in the jump pose.
+- **Air control:** you can steer and pick up speed in the air, so a jump straight up beside a roof can still land on it.
+- **Enemies:**
+  - **They aim at you:** the upper body turns and tilts toward you, and their misses land closer.
+  - **The shield soldier** holds the shield on his left hand, and it takes a blast once (a sticky stuck on the shield breaks it, and he lives).
+- **Wounds:** a cut end gets a small flat cap, not a big red ball (the "whole corpse red" look).
+- **Items:**
+  - **Items with no use yet** (data chip, comlink, keycard, power cell) no longer take the weapon out of your hand.
+  - **The ration bar heals 25%.** **A kyber shard recolours your blade.**
+  - **The blue berry** is a faint blue aura now, not a blue body.
+  - **Holocloak and fall-proof timers** show above the hotbar.
+- **Moves:** **Builds:** Default, Speed and Silly, a whole set of moves in one click (Menu → Moves).
+- **Fists:** two more hits after the hook, a KayKit punch and a shoulder charge.
+- **Ten soldiers** by default (saves that had five get ten once).
+- **Tests:** `tools/test34-playtest.mjs` covers the fixes above.
+- **Coming next (v31, the downloaded assets):** buildings, clouds, grass and paths, enemy skins with smaller heads and mixed weapons, player shields, and the shield soldier's one-handed stance.
+
 ## v29: batch 7 (juggernauts, shields, saber duels, sneaking, Mission 3, move presets, falls)
 - **You're still invincible** (v28.1). Duellist hits and fall damage only count on the damage levels in Weapon → Difficulty.
 - **Special soldiers** turn up in the sandbox now and then (Menu → Tests turns that off, and has buttons to spawn one in front of you).

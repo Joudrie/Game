@@ -33,42 +33,42 @@ The ground rules:
 Your play-by-play, item by item. v30 takes the fixes, and v31 the downloaded assets.
 
 **Character and guns**
-- [ ] **Shoulders look wrecked:** the pistol and rifle stances hunch and cross the shoulders; the left arm pulls across the chest.
-- [ ] **Move presets as named builds:** Default, Speed, Silly/Goofy (plus a reset to defaults).
-- [ ] **Rifle camera:** put the character further to the left of the screen with a rifle (more over the shoulder), so you can see down the gun as you aim.
-- [ ] **Rifle hold:** stock in the shoulder; hands actually gripping (the left hand is open and hovering, the shotgun isn't held properly).
-- [ ] **Reloading makes the gun vanish** (AK, shotgun, sniper): the hands play the pistol reload while the rifle hangs at the shoulder. Rifles need their own reload.
-- [ ] **Sniper:** a chest kill blows the chest apart.
-- [ ] **Saber + blaster:** the blaster points the wrong way. Saber in the right hand, blaster in the left, facing forward, gripped in a fist. Left click fires the left hand, right click swings the right. Six shots before it overheats.
-- [ ] **Items that do nothing** (data chip, comlink, kyber crystal, keycard, power cell…) shouldn't be held in the hand. The ration bar could heal.
+- [~] **Shoulders look wrecked:** *(v30: rifles are held closer with both hands, which crosses the arms less; tell me if it still looks wrong)* the pistol and rifle stances hunch and cross the shoulders; the left arm pulls across the chest.
+- [x] **Move presets as named builds:** Default, Speed, Silly/Goofy (plus a reset to defaults).
+- [x] **Rifle camera:** put the character further to the left of the screen with a rifle (more over the shoulder), so you can see down the gun as you aim.
+- [x] **Rifle hold:** stock in the shoulder; hands actually gripping (the left hand is open and hovering, the shotgun isn't held properly).
+- [x] **Reloading makes the gun vanish** (AK, shotgun, sniper): the hands play the pistol reload while the rifle hangs at the shoulder. Rifles need their own reload.
+- [x] **Sniper:** a chest kill blows the chest apart.
+- [x] **Saber + blaster:** the blaster points the wrong way. Saber in the right hand, blaster in the left, facing forward, gripped in a fist. Left click fires the left hand, right click swings the right. Six shots before it overheats.
+- [x] **Items that do nothing** (data chip, comlink, kyber crystal, keycard, power cell…) shouldn't be held in the hand. The ration bar could heal.
 
 **Saber and the Force**
-- [ ] **Tone the glow down** a little (you love it, just less obvious); the trail shouldn't flare while you're only running.
-- [ ] **Juggernauts and duellists need a real swing:** walking into them with the blade shouldn't hurt them (walking into ordinary soldiers can stay: "hilarious").
-- [ ] **Grappling into a shield soldier** shouldn't kill him. A duellist cuts the rope or knocks you back.
-- [ ] **Force target marker** less solid.
-- [ ] **Choke:** a choking animation, held longer, and you can walk up and strike him down while he hangs there.
-- [ ] **More punch attacks** (keep the current combo as the main one).
+- [x] **Tone the glow down** a little (you love it, just less obvious); the trail shouldn't flare while you're only running.
+- [x] **Juggernauts and duellists need a real swing:** walking into them with the blade shouldn't hurt them (walking into ordinary soldiers can stay: "hilarious").
+- [x] **Grappling into a shield soldier** shouldn't kill him. A duellist cuts the rope or knocks you back.
+- [x] **Force target marker** less solid.
+- [x] **Choke:** a choking animation, held longer, and you can walk up and strike him down while he hangs there.
+- [x] **More punch attacks** (keep the current combo as the main one).
 
 **Throwables and gear**
-- [ ] **Fire grenade:** the game freezes 1–2 s as it ignites, and lags near the flames. The flames look poor: find realistic fire textures. Soldiers should generally avoid fire.
-- [ ] **Teleport orb:**
+- [x] **Fire grenade:** the game freezes 1–2 s as it ignites, and lags near the flames. The flames look poor: find realistic fire textures. Soldiers should generally avoid fire.
+- [x] **Teleport orb:**
   - a wind-up throw and a visible arc while you aim
   - teleporting next to a soldier knocks him back
   - teleporting while falling left you stuck in the jump pose, and so did pressing X in the air
-- [ ] **Blue berry:** a subtle blue aura rather than turning blue all over. Show how long it lasts.
-- [ ] **Holocloak:** show how long it lasts.
+- [x] **Blue berry:** a subtle blue aura rather than turning blue all over. Show how long it lasts.
+- [x] **Holocloak:** show how long it lasts.
 - [ ] **Shields for the player** to use.
 
 **Movement**
-- [ ] **Air control:** when jumping straight up beside a building you can't steer onto it. Let you move in the air.
+- [x] **Air control:** when jumping straight up beside a building you can't steer onto it. Let you move in the air.
 
 **Enemies**
-- [ ] **When they shoot, they don't aim at you.**
+- [x] **When they shoot, they don't aim at you.**
 - [ ] **Different skins,** rotated between spawns (for example a desert SWAT); **heads too big** (too cartoon, not serious); **mixed weapons**.
-- [ ] **Shield soldier:** the shield on his arm, a one-handed pistol stance; a sticky grenade on the shield can leave him alive.
-- [ ] **Cutting a soldier in half turns his whole body red:** blood belongs at the cut.
-- [ ] **More enemies** in the sandbox.
+- [~] **Shield soldier:** the shield on his arm *(v30: held at his hand, and it takes one blast; the one-handed stance comes in v31)*, a one-handed pistol stance; a sticky grenade on the shield can leave him alive.
+- [x] **Cutting a soldier in half turns his whole body red:** blood belongs at the cut.
+- [x] **More enemies** in the sandbox.
 
 **The world** *(download free assets rather than building them; any theme, modern or fantasy, just not cartoon)*
 - [ ] **Buildings** from free asset packs, for a more interesting sandbox.
