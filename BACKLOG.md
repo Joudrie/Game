@@ -31,7 +31,7 @@ The ground rules:
 ## ★ Roadmap (agreed v22): build in this order
 Each batch ends with a play-link update for the owner to try. Order can change whenever the owner says so.
 
-**Batch 1: finish the saber cutting and fix the basics** *(now)*
+**Batch 1: finish the saber cutting and fix the basics** ✅ *done in v23* (except limb reactions with sound, which comes with Batch 2)
 1. Play-test fixes: jetpack off by default; the pistol stuck pointing up after recoil (root cause); short-lived bullet holes on walls and ground.
 2. Dismemberment part 2:
    - soldiers react to losing a limb (clutching the stump)
@@ -42,7 +42,7 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 4. **6-slot hotbar, centred** at the bottom.
 5. **A key to swap shoulders** (camera).
 
-**Batch 2: guns**
+**Batch 2: guns** *(next)*
 1. **AK-47, pump shotgun, sniper** (free CC0 models already in `assets/weapons/quaternius-ultimate-guns`), each with several animations and its own feel.
 2. **Weapon sounds** (free sounds already in `assets/misc/sounds`).
 3. **Bullets vs blasters:** only blaster bolts can be deflected.

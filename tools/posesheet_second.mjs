@@ -7,7 +7,7 @@ import path from 'path';
 const G = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..') + '/';
 const OUT = process.argv[2] || 'posesheet_second.png', VIEW = process.argv[3] || 'front';
 const b64 = (f) => fs.readFileSync(G + f).toString('base64');
-const POSES = [['bones', 0], ['Idle_FoldArms_Loop', 1.0], ['Jump_Loop', 0.2], ['NinjaJump_Idle_Loop', 0.2], ['Sprint_Loop', 0.25], ['Sword_Regular_C', 0.9], ['Punch_Cross', 0.25], ['M2M_Levitate_Idle', 0.5]];
+const POSES = process.env.POSES ? JSON.parse(process.env.POSES) : [['bones', 0], ['Idle_FoldArms_Loop', 1.0], ['Jump_Loop', 0.2], ['NinjaJump_Idle_Loop', 0.2], ['Sprint_Loop', 0.25], ['Sword_Regular_C', 0.9], ['Punch_Cross', 0.25], ['M2M_Levitate_Idle', 0.5]];
 const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 const p = await b.newPage({ viewport: { width: 1600, height: 900 } });
 p.on('pageerror', (e) => console.log('pageerror:', e.message));

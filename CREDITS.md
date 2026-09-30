@@ -5,7 +5,7 @@ Most assets are CC0 (public domain) and need no credit. The ones below need cred
 ## Used in the playable build
 - **The Second**: the owner's character, from their own turnaround images. Shape generated with **Tencent Hunyuan3D-2mv** (Tencent Hunyuan 3D 2.0 Community License; Tencent claims no rights in outputs; not licensed in the EU, UK or South Korea). Details in `assets/characters/the-second/SOURCE.txt`.
 - **Quaternius**: Universal Animation Library 1 and 2, Superhero base character (CC0). The `MR_` clips are our left-to-right mirrors of its sword hits (`tools/bake_mirror.mjs`). quaternius.com
-- **Mesh2Motion**: human add-on animations (CC0). github.com/scottpetrovic/mesh2motion-app
+- **Mesh2Motion**: human add-on animations (CC0). github.com/scottpetrovic/mesh2motion-app v23 adds the Crawl clip (`M2M_Crawl`, crawling soldiers who lost a leg).
 - **100STYLE dataset** (CC BY 4.0): I. Mason, S. Starke, T. Komura, "Real-Time Style Modelling of Human Locomotion via Feature-Wise Transformations and Local Motion Phases", 2022.
 - **CMU Graphics Lab Motion Capture Database** (free for any use): mocap.cs.cmu.edu. BVH conversion by cgspeed.
 - **KayKit Character Animations 1.1** by Kay Lousberg (CC0): kneel-and-fall death, two hit reactions, dual-wield chop, slice and stab. kaylousberg.itch.io
