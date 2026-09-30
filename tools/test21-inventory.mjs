@@ -25,6 +25,7 @@ await p.screenshot({ path: 'inv-drag.png' });
 await p.mouse.up(); await p.waitForTimeout(200);
 console.log('after drag bag0 → hot3:', await hot());
 // tap-to-move: saber (hot0) to bag slot 5
+await p.evaluate(() => { const a = document.getElementById('alert'); if (a) a.hidden = true; }); // a headless freeze report can cover the inventory
 await p.click('#inv .slot[data-where="hot"][data-i="0"]'); await p.click('#inv .slot[data-where="bag"][data-i="5"]'); await p.waitForTimeout(200);
 console.log('after tap hot0 → bag5:', await hot(), '| bag5', await ev(() => JSON.stringify(__game.inv.bag[5])));
 await p.screenshot({ path: 'inv-open.png' });

@@ -1371,7 +1371,7 @@ function buildFist() {
   }
 }
 function handsHolding() {
-  if (pistolInHand) return pistol?.rifle ? 'lr' : 'r'; // both hands grip a rifle (v30)
+  if (pistolInHand) return pistol?.rifle ? 'lr' : 'r'; // both hands grip a rifle (v30); the shield hand is posed by holdShield (v31)
   if (blasterMode() && armed) return 'lr'; // saber in the right fist, blaster in the left
   if (!armed) return '';
   return saberCfg.style === 'single' ? 'r' : 'lr';
@@ -1650,6 +1650,42 @@ function pullGrapple(dt, wx = 0, wz = 0) {
   if (stalled) log('grapple stalled at', dist.toFixed(1), 'm');
   if (grapple.enemy) { if (dist < Math.max(1.3, grapple.vel.length() * dt * 1.5) || grapple.t > 8 || stalled) arriveEnemy(); }
   else if (dist < Math.max(1.1, grapple.vel.length() * dt * 1.5) || grapple.t > 30 || stalled) arriveGrapple();
+}
+
+// ---------------- the player's energy shield (v31) ----------------
+// "Pistol + energy shield": the pistol in the right hand, a round energy shield on the left forearm, held in front of the
+// chest. It stops bolts, bullets and sniper rounds from the front; hits drain it, it recharges after 2.5 s without
+// one, and it drops for 5 s if drained. Owner (v29 play test): "add shields the player can use".
+const pshield = { hp: 1, since: 9, down: 0, flash: 0, mesh: null, blocked: 0 };
+function shieldItem() { return !!ITEMS[inv.hot[inv.active]?.id]?.shield; }
+function shieldUp() { return shieldItem() && gear === 'pistol' && pistolInHand && !dead && pshield.down <= 0 && !!hero; }
+function shieldStops(from) { if (!shieldUp()) return false; const to = from.clone().sub(player.position).setY(0).normalize(); return to.dot(new V3(Math.sin(yaw), 0, Math.cos(yaw))) > 0.3; }
+function shieldPoint() { return pshield.mesh ? pshield.mesh.getWorldPosition(new V3()) : playerChest(); }
+function shieldHit(a) {
+  pshield.hp -= a; pshield.since = 0; pshield.flash = 1; pshield.blocked++;
+  if (pshield.hp <= 0) { pshield.hp = 0; pshield.down = 5; sfx('glass2', shieldPoint(), 0.7); toast('Shield down: it comes back in 5 s', 1400); log('player shield down'); }
+}
+function holdShield(dt) {
+  pshield.since += dt; pshield.flash = Math.max(0, pshield.flash - dt * 3);
+  if (pshield.down > 0 && (pshield.down -= dt) <= 0) { pshield.hp = 1; pshield.since = 9; }
+  else if (pshield.since > 2.5 && pshield.down <= 0) pshield.hp = Math.min(1, pshield.hp + dt * 0.3);
+  const on = shieldItem() && gear === 'pistol' && pistolInHand && !dead && hero;
+  if (!pshield.mesh) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.42, 24, 8, 0, Math.PI * 2, 0, Math.PI * 0.3), new THREE.MeshBasicMaterial({ color: 0x2f8cff, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide }));
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(0.42 * Math.sin(Math.PI * 0.3), 0.012, 6, 32), m.material.clone()); rim.material.opacity = 0.7; rim.rotation.x = Math.PI / 2; rim.position.y = 0.42 * Math.cos(Math.PI * 0.3); m.add(rim);
+    m.renderOrder = 3; m.visible = false; scene.add(m); pshield.mesh = m;
+  }
+  const m = pshield.mesh; m.visible = !!on && pshield.down <= 0;
+  if (!on) return;
+  // the left arm holds it out in front of the chest, a little to the left
+  const f = new V3(Math.sin(yaw), 0, Math.cos(yaw)), left = new V3(Math.cos(yaw), 0, -Math.sin(yaw));
+  const ch = boneByName(hero, 'spine_03').getWorldPosition(new V3());
+  ikArm('l', ch.clone().addScaledVector(f, 0.36).addScaledVector(left, 0.16).add(new V3(0, -0.02, 0)), 1);
+  hero.updateMatrixWorld(true);
+  const hand = boneByName(hero, 'hand_l').getWorldPosition(new V3());
+  // the cap's pole (+y) faces forward, so the shield bulges out toward the shots
+  m.position.copy(hand).addScaledVector(f, -0.22); m.quaternion.setFromUnitVectors(new V3(0, 1, 0), f);
+  m.material.opacity = (0.08 + 0.14 * pshield.hp) + pshield.flash * 0.35; m.children[0].material.opacity = 0.35 + 0.4 * pshield.hp;
 }
 
 // ---------------- the dressed world (v31) ----------------
@@ -2008,7 +2044,7 @@ function updateEnemies(dt) {
       if (e.burst > 0 && (e.burstT -= dt) <= 0) { e.burst--; e.burstT = e.gunKind === 'ar' ? 0.08 : 0.1; enemyBullet(e); }
     } else eplay(e, 'SW_Idle_Gun_Pointing');
     e.g.rotation.y = e.yaw;
-    emixPost(e, dt, ['spine_02'], () => enemyAim(e)); // v30: they point at you
+    emixPost(e, dt, e.jackal ? ['spine_02', 'upperarm_l', 'lowerarm_l'] : ['spine_02'], () => { enemyAim(e); if (e.jackal) jackalArm(e); }); // v30: they point at you; v31: the shield arm
   }
 }
 // run an enemy's animation, then keep any cut-off limbs collapsed (clips would otherwise scale them back)
@@ -2718,6 +2754,7 @@ function enemyBullet(e, dmg = 0.5, snd) {
   const wh0 = castShot(from, dir, 30, false).wall, wh = wh0 && wh0.distance < camRay.far ? wh0 : null; // glass shatters and the bullet goes on
   noise(from, HEAR.enemy);
   const sound = snd === undefined ? (e.gunKind === 'ar' ? 'ar' : 'ak') : snd;
+  if (onTarget && (!wh || wh.distance > from.distanceTo(chest)) && shieldStops(from)) { const at = shieldPoint(); tracer(from, at, 0xffc97a); flash(from); if (sound) sfx(sound, from, 0.6); sparks(at, dir.clone().negate()); shieldHit(dmg * 0.12); return; } // stopped by your shield (v31)
   if (onTarget && (!wh || wh.distance > from.distanceTo(chest))) { tracer(from, chest, 0xffc97a); flash(from); if (sound) sfx(sound, from, 0.6); hurtHits(dmg, 'bullet', from); return; } // bullets can't be blocked
   tracer(from, wh ? wh.point : from.clone().addScaledVector(camRay.ray.direction, camRay.far), 0xffc97a);
   impact(from, camRay.ray.direction, wh, wh ? wh.distance : camRay.far);
@@ -2735,6 +2772,7 @@ function sniperShot(e) {
   const aimAt = on ? chest.clone() : chest.clone().add(new V3((Math.random() - 0.5) * 2, (Math.random() - 0.3) * 1.5, (Math.random() - 0.5) * 2));
   const dir = aimAt.clone().sub(from).normalize(), wall = castShot(from, dir, 200, false).wall;
   flash(from); sfx('sniper', from, 0.9); noise(from, HEAR.enemy); if (e.laser) e.laser.visible = false;
+  if (on && (!wall || wall.distance > from.distanceTo(chest)) && shieldStops(from)) { const at = shieldPoint(); tracer(from, at, 0xffe0a0); sparks(at, dir.clone().negate()); shieldHit(0.45); return; } // a sniper round nearly breaks the shield
   if (on && (!wall || wall.distance > from.distanceTo(chest))) { tracer(from, chest, 0xffe0a0); hurtHits(2, 'bullet', from); return; }
   const end = wall ? wall.point : from.clone().addScaledVector(dir, 150); tracer(from, end, 0xffe0a0); impact(from, dir, wall, wall ? wall.distance : 150);
 }
@@ -2765,6 +2803,7 @@ function updateBolts(dt) {
         continue;
       }
       const body = playerChest();
+      if (!dead && shieldStops(b.owner.g.position) && segDist(p0, p1, body, body) < 0.7) { const at = shieldPoint(); sparks(at, b.vel.clone().negate().normalize()); sfx('deflect', at, 0.8); shieldHit(0.1); b.vel.reflect(b.vel.clone().normalize()).applyAxisAngle(UP, (Math.random() - 0.5) * 2); b.vel.y = Math.abs(b.vel.y) * 0.3 + Math.random() * 3; b.back = 'away'; b.m.lookAt(p1.clone().add(b.vel)); continue; } // the energy shield (v31)
       if (!dead && segDist(p0, p1, body, body) < 0.3) { hurtHits(1, 'bolt', b.owner.g.position); sparks(body, b.vel.clone().negate().normalize()); removeBolt(b); continue; } // it hits you
     } else if (b.back === true && b.owner.state !== 'dead' && segDist(p0, p1, chestAt(b.owner.g.position), chestAt(b.owner.g.position)) < 0.6) {
       b.owner.cutLabel = 'Parried · his own bolt';
@@ -3537,6 +3576,14 @@ function enemyAim(e) {
   rotateBoneWorld(sp, UP, clamp(yawErr, -0.8, 0.8));
   rotateBoneWorld(sp, new V3(-Math.cos(e.yaw), 0, Math.sin(e.yaw)), clamp(pitch, -0.6, 0.6));
 }
+// the shield soldier (v31): pistol one-handed, the left forearm held across in front of him with the shield on it
+function jackalArm(e) {
+  const ua = cutBone(e, 'upperarm_l'), la = cutBone(e, 'lowerarm_l'), ha = cutBone(e, 'hand_l'); if (!ua || !la || !ha) return;
+  const to = player.position.clone().sub(e.g.position).setY(0); const a = to.lengthSq() > 0.01 && e.mind === 'combat' ? Math.atan2(to.x, to.z) : e.yaw;
+  const f = new V3(Math.sin(a), 0, Math.cos(a)), left = new V3(Math.cos(a), 0, -Math.sin(a)), sh = ua.getWorldPosition(new V3());
+  aimBone(ua, la, sh.clone().addScaledVector(f, 0.12).addScaledVector(left, 0.06).add(new V3(0, -0.25, 0)));
+  aimBone(la, ha, sh.clone().addScaledVector(f, 0.45).addScaledVector(left, -0.06).add(new V3(0, -0.2, 0)));
+}
 function aimBone(b, child, target) { // turn b so its child points at the target
   const bp = b.getWorldPosition(new V3()), cp = child.getWorldPosition(new V3());
   const q = new THREE.Quaternion().setFromUnitVectors(cp.sub(bp).normalize(), target.clone().sub(bp).normalize()).multiply(b.getWorldQuaternion(new THREE.Quaternion()));
@@ -4282,6 +4329,7 @@ function endSlide(cancel) {
 const ITEMS = {
   saber:   { name: 'Lightsaber', gear: 'lit', icon: 'saber' },
   pistol:  { name: 'Pistol', gear: 'pistol', gun: 'pistol', icon: 'pistol' },
+  shieldpistol: { name: 'Pistol + energy shield', gear: 'pistol', gun: 'pistol', shield: true, icon: 'shield' },
   force:   { name: 'The Force', gear: 'lit', force: true, icon: 'force' },
   saberblaster: { name: 'Saber + blaster', gear: 'lit', blaster: true, icon: 'saber' },
   ak:      { name: 'AK-47', gear: 'pistol', gun: 'ak', icon: 'pistol' },
@@ -4313,6 +4361,7 @@ const LOOT_IDS = { Credits: 'credits', 'Pistol ammo': 'ammo', 'Rifle ammo': 'amm
 // everything else is a two-tone drawing
 const thumbs = {};
 const ICON = {
+  shield: '<path d="M15 3l10 4v7c0 7-4.5 11-10 13C9.5 25 5 21 5 14V7z" fill="#7fd0ff" opacity=".6" stroke="#3a8dff" stroke-width="1.4"/><path d="M15 7v16" stroke="#3a8dff" stroke-width="1" opacity=".6"/>',
   sticky: '<circle cx="15" cy="16" r="8" fill="#2f7fe0"/><circle cx="12" cy="13" r="2.4" fill="#9cc8ff"/><path d="M15 8V4" stroke="currentColor" stroke-width="2"/>',
   fire: '<rect x="9" y="9" width="12" height="16" rx="2.5" fill="#b8321c"/><path d="M15 3c3 3 3 5 0 7-3-2-3-4 0-7z" fill="#ffb22e"/><rect x="12" y="7" width="6" height="3" rx="1" fill="currentColor"/>',
   cloak: '<path d="M15 4c-5 0-8 4-8 9v13l4-3 4 3 4-3 4 3V13c0-5-3-9-8-9z" fill="#7fd0ff" opacity=".55" stroke="#3a8dff" stroke-width="1.2"/><circle cx="12" cy="12" r="1.4" fill="#3a8dff"/><circle cx="18" cy="12" r="1.4" fill="#3a8dff"/>',
@@ -4373,6 +4422,9 @@ try { if (!localStorage.getItem('v24-guns')) { // hand out the new guns once, in
 try { if (!localStorage.getItem('v25-force')) { // The Force and the saber + blaster: into free slots (the backpack if the hotbar is full)
   for (const id of ['force', 'saberblaster']) if (![...inv.hot, ...inv.bag].some((x) => x && x.id === id)) { const arr = inv.hot.includes(null) ? inv.hot : inv.bag, i = arr.indexOf(null); if (i >= 0) arr[i] = { id, qty: 1 }; }
   localStorage.setItem('v25-force', '1'); saveInv(); } } catch (_) {}
+try { if (!localStorage.getItem('v31-shield')) { // the energy shield: into the backpack once
+  if (![...inv.hot, ...inv.bag].some((x) => x && x.id === 'shieldpistol')) { const i = inv.bag.indexOf(null); if (i >= 0) inv.bag[i] = { id: 'shieldpistol', qty: 1 }; }
+  localStorage.setItem('v31-shield', '1'); saveInv(); } } catch (_) {}
 try { if (!localStorage.getItem('v27-ar')) { // the M4 carbine: into the backpack once
   if (![...inv.hot, ...inv.bag].some((x) => x && x.id === 'ar')) { const i = inv.bag.indexOf(null); if (i >= 0) inv.bag[i] = { id: 'ar', qty: 1 }; }
   localStorage.setItem('v27-ar', '1'); saveInv(); } } catch (_) {}
@@ -5060,6 +5112,7 @@ function animateLoco(dt, C) {
   applyDraw();
   applyRecoil(dt);
   holdRifle();
+  holdShield(dt);
   if (gear === 'lit' && armed && ignite > 0.95 && (clipCheckN = (clipCheckN + 1) % 3) === 0) noteSaberClipping();
 }
 let debugTpose = false, clipCheckN = 0, debugCam = null; // debugCam: test hook, a fixed camera {pos, at} for screenshots
@@ -5495,6 +5548,8 @@ function start() {
     setGore(v) { enemyCfg.gore = v; },
     get blockedShots() { return blockedShots; }, get parries() { return parries; }, get guardBrokenT() { return guardBrokenT; }, get bolts() { return bolts.length; },
     loadouts: () => enemies.map((e) => e.gunKind),
+    enemyBone(id, n) { const e = enemies.find((x) => x.id === id), b = e && cutBone(e, n); return b ? { at: b.getWorldPosition(new V3()).toArray(), g: e.g.position.toArray(), yaw: e.yaw } : null; },
+    shield: () => ({ yaw: +yaw.toFixed(2), bolts: bolts.length, up: shieldUp(), hp: +pshield.hp.toFixed(2), down: +pshield.down.toFixed(1), blocked: pshield.blocked, visible: !!pshield.mesh?.visible }),
     world: () => ({ ...worldStats, blocks: blocks.length, hidden: blocks.filter((b) => b.model).length, clouds: clouds.length }), setUniform(u) { soldierLook.uniform = u; },
     looks: () => enemies.map((e) => ({ uniform: e.uniform, tone: e.tone, head: +(e.bones.Head?.scale.x || 0).toFixed(2), kind: e.gunKind })),
     forceState: () => ({ mode: forceMode(), target: forceTarget && forceTarget.id, ring: forceRing.visible, choke: !!choke, zap: !!zap, zapLeft: +zapLeft.toFixed(2), thrown: !!thrown, blaster: blasterMode(), heat, overheat: overheatT, scorches: scorches.length, trail: sabers.some((s) => s.blades.some((b) => b.userData.trail && b.userData.trail.visible)), light: sabers[0]?.blades[0]?.userData.light?.intensity || 0 }),
