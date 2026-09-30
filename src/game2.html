@@ -1227,6 +1227,7 @@ function attackPress() {
   if (gear === 'pistol') { firePistol(); return; }
   if (tryGroundPound()) return;
   if (!canFight() || blocking) return;
+  if (gear === 'lit' && armed && !atk && speed > CLASSES[klass].jog + 0.3) { const t = dashTarget(); if (t) { startDash(t); return; } } // sprinting at a soldier: dash strike (v28)
   if (atk) { if (atk.heavy) return; if (atk.rec) startAttack(nextHit(atk.i)); else atk.queued = true; return; }
   const C = CLASSES[klass];
   if (speed > C.jog + 0.1) speed = C.jog; // the swing ends the sprint
@@ -1506,7 +1507,7 @@ function grapplePress() {
   if (grapple.state === 'pull' || grapple.state === 'fire') { releaseGrapple(false); return; }
   if (grapple.state !== 'idle') return;
   const h = grappleTarget();
-  grapple.t = 0; grapple.from.copy(wrist()); grapple.best = undefined; grapple.stallT = 0;
+  grapple.t = 0; grapple.from.copy(wrist()); grapple.best = undefined; grapple.stallT = 0; grapple.yank = rmbHeld || aimHeld || blocking; grapple.swing = false;
   if (!h) {
     grapple.state = 'miss'; grapple.anchor.copy(grapple.from).addScaledVector(camera.getWorldDirection(new V3()), 40);
     log('grapple miss');
@@ -1582,7 +1583,10 @@ function updateGrapple(dt) {
   if (grapple.state === 'fire' || grapple.state === 'miss') {
     const k = grapple.state === 'miss' && grapple.t > grapple.flight ? Math.max(0, 2 - grapple.t / grapple.flight) : Math.min(1, grapple.t / grapple.flight);
     tip = w.clone().lerp(grapple.anchor, k);
+    if (grapple.state === 'fire' && k >= 1 && grapple.enemy && grapple.yank) { const e = grapple.enemy; grapple.state = 'idle'; grapple.enemy = null; rope.visible = hook.visible = false; stopOvr(0.2); yankEnemy(e); return; } // v28
     if (grapple.state === 'fire' && k >= 1) {
+      grapple.swing = !!gadgets.swing && !grapple.enemy && grapple.anchor.y > player.position.y + 2.5; // v28: swing instead of reeling in
+      if (grapple.swing) { grapple.len = grapple.anchor.distanceTo(player.position.clone().add(new V3(0, 1.6, 0))); grapple.swingT = 0; }
       grapple.state = 'pull'; mode = 'grapple'; crouch = false; atk = null;
       grapple.vel.set(Math.sin(moveYaw) * speed, vy, Math.cos(moveYaw) * speed);
       playGrappleAnim('gpull', true); log('grapple attached');
@@ -1597,7 +1601,8 @@ function updateGrapple(dt) {
   hook.position.copy(tip); hook.quaternion.copy(rope.quaternion);
 }
 // the pull itself: accelerate toward a point just off the surface, face along the rope
-function pullGrapple(dt) {
+function pullGrapple(dt, wx = 0, wz = 0) {
+  if (grapple.swing) return swingGrapple(dt, wx, wz);
   const target = grapple.enemy
     ? grapple.anchor.clone().add(player.position.clone().sub(grapple.anchor).setY(0).normalize().multiplyScalar(0.9)) // stop just in front of them
     : grapple.anchor.clone().addScaledVector(grapple.normal, 0.5);
@@ -1765,6 +1770,7 @@ function updateEnemies(dt) {
     }
     const to = new V3(player.position.x - pos.x, 0, player.position.z - pos.z), dist = to.length();
     const active = !movesOpen && dist < 70 && !dead;
+    if (e.burning && !['knock', 'grappled', 'choked', 'held'].includes(e.state)) { burnUpdate(e, dt); e.g.rotation.y = e.yaw; emix(e, dt); continue; } // on fire (v28)
     if (e.state === 'choked' || e.state === 'held') { emix(e, dt); continue; } // held in the air by the Force (updateForce), or in a takedown
     if (e.state === 'crawl') { // lost a leg: drags himself toward you
       e.yaw = wrapAngle(e.yaw + wrapAngle(Math.atan2(to.x, to.z) - e.yaw) * (1 - Math.exp(-2 * dt)));
@@ -2343,19 +2349,26 @@ function makeGrenade() {
 // impact grenade: arcs from you toward the crosshair and goes off on first contact
 const grenades = [];
 let nadeCd = 0;
-function throwGrenade() {
-  if (movesOpen || !hero || nadeCd > 0) return;
-  if (!testCfg.infiniteNades) { if (!countItem('grenade')) { toast('No grenades: loot some', 1200); return; } takeItem('grenade'); }
+function throwGrenade(kind = lastNade) {
+  if (movesOpen || !hero || nadeCd > 0 || dead) return;
+  if (!testCfg.infiniteNades && !countItem(NADES[kind])) { if (kind !== 'frag' && countItem('grenade')) kind = 'frag'; else { toast(`No ${ITEMS[NADES[kind]].name.toLowerCase()}s: loot some`, 1200); return; } }
+  if (!testCfg.infiniteNades) takeItem(NADES[kind]);
   nadeCd = 0.6;
   const dir = camera.getWorldDirection(new V3());
-  const m = makeGrenade();
+  const m = makeThrowable(kind);
   m.position.copy(player.position).add(new V3(0, 1.6, 0)).addScaledVector(dir, 0.6); m.castShadow = true; scene.add(m);
-  grenades.push({ m, vel: dir.multiplyScalar(22).add(new V3(0, 4, 0)).add(new V3(Math.sin(moveYaw) * speed, 0, Math.cos(moveYaw) * speed)), t: 0 });
+  grenades.push({ m, kind, vel: dir.multiplyScalar(22).add(new V3(0, 4, 0)).add(new V3(Math.sin(moveYaw) * speed, 0, Math.cos(moveYaw) * speed)), t: 0 });
   if (mode === 'ground' && !atk) playOvr('OverhandThrow', { from: 0.25, speed: 1.8, fade: 0.06, then: () => stopOvr(0.2) });
-  log('grenade');
+  log('grenade', kind);
 }
 function updateGrenades(dt) {
   for (const g of [...grenades]) {
+    if (g.stuck) { // a sticky grenade counting down on whatever it grabbed
+      g.fuse -= dt; if (g.stuck.bone) g.m.position.copy(g.stuck.bone.localToWorld(g.stuck.local.clone()));
+      g.m.scale.setScalar(Math.sin(g.fuse * (g.fuse < 0.6 ? 60 : 25)) > 0 ? 1.3 : 1);
+      if (g.fuse <= 0) { scene.remove(g.m); grenades.splice(grenades.indexOf(g), 1); const e = g.stuck.e; explode(g.m.position.clone(), e && e.state !== 'dead' ? e : null, new V3(0, 0, 0)); }
+      continue;
+    }
     g.t += dt; g.vel.y -= 14 * dt;
     const prev = g.m.position.clone(); g.m.position.addScaledVector(g.vel, dt);
     const p = g.m.position;
@@ -2363,7 +2376,12 @@ function updateGrenades(dt) {
     if (!boom) for (const { box: B } of blocks) if (B.containsPoint(p)) { boom = true; break; }
     let direct = null;
     if (!boom) for (const e of enemies) if (e.state !== 'dead' && e.g.position.clone().add(new V3(0, 1, 0)).distanceTo(p) < 0.7) { boom = true; direct = e; break; }
-    if (boom) { scene.remove(g.m); grenades.splice(grenades.indexOf(g), 1); explode(p.clone(), direct, g.vel.clone()); }
+    if (!boom) continue;
+    if (g.kind === 'sticky') { stickTo(g, direct ? p.clone() : prev.clone(), direct); continue; }
+    scene.remove(g.m); grenades.splice(grenades.indexOf(g), 1);
+    if (g.kind === 'fire') firePatch(prev.clone());
+    else if (g.kind === 'orb') teleportTo(direct ? direct.g.position.clone().add(player.position.clone().sub(direct.g.position).setY(0).normalize().multiplyScalar(1.2)) : prev.clone());
+    else explode(p.clone(), direct, g.vel.clone());
   }
 }
 function explode(at, direct, gvel) {
@@ -2755,7 +2773,7 @@ function respawn() {
 function deadStep(dt, C) {
   dead.t += dt;
   if (dead.body.rag) { stepRag(dead.body.rag, dt); dead.focus.copy(dead.body.rag.P.pelvis.p); }
-  updateSaber(dt); updateHoles(dt); updateBolts(dt); updateEnemies(dt); updatePieces(dt); updateBlood(dt); updateGrenades(dt); updateFx(dt); updateHealth(dt); updateDebris(dt); updateMission(dt);
+  updateSaber(dt); updateHoles(dt); updateBolts(dt); updateEnemies(dt); updatePieces(dt); updateBlood(dt); updateGrenades(dt); updateFx(dt); updateHealth(dt); updateDebris(dt); updateMission(dt); updateFires(dt);
   updateCamera(dt, C);
   $('deathhint').hidden = dead.t < 1;
 }
@@ -2853,20 +2871,22 @@ function ragEnemy(e, v0) {
 
 // ---- stealth takedowns: F from behind a soldier who hasn't seen you (or one who's panicking) ----
 let takedown = null, tdTarget = null, takedowns = 0;
+const isStunned = (e) => e.state === 'crawl' || e.state === 'getup' || (e.state === 'hit' && e.actName === 'M2M_Idle_Hurt');
 function findTakedown() {
   if (dead || takedown || cover || mode !== 'ground' || atk || looting || movesOpen) return null;
   let best = null, bd = 1.9;
   for (const e of enemies) {
-    if (e.state === 'dead' || e.mind === 'combat' || !['engage', 'hit'].includes(e.state)) continue;
+    const stunned = isStunned(e); // a finisher: crawling, getting up or clutching a stump (v28)
+    if (e.state === 'dead' || (!stunned && (e.mind === 'combat' || !['engage', 'hit'].includes(e.state)))) continue;
     const d = e.g.position.clone().sub(player.position).setY(0), dist = d.length(); if (dist > bd) continue;
     const behind = new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw)).dot(d.normalize()); // > 0: he faces away from you
-    if (behind > 0.3 || e.mind === 'panic') { best = e; bd = dist; }
+    if (behind > 0.3 || e.mind === 'panic' || stunned) { best = e; bd = dist; }
   }
   return best;
 }
 function startTakedown(e) {
   const f = new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw)), saber = gear === 'lit' && armed;
-  takedown = { e, t: 0, saber, killed: false };
+  takedown = { e, t: 0, saber, killed: false, finisher: isStunned(e) };
   player.position.copy(e.g.position).addScaledVector(f, -0.8); player.position.y = groundAt(player.position.x, player.position.z, player.position.y + 0.5);
   yaw = moveYaw = e.yaw; speed = 0; e.state = 'held'; setMark(e, null);
   eplay(e, 'Hit_Chest', { loop: false, fade: 0.08 });
@@ -2876,12 +2896,13 @@ function startTakedown(e) {
 function updateTakedown(dt) {
   tdTarget = findTakedown();
   $('tdprompt').hidden = !tdTarget;
+  if (tdTarget) { const t = isStunned(tdTarget) ? ' Finisher' : ' Takedown'; const n = $('tdprompt').lastChild; if (n.textContent !== t) n.textContent = t; }
   if (!takedown) return;
   const T = takedown; T.t += dt; speed = 0;
   if (!T.killed && T.t > 0.3) {
     T.killed = true; takedowns++;
     const e = T.e, f = new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw));
-    if (e.state !== 'dead') { e.state = 'engage'; e.cutLabel = T.saber ? 'Takedown · saber through the back' : 'Takedown'; damageEnemy(e, 999, T.saber ? 'torso' : 'head', 'stealth', f); }
+    if (e.state !== 'dead') { e.state = 'engage'; e.cutLabel = T.finisher ? (T.saber ? 'Finisher · saber' : 'Finisher') : T.saber ? 'Takedown · saber through the back' : 'Takedown'; damageEnemy(e, 999, T.saber ? 'torso' : 'head', 'stealth', f); }
   }
   if (T.t > 0.85) { takedown = null; stopOvr(0.2); }
 }
@@ -2935,6 +2956,145 @@ function coverStep(dt, inp, wx, wz) {
     yaw = wrapAngle(yaw + wrapAngle(want - yaw) * (1 - Math.exp(-12 * dt))); moveYaw = yaw;
   }
   return true;
+}
+
+// ---------------- throwables (v28): sticky, fire, teleport orb ----------------
+// Pick one in the hotbar and click to throw it; X throws whichever you picked last (the frag to begin with).
+// Sticky: sticks to whatever it hits (a soldier too) and goes off 1.6 s later; it kills anyone it's stuck on.
+// Fire: a burning patch for 8 s. Soldiers who walk in catch fire, run about and die; boards in it burn through; it hurts you too.
+// Teleport orb: you appear where it lands.
+const NADES = { frag: 'grenade', sticky: 'sticky', fire: 'firenade', orb: 'orb' };
+let lastNade = 'frag';
+function makeThrowable(kind) {
+  if (kind === 'frag') return makeGrenade();
+  const g = new THREE.Group();
+  if (kind === 'sticky') { g.add(new THREE.Mesh(new THREE.SphereGeometry(0.07, 14, 10), new THREE.MeshStandardMaterial({ color: 0x2f7fe0, emissive: 0x1f5fc0, emissiveIntensity: 0.6, roughness: 0.3 }))); }
+  if (kind === 'fire') { const c = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.2, 12), new THREE.MeshStandardMaterial({ color: 0xb8321c, roughness: 0.5 })); c.rotation.z = Math.PI / 2; g.add(c);
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.04, 10), new THREE.MeshStandardMaterial({ color: 0x8d9297, metalness: 0.7 })); cap.position.x = 0.12; cap.rotation.z = Math.PI / 2; g.add(cap); }
+  if (kind === 'orb') { g.add(new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 12), new THREE.MeshBasicMaterial({ color: 0xc58cff })));
+    const r = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.012, 6, 24), new THREE.MeshBasicMaterial({ color: 0xe8d4ff })); r.rotation.x = Math.PI / 2; g.add(r); }
+  g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+  return g;
+}
+function nadeKindOf(id) { return Object.keys(NADES).find((k) => NADES[k] === id) || 'frag'; }
+function stickTo(g, p, e) { // a sticky grenade grabs hold (a soldier's nearest bone, or the spot it hit)
+  g.fuse = 1.6; g.vel.set(0, 0, 0);
+  if (e) { const bones = ['spine_03', 'pelvis', 'Head', 'thigh_l', 'thigh_r'].map((n) => cutBone(e, n)).filter(Boolean); let best = bones[0], bd = 9;
+    for (const b of bones) { const d = b.getWorldPosition(new V3()).distanceTo(p); if (d < bd) { bd = d; best = b; } }
+    g.stuck = { e, bone: best, local: best.worldToLocal(p.clone()) }; log('sticky on', e.id); }
+  else g.stuck = { at: p.clone() };
+  sfx('deflect', p, 0.4);
+}
+// ---- fire ----
+const fires = [];
+const flameGeo = new THREE.ConeGeometry(0.22, 0.9, 7), flameMats = [0xff6a10, 0xffa21e, 0xe8380c].map((c) => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.9, depthWrite: false }));
+function flameTuft(n, spread, scale = 1) {
+  const g = new THREE.Group();
+  for (let i = 0; i < n; i++) { const m = new THREE.Mesh(flameGeo, flameMats[i % 3]); const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * spread;
+    m.position.set(Math.cos(a) * r, 0.4 * scale, Math.sin(a) * r); m.scale.setScalar(scale * (0.6 + Math.random() * 0.6)); m.userData.s = m.scale.x; m.userData.ph = Math.random() * 9; g.add(m); }
+  return g;
+}
+function flicker(g, t) { for (const m of g.children) { const k = 0.75 + 0.35 * Math.sin(t * 17 + m.userData.ph) + 0.15 * Math.sin(t * 29 + m.userData.ph * 2); m.scale.set(m.userData.s, m.userData.s * k * 1.3, m.userData.s); } }
+function firePatch(at) {
+  const gy = groundAt(at.x, at.z, at.y + 0.5), c = new V3(at.x, gy, at.z);
+  const tuft = flameTuft(16, 2.2); tuft.position.copy(c); scene.add(tuft);
+  const light = new THREE.PointLight(0xff7a2a, 3, 9, 1.6); light.position.copy(c).add(new V3(0, 1, 0)); scene.add(light);
+  fires.push({ c, r: 2.6, t: 0, life: 8, tuft, light, hurtT: 0 });
+  sfx('boom', c, 0.45); noise(c, 25); log('fire patch');
+}
+function setAlight(e) {
+  if (e.burning || e.state === 'dead') return;
+  e.burning = { t: 0, dir: Math.random() * Math.PI * 2 }; alarm(e, 'on fire');
+  e.flames = flameTuft(6, 0.18, 0.55); e.flames.position.set(0, 0.9, 0); e.g.add(e.flames);
+  noise(e.g.position, 25); log('on fire', e.id);
+}
+function updateFires(dt) {
+  for (const f of [...fires]) {
+    f.t += dt; const fade = Math.min(1, (f.life - f.t) / 1.2);
+    flicker(f.tuft, simT); f.tuft.scale.setScalar(Math.max(0.05, fade)); f.light.intensity = 3 * Math.max(0, fade) * (0.85 + 0.15 * Math.sin(simT * 23));
+    for (const e of enemies) if (e.state !== 'dead' && !e.burning && Math.hypot(e.g.position.x - f.c.x, e.g.position.z - f.c.z) < f.r && Math.abs(e.g.position.y - f.c.y) < 1) setAlight(e);
+    for (const b of [...blocks]) if (b.mat === 'wood' && b.box.distanceToPoint(f.c) < f.r * 0.8) { b.burnT = (b.burnT || 0) + dt; if (b.burnT > 3) breakBlock(b, new V3(0, 1, 0), 1.5); }
+    if (!dead && Math.hypot(player.position.x - f.c.x, player.position.z - f.c.z) < f.r * 0.9 && Math.abs(player.position.y - f.c.y) < 1 && (f.hurtT -= dt) <= 0) { f.hurtT = 0.3; hurtPlayer(0.08, 'fire', null); }
+    if (f.t > f.life) { scene.remove(f.tuft); scene.remove(f.light); fires.splice(fires.indexOf(f), 1); }
+  }
+  for (const e of enemies) if (e.flames) {
+    flicker(e.flames, simT + e.g.position.x);
+    if (e.state === 'dead') { e.burning && (e.burning.after = (e.burning.after || 0) + dt); if (!e.burning || e.burning.after > 3) { e.flames.removeFromParent(); e.flames = null; } }
+  }
+}
+// a burning soldier runs about screaming (well, loudly) and drops after about 2 s
+function burnUpdate(e, dt) {
+  const B = e.burning, pos = e.g.position; B.t += dt;
+  if ((B.turnT = (B.turnT || 0) - dt) <= 0) { B.turnT = 0.5 + Math.random() * 0.6; B.dir += (Math.random() - 0.5) * 2.2; }
+  turnTo(e, B.dir, 6, dt);
+  pos.addScaledVector(new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw)), 4 * dt); collideCircle(pos, 0.35); pos.y = groundAt(pos.x, pos.z, pos.y + 0.3);
+  eplay(e, clips.has('SW_Run') ? 'SW_Run' : 'Jog_Fwd_Loop', { fade: 0.15 });
+  if (B.t > 2.2) { e.cutLabel = 'Burned'; damageEnemy(e, 999, 'torso', 'fire'); }
+}
+// ---- teleport ----
+function teleportTo(p) {
+  const from = player.position.clone();
+  const to = new V3(p.x, groundAt(p.x, p.z, p.y + 0.5), p.z);
+  player.position.copy(to); resolveCollisions(); if (mode !== 'ground') { mode = 'ground'; vy = 0; jumps = 0; }
+  if (grapple.state !== 'idle') releaseGrapple(false); cover = null;
+  for (const at of [from, player.position]) { const m = new THREE.Mesh(new THREE.SphereGeometry(0.5, 14, 10), new THREE.MeshBasicMaterial({ color: 0xc58cff, transparent: true, opacity: 0.7, depthWrite: false })); m.position.copy(at).add(new V3(0, 1, 0)); scene.add(m); fx.push({ m, t: 0, life: 0.45, grow: 3 }); }
+  sfx('force', null, 0.9); log('teleport', to.toArray().map((v) => v.toFixed(1)).join(','));
+}
+
+// ---------------- saber moves (v28): dash strike, grapple yank, finishers ----------------
+// Dash strike: attack while sprinting at a soldier up to 10 m ahead and you lunge across the gap, blade first.
+let dash = null, dashes = 0;
+function dashTarget() {
+  const f = new V3(Math.sin(yaw), 0, Math.cos(yaw)); let best = null, bd = 10;
+  for (const e of enemies) {
+    if (e.state === 'dead') continue;
+    const d = e.g.position.clone().sub(player.position); d.y = 0; const dist = d.length();
+    if (dist < 2 || dist > bd || d.normalize().dot(f) < 0.8 || Math.abs(e.g.position.y - player.position.y) > 1.2) continue;
+    best = e; bd = dist;
+  }
+  return best;
+}
+function startDash(e) {
+  dash = { e, t: 0 }; dashes++; atk = null; speed = 0;
+  playOvr('Sword_Dash', { from: 0.12, speed: 1.4, fade: 0.05, then: () => stopOvr(0.2) }); sfx('saber_swing', null, 0.7);
+  log('dash strike', e.id);
+}
+function updateDash(dt) {
+  if (!dash) return;
+  const e = dash.e; dash.t += dt;
+  const to = e.g.position.clone().sub(player.position); to.y = 0; const dist = to.length();
+  if (dist > 0.01) { yaw = moveYaw = Math.atan2(to.x, to.z); }
+  const step = Math.min(18 * dt, Math.max(0, dist - 1.1));
+  player.position.addScaledVector(to.normalize(), step); speed = 0;
+  if (dist < 1.25 || dash.t > 0.6 || e.state === 'dead') {
+    if (e.state !== 'dead' && dist < 1.8) applyCut(e, CUTS.find((c) => c[0] === (Math.random() < 0.5 ? 'waist' : 'chest')), to.clone().normalize()); // the lunge ends in a cut
+    dash = null;
+  }
+}
+// Grapple yank: hold right click (aim or guard) as you grapple a soldier and he's pulled to you instead (onto a lit blade)
+let rmbHeld = false, yanks = 0;
+function yankEnemy(e) {
+  const to = player.position.clone().sub(e.g.position).setY(0), d = to.length(), T = 0.5, reach = Math.max(0, d - 1.4);
+  knock(e, to.normalize().multiplyScalar(reach / T).add(new V3(0, 10 * T, 0)), 0, 'pull');
+  e.pulledT = 1.2; yanks++; sfx('force', null, 0.7); log('grapple yank', e.id);
+}
+// Grapple swing (a setting): a hook high on a wall swings you like a pendulum instead of reeling you in.
+// Push to pump the swing, jump or R to let go and keep the speed.
+function swingGrapple(dt, wx, wz) {
+  const hand = player.position.clone().add(new V3(0, 1.6, 0)), v = grapple.vel;
+  grapple.swingT += dt; v.y -= 20 * dt;
+  if (wx || wz) { v.x += wx * 9 * dt; v.z += wz * 9 * dt; }
+  hand.addScaledVector(v, dt);
+  const clear = grapple.anchor.y - groundAt(grapple.anchor.x, grapple.anchor.z, grapple.anchor.y - 0.5) - 2.2; // the bottom of the arc stays off the ground
+  grapple.len = Math.max(3, grapple.len > clear ? Math.max(clear, grapple.len - 8 * dt) : grapple.len - dt * 0.8); // reels in fast until it clears, then a little, so each swing climbs
+  const r = hand.clone().sub(grapple.anchor), L = r.length();
+  if (L > grapple.len) { r.normalize(); hand.copy(grapple.anchor).addScaledVector(r, grapple.len); const out = v.dot(r); if (out > 0) v.addScaledVector(r, -out); }
+  player.position.copy(hand).add(new V3(0, -1.6, 0));
+  const hz = Math.hypot(v.x, v.z); if (hz > 0.5) yaw = moveYaw = wrapAngle(yaw + wrapAngle(Math.atan2(v.x, v.z) - yaw) * (1 - Math.exp(-8 * dt)));
+  const gy = groundAt(player.position.x, player.position.z, player.position.y + 0.3);
+  if (player.position.y <= gy) player.position.y = gy;
+  if (player.position.y <= gy + 0.01 && grapple.swingT > 0.4 && v.y <= 0) { releaseGrapple(false); mode = 'ground'; vy = 0; speed = Math.min(hz, CLASSES[klass].sprint); jumps = 0; log('swing landed'); }
+  if (grapple.t > 25) releaseGrapple(false);
 }
 
 // ---------------- the Force (v25), Lego Star Wars style ----------------
@@ -3230,7 +3390,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v27 · 2026-09-30';
+const BUILD = 'v28 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -3413,10 +3573,10 @@ addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse') dragging =
 canvas.addEventListener('mousedown', (e) => {
   if (movesOpen || !isLocked()) return;
   if (e.button === 0) attackPress(); // fires the pistol, swings the saber or throws a punch
-  if (e.button === 2) { if (gear === 'pistol') aimHeld = true; else blockPress(); }
+  if (e.button === 2) { rmbHeld = true; if (gear === 'pistol') aimHeld = true; else blockPress(); }
   if (e.button === 1) { e.preventDefault(); specialPress(); } // middle click: lightning with the Force, saber throw otherwise
 });
-addEventListener('mouseup', (e) => { if (e.button === 1) zapEnd(); if (e.button === 0) attackRelease(); if (e.button === 2) { blockRelease(); aimHeld = false; } });
+addEventListener('mouseup', (e) => { if (e.button === 1) zapEnd(); if (e.button === 0) attackRelease(); if (e.button === 2) { rmbHeld = false; blockRelease(); aimHeld = false; } });
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 addEventListener('pointercancel', (e) => { if (e.pointerType !== 'mouse') { if (e.pointerId === joy.id) log('joystick cancelled by the browser'); touchEnd(e); } });
 addEventListener('pointermove', (e) => {
@@ -3598,6 +3758,9 @@ const ITEMS = {
   sniper:  { name: 'Sniper rifle', gear: 'pistol', gun: 'sniper', icon: 'pistol' },
   ar:      { name: 'M4 carbine', gear: 'pistol', gun: 'ar', icon: 'pistol' },
   grenade: { name: 'Frag grenade', stack: 10, icon: 'grenade', use: 'throw' },
+  sticky:  { name: 'Sticky grenade', stack: 10, icon: 'sticky', use: 'throw' },
+  firenade: { name: 'Fire grenade', stack: 10, icon: 'fire', use: 'throw' },
+  orb:     { name: 'Teleport orb', stack: 5, icon: 'orb', use: 'throw' },
   stim:    { name: 'Stim pack', stack: 5, icon: 'stim', use: 'stim' },
   credits: { name: 'Credits', stack: 9999, icon: 'coin' },
   ammo:    { name: 'Pistol ammo', stack: 120, icon: 'ammo' },
@@ -3617,6 +3780,9 @@ const LOOT_IDS = { Credits: 'credits', 'Pistol ammo': 'ammo', 'Rifle ammo': 'amm
 // everything else is a two-tone drawing
 const thumbs = {};
 const ICON = {
+  sticky: '<circle cx="15" cy="16" r="8" fill="#2f7fe0"/><circle cx="12" cy="13" r="2.4" fill="#9cc8ff"/><path d="M15 8V4" stroke="currentColor" stroke-width="2"/>',
+  fire: '<rect x="9" y="9" width="12" height="16" rx="2.5" fill="#b8321c"/><path d="M15 3c3 3 3 5 0 7-3-2-3-4 0-7z" fill="#ffb22e"/><rect x="12" y="7" width="6" height="3" rx="1" fill="currentColor"/>',
+  orb: '<circle cx="15" cy="15" r="6" fill="#c58cff"/><ellipse cx="15" cy="15" rx="12" ry="4" fill="none" stroke="#b070ff" stroke-width="1.6"/>',
   force: '<circle cx="15" cy="15" r="4" fill="#6ab8ff"/><circle cx="15" cy="15" r="8.5" fill="none" stroke="#6ab8ff" stroke-width="1.6" opacity=".7"/><circle cx="15" cy="15" r="12.5" fill="none" stroke="#6ab8ff" stroke-width="1.2" opacity=".4"/>',
   saber: '<path d="M6 24 L22 8" stroke="#35e06a" stroke-width="3" stroke-linecap="round"/><path d="M4 27 L9 22" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>',
   pistol: '<path d="M4 10h21v5h-9l-1.5 10H9l1.5-10H4z" fill="currentColor"/>',
@@ -3675,6 +3841,9 @@ try { if (!localStorage.getItem('v25-force')) { // The Force and the saber + bla
 try { if (!localStorage.getItem('v27-ar')) { // the M4 carbine: into the backpack once
   if (![...inv.hot, ...inv.bag].some((x) => x && x.id === 'ar')) { const i = inv.bag.indexOf(null); if (i >= 0) inv.bag[i] = { id: 'ar', qty: 1 }; }
   localStorage.setItem('v27-ar', '1'); saveInv(); } } catch (_) {}
+try { if (!localStorage.getItem('v28-nades')) { // new throwables: into the backpack once
+  for (const [id, n] of [['sticky', 3], ['firenade', 2], ['orb', 2]]) if (![...inv.hot, ...inv.bag].some((x) => x && x.id === id)) { const i = inv.bag.indexOf(null); if (i >= 0) inv.bag[i] = { id, qty: n }; }
+  localStorage.setItem('v28-nades', '1'); saveInv(); } } catch (_) {}
 const slotAt = (where, i) => (where === 'hot' ? inv.hot : inv.bag)[i];
 const setSlot = (where, i, v) => { (where === 'hot' ? inv.hot : inv.bag)[i] = v; };
 function slotHTML(it, where, i) {
@@ -3700,6 +3869,7 @@ function selectSlot(i, quiet) {
   const it = inv.hot[inv.active], def = it && ITEMS[it.id];
   const want = def?.gear || 'none';
   if (def?.gun && def.gun !== gunKind) setGunKind(def.gun);
+  if (def?.use === 'throw') lastNade = nadeKindOf(it.id); // X throws what you picked last
   if (want !== gear) setGear(want);
   if (!quiet) toast(def ? def.name + (def.stack && it.qty > 1 ? ' ×' + it.qty : '') : 'Fists', 800);
   renderInv();
@@ -3724,7 +3894,7 @@ const countItem = (id) => [...inv.hot, ...inv.bag].reduce((a, it) => a + (it && 
 // Attack with an item slot selected
 function useActiveItem() {
   const it = activeItem(); if (!it || !it.def.use) return false;
-  if (it.def.use === 'throw') { throwGrenade(); return true; }
+  if (it.def.use === 'throw') { throwGrenade(nadeKindOf(it.id)); return true; }
   if (it.def.use === 'stim') { if (hp >= 1) { toast('Health is full', 900); return true; } takeItem('stim'); hp = Math.min(1, hp + 0.5); renderHealth(); toast('Stim pack: +50% health', 1200); flash(player.position.clone().add(new V3(0, 1.2, 0))); log('stim'); return true; }
   return false;
 }
@@ -3791,8 +3961,10 @@ const MISSIONS = {
   m1: { name: 'Mission 1: The courtyard', reward: 'grapple', rewardName: 'Grappling hook', blurb: 'Four waves in the walled courtyard. Loot what they drop.',
     waves: [{ label: 'Pistols', squads: [['pistol', 4]] }, { label: 'AK-47s', squads: [['ak', 4], ['pistol', 1]] }, { label: 'M4 carbines', squads: [['ar', 5]] },
       { label: 'Snipers', squads: [['sniper', 3, 'balcony'], ['ar', 3]] }] },
+  m2: { name: 'Mission 2: Hold the courtyard', reward: 'jetpack', rewardName: 'Jetpack', survive: 180, waves: [],
+    blurb: 'Stay alive for three minutes. They keep coming from the north and the sides, more of them and better armed as the clock runs down, and a sniper takes the balcony near the end.' },
 };
-const GEAR_NAMES = { grapple: 'Grappling hook' };
+const GEAR_NAMES = { grapple: 'Grappling hook', jetpack: 'Jetpack' };
 let kept = new Set(), missionBest = {};
 try { kept = new Set(JSON.parse(localStorage.getItem('kept') || '[]')); missionBest = JSON.parse(localStorage.getItem('missionbest') || '{}') || {}; } catch (_) {}
 const saveKept = () => { try { localStorage.setItem('kept', JSON.stringify([...kept])); localStorage.setItem('missionbest', JSON.stringify(missionBest)); } catch (_) {} };
@@ -3807,7 +3979,7 @@ function startMission(id) {
   if (movesOpen) closeMoves();
   const saved = { inv: JSON.parse(JSON.stringify({ hot: inv.hot, bag: inv.bag, active: inv.active })), mags: { ...ammo.mags } };
   try { localStorage.setItem('inv-sandbox', JSON.stringify(saved)); } catch (_) {}
-  mission = { id, def, wave: -1, state: 'break', t: 4, team: [], saved, kills: 0, t0: simT };
+  mission = { id, def, wave: -1, state: 'break', t: 4, team: [], saved, kills: 0, t0: simT, spawnT: 0 };
   inv.hot = [{ id: 'saber', qty: 1 }, { id: 'pistol', qty: 1 }, { id: 'grenade', qty: 3 }, { id: 'stim', qty: 2 }, null, null];
   inv.bag = new Array(20).fill(null); inv.bag[0] = { id: 'ammo', qty: 60 };
   for (const k of Object.keys(ammo.mags)) ammo.mags[k] = GUNS[k].mag;
@@ -3816,7 +3988,7 @@ function startMission(id) {
   cover = null; takedown = null; hp = 1; hurtT = 99; mode = 'ground'; speed = 0; vy = 0;
   player.position.copy(courtAt(0, -18)); yaw = moveYaw = 0; camYaw = 0; camPitch = 0.12;
   selectSlot(1, true); renderInv(); renderAmmo(); toggleMissions(false); renderHealth();
-  log('mission start', id); toast(`${def.name}: first wave in 4 s`, 2000);
+  log('mission start', id); toast(def.survive ? `${def.name}: they're coming in 4 s` : `${def.name}: first wave in 4 s`, 2000);
 }
 function courtSpot() {
   for (let i = 0; i < 40; i++) {
@@ -3836,8 +4008,35 @@ function spawnWave(i) {
   }
   toast(`Wave ${i + 1} of ${M.def.waves.length}: ${W.label}`, 1800); log('wave', i + 1, n);
 }
+function edgeSpot() { // the north end, or along the side walls
+  if (Math.random() < 0.5) return courtSpot();
+  for (let i = 0; i < 20; i++) { const x = (Math.random() < 0.5 ? -1 : 1) * 19.5, z = -8 + Math.random() * 18, p = courtAt(x, z); if (p.y < 0.1 && p.distanceTo(player.position) > 10 && blocks.every(({ box: B }) => !B.containsPoint(p.clone().add(new V3(0, 0.5, 0))))) return p; }
+  return courtSpot();
+}
+function survivalTick(M, dt) {
+  const el = simT - M.fightT; M.clock = M.def.survive - el;
+  if (M.clock <= 0) { for (const e of M.team) if (e.state !== 'dead') { e.mind = 'patrol'; e.post = e.g.position.clone(); } completeMission(); return; } // they fall back
+  const alive = M.team.filter((e) => e.state !== 'dead' && enemies.includes(e)).length, want = Math.min(8, 3 + Math.floor(el / 30));
+  if (alive < want && (M.spawnT -= dt) <= 0) {
+    M.spawnT = 2;
+    const sniper = el > 110 && !M.team.some((e) => e.hold && e.state !== 'dead');
+    const kinds = ['pistol']; if (el > 40) kinds.push('ak', 'ak'); if (el > 80) kinds.push('ar', 'ar', 'ar');
+    const e = spawnEnemy(sniper ? courtAt(0, 19) : edgeSpot(), sniper ? 'sniper' : kinds[Math.floor(Math.random() * kinds.length)], 'combat');
+    if (e) { e.mission = true; e.hold = sniper; e.yaw = Math.atan2(player.position.x - e.g.position.x, player.position.z - e.g.position.z); M.team.push(e); }
+  }
+}
 function updateMission(dt) {
   const M = mission; if (!M) { $('mhud').hidden = true; return; }
+  if (M.def.survive) { // hold out against reinforcements until the clock runs out
+    if (M.state === 'break' && (M.t -= dt) <= 0) { M.state = 'fight'; M.fightT = simT; M.spawnT = 0; toast('Hold out for 3 minutes', 1800); }
+    else if (M.state === 'fight') survivalTick(M, dt);
+    if ((hudN & 7) === 0) {
+      const down = M.team.filter((e) => e.state === 'dead').length, c = Math.max(0, M.clock ?? M.def.survive);
+      $('mhud').hidden = false;
+      $('mhudtext').textContent = M.state === 'done' ? `${M.def.name}: complete · ${down} down` : M.state === 'break' ? `${M.def.name} · starts in ${Math.ceil(M.t)}` : `${M.def.name} · ${Math.floor(c / 60)}:${String(Math.floor(c % 60)).padStart(2, '0')} left · ${down} down`;
+    }
+    return;
+  }
   const left = M.team.filter((e) => e.state !== 'dead' && enemies.includes(e)).length;
   if (M.state === 'fight' && left === 0) {
     if (M.wave >= M.def.waves.length - 1) completeMission();
@@ -3876,7 +4075,7 @@ function renderMissions() {
   const h = [];
   for (const [id, m] of Object.entries(MISSIONS)) {
     const best = missionBest[id];
-    h.push(`<div class="mcard"><b>${m.name}</b><span>${m.blurb} Waves: ${m.waves.map((w) => w.label).join(', ')}.</span>` +
+    h.push(`<div class="mcard"><b>${m.name}</b><span>${m.blurb}${m.waves.length ? ' Waves: ' + m.waves.map((w) => w.label).join(', ') + '.' : ''}</span>` +
       `<span>Reward: ${m.rewardName} ${kept.has(m.reward) ? '(earned)' : '(not yet)'}${best ? ` · best time ${Math.floor(best / 60)}:${String(Math.round(best % 60)).padStart(2, '0')}` : ''}</span>` +
       `<button type="button" data-mission="${id}">${mission && mission.id === id ? 'Restart' : 'Start'}</button></div>`);
   }
@@ -4001,7 +4200,7 @@ function updateLoot(dt, inp) {
 // ---------------- jetpack ----------------
 // Hold Jump in the air: thrust up. Hold C: hover in place. Sprint: fly flat out, Mandalorian style.
 // Let go of everything and you fall with the pack idling; landing ends the flight.
-const gadgets = { jetpack: false, forceMarker: true }; // off by default since v23: switch it on in the Weapon panel
+const gadgets = { jetpack: false, forceMarker: true, swing: false }; // off by default since v23: switch it on in the Weapon panel
 try { Object.assign(gadgets, JSON.parse(localStorage.getItem('gadgets') || '{}')); if (!localStorage.getItem('v23-jet')) { gadgets.jetpack = false; localStorage.setItem('v23-jet', '1'); localStorage.setItem('gadgets', JSON.stringify(gadgets)); } } catch (_) {}
 const saveGadgets = () => { try { localStorage.setItem('gadgets', JSON.stringify(gadgets)); } catch (_) {} };
 const jet = { boost: false, hover: false, thrust: 0, anim: '' };
@@ -4029,7 +4228,7 @@ function step(dt) {
   const fx = Math.sin(camYaw), fz = Math.cos(camYaw);
   const wx = fx * inp.y - fz * inp.x, wz = fz * inp.y + fx * inp.x;
   const inCover = !!cover && coverStep(dt, inp, wx, wz);
-  if (takedown) { jumpQueued = false; slideQueued = false; }
+  if (takedown || dash) { jumpQueued = false; slideQueued = false; }
 
   let target = 0;
   if (inp.mag > 0.01) {
@@ -4050,7 +4249,7 @@ function step(dt) {
   if (atk) { jumpQueued = false; slideQueued = false; }
   if (blocking) slideQueued = false;                     // you can block in the air, but not slide while guarding
   if ((gear === 'lit' || gear === 'pistol') && crouch && !inCover) crouch = false;
-  if (takedown) target = 0;
+  if (takedown || dash) target = 0;
 
   // facing
   const prevYaw = yaw;
@@ -4061,7 +4260,7 @@ function step(dt) {
     yaw = wrapAngle(yaw + wrapAngle(camYaw - yaw) * (1 - Math.exp(-12 * dt)));
     if (inp.mag > 0.01) { moveYaw = Math.atan2(wx, wz); strafeAngle = wrapAngle(moveYaw - yaw); }
     target = Math.min(target, gear === 'pistol' ? C.jog * 0.75 : C.walk * 1.2);
-  } else if (inCover || takedown) {
+  } else if (inCover || takedown || dash) {
   } else if (inp.mag > 0.01) {
     diff = wrapAngle(Math.atan2(wx, wz) - yaw);
     let sharp = lerp(11, 6, clamp((speed - C.jog) / (C.sprint - C.jog), 0, 1));
@@ -4084,7 +4283,7 @@ function step(dt) {
   }
   // jetpack: hold Jump in the air to fly (a quick tap is still a double jump)
   jumpHeldT = jumpHeld ? jumpHeldT + dt : 0;
-  if (gadgets.jetpack && !mission && mode === 'air' && jumpHeld && jumpHeldT > 0.2 && !pound) startJet();
+  if ((mission ? kept.has('jetpack') : gadgets.jetpack) && mode === 'air' && jumpHeld && jumpHeldT > 0.2 && !pound) startJet();
   if (jumpQueued && mode === 'jet') jumpQueued = false;
   if (jumpQueued) {
     jumpQueued = false;
@@ -4095,7 +4294,7 @@ function step(dt) {
   }
 
   // speed
-  if (mode === 'grapple') pullGrapple(dt);
+  if (mode === 'grapple') pullGrapple(dt, wx, wz);
   else {
   if (inCover) {} // coverStep moved you
   else if (mode === 'ground') {
@@ -4133,6 +4332,7 @@ function step(dt) {
     } else player.position.y = gy;
   }
   }
+  updateDash(dt);
   resolveCollisions();
   updateGrapple(dt);
   player.rotation.y = yaw;
@@ -4146,7 +4346,7 @@ function step(dt) {
   heat = Math.max(0, heat - dt * 0.7); overheatT = Math.max(0, overheatT - dt);
   if (blasterMode() && (hudN & 7) === 0) renderAmmo(); // the heat gauge cools down
   updateSaber(dt);
-  updateHoles(dt); updateBolts(dt); updateTakedown(dt); updateHealth(dt); updateDebris(dt); updateMission(dt);
+  updateHoles(dt); updateBolts(dt); updateTakedown(dt); updateHealth(dt); updateDebris(dt); updateMission(dt); updateFires(dt);
   const te = performance.now(); updateEnemies(dt); updatePieces(dt); updateBlood(dt); perf.enemyAcc += performance.now() - te; updateGrenades(dt); updateFx(dt);
   animateLoco(dt, C);
   updateCamera(dt, C);
@@ -4424,12 +4624,13 @@ function buildMoves() {
   h.push(`<h3>Settings</h3>` +
     `<label class="switch"><input type="checkbox" id="ragon" ${enemyCfg.ragdoll !== false ? 'checked' : ''}> Ragdoll deaths (blasts, pushes and walls throw soldiers limp)</label>` +
     `<label class="switch"><input type="checkbox" id="forcemark" ${gadgets.forceMarker !== false ? 'checked' : ''}> Force target marker (the red ring on who you're looking at)</label>` +
+    `<label class="switch"><input type="checkbox" id="swingon" ${gadgets.swing ? 'checked' : ''}> Grapple swings (Spider-Man): a hook high on a wall swings you instead of reeling you in</label>` +
     `<label class="switch"><input type="checkbox" id="jeton" ${gadgets.jetpack ? 'checked' : ''}> Jetpack: hold Jump in the air to fly, hold C (or Slide) to hover, sprint to fly flat out</label>` +
     `<label class="switch"><input type="checkbox" id="pushbodies" ${enemyCfg.pushBodies ? 'checked' : ''}> Force push moves bodies (grenades always do)</label>` +
     `<label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>` +
     `<label class="switch"><input type="checkbox" id="infnades" ${testCfg.infiniteNades ? 'checked' : ''}> Infinite grenades (off: each throw uses one from your inventory)</label>` +
     `<label class="switch"><input type="checkbox" id="infammo" ${testCfg.infiniteAmmo ? 'checked' : ''}> Infinite spare ammo (off: reloads use the pistol ammo in your inventory; the magazine always empties)</label>`);
-  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, <kbd>G</kbd> loot a body, <kbd>Q</kbd> take cover (A/D along it, right-click to peek, fire without aiming to blind fire), <kbd>F</kbd> behind an unaware soldier: takedown, <kbd>Z</kbd> reload (it also reloads itself when empty), scroll wheel or <kbd>1</kbd>–<kbd>5</kbd> hotbar, <kbd>I</kbd> inventory, <kbd>E</kbd> saber on/off, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
+  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> throw (the grenade, sticky, fire grenade or teleport orb you picked last), <kbd>G</kbd> loot a body, <kbd>Q</kbd> take cover (A/D along it, right-click to peek, fire without aiming to blind fire), <kbd>F</kbd> behind an unaware soldier: takedown (a finisher on one who's down or hurt), attack while sprinting at a soldier: dash strike, hold right-click and grapple a soldier: yank him to you, <kbd>Z</kbd> reload (it also reloads itself when empty), scroll wheel or <kbd>1</kbd>–<kbd>5</kbd> hotbar, <kbd>I</kbd> inventory, <kbd>E</kbd> saber on/off, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
   h.push(`</section>`);
   $('weaponbody').innerHTML = h.join(''); h.length = 0;
   h.push(`<section data-panel="moves">`);
@@ -4489,6 +4690,7 @@ function buildMoves() {
   wb.addEventListener('change', (e) => {
     if (e.target.id === 'pushbodies') { enemyCfg.pushBodies = e.target.checked; saveEnemyCfg(); }
     if (e.target.id === 'forcemark') { gadgets.forceMarker = e.target.checked; saveGadgets(); }
+    if (e.target.id === 'swingon') { gadgets.swing = e.target.checked; saveGadgets(); }
     if (e.target.id === 'ragon') { enemyCfg.ragdoll = e.target.checked; saveEnemyCfg(); }
     if (e.target.id === 'jeton') { gadgets.jetpack = e.target.checked; saveGadgets(); if (!gadgets.jetpack && mode === 'jet') mode = 'air'; }
   });
@@ -4699,6 +4901,12 @@ function start() {
     matBlocks: (m) => blocks.filter((b) => b.court && b.mat === m).map((b) => ({ c: b.box.getCenter(new V3()).toArray().map((v) => +v.toFixed(2)), hp: b.hp })),
     shootPoint(x, y, z) { fireCd = 0; return firePistol(new V3(x, y, z).sub(camera.position).normalize()); }, get camPos() { return camera.position.toArray(); },
     setAtt, hasAtt, get zoom() { return gunZoom(); }, get lasers() { return enemies.filter((e) => e.laser && e.laser.visible).length; },
+    get fires() { return fires.length; }, burning: () => enemies.filter((e) => e.burning && e.state !== 'dead').length, get grenadesOut() { return grenades.map((g) => ({ kind: g.kind || 'frag', stuck: !!g.stuck, on: g.stuck?.e?.id || null })); },
+    throwKind(k) { nadeCd = 0; throwGrenade(k); }, get lastNade() { return lastNade; }, firePatch: (x, z) => firePatch(new V3(x, 0, z)), teleportTo: (x, z) => teleportTo(new V3(x, 0, z)),
+    stickOn(i) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e) return null; const m = makeThrowable('sticky'); scene.add(m); const g = { m, kind: 'sticky', vel: new V3(), t: 0 }; grenades.push(g); stickTo(g, chestOf(e), e); return e.id; },
+    missionClock(sec) { if (mission && mission.fightT !== undefined) mission.fightT = simT - (mission.def.survive - sec); },
+    get dash() { return !!dash; }, get dashes() { return dashes; }, dashTarget: () => dashTarget()?.id || null, get yanks() { return yanks; }, setRmb(v) { rmbHeld = v; },
+    setGadget(k, v) { gadgets[k] = v; }, get swing() { return grapple.state === 'pull' && !!grapple.swing; }, get grappleState() { return grapple.state; }, get tdLabel() { return $('tdprompt').lastChild.textContent.trim(); },
     enterCover, leaveCover, get cover() { return cover ? { low: cover.low, peek: +cover.peek.toFixed(2), edge: cover.edge, u: +cover.u.toFixed(2), n: [cover.n.x, cover.n.z] } : null; }, get crouch() { return crouch; },
     ragPelvis(i) { const e = enemies[i]; return e && e.rag ? e.rag.P.pelvis.p.toArray().map((v) => +v.toFixed(2)) : null; } };
 }

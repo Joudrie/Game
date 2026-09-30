@@ -68,6 +68,14 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 3. **Gear you keep forever** from each mission (for example, the grappling hook).
 4. **Creative menu:** a catalogue of every weapon and item to drag into the inventory; attachments from each item's menu (suppressor, scope).
 
+**Batch 6: gadgets and saber moves** ✅ *done in v28* (chosen by Claude from this backlog when the owner said "continue"; change the order any time)
+1. **Throwables:** sticky grenade, fire grenade (a burning patch that sets soldiers alight and burns through boards), teleport orb. X throws the one you picked last.
+2. **Saber moves:** dash strike (attack while sprinting at a soldier), grapple yank (hold right-click as you grapple a soldier), finishers on soldiers who are down or hurt.
+3. **Grapple swing** (Spider-Man), a setting next to the zip-line.
+4. **Mission 2: Hold the courtyard.** Survive 3 minutes of reinforcements; the reward is the jetpack, for good.
+
+**Ideas for Batch 7** (the owner picks): juggernauts and shields; saber duels (enemies who block); droids that fall apart; fall damage and deadly ledges; killstreaks; first person with aim-down-sights; a first city block (Naboo-style) to fight through; customisable, saved sabers; the slanted cut that follows the blade's angle.
+
 **Later** (in the sections below): first person with ADS, leaning and quickscoping; droids; co-op (duo PvE); killstreaks and throwables; fire and sticky grenades; juggernauts and shields; saber duels; Dead Eye; stealth missions and climbing; the character creator; the Naboo city; the hoverboard; mechs; emotes; civilians and voice lines.
 
 ## Owner's answers (v22, round 3)
@@ -86,8 +94,8 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 ## ★ Current focus: dismemberment (owner, v22)
 "I really want to ace the dismemberment mechanic." Cartoon, not gory: blood yes, gore no.
 - [x] **v22:** the blade decides. Head, torso and legs kill, cut exactly where the blade passed; hands and arms come off and the soldier lives; the gun hand drops the pistol and he runs; cartoon blood and splats; grenades and pushes throw loose limbs and guns.
-- [ ] **Better reactions to losing a limb:** clutching the stump, a scream (voice lines later), switching the gun to the other hand, one-armed soldiers still shooting.
-- [ ] **Leg cuts that don't kill:** he falls and crawls.
+- [x] **Better reactions to losing a limb:** clutching the stump, a scream (voice lines later), switching the gun to the other hand, one-armed soldiers still shooting. *(done v23 (the scream waits for voice lines))*
+- [x] **Leg cuts that don't kill:** he falls and crawls. *(done v23)*
 - [ ] **The cut follows the blade's angle:** a slanted slice through the mesh instead of cutting at a joint.
 - [ ] **Droids fall apart:** sparks instead of blood, and they keep coming with missing parts.
 - [ ] **Energy shields:** a Jackal-style shield, and **juggernauts** whose skin-tight force field (like a starship's shield) takes three saber hits while they shoot you. Not yet.
@@ -134,17 +142,16 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 - **Weapon sounds** would make the owner grin.
 - **Later:** mechs, a hoverboard (a skateboard with no wheels), stealth missions.
 
-## 0. Next up: your asks from the v20 play test
-(They were on hold for The Second's rig; The Second is now shelved, so these are open.)
-- [ ] **Jetpack off by default;** you turn it on yourself. (The switch exists in the Weapon panel; the default flips.)
-- [ ] **Pistol stuck pointing at the sky:** after aiming and firing, recoil leaves the gun pointing up until the mouse moves again. Find the root cause (recoil offset not decaying while the mouse is still).
-- [ ] **Bullet holes** where shots hit boxes and the ground; short-lived decals.
+## 0. Your asks from the v20 play test
+- [x] **Jetpack off by default;** you turn it on yourself. (The switch exists in the Weapon panel; the default flips.) *(done v23)*
+- [x] **Pistol stuck pointing at the sky:** after aiming and firing, recoil leaves the gun pointing up until the mouse moves again. Find the root cause (recoil offset not decaying while the mouse is still). *(done v23)*
+- [x] **Bullet holes** where shots hit boxes and the ground; short-lived decals. *(done v23)*
 - [ ] **A better pistol model** from a free, licensed source.
 - [ ] **Move presets:** instead of rotating at random, pick a default per slot (and saved presets), e.g. "always this idle, this run".
 
 ## 1. Enemies and combat testing
 - [x] ~~Five enemy soldiers, deaths by cause (head, torso, legs, explosion, push, wall impact), bodies staying 90 s, hit reactions.~~ Done in v12.
-- [ ] **Physics ragdoll** on top of the death animations, so bodies slump over steps, roofs and each other. v14 fakes the flight (clip stretched to the flight, head-over-heels flips). *[free assets: Rapier or Jolt physics, downloaded]*
+- [x] **Physics ragdoll** on top of the death animations, so bodies slump over steps, roofs and each other. v14 fakes the flight (clip stretched to the flight, head-over-heels flips). *[free assets: Rapier or Jolt physics, downloaded]* *(done v26 (Verlet ragdoll for blast, push and wall deaths))*
   - **Bodies already on the ground ragdoll** when a grenade or Force push hits them, instead of staying frozen in their pose.
   - **Severed limbs** (a foot lying on the ground) get knocked away by grenades and Force push too.
 - [x] **Enemies that look like enemies:** SWAT officers since v21 (`tools/reskin_swat.mjs`).
@@ -157,21 +164,13 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 - [ ] **Death direction:** fall away from the shot. Needs the clips sorted by which way they fall, and mirrored copies.
 - [ ] **Health per class,** using your rules: Force lowest, heavy highest. The current numbers are placeholders and unused.
 - [ ] **Saber hits on enemies:** they already do damage (55 per hit, 90 for a heavy). Still to do: hit stop, sparks, and saber-specific deaths.
-- [ ] **Blocking stops incoming shots and attacks;** parry timing.
+- [x] **Blocking stops incoming shots and attacks;** parry timing. *(done v24)*
 - [ ] **Enemy AI:** approach, take cover, shoot. *[free assets: Yuka]*
 
 - [ ] **Zombies mode** (eventually): slow, many, keep crawling after losing legs. Later rounds bring **more zombies, not tougher ones**: each keeps a small amount of health, so it stays tactical. *[free assets: Quaternius zombie models and animations]*
-- [ ] **Dismemberment polish:** choose the cut from where the blade actually passed; **hands and arms cut off living soldiers, who keep fighting without them**; dismemberment on every model we add (droids, robots); blood decals on the ground (sparks for droids).
-- [ ] **One-touch saber lethality:** a blade that touches a soldier cuts or kills, instead of taking a slice of health.
-- [ ] **More combat moves:** air slash combos, a dash strike, a grapple yank (pull the enemy to you instead), a finisher on stunned soldiers.
-
-## 0. On hold until The Second's rig is finished (owner's order, v20.2)
-- [ ] **Jetpack off by default;** you turn it on yourself. (The switch exists in the Weapon panel; the default flips.)
-- [ ] **Pistol stuck pointing at the sky:** after aiming and firing, recoil leaves the gun pointing up until the mouse moves again. Find the root cause (recoil offset not decaying while the mouse is still).
-- [ ] **Bullet holes** where shots hit boxes and the ground; short-lived decals.
-- [ ] **A better pistol model** from a free, licensed source.
-- [ ] **Move presets:** instead of rotating at random, pick a default per slot (and saved presets), e.g. "always this idle, this run".
-- [ ] **Easy model switching:** The Second or the default hero. v20.2 put the switch in Menu → Moves; a quicker toggle could follow.
+- [x] **Dismemberment polish:** choose the cut from where the blade actually passed; **hands and arms cut off living soldiers, who keep fighting without them**; dismemberment on every model we add (droids, robots); blood decals on the ground (sparks for droids). *(done v22–v23)*
+- [x] **One-touch saber lethality:** a blade that touches a soldier cuts or kills, instead of taking a slice of health. *(done v22)*
+- [x] **More combat moves:** air slash combos, a dash strike, a grapple yank (pull the enemy to you instead), a finisher on stunned soldiers. *(done v28 (dash strike, grapple yank, finishers; air slashes still to do))*
 
 ## 1b. The Second *[later: shelved in v21]*
 The image-to-3D route was too rough: the colour step never worked on Hugging Face, Blender needs a T-pose, and image generators can't draw a side-on T-pose. The files and tools stay in the repo (`assets/characters/the-second/`, `tools/bake_the_second.py`, `tools/rig_the_second.mjs`); he's just not in the build. Add `"second": b64('the_second_rigged.glb')` back to `tools/build2.py` to bring him back.
@@ -180,10 +179,10 @@ The image-to-3D route was too rough: the colour step never worked on Hugging Fac
 ## 2. Lightsaber
 The centrepiece. It should feel like a tool you can do anything with.
 - [ ] **Drawing the saber, with a choice of carry:** at the hip, cross-draw, on the back… picked in the menu, each with its own draw.
-- [ ] **The blade is a light source:** a coloured glow on the character's face and nearby surfaces, bright enough to light a dark room like a torch.
-- [ ] **Sound:** ignite, the quiet hum, swings, clashes.
-- [ ] **Cutting the world:** sparks and glowing scorch marks when the blade cuts the ground, walls and buildings.
-- [ ] **Blade trail** as it swings and moves (the Lego Star Wars look).
+- [x] **The blade is a light source:** a coloured glow on the character's face and nearby surfaces, bright enough to light a dark room like a torch. *(done v25)*
+- [x] **Sound:** ignite, the quiet hum, swings, clashes. *(done v25 (clashes still to do))*
+- [x] **Cutting the world:** sparks and glowing scorch marks when the blade cuts the ground, walls and buildings. *(done v25)*
+- [x] **Blade trail** as it swings and moves (the Lego Star Wars look). *(done v25)*
 - [ ] **Customisable sabers,** saved as items: hilt, blade colour and more. Saved sabers appear under "saved items" in the inventory next time you play.
 - [ ] **Draw and holster animations.** v14 does it with live arm IK. Mixamo clips would look better. *[needs you: Mixamo `Draw Sword 1`/`2`, `Sheath Sword 1`/`2`]*
 - [ ] **Many more combos,** simple but plentiful, Fortnite-style. *[needs you: Mixamo Great Sword Pack, `One Hand Sword Combo`, `Two Hand Sword Combo`]*
@@ -196,11 +195,11 @@ The centrepiece. It should feel like a tool you can do anything with.
 - [ ] **Running with an ignited saber:** a dedicated run clip. *[needs you: Mixamo `Run With Sword`]*
 
 ## 3. Rifle and guns
-- [ ] **Cover shooting (RDR2 / GTA V):** a button to duck behind cover; peek out, aim out and duck back; reload crouched behind cover; blind-fire over the top without exposing yourself.
+- [x] **Cover shooting (RDR2 / GTA V):** a button to duck behind cover; peek out, aim out and duck back; reload crouched behind cover; blind-fire over the top without exposing yourself. *(done v26)*
 - [ ] **First-person mode** with aim down sights, and **leaning** around corners while aiming.
-- [ ] **Snipers that feel like Black Ops 2:** quickscoping matters; optional trickshot mechanics.
-- [ ] **More guns:** shotgun, sniper rifles and more; Fortnite-level variety.
-- [ ] **Attachments from the item menu:** right-click (long-press on a phone) a weapon in the inventory → e.g. "Add suppressor".
+- [x] **Snipers that feel like Black Ops 2:** quickscoping matters; optional trickshot mechanics. *(done v24 (trickshots still to do))*
+- [x] **More guns:** shotgun, sniper rifles and more; Fortnite-level variety. *(done v24, v27)*
+- [x] **Attachments from the item menu:** right-click (long-press on a phone) a weapon in the inventory → e.g. "Add suppressor". *(done v27 (tap the gun in the inventory))*
 - [ ] **Rifle on the back; draw and holster.** *[needs you: Mixamo `Grab Rifle From Back`, `Put Back Rifle`]*
 - [ ] **Two-handed rifle locomotion.** *[needs you: Mixamo `Rifle 8-Way Locomotion Pack`]*
 - [ ] **Cock the rifle on spawn or equip:** procedural bolt pull. *[free assets: Flat Guns East rifles have bolt bones]*
@@ -211,16 +210,16 @@ The centrepiece. It should feel like a tool you can do anything with.
   - an alternate reload about 20% of the time, just as fast
 
   *[needs you: Mixamo `Reloading`; the variants come from procedural bolt and magazine motion]*
-- [ ] **Weapon switching** between rifle and saber.
+- [x] **Weapon switching** between rifle and saber. *(done v23)*
 - [ ] **First-person mode:** arms, aim down sights, reloads. *[free assets: CC0 FPS rifle hands; better: Sketchfab ccransh FPS hands, CC-BY]*
-- [ ] **Pistol feel:** the shot, flash, tracer and hit marker work (v12). Still to do: recoil animation, sound, ammo and reload.
-- [ ] **Shotgun.** *[later]*
+- [x] **Pistol feel:** the shot, flash, tracer and hit marker work (v12). Still to do: recoil animation, sound, ammo and reload. *(done v24)*
+- [x] **Shotgun.** *[later]* *(done v24)*
 
 ## 4. Grappling hook
 - [x] ~~Grapple onto enemies.~~ Done in v13: hook, stun, pull in, strike.
-- [ ] **Swinging** (Spider-Man style) as an option next to the zip-line.
+- [x] **Swinging** (Spider-Man style) as an option next to the zip-line. *(done v28 (a setting in the Weapon panel))*
 - [ ] **Hanging and climbing on walls** when the hook lands mid-wall. *[needs you: Mixamo `Hanging Idle`, `Braced Hang`, `Climbing Up Wall`]*
-- [ ] **Grapple yank:** pull the enemy to you instead of you to them.
+- [x] **Grapple yank:** pull the enemy to you instead of you to them. *(done v28 (hold right-click as you grapple))*
 - [ ] **Rope physics:** sag and wobble on the rope.
 - [ ] **Per-character grapple:** a wrist hook only for characters who have it, from the ability pool (see section 6).
 
@@ -229,21 +228,21 @@ The centrepiece. It should feel like a tool you can do anything with.
 - [ ] **Knee slide, and a second slide for after long sprints.** *[needs you: Mixamo `Running Slide`, `Sprint To Backslide`]*
 - [ ] **Real jump, flip and landing clips.** *[needs you: Mixamo `Front Flip`, `Running Forward Flip`, `Hard Landing`]*
 - [ ] **Vault and roll** over low blocks. *[free assets: CMU vault and roll mocap]*
-- [ ] **Wall run** (fits the fun-first feel).
+- [x] **Wall run** (fits the fun-first feel). *(done v25)*
 - [ ] **The Second's green trail** when he bursts forward, and a Force dash.
 
 ## 6. Gadgets and abilities
 - [ ] **Fortnite-style weapons:** swords with lunges, a plunger-style grappling hook, fun side weapons.
-- [ ] **Grenade types:** impact (done), **fire** (leaves a trail of fire that blocks an enemy's path), **sticky** (sticks to an enemy and kills outright, even armoured ones).
+- [x] **Grenade types:** impact (done), **fire** (leaves a trail of fire that blocks an enemy's path), **sticky** (sticks to an enemy and kills outright, even armoured ones). *(done v28 (sticky and fire; plus a teleport orb))*
 - [ ] **Grappling that feels like Arkham Knight.**
 - [ ] **Fortnite-inspired gadgets** (inspired, not copied): go through the vaulted-items catalogue and pick ideas, e.g. a thrown orb that teleports you where it lands.
 - [x] ~~Jetpack~~ (v14). Still to do: fuel, a proper model and sound, and hover animations from Mixamo (`Flying`).
 - [x] ~~Impact grenade.~~ Done in v12. Still to do: a grenade model, sound, and a count per life.
 - [ ] **Ability pool assigned per character** as each one is added. Examples: wrist grapple, Force push, dash, grenades.
-- [ ] **Force moves:** push is done (v12); pull and levitate still to do. *[free assets: Power Up, Levitate clips]*
+- [x] **Force moves:** push is done (v12); pull and levitate still to do. *[free assets: Power Up, Levitate clips]* *(done v25 (pull, choke, lightning))*
 
 ## 6b. Looting and inventory
-- [ ] **Creative menu:** a catalogue of every weapon and item; drag any of them into an inventory slot. Keep it uncluttered: options live in each item's own menu (right-click / long-press), not on the main screen.
+- [x] **Creative menu:** a catalogue of every weapon and item; drag any of them into an inventory slot. Keep it uncluttered: options live in each item's own menu (right-click / long-press), not on the main screen. *(done v27)*
 - [ ] **Saved items:** customised weapons (sabers, pistols with attachments) saved and listed in the inventory.
 - [x] ~~Loot bodies (kneel, rummage, items pop up).~~ Done in v15, cosmetic.
 - [x] ~~Inventory: hotbar and backpack, loot is kept.~~ Done in v16. Pistol ammo and reloads done in v17. Still to do: stims healing once health exists, dropping items, and credits for something.
@@ -253,17 +252,17 @@ The centrepiece. It should feel like a tool you can do anything with.
 ## 6c. Enemy types, killstreaks and modes
 - [ ] **Enemy types like MW2 Spec Ops** (types, not just skins): infantry, **juggernauts** (heavily armoured), **dogs**, and later droids.
 - [ ] **Killstreaks,** e.g. a support gunship or an ally covering you, like the co-op mission "Big Brother" where someone assists you as you run through enemies.
-- [ ] **Health:** slow regenerating health (about a minute to heal fully), with the saber still one-hit lethal to enemies.
+- [x] **Health:** slow regenerating health (about a minute to heal fully), with the saber still one-hit lethal to enemies. *(done v26)*
 - [ ] **Armour** you find and wear (Skyrim-ish).
-- [ ] **Difficulty modes:** easy, normal, hard, extreme.
-- [ ] **Stealth** (Metal Gear).
+- [x] **Difficulty modes:** easy, normal, hard, extreme. *(done v26)*
+- [x] **Stealth** (Metal Gear). *(done v26 (patrols, takedowns))*
 - [ ] **Emotes** (Fortnite / Destiny).
 
 ## 6d. Destruction (Rainbow Six Siege)
 Not everything breaks, but some things do, and by material:
-- [ ] **Stone:** buildings; they take marks (bullet holes, saber scorch) but stand.
-- [ ] **Glass:** shatters completely.
-- [ ] **Wood (soft walls):** can be destroyed; the fragments stay on the ground. **Partial destruction:** a grenade in the right corner takes out mostly that corner and leaves the rest of the wall standing.
+- [x] **Stone:** buildings; they take marks (bullet holes, saber scorch) but stand. *(done v27)*
+- [x] **Glass:** shatters completely. *(done v27)*
+- [x] **Wood (soft walls):** can be destroyed; the fragments stay on the ground. **Partial destruction:** a grenade in the right corner takes out mostly that corner and leaves the rest of the wall standing. *(done v27)*
 - [ ] **Bullet holes** in soft walls you can see through.
 
 ## 7. Your characters
