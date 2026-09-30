@@ -2,6 +2,10 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v28.1: invincible while testing
+- **The player is invincible by default** (owner's rule for the testing phase). Nothing hurts you: bolts, bullets, fire, your own grenade.
+- **Every existing save is switched to it once.** The other levels (Easy to Extreme) stay under Weapon → Difficulty for trying damage out; the level is now called **Invincible** instead of Sandbox.
+
 ## v28: batch 6 (throwables, saber moves, grapple swing, Mission 2)
 - **The roadmap was finished,** so Claude picked Batch 6 from the backlog (see BACKLOG → Roadmap; change the order any time).
 - **Three new throwables** (in your backpack once: 3 sticky, 2 fire, 2 orbs; also in the creative catalogue). Pick one in the hotbar and click to throw; **X throws whichever you picked last**.

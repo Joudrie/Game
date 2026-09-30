@@ -16,6 +16,7 @@ const park = () => ev(() => { const n = __game.enemies().filter((e) => e.state !
 const put = (i, x, z, yawR, wait = 999) => ev(([i, x, z, yawR, wait]) => { __game.moveEnemy(i, x, z, yawR); __game.setMind(i, 'patrol', wait); __game.faceEnemy(i, yawR); }, [i, x, z, yawR, wait]);
 const mindOf = async (i) => (await alive())[i];
 
+check((await ev(() => __game.difficulty)) === 'sandbox' && (await ev(() => { __game.hurt(0.5); return __game.hp; })) === 1, 'invincible by default while testing (owner, v28.1)');
 await ev(() => { __game.setDifficulty('normal'); __game.place(0, 0); __game.look(0, 0.1); __game.fillEnemies(); __game.advance(1); });
 let ms = await alive();
 check(ms.length >= 5 && ms.every((m) => m.mind === 'patrol'), `soldiers start on patrol (${ms.map((m) => m.mind).join(', ')})`);
