@@ -69,6 +69,7 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #classchip b { font-weight: 700; font-size: 12px; }
 #classchip span { color: var(--ink-soft); font-size: 11px; font-family: var(--font-mono); }
 #top .spacer { flex: 1; }
+@media (max-width: 420px) { #top { gap: 4px; left: 8px; right: 8px; } #top button { padding: 6px 7px; font-size: 11px; } #classchip b { font-size: 11px; } #classchip span { display: none; } } /* four buttons and the class card fit at 375 px */
 
 #readout { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); left: var(--s4); font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; padding: var(--s2) var(--s3); }
 #perf { top: calc(var(--s4) + 60px + env(safe-area-inset-top, 0px)); left: var(--s4); max-width: calc(100vw - 2 * var(--s4)); font: 500 11px/1.4 var(--font-mono); padding: var(--s1) var(--s2); }
@@ -123,6 +124,20 @@ body.can-loot #pad .loot-only { display: inline-block; }
 #deathpanel { top: 38%; left: 50%; transform: translate(-50%, -50%); z-index: 6; padding: var(--s4) var(--s5); display: grid; gap: var(--s2); justify-items: center; text-align: center; pointer-events: auto; }
 #deathpanel b { font-size: 18px; letter-spacing: .06em; text-transform: uppercase; }
 #deathpanel span { color: var(--ink-soft); font-size: 12px; }
+#missions { position: fixed; z-index: 6; top: calc(var(--s4) + 48px + env(safe-area-inset-top, 0px)); right: var(--s4); width: min(380px, calc(100vw - 2 * var(--s4))); max-height: 70vh; display: flex; flex-direction: column; pointer-events: auto; padding: 0; }
+#missions header { display: flex; align-items: center; gap: var(--s2); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
+#missions header h2 { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin: 0; flex: 1; }
+#missions .body { overflow-y: auto; padding: 0 var(--s4) var(--s4); }
+#missions h3 { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin: var(--s5) 0 var(--s2); }
+.mcard { display: grid; gap: var(--s1); padding: var(--s3); border: 1px solid var(--line); border-radius: var(--r); margin-top: var(--s3); }
+.mcard span { color: var(--ink-soft); font-size: 12px; line-height: 1.45; }
+.mcard button { justify-self: start; margin-top: var(--s1); min-height: 36px; }
+#mhud { top: calc(var(--s4) + 100px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); padding: var(--s1) var(--s3); font: 500 12px var(--font-mono); white-space: nowrap; max-width: calc(100vw - 32px); overflow: hidden; text-overflow: ellipsis; }
+#mdone { top: 38%; left: 50%; transform: translate(-50%, -50%); z-index: 6; padding: var(--s4) var(--s5); display: grid; gap: var(--s2); justify-items: center; text-align: center; pointer-events: auto; width: min(360px, calc(100vw - 32px)); }
+#mdone b { font-size: 18px; letter-spacing: .06em; text-transform: uppercase; }
+#mdone span { color: var(--ink-soft); font-size: 12px; line-height: 1.45; }
+#mdone .row2 { display: flex; gap: var(--s2); }
+.attrow { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; margin-top: var(--s2); font-size: 12px; color: var(--ink-soft); }
 #scope { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(circle at 50% 50%, transparent 0 31vmin, rgba(0,0,0,.92) 32vmin); }
 #scope::before, #scope::after { content: ''; position: absolute; background: rgba(0,0,0,.8); }
 #scope::before { left: 50%; top: calc(50% - 31vmin); width: 1px; height: 62vmin; }
@@ -191,6 +206,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 <div id="top" class="hud">
   <button type="button" id="classchip" class="panel" aria-label="Change class"><b id="classname">Light infantry</b><span id="classstats"></span></button>
   <div class="spacer"></div>
+  <button type="button" id="missionsbtn" aria-expanded="false" aria-controls="missions">Missions</button>
   <button type="button" id="gearbtn" aria-expanded="false" aria-controls="weapon">Weapon</button>
   <button type="button" id="invbtn" aria-expanded="false" aria-controls="inv">Inventory</button>
   <button type="button" id="movesbtn">Menu</button>
@@ -200,9 +216,11 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 <section id="inv" class="hud panel" hidden aria-label="Inventory">
   <header><h2>Inventory</h2><span class="hint">Drag to move · or tap one, then another</span><button type="button" id="invclose">Close</button></header>
   <div class="invbody">
-    <h3>Hotbar <small>scroll or 1–5 in play</small></h3><div class="grid hot" id="invhot"></div>
+    <h3>Hotbar <small>scroll or 1–6 in play</small></h3><div class="grid hot" id="invhot"></div>
     <h3>Backpack</h3><div class="grid" id="invbag"></div>
     <p class="note" id="invinfo" aria-live="polite">&nbsp;</p>
+    <div id="invatt" class="attrow" hidden></div>
+    <div id="invcreative"><h3>Creative <small>sandbox: click to add</small></h3><div class="grid" id="invcat"></div></div>
   </div>
 </section>
 <div id="dragghost" hidden></div>
@@ -211,6 +229,12 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
   <div class="body" id="weaponbody"></div>
 </section>
 
+<section id="missions" class="hud panel" hidden aria-label="Missions">
+  <header><h2>Missions</h2><button type="button" id="missionsclose">Close</button></header>
+  <div class="body" id="missionsbody"></div>
+</section>
+<div id="mhud" class="hud panel" hidden aria-live="polite"><span id="mhudtext"></span></div>
+<section id="mdone" class="hud panel" hidden role="dialog" aria-label="Mission complete"><b>Mission complete</b><span id="mdonetext"></span><div class="row2"><button type="button" id="mdoneagain">Play again</button><button type="button" id="mdoneback">Back to the sandbox</button></div></section>
 <div id="perf" class="hud panel" hidden aria-live="off"></div>
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
 <div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
@@ -226,7 +250,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 <div id="hurt" aria-hidden="true"></div>
 <div id="hpbar" class="hud" hidden role="meter" aria-label="Health"><i></i></div>
 <div id="tdprompt" class="hud panel" hidden><kbd>F</kbd> Takedown</div>
-<section id="deathpanel" class="hud panel" hidden role="alertdialog" aria-label="You died"><b>You died</b><span id="deathcause"></span><button type="button" id="respawnbtn">Respawn</button><span id="deathhint" hidden>Enter to respawn · move the mouse to look around</span></section>
+<section id="deathpanel" class="hud panel" hidden role="alertdialog" aria-label="You died"><b>You died</b><span id="deathcause"></span><button type="button" id="respawnbtn">Respawn</button><button type="button" id="deathquit" hidden>Quit mission</button><span id="deathhint" hidden>Enter to respawn · move the mouse to look around</span></section>
 <div id="pad" class="hud">
   <button type="button" id="grapplebtn">Grapple</button>
   <button type="button" id="blockbtn" class="armed-only">Block</button>
@@ -485,6 +509,51 @@ function buildCity() {
   }
 }
 buildCity();
+// ---------------- the courtyard (v27): a walled test arena 175 m north of the start ----------------
+// Stone walls, pillars and a balcony (a ledge to fall from, snipers' perch) only take marks. Wooden walls are built from
+// boards that break one at a time; crates break whole. Glass shatters and lets shots through. Home of Mission 1.
+const COURT = { x: 0, z: 175, half: 22 };
+const MATS = {
+  stone: new THREE.MeshLambertMaterial({ color: 0xd3c7a8 }), wood: new THREE.MeshLambertMaterial({ color: 0x9a6b3c }), crate: new THREE.MeshLambertMaterial({ color: 0xa47a45 }),
+  glass: new THREE.MeshStandardMaterial({ color: 0xbfe6f5, transparent: true, opacity: 0.3, roughness: 0.05, metalness: 0.1, depthWrite: false }),
+};
+const MAT_EDGE = { stone: new THREE.LineBasicMaterial({ color: 0xa89d80 }), wood: new THREE.LineBasicMaterial({ color: 0x5e3c1e }), crate: new THREE.LineBasicMaterial({ color: 0x5e3c1e }) };
+const MAT_HP = { wood: 90, crate: 160 };
+function addPart(x0, y0, z0, x1, y1, z1, mat = 'stone') {
+  const box = new THREE.Box3(new V3(x0, y0, z0), new V3(x1, y1, z1)), size = box.getSize(new V3());
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(size.x, size.y, size.z), MATS[mat]); box.getCenter(mesh.position);
+  mesh.castShadow = mesh.receiveShadow = mat !== 'glass';
+  if (MAT_EDGE[mat]) mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry), MAT_EDGE[mat]));
+  const b = { box, mesh, mat: mat === 'crate' ? 'wood' : mat, hp: MAT_HP[mat] || 0, court: true }; mesh.userData.block = b;
+  scene.add(mesh); blocks.push(b); return b;
+}
+function buildCourtyard() {
+  const { x: X, z: Z, half: R } = COURT;
+  // clear any city block standing in the way
+  const zone = new THREE.Box3(new V3(X - R - 6, 0, Z - R - 6), new V3(X + R + 6, 99, Z + R + 12));
+  for (const b of [...blocks]) if (b.box.intersectsBox(zone)) { scene.remove(b.mesh); blocks.splice(blocks.indexOf(b), 1); }
+  const W = (x0, z0, x1, z1, h = 5) => addPart(X + x0, 0, Z + z0, X + x1, h, Z + z1);
+  W(-R - 1, -R - 1, -2, -R); W(2, -R - 1, R + 1, -R);   // south wall, with the gate you come in by
+  W(-R - 1, R, -3, R + 1); W(3, R, R + 1, R + 1);       // north wall and its gate
+  W(-R - 1, -R, -R, R); W(R, -R, R + 1, R);             // west and east
+  W(-R, -R, -R + 5, -R + 5, 8);                         // a tall corner tower (grapple up, fall off)
+  // the balcony along the north wall: a ledge 3.4 m up with a low parapet, stairs at both ends
+  addPart(X - 20, 3.0, Z + 16, X + 20, 3.4, Z + R);
+  addPart(X - 16.5, 3.4, Z + 16, X + 16.5, 4.3, Z + 16.35);
+  for (let i = 0; i < 8; i++) for (const s of [-1, 1]) { const x0 = s < 0 ? X - 20 : X + 17; addPart(x0, 0, Z + 10 + i * 0.75, x0 + 3, 0.4 * (i + 1), Z + 16); }
+  for (const [px, pz] of [[-9, -10], [9, -10], [-9, 8], [9, 8]]) addPart(X + px - 0.6, 0, Z + pz - 0.6, X + px + 0.6, 5, Z + pz + 0.6); // pillars
+  // crates: low cover that breaks
+  for (const [cx, cz] of [[-5, -7], [6, -3], [-13, 1], [13, -9], [1, 7], [-15, -14], [14, 12], [-3, -16]]) addPart(X + cx - 0.6, 0, Z + cz - 0.6, X + cx + 0.6, 1.2, Z + cz + 0.6, 'crate');
+  // wooden walls: boards 1 m wide in two rows, so they break partly
+  const woodWall = (x0, x1, z) => { for (let x = x0; x < x1 - 0.01; x += 1) for (const [y0, y1] of [[0, 1.2], [1.2, 2.4]]) addPart(X + x, y0, Z + z, X + x + 1, y1, Z + z + 0.25, 'wood'); };
+  woodWall(-16, -8, 3); woodWall(8, 16, -5);
+  // a glass front: stone sill, eight panes, stone lintel
+  addPart(X + 4, 0, Z - 15, X + 16, 0.9, Z - 14.7); addPart(X + 4, 2.4, Z - 15, X + 16, 2.8, Z - 14.7);
+  for (let x = 4; x < 16 - 0.01; x += 1.5) addPart(X + x, 0.9, Z - 14.9, X + x + 1.5, 2.4, Z - 14.8, 'glass');
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(2 * R, 2 * R), new THREE.MeshLambertMaterial({ color: 0xc9bd9f })); // paving
+  floor.rotation.x = -Math.PI / 2; floor.position.set(X, 0.004, Z); floor.receiveShadow = true; scene.add(floor);
+}
+buildCourtyard();
 const blockMeshes = blocks.map((b) => b.mesh);
 const PR = 0.35; // player radius
 function groundAt(x, z, y) {
@@ -568,9 +637,10 @@ async function boot() {
   const [h, u1, u2] = await Promise.all([parseGLB(A.hero), parseGLB(A.ual1), parseGLB(A.ual2)]);
   log('boot', BUILD);
   for (const c of [...u1.animations, ...u2.animations]) clips.set(c.name, c);
-  for (const j of (EXTRA.clips || [])) { const c = THREE.AnimationClip.parse(j); clips.set(c.name, c); }
+  for (const j of (EXTRA.clips || [])) { if (j.T) for (const t of j.tracks) if (!t.times) t.times = j.T; const c = THREE.AnimationClip.parse(j); clips.set(c.name, c); } // tools/build2.py stores shared key times once per clip
   fillMissingTracks();
   try { rifleModel = (await parseGLB(A.rifle)).scene; pistolModel = (await parseGLB(A.pistol)).scene; } catch (e) { report('error', 'Weapon model failed: ' + e.message); }
+  for (const [k, v] of Object.entries(A.att || {})) { try { attModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Attachment ${k} failed: ` + e.message); } }
   for (const [k, v] of Object.entries(A.guns || {})) { try { gunModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Gun model ${k} failed: ` + e.message); } }
   try { if (A.jetpack) jetpackModel = new OBJLoader().parse(new TextDecoder().decode(decodeB64(A.jetpack))); } catch (e) { report('error', 'Jetpack model failed: ' + e.message); }
   // height to 1.8 m, feet on the ground
@@ -614,7 +684,7 @@ async function boot() {
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
   poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
-  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildGuns(); buildFist(); buildGuardPose(); buildJetpack(); buildMags(); renderThumbs();
+  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildGuns(); for (const k of Object.keys(guns)) applyAtt(k); buildFist(); buildGuardPose(); buildJetpack(); buildMags(); renderThumbs();
   mixer = new THREE.AnimationMixer(hero);
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
@@ -859,6 +929,8 @@ const GUNS = {
              reload: [1.5, 1.9], len: 0.88, grip: [0.36, 0.42], fore: [0.63, 0.3], model: 'ak', bolt: 'bullet' },
   shotgun: { name: 'Pump shotgun', ammo: 'ammo_shells', mag: 6, cd: 0.85, pellets: 9, spread: 0.065, dmg: { head: 45, torso: 30, legs: 22 }, falloff: [8, 26], sound: 'shotgun', after: 'pump', kick: 1.7, camKick: 0.03,
              reload: [1.7, 2.1], len: 1.0, grip: [0.3, 0.45], fore: [0.62, 0.45], model: 'shotgun', knock: 7, bolt: 'bullet' },
+  ar:      { name: 'M4 carbine', ammo: 'ammo_rifle', mag: 30, cd: 0.085, auto: true, pellets: 1, spread: 0.005, bloom: 0.002, dmg: { head: 100, torso: 34, legs: 26 }, sound: 'ar', kick: 0.35, camKick: 0.005,
+             reload: [1.4, 1.8], len: 0.84, grip: [0.34, 0.52], fore: [0.64, 0.36], model: 'ar', bolt: 'bullet' },
   sniper:  { name: 'Sniper rifle', ammo: 'ammo_sniper', mag: 5, cd: 1.2, pellets: 1, spread: 0, dmg: { head: 300, torso: 200, legs: 160 }, zoom: 20, sound: 'sniper', after: 'bolt', kick: 2, camKick: 0.035,
              reload: [1.8, 2.2], len: 1.2, grip: [0.26, 0.5], fore: [0.5, 0.45], model: 'sniper', bolt: 'bullet' },
 };
@@ -912,6 +984,36 @@ function setGunKind(kind) {
   if (gunMag) { if (kind === 'pistol') pistol.root.add(gunMag); else gunMag.removeFromParent(); }
   pistolInHand = inHand; placePistol(); reload = null; renderAmmo();
 }
+// ---------------- attachments (v27) ----------------
+// Each gun can carry a suppressor (quiet: soldiers only hear it within 8 m) and a scope (aiming zooms in 2.5x, with the
+// scope view). Set them from the gun's slot in the inventory. Models: Quaternius Ultimate Gun Pack (CC0).
+const ATT = { suppressor: { name: 'Suppressor', fits: ['pistol', 'ak', 'ar', 'sniper'] }, scope: { name: 'Scope', fits: ['pistol', 'ak', 'ar', 'shotgun'] } };
+const attModels = {};
+let gunAtt = {};
+try { gunAtt = JSON.parse(localStorage.getItem('gunatt') || '{}') || {}; } catch (_) {}
+const saveAtt = () => { try { localStorage.setItem('gunatt', JSON.stringify(gunAtt)); } catch (_) {} };
+const hasAtt = (kind, a) => !!gunAtt[kind]?.[a] && ATT[a].fits.includes(kind);
+function setAtt(kind, a, on) { if (!ATT[a]?.fits.includes(kind)) return; (gunAtt[kind] = gunAtt[kind] || {})[a] = !!on; saveAtt(); applyAtt(kind); log('attachment', kind, a, on); }
+// hang the attachment models on the gun (a group named 'att'; soldiers' copies of the gun leave it off)
+function applyAtt(kind) {
+  const g = guns[kind]; if (!g) return;
+  g.root.getObjectByName('att')?.removeFromParent();
+  const inner = g.root.children[0]; if (!inner) return;
+  g.root.updateMatrixWorld(true);
+  const inv0 = g.root.matrixWorld.clone().invert(), box = new THREE.Box3().setFromObject(inner).applyMatrix4(inv0), size = box.getSize(new V3());
+  const grp = new THREE.Group(); grp.name = 'att';
+  const place = (model, len, at, alongMin) => { // scale to length along x, then line its end (or its middle) up with `at`
+    const m = model.clone(true); m.updateMatrixWorld(true); const mb = new THREE.Box3().setFromObject(m), ms = mb.getSize(new V3());
+    m.scale.multiplyScalar(len / ms.x); m.updateMatrixWorld(true); const b2 = new THREE.Box3().setFromObject(m), c2 = b2.getCenter(new V3());
+    m.position.set(at.x - (alongMin ? b2.min.x : c2.x), at.y - (alongMin ? c2.y : b2.min.y), at.z - c2.z); grp.add(m);
+  };
+  const small = kind === 'pistol';
+  if (hasAtt(kind, 'suppressor') && attModels.suppressor) place(attModels.suppressor, small ? 0.1 : 0.17, g.muzzle, true);
+  if (hasAtt(kind, 'scope') && attModels.scope) place(attModels.scope, small ? 0.1 : Math.min(0.3, size.x * 0.3), new V3(box.min.x + size.x * (small ? 0.5 : 0.45), box.max.y - size.y * (small ? 0.02 : 0.12), (box.min.z + box.max.z) / 2), false);
+  grp.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+  if (grp.children.length) g.root.add(grp);
+}
+const gunZoom = () => G().zoom || (hasAtt(gunKind, 'scope') ? 24 : 0);
 // ---------------- sound (v24) ----------------
 // Short, trimmed CC0 clips (build/sfx, made by tools/make_sfx.sh). Web Audio starts on the first click or key.
 const audio = { ctx: null, buf: {} };
@@ -1400,6 +1502,7 @@ function playGrappleAnim(slot, loop) {
 }
 function grapplePress() {
   if (movesOpen || !hero) return;
+  if (mission && !kept.has('grapple') && grapple.state === 'idle') { toast('Grappling hook: finish Mission 1 to keep it', 1500); return; }
   if (grapple.state === 'pull' || grapple.state === 'fire') { releaseGrapple(false); return; }
   if (grapple.state !== 'idle') return;
   const h = grappleTarget();
@@ -1557,22 +1660,22 @@ function pickFrom(list, key) {
   return (lastPick[key] = ok[i]);
 }
 const ENEMY_BONES = ['Head', 'neck_01', 'pelvis', 'spine_02', 'thigh_l', 'calf_l', 'foot_l', 'thigh_r', 'calf_r', 'foot_r', 'upperarm_l', 'lowerarm_l', 'upperarm_r', 'lowerarm_r', 'hand_r'];
-function spawnEnemy(at) {
+function spawnEnemy(at, kind, mind) {
   if (!enemyTemplate) return null;
   const root = cloneSkinned(enemyTemplate);
   root.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.castShadow = true; o.frustumCulled = false; } });
   const g = new THREE.Group(); g.add(root); g.position.copy(at); scene.add(g);
   const bones = {}; root.traverse((o) => { if (ENEMY_BONES.includes(o.name)) bones[o.name] = o; });
   let gun = null;
-  const gunKind = guns.ak && Math.random() < 0.3 ? 'ak' : 'pistol'; // most carry blaster pistols; about a third carry AK-47s
+  const gunKind = kind && guns[kind] ? kind : guns.ak && Math.random() < 0.3 ? 'ak' : 'pistol'; // most carry blaster pistols; about a third carry AK-47s
   if (pistolModel && mounts.pistolHand) {
-    gun = guns[gunKind].root.clone(true); bones.hand_r.add(gun);
+    gun = guns[gunKind].root.clone(true); gun.getObjectByName('att')?.removeFromParent(); bones.hand_r.add(gun);
     gun.position.copy(mounts.pistolHand.p); gun.quaternion.copy(mounts.pistolHand.q); gun.scale.copy(mounts.pistolHand.s);
   }
   const e = { g, root, bones, mixer: new THREE.AnimationMixer(root), act: null, hp: 100, total: 0, dmg: { head: 0, torso: 0, legs: 0 },
     state: 'engage', yaw: Math.atan2(player.position.x - at.x, player.position.z - at.z), vel: new V3(), fireT: 1 + Math.random() * 2,
     strafe: Math.random() < 0.5 ? 1 : -1, strafeT: 2 + Math.random() * 2, hitT: 0, deadT: 0, id: Math.random().toString(36).slice(2, 6), hitBy: new Set(), gun, gunKind,
-    mind: enemies.some((o) => o.state !== 'dead' && o.mind === 'combat') ? 'combat' : 'patrol' }; // reinforcements join a fight already on
+    mind: mind || (enemies.some((o) => o.state !== 'dead' && o.mind === 'combat') ? 'combat' : 'patrol') }; // reinforcements join a fight already on
   enemies.push(e); eplay(e, 'SW_Idle_Gun_Pointing');
   return e;
 }
@@ -1585,7 +1688,7 @@ function eplay(e, name, { loop = true, fade = 0.2, from = 0, speed = 1 } = {}) {
   if (e.act && e.act !== a) { e.act.fadeOut(fade); a.fadeIn(fade); }
   e.act = a; e.actName = name;
 }
-function removeEnemy(e) { scene.remove(e.g); e.mixer.stopAllAction(); e.mixer.uncacheRoot(e.root); enemies.splice(enemies.indexOf(e), 1); }
+function removeEnemy(e) { if (e.laser) scene.remove(e.laser); scene.remove(e.g); e.mixer.stopAllAction(); e.mixer.uncacheRoot(e.root); enemies.splice(enemies.indexOf(e), 1); }
 function openSpot(minR, maxR) {
   for (let i = 0; i < 40; i++) {
     const a = Math.random() * Math.PI * 2, r = minR + Math.random() * (maxR - minR);
@@ -1596,7 +1699,7 @@ function openSpot(minR, maxR) {
 }
 let respawnT = 0, filled = false;
 function keepEnemiesUp(dt) {
-  if (!enemyCfg.on || !enemyTemplate || !hero) return;
+  if (!enemyCfg.on || !enemyTemplate || !hero || mission) return; // a mission brings its own waves
   const alive = enemies.filter((e) => e.state !== 'dead').length;
   respawnT -= dt;
   if (alive >= enemyCfg.count) filled = true;
@@ -1604,14 +1707,15 @@ function keepEnemiesUp(dt) {
   if (alive < enemyCfg.count && respawnT <= 0) { spawnEnemy(openSpot(filled ? 20 : 12, filled ? 34 : 24)); respawnT = filled ? 3 : 0.1; }
 }
 function collideCircle(p, r) {
-  let hit = null;
-  for (const { box: B } of blocks) {
+  let hit = null; collideCircle.block = null;
+  for (const blk of blocks) {
+    const B = blk.box;
     if (p.y >= B.max.y - 0.05 || p.y + 1.7 <= B.min.y) continue;
     const cx = clamp(p.x, B.min.x, B.max.x), cz = clamp(p.z, B.min.z, B.max.z);
     const dx = p.x - cx, dz = p.z - cz, d2 = dx * dx + dz * dz;
     if (d2 >= r * r) continue;
     const d = Math.sqrt(d2) || 1e-3, nx = dx / d || 1, nz = dz / d;
-    p.x += nx * (r - d); p.z += nz * (r - d); hit = new V3(nx, 0, nz);
+    p.x += nx * (r - d); p.z += nz * (r - d); hit = new V3(nx, 0, nz); collideCircle.block = blk;
   }
   return hit;
 }
@@ -1645,8 +1749,9 @@ function updateEnemies(dt) {
       e.vel.y -= 20 * dt;
       pos.addScaledVector(e.vel, dt);
       const hs = Math.hypot(e.vel.x, e.vel.z);
-      const wall = collideCircle(pos, 0.35);
-      if (wall && hs > 7) { log('enemy hit a wall at', hs.toFixed(1), 'm/s'); e.ragV = e.vel.clone(); damageEnemy(e, 999, 'torso', 'impact'); e.vel.set(0, Math.min(e.vel.y, 0), 0); continue; }
+      const wall = collideCircle(pos, 0.35), wb = collideCircle.block;
+      if (wall && hs > 5 && wb && (wb.mat === 'wood' || wb.mat === 'glass')) { breakBlock(wb, e.vel.clone(), 6); e.vel.x *= 0.7; e.vel.z *= 0.7; } // thrown through boards or glass (v27)
+      else if (wall && hs > 7) { log('enemy hit a wall at', hs.toFixed(1), 'm/s'); e.ragV = e.vel.clone(); damageEnemy(e, 999, 'torso', 'impact'); e.vel.set(0, Math.min(e.vel.y, 0), 0); continue; }
       else if (wall) { e.vel.x *= -0.3; e.vel.z *= -0.3; }
       const gy = groundAt(pos.x, pos.z, pos.y - e.vel.y * dt);
       if (pos.y <= gy && e.vel.y < 0) {
@@ -1702,6 +1807,7 @@ function updateEnemies(dt) {
       else if (dist < 7) { move.copy(fwd).negate(); sp = 2.4; clip = 'SW_Run_Back'; }
       else if (Math.random() < 0.004) e.strafe = 0;
       else if (e.strafe) { move.copy(side).multiplyScalar(e.strafe); sp = 2.2; clip = e.strafe > 0 ? 'SW_Run_Right' : 'SW_Run_Left'; }
+      if (e.hold) { move.set(0, 0, 0); sp = 0; clip = 'SW_Idle_Gun_Pointing'; } // snipers keep their perch
       pos.addScaledVector(move, sp * dt);
       collideCircle(pos, 0.35);
       pos.y = groundAt(pos.x, pos.z, pos.y + 0.3);
@@ -1709,14 +1815,18 @@ function updateEnemies(dt) {
       // shoot: blaster pistols fire bolts you can see, block and parry; AK-47s fire bursts of bullets you can't deflect
       e.fireT -= dt;
       if (!e.los) e.fireT = Math.max(e.fireT, 0.5);
-      if (e.gunKind !== 'ak' && e.fireT < 0.4 && !e.tell && dist < 50) { e.tell = true; glint(muzzleOf(e)); } // the tell before a bolt: time your block to it
-      if (e.fireT <= 0 && dist < 50) {
+      const range = e.gunKind === 'sniper' ? 120 : 50, rifle = e.gunKind === 'ak' || e.gunKind === 'ar';
+      if (!rifle && e.fireT < 0.4 && !e.tell && dist < range) { e.tell = true; glint(muzzleOf(e)); } // the tell before a bolt (or a sniper's scope glint): time your block to it
+      if (e.gunKind === 'sniper') sniperLaser(e, e.los && e.fireT < 1.3 && dist < range);
+      if (e.fireT <= 0 && dist < range) {
         e.tell = false;
         if (e.gunKind === 'ak') { e.fireT = (1.6 + Math.random() * 1.6) * DF().react; e.burst = 3; e.burstT = 0; }
+        else if (e.gunKind === 'ar') { e.fireT = (1.3 + Math.random() * 1.2) * DF().react; e.burst = 4; e.burstT = 0; }
+        else if (e.gunKind === 'sniper') { e.fireT = (3 + Math.random() * 1.5) * DF().react; sniperShot(e); }
         else { e.fireT = (1.1 + Math.random() * 1.6) * DF().react; shootBolt(e); }
         if (sp === 0) eplay(e, 'SW_Idle_Gun_Shoot', { loop: false, fade: 0.08 });
       }
-      if (e.burst > 0 && (e.burstT -= dt) <= 0) { e.burst--; e.burstT = 0.1; enemyBullet(e); }
+      if (e.burst > 0 && (e.burstT -= dt) <= 0) { e.burst--; e.burstT = e.gunKind === 'ar' ? 0.08 : 0.1; enemyBullet(e); }
     } else eplay(e, 'SW_Idle_Gun_Pointing');
     e.g.rotation.y = e.yaw;
     emix(e, dt);
@@ -1762,12 +1872,13 @@ function firePistol(aimDir) {
   const D = G();
   if (ammo.mag <= 0) { fireCd = 0.25; if (!startReload()) toast(`Out of ${D.name} ammo: loot some`, 1300); return; } // dry: reload if you can
   const blind = !!cover && !aimHeld; // blind fire from cover: the gun comes over the top, the shots go wild
-  fireCd = D.cd; recoil = D.kick; fireRaiseT = blind ? 0 : 0.7; noise(player.position, HEAR[gunKind] || 40);
+  const sup = hasAtt(gunKind, 'suppressor');
+  fireCd = D.cd; recoil = D.kick; fireRaiseT = blind ? 0 : 0.7; noise(player.position, sup ? 8 : HEAR[gunKind] || 40);
   ammo.mag--; saveAmmo(); renderAmmo();
   if (ammo.mag === 0) setTimeout(() => { if (ammo.mag === 0 && gear === 'pistol') startReload(); }, 250); // empty: reload on its own
   const base = aimDir || camera.getWorldDirection(new V3()), o = camera.position.clone();
   const muzzle = pistol ? pistol.root.localToWorld(pistol.muzzle.clone()) : wrist();
-  flash(muzzle); sfx(D.sound, null, 0.9);
+  if (!sup) flash(muzzle); sfx(sup ? 'suppressed' : D.sound, null, sup ? 0.8 : 0.9);
   if (D.after) setTimeout(() => sfx(D.after, null, 0.8), D.cd * 400);
   const aimed = aimHeld && isStrafing();
   const cone = (D.spread + bloom + (blind ? 0.1 : 0)) * (aimed ? 0.6 : 1);
@@ -1776,10 +1887,7 @@ function firePistol(aimDir) {
   for (let pI = 0; pI < D.pellets; pI++) {
     const dir = base.clone();
     if (cone > 0) { const a = Math.random() * Math.PI * 2, r = cone * Math.sqrt(Math.random()); const u = new V3().crossVectors(dir, new V3(0, 1, 0)).normalize(), v = new V3().crossVectors(u, dir); dir.addScaledVector(u, Math.cos(a) * r).addScaledVector(v, Math.sin(a) * r).normalize(); }
-    aimRay.set(o, dir); aimRay.far = 300;
-    const wall = aimRay.intersectObjects(blockMeshes, false)[0];
-    const far = wall ? wall.distance : 300;
-    const hit = rayZones(o, dir, far);
+    const { wall, far, hit } = castShot(o, dir, D.dmg.torso); // through glass, and through wood it breaks
     const end = hit ? hit.point : wall ? wall.point : o.clone().addScaledVector(dir, far);
     tracer(muzzle, end, 0xfff1c2);
     if (!hit) { impact(o, dir, wall, far); continue; }
@@ -2131,6 +2239,7 @@ function forcePush() {
     if (e.state === 'dead') { if (enemyCfg.pushBodies) shoveBody(e, d.multiplyScalar(10 + 10 * k).add(new V3(0, 3 + 3 * k, 0))); continue; }
     knock(e, d.multiplyScalar(14 + 14 * k).add(new V3(0, 4 + 4 * k, 0)), 30, 'push'); n++;
   }
+  for (const b of [...blocks]) if (b.mat === 'wood' || b.mat === 'glass') { const d = b.box.getCenter(new V3()).sub(player.position); d.y = 0; const dist = d.length(); if (dist < 9 && d.normalize().dot(f) > 0.6) breakBlock(b, f, 12); } // v27: boards and glass in the cone
   for (const pc of pieces) { // severed limbs and dropped guns in the cone fly too
     const d = pc.outer.position.clone().sub(player.position); d.y = 0; const dist = d.length();
     if (dist > 14 || d.normalize().dot(f) < 0.64) continue;
@@ -2258,7 +2367,7 @@ function updateGrenades(dt) {
   }
 }
 function explode(at, direct, gvel) {
-  blast(at); dust(new V3(at.x, groundAt(at.x, at.z, at.y + 0.5), at.z), 1.6); noise(at, HEAR.explosion);
+  blast(at); dust(new V3(at.x, groundAt(at.x, at.z, at.y + 0.5), at.z), 1.6); noise(at, HEAR.explosion); sfx('boom', at, 1); breakAround(at, 3.5, 9);
   // your own blast: close in, it blows you apart like anyone else; further out it hurts (v26)
   if (!dead && DF().hits !== Infinity) {
     const d = player.position.clone().add(new V3(0, 0.9, 0)).sub(at), dist = d.length();
@@ -2312,6 +2421,71 @@ function flash(at) {
   const m = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffe08a, transparent: true, opacity: 1, depthWrite: false }));
   m.position.copy(at); scene.add(m); fx.push({ m, t: 0, life: 0.06 });
 }
+// ---------------- breaking things (v27) ----------------
+// Glass shatters at the first hit (shots carry on through). Wood takes damage and breaks into chunks that stay
+// a while. Blasts, the Force push, the saber and soldiers thrown into it break it too. Stone only takes marks.
+const debris = [];
+function removeBlock(b) { const i = blocks.indexOf(b); if (i < 0) return false; blocks.splice(i, 1); const j = blockMeshes.indexOf(b.mesh); if (j >= 0) blockMeshes.splice(j, 1); scene.remove(b.mesh); return true; }
+let broken = { glass: 0, wood: 0 };
+function breakBlock(b, dir, force = 4) {
+  if (!removeBlock(b)) return;
+  const B = b.box, size = B.getSize(new V3()), c = B.getCenter(new V3()), d = (dir || new V3()).clone().setY(0).normalize();
+  broken[b.mat] = (broken[b.mat] || 0) + 1;
+  if (b.mat === 'glass') {
+    sfx(Math.random() < 0.5 ? 'glass' : 'glass2', c, 1);
+    const mat = new THREE.MeshBasicMaterial({ color: 0xd8f1fb, transparent: true, opacity: 0.8, side: THREE.DoubleSide, depthWrite: false });
+    for (let i = 0; i < 22; i++) {
+      const m = new THREE.Mesh(new THREE.CircleGeometry(0.05 + Math.random() * 0.08, 3), mat.clone());
+      m.position.set(B.min.x + Math.random() * size.x, B.min.y + Math.random() * size.y, B.min.z + Math.random() * size.z); m.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6); scene.add(m);
+      fx.push({ m, t: 0, life: 1.6 + Math.random(), vel: d.clone().multiplyScalar(force * (0.3 + Math.random() * 0.6)).add(new V3((Math.random() - 0.5) * 2.5, Math.random() * 2, (Math.random() - 0.5) * 2.5)) });
+    }
+    return;
+  }
+  sfx(Math.random() < 0.5 ? 'wood' : 'wood2', c, 1); dust(new V3(c.x, B.min.y, c.z), 0.7);
+  // chunks: the board (or crate) splits into a 3 x 2 grid of pieces along its longer side
+  const long = size.x >= size.z ? 'x' : 'z', nx = 3, ny = 2;
+  for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+    const s = size.clone(); s[long] /= nx; s.y /= ny; s.multiplyScalar(0.9);
+    const m = new THREE.Mesh(new THREE.BoxGeometry(s.x, s.y, s.z), b.mesh.material); m.castShadow = true;
+    const p = B.min.clone(); p[long] += (i + 0.5) * size[long] / nx; p.y += (j + 0.5) * size.y / ny; p[long === 'x' ? 'z' : 'x'] = c[long === 'x' ? 'z' : 'x'];
+    m.position.copy(p); scene.add(m);
+    debris.push({ m, vel: d.clone().multiplyScalar(force * (0.5 + Math.random() * 0.6)).add(new V3((Math.random() - 0.5) * 3, 1.5 + Math.random() * 3, (Math.random() - 0.5) * 3)),
+      axis: new V3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), spin: 4 + Math.random() * 8, rest: false, t: 0, h: s.y / 2 });
+  }
+  while (debris.length > 140) { scene.remove(debris[0].m); debris.shift(); }
+}
+function updateDebris(dt) {
+  for (const k of [...debris]) {
+    k.t += dt;
+    if (k.t > 40) { k.m.material = k.m.material.transparent ? k.m.material : k.m.material.clone(); k.m.material.transparent = true; k.m.material.opacity = Math.max(0, 1 - (k.t - 40) / 2); if (k.t > 42) { scene.remove(k.m); debris.splice(debris.indexOf(k), 1); } }
+    if (k.rest) continue;
+    k.vel.y -= 20 * dt; k.m.position.addScaledVector(k.vel, dt); k.m.rotateOnAxis(k.axis, k.spin * dt);
+    const gy = groundAt(k.m.position.x, k.m.position.z, k.m.position.y + 0.3) + k.h * 0.6;
+    if (k.m.position.y < gy) { k.m.position.y = gy; if (Math.abs(k.vel.y) < 1.5) { k.rest = true; continue; } k.vel.set(k.vel.x * 0.4, -k.vel.y * 0.3, k.vel.z * 0.4); k.spin *= 0.5; }
+  }
+}
+// a shot, a bolt or a blow meeting a block: 'through' when it broke and the shot carries on, 'stop' otherwise
+function hitBlock(b, dmg, at, dir) {
+  if (!b || !b.mat || b.mat === 'stone') return 'stop';
+  if (b.mat === 'glass') { breakBlock(b, dir, 3); return 'through'; }
+  b.hp -= dmg; sparks(at, dir.clone().negate()); if (Math.random() < 0.5) sfx('wood2', at, 0.5);
+  if (b.hp <= 0) { breakBlock(b, dir, 5); return 'through'; }
+  return 'stop';
+}
+// where a shot ends: walks the ray through glass (it shatters) and wood it breaks; stops at the first soldier in the way
+function castShot(o, dir, dmg, zones = true) {
+  let wall = null, far = 300, hit = null;
+  for (let k = 0; k < 6; k++) {
+    aimRay.set(o, dir); aimRay.far = 300; wall = aimRay.intersectObjects(blockMeshes, false)[0] || null; far = wall ? wall.distance : 300;
+    hit = zones ? rayZones(o, dir, far) : null;
+    if (hit || !wall) break;
+    if (hitBlock(wall.object.userData.block, dmg, wall.point, dir) !== 'through') break;
+  }
+  return { wall, far, hit };
+}
+function breakAround(at, r, force) { // blasts
+  for (const b of [...blocks]) if ((b.mat === 'wood' || b.mat === 'glass') && b.box.distanceToPoint(at) < (b.mat === 'glass' ? r * 1.6 : r)) breakBlock(b, b.box.getCenter(new V3()).sub(at).normalize(), force);
+}
 let blockedShots = 0;
 // ---------------- blaster bolts, parry and guard (v24) ----------------
 // A bolt flies at about 38 m/s. Guarding (front and sides, never your back) deflects it. Block in the last 0.3 s
@@ -2339,13 +2513,28 @@ function enemyBullet(e) {
   const from = muzzleOf(e), onTarget = Math.random() < DF().acc * 0.6, chest = playerChest();
   const aimAt = onTarget ? chest.clone().add(new V3((Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3))
     : player.position.clone().add(new V3((Math.random() - 0.5) * 2.4, 1.2 + (Math.random() - 0.3) * 1.2, (Math.random() - 0.5) * 2.4));
-  camRay.set(from, aimAt.clone().sub(from).normalize()); camRay.far = from.distanceTo(aimAt) + 30;
-  const wh = camRay.intersectObjects(blockMeshes, false)[0];
+  const dir = aimAt.clone().sub(from).normalize(); camRay.set(from, dir); camRay.far = from.distanceTo(aimAt) + 30;
+  const wh0 = castShot(from, dir, 30, false).wall, wh = wh0 && wh0.distance < camRay.far ? wh0 : null; // glass shatters and the bullet goes on
   noise(from, HEAR.enemy);
-  if (onTarget && (!wh || wh.distance > from.distanceTo(chest))) { tracer(from, chest, 0xffc97a); flash(from); sfx('ak', from, 0.6); hurtHits(0.5, 'bullet', from); return; } // bullets can't be blocked
+  if (onTarget && (!wh || wh.distance > from.distanceTo(chest))) { tracer(from, chest, 0xffc97a); flash(from); sfx(e.gunKind === 'ar' ? 'ar' : 'ak', from, 0.6); hurtHits(0.5, 'bullet', from); return; } // bullets can't be blocked
   tracer(from, wh ? wh.point : from.clone().addScaledVector(camRay.ray.direction, camRay.far), 0xffc97a);
   impact(from, camRay.ray.direction, wh, wh ? wh.distance : camRay.far);
   flash(from); sfx('ak', from, 0.6);
+}
+// enemy sniper (v27): a red laser for the second before he fires, a scope glint, then one heavy round (two hits' worth)
+function sniperLaser(e, on) {
+  if (!on) { if (e.laser) e.laser.visible = false; return; }
+  if (!e.laser) { e.laser = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(), new V3()]), new THREE.LineBasicMaterial({ color: 0xff2a1a, transparent: true, opacity: 0.75 })); e.laser.frustumCulled = false; scene.add(e.laser); }
+  const a = muzzleOf(e), b = playerChest().add(new V3(Math.sin(simT * 7) * 0.25, Math.cos(simT * 5) * 0.2, 0)), p = e.laser.geometry.attributes.position;
+  p.setXYZ(0, a.x, a.y, a.z); p.setXYZ(1, b.x, b.y, b.z); p.needsUpdate = true; e.laser.visible = true;
+}
+function sniperShot(e) {
+  const from = muzzleOf(e), chest = playerChest(), on = Math.random() < Math.min(0.95, DF().acc + 0.3);
+  const aimAt = on ? chest.clone() : chest.clone().add(new V3((Math.random() - 0.5) * 2, (Math.random() - 0.3) * 1.5, (Math.random() - 0.5) * 2));
+  const dir = aimAt.clone().sub(from).normalize(), wall = castShot(from, dir, 200, false).wall;
+  flash(from); sfx('sniper', from, 0.9); noise(from, HEAR.enemy); if (e.laser) e.laser.visible = false;
+  if (on && (!wall || wall.distance > from.distanceTo(chest))) { tracer(from, chest, 0xffe0a0); hurtHits(2, 'bullet', from); return; }
+  const end = wall ? wall.point : from.clone().addScaledVector(dir, 150); tracer(from, end, 0xffe0a0); impact(from, dir, wall, wall ? wall.distance : 150);
 }
 function guardCovers(from) { // front and sides, not your back
   const toShooter = from.clone().sub(player.position).setY(0).normalize(), facing = new V3(Math.sin(yaw), 0, Math.cos(yaw));
@@ -2379,7 +2568,8 @@ function updateBolts(dt) {
       b.owner.cutLabel = 'Parried · his own bolt';
       damageEnemy(b.owner, 999, 'torso', 'bolt', b.vel.clone()); removeBolt(b); continue;
     }
-    if (p1.y < groundAt(p1.x, p1.z, p1.y + 0.5) || blocks.some(({ box: B }) => B.containsPoint(p1))) { sparks(p1, b.vel.clone().negate().normalize()); removeBolt(b); }
+    const hb = blocks.find(({ box: B }) => B.containsPoint(p1));
+    if (p1.y < groundAt(p1.x, p1.z, p1.y + 0.5) || (hb && hitBlock(hb, 40, p1, b.vel.clone().normalize()) !== 'through')) { sparks(p1, b.vel.clone().negate().normalize()); removeBolt(b); }
   }
 }
 function breakGuard() {
@@ -2548,12 +2738,13 @@ function playerDie(kind, push, blownApart) {
   }
   dead = { t: 0, kind, body, focus: body.rag ? body.rag.P.pelvis.p.clone() : player.position.clone() };
   const cause = { explosion: blownApart ? 'Your own grenade' : 'Blast', bolt: 'Blaster bolt', bullet: 'Gunfire', fall: 'Fall' }[kind] || kind;
-  $('deathcause').textContent = cause; $('deathpanel').hidden = false; $('lootprompt').hidden = true; $('tdprompt').hidden = true; renderHealth();
+  $('deathcause').textContent = mission ? `${cause}. Mission failed.` : cause; $('respawnbtn').textContent = mission ? 'Retry mission' : 'Respawn'; $('deathquit').hidden = !mission; $('deathpanel').hidden = false; $('lootprompt').hidden = true; $('tdprompt').hidden = true; renderHealth();
   if (isLocked()) document.exitPointerLock?.();
   log('player died', kind);
 }
 function respawn() {
   if (!dead) return;
+  if (mission) { const id = mission.id; endMission('failed', true); scene.remove(dead.body.g); dead = null; hero.visible = true; $('deathpanel').hidden = true; startMission(id); return; } // retry
   scene.remove(dead.body.g); dead = null;
   hero.visible = true; hp = 1; hurtT = 99; hurtFlash = 0;
   player.position.copy(spawnAt); speed = 0; vy = 0; mode = 'ground'; jumps = 0; crouch = false;
@@ -2564,7 +2755,7 @@ function respawn() {
 function deadStep(dt, C) {
   dead.t += dt;
   if (dead.body.rag) { stepRag(dead.body.rag, dt); dead.focus.copy(dead.body.rag.P.pelvis.p); }
-  updateSaber(dt); updateHoles(dt); updateBolts(dt); updateEnemies(dt); updatePieces(dt); updateBlood(dt); updateGrenades(dt); updateFx(dt); updateHealth(dt);
+  updateSaber(dt); updateHoles(dt); updateBolts(dt); updateEnemies(dt); updatePieces(dt); updateBlood(dt); updateGrenades(dt); updateFx(dt); updateHealth(dt); updateDebris(dt); updateMission(dt);
   updateCamera(dt, C);
   $('deathhint').hidden = dead.t < 1;
 }
@@ -2900,11 +3091,13 @@ function saberFx(dt) {
       if (T.y < g && B.y > g) { const at = B.clone().lerp(T, (B.y - g) / (B.y - T.y)); scorch(at, UP); sparks(at, UP); u.fxT = 0.05; }
       else {
         const ray = new THREE.Ray(B, T.clone().sub(B).normalize()), hit = new V3();
-        for (const { box } of blocks) if (ray.intersectBox(box, hit) && hit.distanceTo(B) < u.L && !box.containsPoint(B)) {
+        for (const blk of blocks) { const box = blk.box; if (ray.intersectBox(box, hit) && hit.distanceTo(B) < u.L && !box.containsPoint(B)) {
           const c = box.getCenter(new V3()), h = box.getSize(new V3()).multiplyScalar(0.5), d = hit.clone().sub(c);
           const ax = ['x', 'y', 'z'].reduce((a, k) => (Math.abs(d[k]) / h[k] > Math.abs(d[a]) / h[a] ? k : a), 'x');
-          const n = new V3(); n[ax] = Math.sign(d[ax]); scorch(hit, n); sparks(hit, n); u.fxT = 0.05; break;
-        }
+          const n = new V3(); n[ax] = Math.sign(d[ax]);
+          if (blk.mat === 'wood' || blk.mat === 'glass') breakBlock(blk, n.clone().negate(), 3); else scorch(hit, n); // the blade goes through boards and glass (v27)
+          sparks(hit, n); u.fxT = 0.05; break;
+        } }
       }
     }
   }
@@ -2936,8 +3129,8 @@ function fireBlaster() {
   if (!blasterMode() || !blasterGun || overheatT > 0 || fireCd > 0) return;
   fireCd = 0.18; heat += 1; if (heat >= 4) { overheatT = 2.5; heat = 0; toast('Blaster overheated', 900); }
   const dir = camera.getWorldDirection(new V3()), o = camera.position.clone();
-  aimRay.set(o, dir); aimRay.far = 300; const wall = aimRay.intersectObjects(blockMeshes, false)[0], far = wall ? wall.distance : 300;
-  const hit = rayZones(o, dir, far), muzzle = blasterGun.localToWorld(new V3(0.2, 0.03, 0)), end = hit ? hit.point : wall ? wall.point : o.clone().addScaledVector(dir, far);
+  const { wall, far, hit } = castShot(o, dir, 34);
+  const muzzle = blasterGun.localToWorld(new V3(0.2, 0.03, 0)), end = hit ? hit.point : wall ? wall.point : o.clone().addScaledVector(dir, far);
   tracer(muzzle, end, 0x7dffb0); flash(muzzle); sfx('blaster', null, 0.8); noise(player.position, HEAR.blaster);
   if (hit) damageEnemy(hit.e, GUNS.pistol.dmg[hit.zone], hit.zone, 'bullet', dir); else impact(o, dir, wall, far);
   renderAmmo();
@@ -3037,7 +3230,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v26 · 2026-09-30';
+const BUILD = 'v27 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -3403,6 +3596,7 @@ const ITEMS = {
   ak:      { name: 'AK-47', gear: 'pistol', gun: 'ak', icon: 'pistol' },
   shotgun: { name: 'Pump shotgun', gear: 'pistol', gun: 'shotgun', icon: 'pistol' },
   sniper:  { name: 'Sniper rifle', gear: 'pistol', gun: 'sniper', icon: 'pistol' },
+  ar:      { name: 'M4 carbine', gear: 'pistol', gun: 'ar', icon: 'pistol' },
   grenade: { name: 'Frag grenade', stack: 10, icon: 'grenade', use: 'throw' },
   stim:    { name: 'Stim pack', stack: 5, icon: 'stim', use: 'stim' },
   credits: { name: 'Credits', stack: 9999, icon: 'coin' },
@@ -3461,7 +3655,7 @@ function thumbOf(obj, { yaw = 0.6, pitch = 0.35, roll = 0, fill = 0.8 } = {}) {
 function renderThumbs() {
   try {
     if (pistolModel) thumbs.pistol = thumbOf(guns.pistol.root.children[0].clone(true), { yaw: 0, pitch: 0, fill: 0.95 });
-    for (const k of ['ak', 'shotgun', 'sniper']) if (guns[k]) thumbs[k] = thumbOf(guns[k].root.children[0].clone(true), { yaw: 0, pitch: 0, fill: 0.98 });
+    for (const k of ['ak', 'shotgun', 'sniper', 'ar']) if (guns[k]) thumbs[k] = thumbOf(guns[k].root.children[0].clone(true), { yaw: 0, pitch: 0, fill: 0.98 });
     const sb = makeSaber(false); for (const b of sb.blades) { b.visible = true; b.scale.y = 1; }
     thumbs.saber = thumbOf(sb.root, { yaw: 0.3, pitch: 0, roll: -0.8, fill: 0.92 });
     thumbs.grenade = thumbOf(makeGrenade(), { yaw: 0.4, pitch: 0.2, fill: 0.85 });
@@ -3478,6 +3672,9 @@ try { if (!localStorage.getItem('v24-guns')) { // hand out the new guns once, in
 try { if (!localStorage.getItem('v25-force')) { // The Force and the saber + blaster: into free slots (the backpack if the hotbar is full)
   for (const id of ['force', 'saberblaster']) if (![...inv.hot, ...inv.bag].some((x) => x && x.id === id)) { const arr = inv.hot.includes(null) ? inv.hot : inv.bag, i = arr.indexOf(null); if (i >= 0) arr[i] = { id, qty: 1 }; }
   localStorage.setItem('v25-force', '1'); saveInv(); } } catch (_) {}
+try { if (!localStorage.getItem('v27-ar')) { // the M4 carbine: into the backpack once
+  if (![...inv.hot, ...inv.bag].some((x) => x && x.id === 'ar')) { const i = inv.bag.indexOf(null); if (i >= 0) inv.bag[i] = { id: 'ar', qty: 1 }; }
+  localStorage.setItem('v27-ar', '1'); saveInv(); } } catch (_) {}
 const slotAt = (where, i) => (where === 'hot' ? inv.hot : inv.bag)[i];
 const setSlot = (where, i, v) => { (where === 'hot' ? inv.hot : inv.bag)[i] = v; };
 function slotHTML(it, where, i) {
@@ -3528,7 +3725,7 @@ const countItem = (id) => [...inv.hot, ...inv.bag].reduce((a, it) => a + (it && 
 function useActiveItem() {
   const it = activeItem(); if (!it || !it.def.use) return false;
   if (it.def.use === 'throw') { throwGrenade(); return true; }
-  if (it.def.use === 'stim') { takeItem('stim'); toast('Stim pack used (health comes later)', 1400); flash(player.position.clone().add(new V3(0, 1.2, 0))); log('stim'); return true; }
+  if (it.def.use === 'stim') { if (hp >= 1) { toast('Health is full', 900); return true; } takeItem('stim'); hp = Math.min(1, hp + 0.5); renderHealth(); toast('Stim pack: +50% health', 1200); flash(player.position.clone().add(new V3(0, 1.2, 0))); log('stim'); return true; }
   return false;
 }
 // move or swap between any two slots; the same stackable item merges
@@ -3546,16 +3743,20 @@ function moveItem(a, b) {
 let invPick = null, drag = null;
 function toggleInv(open = $('inv').hidden) {
   $('inv').hidden = !open; $('invbtn').setAttribute('aria-expanded', String(open)); invPick = null;
-  if (open) { toggleWeapon(false); if (isLocked()) document.exitPointerLock?.(); }
-  renderInv();
+  if (open) { toggleWeapon(false); if (!$('missions').hidden) toggleMissions(false); if (isLocked()) document.exitPointerLock?.(); renderCreative(); }
+  renderAttFor(null); renderInv();
 }
-function slotFromPoint(x, y) { const el = document.elementFromPoint(x, y)?.closest('#inv .slot'); return el ? { where: el.dataset.where, i: +el.dataset.i, el } : null; }
+function slotFromPoint(x, y) { const el = document.elementFromPoint(x, y)?.closest('#inv .slot[data-where]'); return el ? { where: el.dataset.where, i: +el.dataset.i, el } : null; }
 function setupInventoryUI() {
   $('invbtn').addEventListener('click', () => toggleInv());
   $('invclose').addEventListener('click', () => toggleInv(false));
   $('hotbar').addEventListener('pointerdown', (e) => { const b = e.target.closest('.slot'); if (!b) return; e.preventDefault(); e.stopPropagation(); selectSlot(+b.dataset.i); });
+  $('inv').addEventListener('click', (e) => {
+    const c = e.target.closest('[data-cat]'); if (c) { addFromCatalog(c.dataset.cat); return; }
+    const a = e.target.closest('[data-att]'); if (a) { const k = a.dataset.kind; setAtt(k, a.dataset.att, !hasAtt(k, a.dataset.att)); renderAttFor({ id: Object.keys(ITEMS).find((id) => ITEMS[id].gun === k) }); }
+  });
   $('inv').addEventListener('pointerdown', (e) => {
-    const b = e.target.closest('.slot'); if (!b) return;
+    const b = e.target.closest('.slot[data-where]'); if (!b) return;
     e.preventDefault();
     drag = { from: { where: b.dataset.where, i: +b.dataset.i }, x: e.clientX, y: e.clientY, moved: false, id: e.pointerId };
   });
@@ -3576,10 +3777,136 @@ function setupInventoryUI() {
     if (d.moved) { const to = slotFromPoint(e.clientX, e.clientY); if (to) moveItem(d.from, to); else renderInv(); return; }
     // tap: pick a slot, then tap where it should go
     const it = slotAt(d.from.where, d.from.i);
-    if (!invPick) { if (it) { invPick = d.from; $('invinfo').textContent = `${ITEMS[it.id].name}${it.qty > 1 ? ' ×' + it.qty : ''}: tap a slot to move it there`; } renderInv(); return; }
+    if (!invPick) { if (it) { invPick = d.from; $('invinfo').textContent = `${ITEMS[it.id].name}${it.qty > 1 ? ' ×' + it.qty : ''}: tap a slot to move it there`; renderAttFor(it); } renderInv(); return; }
     const from = invPick; invPick = null; moveItem(from, d.from); $('invinfo').innerHTML = '&nbsp;';
   });
   renderInv();
+}
+
+// ---------------- missions (v27) ----------------
+// Mission 1, the courtyard: four waves (pistols, AK-47s, M4 carbines, then snipers on the balcony with rifles below).
+// You go in with a saber, a pistol, three grenades and two stims, plus whatever gear you've earned; loot the rest.
+// Finish it and you keep its reward for good (the grappling hook). The sandbox always has everything. Replayable.
+const MISSIONS = {
+  m1: { name: 'Mission 1: The courtyard', reward: 'grapple', rewardName: 'Grappling hook', blurb: 'Four waves in the walled courtyard. Loot what they drop.',
+    waves: [{ label: 'Pistols', squads: [['pistol', 4]] }, { label: 'AK-47s', squads: [['ak', 4], ['pistol', 1]] }, { label: 'M4 carbines', squads: [['ar', 5]] },
+      { label: 'Snipers', squads: [['sniper', 3, 'balcony'], ['ar', 3]] }] },
+};
+const GEAR_NAMES = { grapple: 'Grappling hook' };
+let kept = new Set(), missionBest = {};
+try { kept = new Set(JSON.parse(localStorage.getItem('kept') || '[]')); missionBest = JSON.parse(localStorage.getItem('missionbest') || '{}') || {}; } catch (_) {}
+const saveKept = () => { try { localStorage.setItem('kept', JSON.stringify([...kept])); localStorage.setItem('missionbest', JSON.stringify(missionBest)); } catch (_) {} };
+// a reload in the middle of a mission gives your sandbox inventory back
+try { const s = localStorage.getItem('inv-sandbox'); if (s) { const o = JSON.parse(s); Object.assign(inv, o.inv); Object.assign(ammo.mags, o.mags); localStorage.removeItem('inv-sandbox'); saveInv(); saveAmmo(); } } catch (_) {}
+let mission = null;
+const courtAt = (x, z) => new V3(COURT.x + x, groundAt(COURT.x + x, COURT.z + z, 9), COURT.z + z);
+function startMission(id) {
+  const def = MISSIONS[id]; if (!def) return;
+  if (dead) { scene.remove(dead.body.g); dead = null; hero.visible = true; $('deathpanel').hidden = true; }
+  if (mission) endMission('restart', true);
+  if (movesOpen) closeMoves();
+  const saved = { inv: JSON.parse(JSON.stringify({ hot: inv.hot, bag: inv.bag, active: inv.active })), mags: { ...ammo.mags } };
+  try { localStorage.setItem('inv-sandbox', JSON.stringify(saved)); } catch (_) {}
+  mission = { id, def, wave: -1, state: 'break', t: 4, team: [], saved, kills: 0, t0: simT };
+  inv.hot = [{ id: 'saber', qty: 1 }, { id: 'pistol', qty: 1 }, { id: 'grenade', qty: 3 }, { id: 'stim', qty: 2 }, null, null];
+  inv.bag = new Array(20).fill(null); inv.bag[0] = { id: 'ammo', qty: 60 };
+  for (const k of Object.keys(ammo.mags)) ammo.mags[k] = GUNS[k].mag;
+  [...enemies].forEach(removeEnemy); for (const b of [...bolts]) removeBolt(b);
+  if (grapple.state !== 'idle') releaseGrapple(false);
+  cover = null; takedown = null; hp = 1; hurtT = 99; mode = 'ground'; speed = 0; vy = 0;
+  player.position.copy(courtAt(0, -18)); yaw = moveYaw = 0; camYaw = 0; camPitch = 0.12;
+  selectSlot(1, true); renderInv(); renderAmmo(); toggleMissions(false); renderHealth();
+  log('mission start', id); toast(`${def.name}: first wave in 4 s`, 2000);
+}
+function courtSpot() {
+  for (let i = 0; i < 40; i++) {
+    const x = (Math.random() - 0.5) * 34, z = 10 + Math.random() * 5, p = courtAt(x, z);
+    if (p.y < 0.1 && blocks.every(({ box: B }) => p.x < B.min.x - 0.7 || p.x > B.max.x + 0.7 || p.z < B.min.z - 0.7 || p.z > B.max.z + 0.7 || B.min.y > 2)) return p;
+  }
+  return courtAt(0, 12);
+}
+function spawnWave(i) {
+  const M = mission, W = M.def.waves[i]; M.wave = i; M.state = 'fight';
+  let n = 0;
+  for (const [kind, count, where] of W.squads) for (let k = 0; k < count; k++) {
+    const at = where === 'balcony' ? courtAt(-12 + (k * 24) / Math.max(1, count - 1), 19) : courtSpot();
+    const e = spawnEnemy(at, kind, 'combat'); if (!e) continue;
+    e.mission = true; if (where === 'balcony') e.hold = true;
+    e.yaw = Math.atan2(player.position.x - at.x, player.position.z - at.z); M.team.push(e); n++;
+  }
+  toast(`Wave ${i + 1} of ${M.def.waves.length}: ${W.label}`, 1800); log('wave', i + 1, n);
+}
+function updateMission(dt) {
+  const M = mission; if (!M) { $('mhud').hidden = true; return; }
+  const left = M.team.filter((e) => e.state !== 'dead' && enemies.includes(e)).length;
+  if (M.state === 'fight' && left === 0) {
+    if (M.wave >= M.def.waves.length - 1) completeMission();
+    else { M.state = 'break'; M.t = 6; toast(`Wave ${M.wave + 1} cleared. Loot up: next wave in 6 s`, 2000); }
+  } else if (M.state === 'break' && (M.t -= dt) <= 0) spawnWave(M.wave + 1);
+  if ((hudN & 7) === 0) {
+    $('mhud').hidden = false;
+    $('mhudtext').textContent = M.state === 'done' ? `${M.def.name}: complete` : M.state === 'break' ? `${M.def.name} · wave ${M.wave + 2} of ${M.def.waves.length} in ${Math.ceil(M.t)}`
+      : `${M.def.name} · wave ${M.wave + 1} of ${M.def.waves.length}: ${M.def.waves[M.wave].label} · ${left} left`;
+  }
+}
+function completeMission() {
+  const M = mission; M.state = 'done';
+  const time = simT - M.t0, first = !kept.has(M.def.reward);
+  kept.add(M.def.reward); if (!missionBest[M.id] || time < missionBest[M.id]) missionBest[M.id] = +time.toFixed(1); saveKept();
+  $('mdonetext').textContent = `${first ? 'You keep the ' + M.def.rewardName + ' for good: it works in every mission from now on.' : 'The ' + M.def.rewardName + ' is already yours.'} Time ${Math.floor(time / 60)}:${String(Math.round(time % 60)).padStart(2, '0')}.`;
+  $('mdone').hidden = false; if (isLocked()) document.exitPointerLock?.();
+  log('mission complete', M.id, time.toFixed(1));
+}
+// why: 'quit' | 'done' | 'failed' | 'restart'
+function endMission(why, keepPlace) {
+  const M = mission; if (!M) return;
+  for (const e of [...enemies]) if (e.mission) { if (e.laser) scene.remove(e.laser); removeEnemy(e); }
+  inv.hot = M.saved.inv.hot; inv.bag = M.saved.inv.bag; inv.active = M.saved.inv.active; Object.assign(ammo.mags, M.saved.mags);
+  try { localStorage.removeItem('inv-sandbox'); } catch (_) {}
+  saveInv(); saveAmmo(); mission = null; $('mhud').hidden = true; $('mdone').hidden = true;
+  if (!keepPlace) { player.position.copy(spawnAt); mode = 'ground'; speed = 0; vy = 0; cover = null; }
+  respawnT = 0; filled = false; selectSlot(inv.active, true); renderInv(); renderAmmo();
+  log('mission end', why);
+}
+function toggleMissions(open = $('missions').hidden) {
+  $('missions').hidden = !open; $('missionsbtn').setAttribute('aria-expanded', String(open));
+  if (open) { toggleWeapon(false); toggleInv(false); if (isLocked()) document.exitPointerLock?.(); renderMissions(); }
+}
+function renderMissions() {
+  const h = [];
+  for (const [id, m] of Object.entries(MISSIONS)) {
+    const best = missionBest[id];
+    h.push(`<div class="mcard"><b>${m.name}</b><span>${m.blurb} Waves: ${m.waves.map((w) => w.label).join(', ')}.</span>` +
+      `<span>Reward: ${m.rewardName} ${kept.has(m.reward) ? '(earned)' : '(not yet)'}${best ? ` · best time ${Math.floor(best / 60)}:${String(Math.round(best % 60)).padStart(2, '0')}` : ''}</span>` +
+      `<button type="button" data-mission="${id}">${mission && mission.id === id ? 'Restart' : 'Start'}</button></div>`);
+  }
+  h.push(`<h3>Gear you keep</h3><p class="note">${[...kept].map((g) => GEAR_NAMES[g] || g).join(', ') || 'Nothing yet: finish a mission.'} In missions you only have what you've earned; the sandbox has everything.</p>`);
+  h.push(`<div class="seg" style="grid-template-columns:repeat(2,1fr)">${mission ? '<button type="button" id="mquit">Quit mission</button>' : ''}<button type="button" id="mvisit">Go to the courtyard</button></div>`);
+  $('missionsbody').innerHTML = h.join('');
+}
+// ---------------- creative (v27): every item, one click away (sandbox only) ----------------
+function renderCreative() {
+  const el = $('invcat'); if (!el) return;
+  $('invcreative').hidden = !!mission;
+  if (mission) return;
+  el.innerHTML = Object.entries(ITEMS).map(([id, def]) => {
+    const icon = thumbs[id] ? `<img src="${thumbs[id]}" alt="" draggable="false">` : `<svg viewBox="0 0 30 30" aria-hidden="true">${ICON[def.icon]}</svg>`;
+    return `<button type="button" class="slot cat${def.rare ? ' rare' : ''}" data-cat="${id}" title="Add ${def.name}" aria-label="Add ${def.name}">${icon}</button>`;
+  }).join('');
+}
+function addFromCatalog(id) {
+  const def = ITEMS[id]; if (!def) return;
+  const n = def.stack ? Math.min(def.stack, id === 'credits' ? 100 : 10) : 1, left = addItem(id, n);
+  toast(left >= n ? 'Backpack full' : `Added ${def.name}${n - left > 1 ? ' ×' + (n - left) : ''}`, 900); renderAmmo();
+}
+// the attachment switches for a picked gun (inventory)
+function renderAttFor(it) {
+  const el = $('invatt'); if (!el) return;
+  const kind = it && ITEMS[it.id]?.gun;
+  if (!kind) { el.hidden = true; return; }
+  const opts = Object.entries(ATT).filter(([, a]) => a.fits.includes(kind));
+  el.hidden = !opts.length;
+  el.innerHTML = `<span>${GUNS[kind].name} attachments:</span>` + opts.map(([k, a]) => `<button type="button" data-att="${k}" data-kind="${kind}" aria-pressed="${hasAtt(kind, k)}">${a.name}</button>`).join('');
 }
 
 // ---------------- looting ----------------
@@ -3593,7 +3920,7 @@ const LOOT_TABLE = [ // [name, min, max, weight, rare]; every body also carries 
 const lootLog = [];
 let looting = null, lootTarget = null, lootHideT = 0;
 function rollLoot(e) {
-  const n = 1 + Math.floor(Math.random() * 3), out = [e && e.gunKind === 'ak' ? { name: 'Rifle ammo', qty: 60 + Math.floor(Math.random() * 31), rare: false } : { name: 'Pistol ammo', qty: 30 + Math.floor(Math.random() * 7), rare: false }], total = LOOT_TABLE.reduce((a, r) => a + r[3], 0);
+  const n = 1 + Math.floor(Math.random() * 3), out = [e && e.gunKind === 'sniper' ? { name: 'Sniper rounds', qty: 10 + Math.floor(Math.random() * 6), rare: false } : e && (e.gunKind === 'ak' || e.gunKind === 'ar') ? { name: 'Rifle ammo', qty: 60 + Math.floor(Math.random() * 31), rare: false } : { name: 'Pistol ammo', qty: 30 + Math.floor(Math.random() * 7), rare: false }], total = LOOT_TABLE.reduce((a, r) => a + r[3], 0);
   for (let i = 0; i < n; i++) {
     let x = Math.random() * total, r = LOOT_TABLE[0];
     for (const row of LOOT_TABLE) { x -= row[3]; if (x <= 0) { r = row; break; } }
@@ -3757,7 +4084,7 @@ function step(dt) {
   }
   // jetpack: hold Jump in the air to fly (a quick tap is still a double jump)
   jumpHeldT = jumpHeld ? jumpHeldT + dt : 0;
-  if (gadgets.jetpack && mode === 'air' && jumpHeld && jumpHeldT > 0.2 && !pound) startJet();
+  if (gadgets.jetpack && !mission && mode === 'air' && jumpHeld && jumpHeldT > 0.2 && !pound) startJet();
   if (jumpQueued && mode === 'jet') jumpQueued = false;
   if (jumpQueued) {
     jumpQueued = false;
@@ -3819,7 +4146,7 @@ function step(dt) {
   heat = Math.max(0, heat - dt * 0.7); overheatT = Math.max(0, overheatT - dt);
   if (blasterMode() && (hudN & 7) === 0) renderAmmo(); // the heat gauge cools down
   updateSaber(dt);
-  updateHoles(dt); updateBolts(dt); updateTakedown(dt); updateHealth(dt);
+  updateHoles(dt); updateBolts(dt); updateTakedown(dt); updateHealth(dt); updateDebris(dt); updateMission(dt);
   const te = performance.now(); updateEnemies(dt); updatePieces(dt); updateBlood(dt); perf.enemyAcc += performance.now() - te; updateGrenades(dt); updateFx(dt);
   animateLoco(dt, C);
   updateCamera(dt, C);
@@ -3964,7 +4291,7 @@ let camKick = 0; // how far the last shots kicked the view up; eased back so rec
 let aimZoom = 0;
 const BASE_FOV = 55;
 function updateCamera(dt, C) {
-  const scoped = gear === 'pistol' && pistolInHand && G().zoom && aimHeld && isStrafing();
+  const scoped = gear === 'pistol' && pistolInHand && gunZoom() && aimHeld && isStrafing();
   const inScope = scoped && camera.fov < BASE_FOV * 0.6;
   $('scope').hidden = !inScope; if (hero) hero.visible = !inScope && !dead; if (pistol && pistol.rifle) pistol.root.visible = !inScope; // the scope shows the world, not the back of your head
   if (camKick > 0) { const r = Math.min(camKick, camKick * 10 * dt + 0.0005); camPitch = clamp(camPitch + r, -0.45, 1.15); camKick -= r; }
@@ -3989,7 +4316,7 @@ function updateCamera(dt, C) {
   if (ch) camPos.copy(eye).addScaledVector(back, Math.max(0.3, ch.distance - 0.3));
   camera.position.copy(camPos);
   camera.lookAt(pivot.x + right.x, pivot.y, pivot.z + right.z);
-  const fov = scoped ? G().zoom : lerp(BASE_FOV, klass === 'force' ? 66 : 62, sprintT);
+  const fov = scoped ? gunZoom() : lerp(BASE_FOV, klass === 'force' ? 66 : 62, sprintT);
   if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = damp(camera.fov, fov, scoped || camera.fov < BASE_FOV - 1 ? 16 : 4, dt); camera.updateProjectionMatrix(); } // the scope snaps in fast (quickscopes)
 }
 
@@ -4268,6 +4595,15 @@ function perfSample(raw, cpu, render) {
 const timer = new THREE.Timer();
 function start() {
   $('respawnbtn').addEventListener('click', () => respawn());
+  $('deathquit').addEventListener('click', () => { if (!dead) return; endMission('quit'); scene.remove(dead.body.g); dead = null; hero.visible = true; hp = 1; $('deathpanel').hidden = true; renderHealth(); });
+  $('missionsbtn').addEventListener('click', () => toggleMissions()); $('missionsclose').addEventListener('click', () => toggleMissions(false));
+  $('missionsbody').addEventListener('click', (e) => {
+    const m = e.target.closest('[data-mission]'); if (m) { startMission(m.dataset.mission); return; }
+    if (e.target.closest('#mquit')) { endMission('quit'); toggleMissions(false); }
+    if (e.target.closest('#mvisit')) { if (mission) endMission('quit'); player.position.copy(courtAt(0, -18)); yaw = moveYaw = camYaw = 0; mode = 'ground'; speed = 0; vy = 0; toggleMissions(false); }
+  });
+  $('mdoneagain').addEventListener('click', () => { if (mission) startMission(mission.id); });
+  $('mdoneback').addEventListener('click', () => endMission('done'));
   pickGaitVariants(true); spawnAt = player.position.clone();
   renderer.setAnimationLoop((t) => {
     timer.update(t);
@@ -4356,6 +4692,13 @@ function start() {
     setMind(i, m, wait = 0) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e) return; e.mind = m; e.sus = 0; e.wp = null; e.waitT = wait; e.post = e.g.position.clone(); if (e.state === 'hit') { e.state = 'engage'; e.hitT = 0; } setMark(e, null); },
     faceEnemy(i, yawR) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) { e.yaw = yawR; e.g.rotation.y = yawR; } },
     get alarms() { return alarms; }, get takedowns() { return takedowns; }, get tdTarget() { return tdTarget ? tdTarget.id : null; }, get takedown() { return !!takedown; },
+    startMission, endMission, get mission() { return mission ? { id: mission.id, wave: mission.wave, state: mission.state, left: mission.team.filter((e) => e.state !== 'dead' && enemies.includes(e)).length, kinds: mission.team.filter((e) => e.state !== 'dead').map((e) => e.gunKind), hold: mission.team.filter((e) => e.hold).length } : null; },
+    killWave() { for (const e of [...enemies]) if (e.mission && e.state !== 'dead') { e.cutLabel = 'test'; damageEnemy(e, 999, 'torso', 'stealth'); } }, get kept() { return [...kept]; }, forgetKept() { kept.clear(); saveKept(); },
+    goCourt(x = 0, z = -18) { player.position.copy(courtAt(x, z)); mode = 'ground'; speed = 0; vy = 0; }, courtAt: (x, z) => courtAt(x, z).toArray(),
+    mats: () => { const o = {}; for (const b of blocks) if (b.court) o[b.mat] = (o[b.mat] || 0) + 1; return o; }, get broken() { return { ...broken }; }, get debris() { return debris.length; },
+    matBlocks: (m) => blocks.filter((b) => b.court && b.mat === m).map((b) => ({ c: b.box.getCenter(new V3()).toArray().map((v) => +v.toFixed(2)), hp: b.hp })),
+    shootPoint(x, y, z) { fireCd = 0; return firePistol(new V3(x, y, z).sub(camera.position).normalize()); }, get camPos() { return camera.position.toArray(); },
+    setAtt, hasAtt, get zoom() { return gunZoom(); }, get lasers() { return enemies.filter((e) => e.laser && e.laser.visible).length; },
     enterCover, leaveCover, get cover() { return cover ? { low: cover.low, peek: +cover.peek.toFixed(2), edge: cover.edge, u: +cover.u.toFixed(2), n: [cover.n.x, cover.n.z] } : null; }, get crouch() { return crouch; },
     ragPelvis(i) { const e = enemies[i]; return e && e.rag ? e.rag.P.pelvis.p.toArray().map((v) => +v.toFixed(2)) : null; } };
 }

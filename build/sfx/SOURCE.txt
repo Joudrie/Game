@@ -8,3 +8,7 @@ saber_on, saber_hum, saber_swing: Freesound 47126, 47124, 47125 by gyzhor (CC0)
 saber_off: Freesound 591433 "Laser Sword Turn Off" (CC0)
 force: Freesound 423799 "Little Whoosh 2" (CC0)
 zap: Kenney Sci-fi Sounds forceField_001 (CC0)
+ar: Free Firearm Sound Library AR-15_D_24P (CC0)
+suppressed: the pistol clip above, muffled with a low-pass filter
+glass, glass2, wood, wood2: Kenney Impact Sounds (impactGlass_heavy_000/003, impactWood_heavy_001, impactPlank_medium_002), CC0
+boom: Freesound 609587 "Grenade Explosion SFX medium-sized meaty realistic" (CC0)

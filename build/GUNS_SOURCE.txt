@@ -1,2 +1,3 @@
 gun_ak.glb = AssaultRifle_2.glb, gun_shotgun.glb = Shotgun_3.glb, gun_sniper.glb = SniperRifle_3.glb
 from Quaternius "Ultimate Gun Pack" (CC0), assets/weapons/quaternius-ultimate-guns/ (see its SOURCE.txt)
+v27: gun_ar.glb = AssaultRifle2_4.glb (M4 carbine); att_suppressor.glb = Silencer_Short.glb; att_scope.glb = Scope_1.glb (same pack, CC0)
