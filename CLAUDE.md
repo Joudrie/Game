@@ -22,7 +22,7 @@ A mobile-first third-person action game in three.js (GTA / Red Dead / Watch Dogs
 - **Tests:** `node tools/testNN-*.mjs` (Playwright, Chromium at `/opt/pw-browsers/chromium` with swiftshader flags; see any test).
   - Headless runs at about 8 fps, so use the `__game.advance(seconds)` hook instead of real waits.
   - Test hooks live on `window.__game`: `setGear`, `selectSlot`, `fillEnemies`, `moveEnemy`, `damageEnemy`, `shootAt`, `setKey`, `advance`, `startLoot`, `startReload`…
-  - Main tests: test17 (enemies), test18 (combat), test19 (v14 feel), test20 (loot), test21 (inventory), test22 (reload), test9 (menus and gear).
+  - Main tests: test17 (enemies), test18 (combat), test23 (dual combos), test19 (v14 feel), test20 (loot), test21 (inventory), test22 (reload), test9 (menus and gear).
   - `tools/sheet17.mjs` makes animation contact sheets. Use them to check clips by eye before adding them.
 - **Animation pipeline:** everything is retargeted onto the UE5-mannequin skeleton of the Quaternius Superhero.
   - `tools/retarget.mjs`: `retarget` for sources with a T-pose; `retargetDir` for rigs that don't have one.
@@ -42,7 +42,7 @@ These are added as **API credentials** in the cloud environment. The proxy injec
 - **Hugging Face** (`huggingface.co`, `*.hf.space`, `Authorization: Bearer …`)
   - Use it to turn the owner's paintings into 3D. Image-to-3D Spaces include `microsoft/TRELLIS`, `tencent/Hunyuan3D-2` and `stabilityai/TripoSR`; call them with `gradio_client`.
   - First character: **The Second**. The front, side and back turnaround images are in the owner's earlier chat; ask them to add the images to `assets/characters/the-second/` if they aren't in the repo.
-- **Mixamo** (`www.mixamo.com`, `Authorization: Bearer <localStorage.access_token>`). This API is **unofficial** and the token **expires after about a day**; ask the owner to refresh it when requests return 401.
+- **Mixamo** (`www.mixamo.com`, `Authorization: Bearer <localStorage.access_token>`). This API is **unofficial** and the token **expires after about a day**. **As of v19 the owner can't sign in to Mixamo at all** (account pages are broken), so every authorized call returns 401. Search and product details still work without auth. Don't plan around Mixamo; look for free sources instead. `tools/mixamo_fetch.mjs` does the whole export if a token ever works.
   - Also send `X-Api-Key: mixamo2`. Search works without auth: `GET /api/v1/products?page=1&limit=48&type=Motion%2CMotionPack&query=<words>`.
   - Export flow, as the site does it (unverified here):
     1. `GET /api/v1/products/<id>?similar=0&character_id=<char>` for `details.gms_hash`
@@ -52,10 +52,11 @@ These are added as **API credentials** in the cloud environment. The proxy injec
   - Convert the FBX, for example with the `fbx2gltf` npm binary, then bake with `mixamoMap('mixamorig')`.
   - Wanted clips: see `ASSET_GUIDE.md` (sword draw and sheath, sword and dual combos, pistol locomotion, rifle pack, deaths by cause, slides, flips, flying).
 
-## Where things stand (v18)
+## Where things stand (v19)
 - **Movement:** classes (light, Force, heavy), slides with momentum, infinite and double jumps, grapple (also onto enemies), jetpack (Mandalorian model), ground pound.
-- **Combat:** five-hit saber combo (plus a dual-saber variant), fists combo, pistol with aim pitch, 12-round magazine, reload and dropped magazines, Force push, grenades, saber blocking bullets.
+- **Combat:** five-hit saber combo, four dual-saber combos (Moves → Dual saber combo; left-hand hits are mirrored clips from `tools/bake_mirror.mjs`), fists combo, pistol with aim pitch, 12-round magazine, reload and dropped magazines, Force push, grenades, saber blocking bullets.
 - **Enemies:** five soldiers with deaths by cause (head, torso, legs, explosion, push, wall impact, grapple, pound), always-on dismemberment, bodies that can be moved, looting.
 - **Items:** hotbar (5 slots, scroll or 1–5) and inventory (drag or tap), saved in localStorage.
 - **Look:** sand ground, pale blue sky, grey boxes, grid always on.
-- **Next:** see `BACKLOG.md`. The owner's asks: better assets through the new credentials, The Second as a 3D character, Mixamo animations to replace the IK draw/holster and add combos.
+- **Next:** see `BACKLOG.md`. The owner's asks: better assets through the new credentials, The Second as a 3D character, free replacements for the IK draw/holster and more combos (Mixamo is unavailable).
+- **Sketchfab:** in v19 the API returned `202` with an AWS WAF bot challenge for every request from the container. Don't try to get around it; ask the owner to download models by hand if needed.

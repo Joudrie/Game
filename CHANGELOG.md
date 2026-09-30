@@ -2,6 +2,19 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v19: dual-saber combos
+- **Four dual-saber combos**, now with both hands striking. They're picked in **Menu → Moves → Dual saber combo**; the ticked ones rotate, a different one each time you start a new chain (the first three are ticked by default).
+  - **Flurry:** right, left, right, left, then a cross-slash and a double chop (6 hits).
+  - **Twin spin:** right, left, spin, left-handed spin slash, double stab.
+  - **Double blades:** slice, chop, left-handed spin, stab.
+  - **Mixed:** the v18 dual chain, kept as an option.
+- **Where the moves come from:** Mixamo sign-in doesn't work, so these are built from free CC0 clips we already had.
+  - KayKit's three dual-wield strikes: chop, slice, and the stab, which is now used for the first time.
+  - Left-handed copies of the Quaternius sword hits. `tools/bake_mirror.mjs` mirrors them left to right, and they match the originals to within 3 mm.
+- Single saber keeps the five-hit combo.
+- **Automated test:** `tools/test23-dual-combo.mjs`.
+- `tools/mixamo_fetch.mjs` does the full Mixamo export in one command, in case sign-in ever works again.
+
 ## v18: a real Mandalorian jetpack
 - **The jetpack is now a downloaded model:** "Boba Fett/Mandalorian Jet Pack" by Jace1969 on Printables (CC BY, credited in `CREDITS.md`). Source file and notes are in `assets/jetpack/`.
   - It's the classic look: a missile up the middle, twin fuel tanks, and a cone thruster hanging off each lower corner.
