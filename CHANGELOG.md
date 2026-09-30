@@ -2,6 +2,21 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v28: batch 6 (throwables, saber moves, grapple swing, Mission 2)
+- **The roadmap was finished,** so Claude picked Batch 6 from the backlog (see BACKLOG → Roadmap; change the order any time).
+- **Three new throwables** (in your backpack once: 3 sticky, 2 fire, 2 orbs; also in the creative catalogue). Pick one in the hotbar and click to throw; **X throws whichever you picked last**.
+  - **Sticky grenade:** sticks to whatever it hits, a soldier included, and goes off 1.6 s later, blinking faster at the end. Stuck on a soldier, it blows him apart.
+  - **Fire grenade:** leaves a burning patch for 8 s. Soldiers who walk in catch fire, run about and drop ("Burned"). Wooden boards in it burn through after 3 s. **It hurts you too.**
+  - **Teleport orb:** you appear where it lands, or beside the soldier it hits.
+- **Saber moves:**
+  - **Dash strike:** attack while sprinting at a soldier up to 10 m ahead and you lunge across the gap and cut him in half.
+  - **Grapple yank:** hold right-click (aim or guard) as you grapple a soldier and he's pulled to you instead, onto your blade if it's lit.
+  - **Finishers:** a soldier who's crawling, getting up or clutching a stump shows **F Finisher** from any side.
+- **Grapple swing** (Weapon panel setting): a hook high on a wall swings you like a pendulum instead of reeling you in. It reels in until the arc clears the ground, you push to pump the swing, and jump lets go with the speed.
+- **Mission 2: Hold the courtyard.** Stay alive for 3 minutes while soldiers keep coming from the north and the sides, more of them and better armed as time runs down, with a sniper on the balcony near the end. **The reward is the jetpack:** once earned, holding Jump in the air flies in every mission.
+- **BACKLOG cleanup:** 33 items built since v22 are ticked off with their version, and the duplicate "on hold" section is gone.
+- **Automated test:** `tools/test32-batch6.mjs` covers all three throwables, fire spreading to soldiers, boards and you, the dash strike, yank, finisher, swing and Mission 2 (including the jetpack reward in use). Build 14.62 MB.
+
 ## v27: roadmap batch 5 (the courtyard, Mission 1, gear you keep, attachments, creative)
 - **The courtyard** (Missions → Go to the courtyard, or 175 m north of the start): a walled arena with pillars, crates, a tall corner tower and **a balcony 3.4 m up** with stairs at both ends (a ledge to fall or be pushed from).
   - **Glass shatters** at the first hit and shots carry on through. Soldiers can see you through it.
