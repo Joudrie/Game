@@ -2,6 +2,15 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v15: looting
+- **Loot bodies:** walk up to a body and a "Loot body" prompt appears. Press **G** (the **Loot** button on a phone, or D-pad down on a gamepad).
+  - You kneel and rummage for about 2 seconds, using `Fixing_Kneeling` from the free pack (now packed). A lit saber switches off while you search and relights after.
+  - Items pop up one at a time under the top bar: 1–3 per body from a small table (credits, pistol ammo, power cells, stim packs, frag grenades, ration bars, data chips, keycards, comlinks, and a rare kyber shard in orange).
+  - Moving, jumping, sliding or attacking stops the search. Stop before anything turns up and you can come back for it.
+  - A searched body stops prompting and stays around a little longer.
+- **Cosmetic for now:** nothing is added to an inventory yet. Every find is recorded (item, amount, time, which body) so the inventory can use it later.
+- **Automated test:** `tools/test20-loot.mjs`.
+
 ## v14.1: dismemberment always on, scroll to switch weapons
 - **Dismemberment is always on.** The switch is gone from the Weapon panel.
 - **Scroll wheel switches weapons:** fists → hilt → saber → pistol, and back around, one step per notch, with the draw or holster animation each time. A small label shows the new weapon.

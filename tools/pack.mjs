@@ -14,7 +14,7 @@ await ch.transform(
 await io.write(`${OUT}/hero.glb`, ch);
 
 const KEEP = {
-  ual1: ['Idle_Loop','Walk_Loop','Walk_Formal_Loop','Jog_Fwd_Loop','Sprint_Loop','Jump_Start','Jump_Loop','Jump_Land','Roll','Crouch_Idle_Loop','Crouch_Fwd_Loop','Sword_Idle','Sword_Attack','Pistol_Idle_Loop','Pistol_Shoot','Pistol_Reload','Pistol_Aim_Down','Pistol_Aim_Neutral','Pistol_Aim_Up','Interact','Spell_Simple_Enter','Punch_Jab','Punch_Cross','Death01','Hit_Chest','Hit_Head','Idle_Talking_Loop','Dance_Loop','Spell_Simple_Shoot'],
+  ual1: ['Idle_Loop','Walk_Loop','Walk_Formal_Loop','Jog_Fwd_Loop','Sprint_Loop','Jump_Start','Jump_Loop','Jump_Land','Roll','Crouch_Idle_Loop','Crouch_Fwd_Loop','Sword_Idle','Sword_Attack','Pistol_Idle_Loop','Pistol_Shoot','Pistol_Reload','Pistol_Aim_Down','Pistol_Aim_Neutral','Pistol_Aim_Up','Interact','Spell_Simple_Enter','Fixing_Kneeling','PickUp_Table','Punch_Jab','Punch_Cross','Death01','Hit_Chest','Hit_Head','Idle_Talking_Loop','Dance_Loop','Spell_Simple_Shoot'],
   ual2: ['Slide_Start','Slide_Loop','Slide_Exit','NinjaJump_Start','NinjaJump_Idle_Loop','NinjaJump_Land','ClimbUp_1m','Idle_FoldArms_Loop','Sword_Block','Sword_Dash','Sword_Regular_A','Sword_Regular_A_Rec','Sword_Regular_B','Sword_Regular_B_Rec','Sword_Regular_C','Sword_Regular_Combo','Sword_Heavy_Combo','Melee_Hook','Melee_Hook_Rec','OverhandThrow','Hit_Knockback','Shield_Dash','LayToIdle','Idle_No_Loop'],
 };
 for (const [k, list] of Object.entries(KEEP)) {
