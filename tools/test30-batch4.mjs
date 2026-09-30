@@ -83,7 +83,7 @@ check(!(await ev(() => __game.tdTarget)), 'no takedown from the front');
 
 // health: hits by difficulty, slow regen
 await park();
-await ev(() => { __game.hurt(0.3); __game.advance(3); });
+await ev(() => { __game.setHp(1); __game.hurt(0.3); __game.advance(3); });
 const h1 = await ev(() => __game.hp);
 await ev(() => __game.advance(3));
 const h2 = await ev(() => __game.hp);

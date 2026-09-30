@@ -2479,7 +2479,7 @@ function calmUpdate(e, dt, to, dist) {
     return;
   }
   e.sus = e.seeRate ? Math.min(1, (e.sus || 0) + e.seeRate * dt) : Math.max(0, (e.sus || 0) - dt * 0.15);
-  if (e.sus >= 1) { e.mind = 'spot'; e.yellT = 1.1 * DF().react; log('spotted by', e.id); return; }
+  if (e.sus >= 1) { e.mind = 'spot'; e.yellT = 1.1 * DF().react; setMark(e, '!'); log('spotted by', e.id); return; }
   setMark(e, e.sus > 0.2 ? '?' : null);
   if (e.sus > 0.2) { turnTo(e, Math.atan2(to.x, to.z), 2.5, dt); eplay(e, 'SW_Idle_Gun', { fade: 0.25 }); return; } // something's there: he stops and looks
   // patrol: strolls between spots near his post and waits at each
@@ -4351,7 +4351,7 @@ function start() {
     setClass(k) { klass = k; renderClass(); }, openMoves, closeMoves,
     // v26 hooks
     setDifficulty, get difficulty() { return difficulty; }, get hp() { return +hp.toFixed(3); }, get dead() { return dead ? { kind: dead.kind, t: +dead.t.toFixed(2), severed: dead.body.severed.map((b) => b.name), rag: !!dead.body.rag, asleep: !!dead.body.rag?.asleep, pelvis: dead.body.rag?.P.pelvis.p.toArray().map((v) => +v.toFixed(2)) } : null; },
-    respawn, hurt(frac, kind = 'bolt') { hurtPlayer(frac, kind, player.position.clone().add(new V3(0, 0, 5))); }, get deaths() { return deaths; },
+    respawn, setHp(v) { hp = v; hurtT = 99; renderHealth(); }, hurt(frac, kind = 'bolt') { hurtPlayer(frac, kind, player.position.clone().add(new V3(0, 0, 5))); }, get deaths() { return deaths; },
     minds: () => enemies.map((e) => ({ id: e.id, state: e.state, mind: e.mind || null, sus: +(e.sus || 0).toFixed(2), mark: e.markCh || null, los: !!e.los, rag: !!e.rag, asleep: !!e.rag?.asleep })),
     setMind(i, m, wait = 0) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e) return; e.mind = m; e.sus = 0; e.wp = null; e.waitT = wait; e.post = e.g.position.clone(); if (e.state === 'hit') { e.state = 'engage'; e.hitT = 0; } setMark(e, null); },
     faceEnemy(i, yawR) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) { e.yaw = yawR; e.g.rotation.y = yawR; } },
