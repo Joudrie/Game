@@ -2,6 +2,29 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v21: SWAT soldiers, a performance readout, The Second shelved
+- **The soldiers are SWAT officers** (Quaternius SWAT, CC0) instead of a grey copy of the hero.
+  - Dark grey armour, black vest and helmet, visor, knee pads, gloved hands.
+  - `tools/reskin_swat.mjs` puts him on our skeleton: his bones are matched to ours by name, our joints are moved onto his, and he's scaled so his hip height matches (the animations set the hip height). He keeps the artist's own weights, so he bends cleanly.
+  - His 5 meshes and 7 colours are merged into one mesh with painted-on colours: one draw call per soldier instead of seven. His built-in gun is left out; the game still hands every soldier its pistol.
+  - Deaths, pushes, grenades and dismemberment all work on him (test17 and test18 pass).
+- **Performance readout:** Menu → Tests → Performance.
+  - "Show frame rate and costs" puts a line at the top left: fps, game-logic time (the soldiers' share separately), draw time, draw calls, triangles, soldiers and bodies.
+  - Buttons keep **5, 10, 20 or 40 soldiers** alive, so you can see what more enemies cost on your own device.
+- **Measured headless** (`tools/test25-perf.mjs`):
+
+  | Soldiers | Game logic per frame | Draw calls | Triangles |
+  |---|---|---|---|
+  | 5 | 0.24 ms | 87 | 118k |
+  | 10 | 0.23 ms | 115 | 198k |
+  | 20 | 0.46 ms | 165 | 359k |
+  | 40 | 0.74 ms | 242 | 675k |
+
+  - Each soldier adds about 4 draw calls and 16k triangles: his body and pistol, drawn twice because they also cast shadows.
+  - Game logic is tiny. The graphics card does the real work.
+- **The Second is shelved.** He's out of the build (the files and tools stay in the repo); the Superhero plays again. The build dropped from 15.9 to 15.2 MB, SWAT soldiers included.
+- **`BACKLOG.md` has the owner's whole vision:** a lethal saber, dismemberment for droids, deadly weapons with difficulty from numbers, ragdolls and flying limbs, saber light and trails, a creative-mode catalogue, attachments, saved sabers, and Fortnite-inspired gadgets.
+
 ## v20.2: character switch in the Menu
 - The Second / Superhero switch is now at the top of **Menu → Moves** too; it was only in the Weapon panel, so there was no obvious way back after switching.
 - Your other requests (jetpack off by default, the pistol stuck pointing up after recoil, bullet holes, a better pistol, move presets) are in `BACKLOG.md` under "On hold until The Second's rig is finished".

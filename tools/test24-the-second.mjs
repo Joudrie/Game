@@ -8,6 +8,7 @@ const errs = []; p.on('pageerror', e => { errs.push(e.message); console.log('pag
 await p.goto(URL); await p.waitForFunction(() => window.__game, null, { timeout: 120000 });
 const ev = (f, a) => p.evaluate(f, a);
 let fail = 0;
+if (!(await ev(() => !!window.__ASSETS.second))) { console.log('The Second is not in this build (shelved in v21); skipped'); await b.close(); process.exit(0); }
 const who = await ev(() => __game.character());
 console.log('character mesh:', who);
 if (who !== 'TheSecond') { console.log('FAIL: player is not The Second'); fail++; }

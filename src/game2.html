@@ -71,6 +71,8 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #top .spacer { flex: 1; }
 
 #readout { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); left: var(--s4); font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; padding: var(--s2) var(--s3); }
+#perf { top: calc(var(--s4) + 60px + env(safe-area-inset-top, 0px)); left: var(--s4); max-width: calc(100vw - 2 * var(--s4)); font: 500 11px/1.4 var(--font-mono); padding: var(--s1) var(--s2); }
+@media (max-width: 420px) { #perf { top: calc(var(--s4) + 96px + env(safe-area-inset-top, 0px)); } } /* the class card wraps to three lines on phones */
 #readout .gait.hot { color: var(--signal); }
 #help { bottom: calc(var(--s4) + 72px + env(safe-area-inset-bottom, 0px)); right: var(--s4); padding: var(--s2) var(--s3); color: var(--ink-soft); white-space: nowrap; }
 #help kbd { font-family: var(--font-mono); font-size: 11px; color: var(--ink); background: var(--key); border: 1px solid var(--line); border-radius: 3px; padding: 0 var(--s1); }
@@ -197,6 +199,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
   <div class="body" id="weaponbody"></div>
 </section>
 
+<div id="perf" class="hud panel" hidden aria-live="off"></div>
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
 <div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
 <div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>G</kbd> loot a body · <kbd>Z</kbd> reload · scroll or <kbd>1</kbd>–<kbd>5</kbd> hotbar · <kbd>I</kbd> inventory · <kbd>Shift</kbd>+scroll zoom · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
@@ -561,8 +564,11 @@ async function boot() {
     m.updateMatrixWorld(true); box.setFromObject(m); m.position.y = -box.min.y; m.updateMatrixWorld(true);
     return m;
   };
-  const soldierBody = fit(h.scene); // the soldiers keep the Superhero body
-  hero = soldierBody;
+  const heroBody = fit(h.scene);
+  hero = heroBody;
+  // the soldiers wear the Quaternius SWAT officer, moved onto our skeleton by tools/reskin_swat.mjs (v21)
+  let soldierBody = heroBody;
+  if (A.enemy) { try { soldierBody = fit((await parseGLB(A.enemy)).scene); } catch (e) { report('error', 'Soldier model failed: ' + e.message); } }
   if (charCfg === 'second' && A.second) {
     try { const sc = (await parseGLB(A.second)).scene; sc.traverse((o) => { if (o.isMesh && !o.geometry.attributes.normal) o.geometry.computeVertexNormals(); }); hero = fit(sc); } catch (e) { report('error', 'The Second failed to load: ' + e.message); }
   }
@@ -585,7 +591,7 @@ async function boot() {
   for (const [id, c] of Object.entries(cal)) c.angle = wrapAngle(Math.atan2(c.fwd.x, c.fwd.z) - f0);
   hero.rotation.y = soldierBody.rotation.y = -Math.atan2(f.x, f.z);
   enemyTemplate = cloneSkinned(soldierBody);
-  enemyTemplate.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.color = new THREE.Color(0x6a7482); } });
+  if (soldierBody === heroBody) enemyTemplate.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.color = new THREE.Color(0x6a7482); } });
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
   poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
@@ -675,7 +681,7 @@ function updateOvr(dt) {
 // ---------------- lightsaber ----------------
 const SABER_COLORS = { Green: 0x35e06a, Blue: 0x3a8dff, Purple: 0x9b5cff, Red: 0xff3b30, Yellow: 0xffd33d, White: 0xf4f4f4 };
 // who you play: The Second (the owner's character, built from their turnaround images) or the Quaternius Superhero
-let charCfg = 'second';
+let charCfg = 'superhero'; // The Second is shelved (v21): not embedded in the build, so the Superhero plays
 try { const c = localStorage.getItem('character'); if (c === 'second' || c === 'superhero') charCfg = c; } catch (_) {}
 const saberCfg = { style: 'dual', grip: 'normal', color: 'Green' };
 try { Object.assign(saberCfg, JSON.parse(localStorage.getItem('saber') || '{}')); } catch (_) {}
@@ -1402,8 +1408,8 @@ function pullGrapple(dt) {
 // differently by cause. Bodies stay 90 s, then fade; a new soldier spawns to keep five alive.
 let enemyTemplate = null;
 const enemies = [];
-const ENEMY_COUNT = 5, CORPSE_TIME = 90, MAX_CORPSES = 12;
-const enemyCfg = { on: true, gore: true, pushBodies: true };
+const CORPSE_TIME = 90, MAX_CORPSES = 12;
+const enemyCfg = { on: true, gore: true, pushBodies: true, count: 5 }; // count: soldiers kept alive (Tests → Performance)
 try { Object.assign(enemyCfg, JSON.parse(localStorage.getItem('enemycfg') || '{}')); } catch (_) {}
 enemyCfg.gore = true; // dismemberment is always on (v14.1)
 const saveEnemyCfg = () => { try { localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } catch (_) {} };
@@ -1477,9 +1483,9 @@ function keepEnemiesUp(dt) {
   if (!enemyCfg.on || !enemyTemplate || !hero) return;
   const alive = enemies.filter((e) => e.state !== 'dead').length;
   respawnT -= dt;
-  if (alive >= ENEMY_COUNT) filled = true;
+  if (alive >= enemyCfg.count) filled = true;
   // the first squad arrives together; after that, replacements trickle in every 3 s
-  if (alive < ENEMY_COUNT && respawnT <= 0) { spawnEnemy(openSpot(filled ? 20 : 12, filled ? 34 : 24)); respawnT = filled ? 3 : 0.1; }
+  if (alive < enemyCfg.count && respawnT <= 0) { spawnEnemy(openSpot(filled ? 20 : 12, filled ? 34 : 24)); respawnT = filled ? 3 : 0.1; }
 }
 function collideCircle(p, r) {
   let hit = null;
@@ -2067,7 +2073,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v20.2 · 2026-09-30';
+const BUILD = 'v21 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -2771,7 +2777,7 @@ function step(dt) {
   updateJetpackLook();
   updateCombat(dt);
   updateSaber(dt);
-  updateEnemies(dt); updatePieces(dt); updateGrenades(dt); updateFx(dt);
+  const te = performance.now(); updateEnemies(dt); updatePieces(dt); perf.enemyAcc += performance.now() - te; updateGrenades(dt); updateFx(dt);
   animateLoco(dt, C);
   updateCamera(dt, C);
   hud(C);
@@ -3002,9 +3008,11 @@ function buildMoves() {
   const body = $('movesbody');
   const h = [];
   h.push(`<section data-panel="setup">`);
-  h.push(`<h3>Character <small>reloads the game</small></h3><div class="seg" role="group" aria-label="Character" style="grid-template-columns:repeat(2,1fr)">`);
-  for (const [k, l] of [['second', 'The Second'], ['superhero', 'Superhero']]) h.push(`<button type="button" data-char="${k}" aria-pressed="${charCfg === k}">${l}</button>`);
-  h.push(`</div>`);
+  if (window.__ASSETS.second) {
+    h.push(`<h3>Character <small>reloads the game</small></h3><div class="seg" role="group" aria-label="Character" style="grid-template-columns:repeat(2,1fr)">`);
+    for (const [k, l] of [['second', 'The Second'], ['superhero', 'Superhero']]) h.push(`<button type="button" data-char="${k}" aria-pressed="${charCfg === k}">${l}</button>`);
+    h.push(`</div>`);
+  }
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p><p class="note">Everything ticked below is for <b id="movesfor">${CLASSES[klass].label}</b>. Each class keeps its own set.</p>`);
@@ -3029,9 +3037,11 @@ function buildMoves() {
   $('weaponbody').innerHTML = h.join(''); h.length = 0;
   h.push(`<section data-panel="moves">`);
   // the character switch also lives here, where people look for it first (it's in the Weapon panel too)
-  h.push(`<h3>Character <small>reloads the game</small></h3><div class="seg" role="group" aria-label="Character" style="grid-template-columns:repeat(2,1fr)">`);
-  for (const [k, l] of [['second', 'The Second'], ['superhero', 'Superhero']]) h.push(`<button type="button" data-char="${k}" aria-pressed="${charCfg === k}">${l}</button>`);
-  h.push(`</div>`);
+  if (window.__ASSETS.second) {
+    h.push(`<h3>Character <small>reloads the game</small></h3><div class="seg" role="group" aria-label="Character" style="grid-template-columns:repeat(2,1fr)">`);
+    for (const [k, l] of [['second', 'The Second'], ['superhero', 'Superhero']]) h.push(`<button type="button" data-char="${k}" aria-pressed="${charCfg === k}">${l}</button>`);
+    h.push(`</div>`);
+  }
   for (const [slot, m] of Object.entries(MOVES)) {
     h.push(`<h3>${m.label} <small>${m.variants.length} found</small></h3>`);
     for (const v of m.variants) {
@@ -3056,6 +3066,10 @@ function buildMoves() {
     `<div class="seg" style="margin-top:8px;grid-template-columns:repeat(2,1fr)"><button type="button" id="enemyreset">Respawn all</button><button type="button" id="enemyclear">Clear bodies</button></div>` +
     `<p class="stats" id="enemystats"></p>` +
     `<p class="note">Deaths by cause: head (killing shot in the head), legs (most damage and the killing shot in the legs), torso (the rest), explosion, wall impact (Force push into a wall), push. Pistol: head 100, torso 34, legs 26 damage out of 100.</p>`);
+  h.push(`<h3>Performance</h3><label class="switch"><input type="checkbox" id="perfon" ${perf.on ? 'checked' : ''}> Show frame rate and costs (top left)</label>` +
+    `<p class="note" style="margin:8px 0 4px">Soldiers kept alive:</p><div class="seg" role="group" aria-label="Soldier count" style="grid-template-columns:repeat(4,1fr)">` +
+    [5, 10, 20, 40].map((n) => `<button type="button" data-ecount="${n}" aria-pressed="${enemyCfg.count === n}">${n}</button>`).join('') + `</div>` +
+    `<p class="note">"game" is the time the game logic takes each frame, "soldiers" the part spent on soldiers and severed limbs, "draw" the time to hand the frame to the graphics card. Under 16 ms in total keeps 60 fps.</p>`);
   h.push(`<h3>Status</h3><p class="stats" id="teststatus"></p>`);
   h.push(`</section>`);
   body.innerHTML = h.join('');
@@ -3079,7 +3093,11 @@ function buildMoves() {
     if (e.target.id === 'pushbodies') { enemyCfg.pushBodies = e.target.checked; saveEnemyCfg(); }
     if (e.target.id === 'jeton') { gadgets.jetpack = e.target.checked; saveGadgets(); if (!gadgets.jetpack && mode === 'jet') mode = 'air'; }
   });
+  body.addEventListener('change', (e) => { if (e.target.id === 'perfon') { perf.on = e.target.checked; $('perf').hidden = !perf.on; try { localStorage.setItem('perf', perf.on ? '1' : '0'); } catch (_) {} } });
   body.addEventListener('click', (e) => {
+    const ec = e.target.closest('[data-ecount]');
+    if (ec) { enemyCfg.count = +ec.dataset.ecount; saveEnemyCfg(); respawnT = 0; filled = false; body.querySelectorAll('[data-ecount]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.ecount === enemyCfg.count)));
+      const alive = enemies.filter((x) => x.state !== 'dead'); for (const x of alive.slice(enemyCfg.count)) removeEnemy(x); renderEnemyTests(); return; }
     if (e.target.closest('#enemyreset')) { [...enemies].filter((x) => x.state !== 'dead').forEach(removeEnemy); respawnT = 0; filled = false; renderEnemyTests(); }
     if (e.target.closest('#enemyclear')) { [...enemies].filter((x) => x.state === 'dead').forEach(removeEnemy); renderEnemyTests(); }
   });
@@ -3152,6 +3170,23 @@ function renderClassDetail() {
     `Jump ${C.doubleJump ? '+ double jump' : 'single'}. Slide ${C.slideTime}s. ${C.health} HP (not used until combat).`;
 }
 
+// ---------------- performance readout (Tests → Performance) ----------------
+// Smoothed over about a second: frame rate, game-logic time (soldiers separately), render submit time,
+// draw calls and triangles. Shown top left when switched on; also on window.__game.perf.
+const perf = { on: false, fps: 0, cpu: 0, enemies: 0, render: 0, calls: 0, tris: 0, enemyAcc: 0, t: 0 };
+try { perf.on = localStorage.getItem('perf') === '1'; } catch (_) {}
+function perfSample(raw, cpu, render) {
+  const k = 0.05, en = perf.enemyAcc; perf.enemyAcc = 0;
+  if (raw > 0) perf.fps += (1 / raw - perf.fps) * k;
+  perf.cpu += (cpu - perf.cpu) * k; perf.enemies += (en - perf.enemies) * k; perf.render += (render - perf.render) * k;
+  perf.calls = renderer.info.render.calls; perf.tris = renderer.info.render.triangles;
+  perf.t += raw;
+  if (perf.on && perf.t > 0.5) {
+    perf.t = 0;
+    const alive = enemies.filter((e) => e.state !== 'dead').length;
+    $('perf').textContent = `${perf.fps.toFixed(0)} fps · game ${perf.cpu.toFixed(1)} ms (soldiers ${perf.enemies.toFixed(1)}) · draw ${perf.render.toFixed(1)} ms · ${perf.calls} calls · ${(perf.tris / 1000).toFixed(0)}k tris · ${alive} soldiers, ${enemies.length - alive} bodies`;
+  }
+}
 // ---------------- loop ----------------
 const timer = new THREE.Timer();
 function start() {
@@ -3160,6 +3195,7 @@ function start() {
     timer.update(t);
     const raw = Math.max(0, timer.getDelta()), dt = Math.min(raw, 0.05); // never run animations backwards
     checkHitch(raw);
+    const t0 = performance.now();
     try {
     if (movesOpen) {
       updateSaber(dt);
@@ -3177,11 +3213,14 @@ function start() {
       report('error', `${err.message} | ${(err.stack || '').split('\n').slice(1, 3).join(' ').trim()}`);
       try { mixer.update(dt); applyFists(); } catch (_) {}
     }
+    const t1 = performance.now();
     renderer.render(scene, camera);
+    perfSample(raw, t1 - t0, performance.now() - t1);
   });
+  $('perf').hidden = !perf.on;
   setGear(gear, true);
   window.__game = { character: () => { let n = null; hero.traverse((o) => { if (!n && o.isSkinnedMesh) n = o.name; }); return n; }, enemies: () => enemies.map((e) => ({ id: e.id, state: e.state, hp: e.hp, pos: e.g.position.toArray().map((v) => +v.toFixed(1)), death: e.deathType || null, clip: e.actName })),
-    firePistol, forcePush, throwGrenade, deathCounts,
+    firePistol, forcePush, throwGrenade, deathCounts, perf, setEnemyCount(n) { enemyCfg.count = n; respawnT = 0; filled = false; },
     // test hook: shoot from the camera at a zone of the i-th living enemy (head, torso or legs)
     shootAt(i, zone) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e) return null; fireCd = 0;
       const z = enemyZones(e).find((q) => q.zone === zone), at = z.a.clone().lerp(z.b, zone === 'legs' ? 0.8 : 0.5);
@@ -3202,7 +3241,7 @@ function start() {
     startLoot, get looting() { return looting ? { t: +looting.t.toFixed(2), shown: looting.shown, n: looting.items.length } : null; }, get lootLog() { return lootLog.slice(); }, get lootTarget() { return lootTarget ? lootTarget.id : null; },
     inv, selectSlot, moveItem, addItem, toggleInv, countItem,
     ammo, startReload, get reload() { return reload ? { t: +reload.t.toFixed(2), empty: reload.empty } : null; }, get mags() { return mags.length; }, get magPos() { return mags.map((g) => g.m.position.toArray().map((v) => +v.toFixed(2)).concat(g.rest ? 'rest' : 'moving')); }, magDebug(big) { const g = mags[0]; if (!g) return null; if (big) g.m.scale.setScalar(big); const v = g.m.position.clone().project(camera); return { inScene: g.m.parent === scene, visible: g.m.visible, scale: g.m.scale.toArray(), screen: [+((v.x + 1) / 2 * innerWidth).toFixed(0), +((1 - v.y) / 2 * innerHeight).toFixed(0), +v.z.toFixed(3)], gunMagWorld: gunMag.getWorldScale(new V3()).toArray().map((x) => +x.toFixed(3)) }; }, get thumbs() { return Object.keys(thumbs); }, get magOut() { return magOut; },
-    fillEnemies() { while (enemies.filter((x) => x.state !== 'dead').length < ENEMY_COUNT) spawnEnemy(openSpot(20, 34)); },
+    fillEnemies() { while (enemies.filter((x) => x.state !== 'dead').length < enemyCfg.count) spawnEnemy(openSpot(20, 34)); },
     moveEnemy(i, x, z, yawR) { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) { e.g.position.set(x, groundAt(x, z, 99), z); if (yawR !== undefined) e.yaw = yawR; e.state = 'hit'; e.hitT = 5; e.g.updateMatrixWorld(true); } }, killFeed, damageEnemy: (i, amt, zone, kind) => { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) damageEnemy(e, amt, zone, kind); return !!e; },
     playOnEnemy(i, name, from = 0, speed = 1) { const e = enemies.filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },
     get blocks() { return blocks.map((b) => ({ min: b.box.min.toArray().map((v) => +v.toFixed(1)), max: b.box.max.toArray().map((v) => +v.toFixed(1)) })); },
