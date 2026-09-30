@@ -79,7 +79,7 @@ check((await ev(() => __game.jumpsDone)) === 3, `three jumps in the air: vy ${vy
 await ev(() => { __game.testCfg.infiniteJumps = true; __game.advance(3); });
 // wall run: sprint along a tall wall and jump
 const boxes = await ev(() => __game.blockBoxes());
-const W = boxes.filter((x) => x[4] > 3 && x[5] - x[2] > 6).sort((a, c) => (c[5] - c[2]) - (a[5] - a[2]))[0];
+const W = boxes.filter((x) => x[4] > 3 && x[5] - x[2] > 6 && x[5] < 140).sort((a, c) => (c[5] - c[2]) - (a[5] - a[2]))[0];
 await ev((B) => { __game.place(B[3] + 0.5, B[2] + 1); __game.look(0, 0.1); __game.advance(0.5); }, W);
 const wr = await ev(() => { __game.setKey('KeyW', true); __game.setKey('ShiftLeft', true); __game.advance(1.2); __game.setKey('Space', true); __game.advance(0.05); __game.setKey('Space', false);
   let on = 0, top = 0; for (let i = 0; i < 14; i++) { __game.advance(0.1); if (__game.wallRun) on++; top = Math.max(top, __game.pos[1]); } __game.setKey('KeyW', false); __game.setKey('ShiftLeft', false); return { on, top }; });
