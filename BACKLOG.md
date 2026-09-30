@@ -49,13 +49,13 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 4. **Block and parry:** holding block covers the front and sides, not the back; the guard breaks after many hits; a block timed to the shot sends the bolt back at the shooter (a sniper's scope glint is the tell).
 5. Soldiers carry these weapons and drop them.
 
-**Batch 3: Jedi powers and movement** *(next)* (the Jedi class first)
+**Batch 3: Jedi powers and movement** ✅ *done in v25* (the Jedi class first)
 1. **Force targeting like Lego Star Wars** (a marker on whoever you look at, with an on/off toggle and cooldowns): pull (into your blade), choke, lightning, saber throw.
 2. **Saber feel:** blade trail, the blade lights faces and rooms, sparks and scorch marks on walls and ground, the hum and ignite sounds.
 3. **Triple jump,** each jump higher; a little wall running during the super sprint.
 4. **Saber + blaster** as one item (the blaster overheats after about 4 shots).
 
-**Batch 4: enemies that think, and you can die**
+**Batch 4: enemies that think, and you can die** *(next)*
 1. **Enemy states:** idle, patrol, alerted, targeting. An idle guard who sees someone die panics for a moment. A guard who spots you yells, and killing him before he finishes keeps it quiet. Suppressors are silent; gunfire alerts everyone.
 2. **Stealth kills.**
 3. **Player damage** (hits to kill set by difficulty), slow regenerating health, easy / normal / hard / extreme (smarter AI on the hard ones).

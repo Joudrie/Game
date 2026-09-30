@@ -4,3 +4,7 @@ pump: OpenGameArt "Gun reload sounds" shotguncock_0.wav (CC0)
 bolt: Freesound 267895 "Mosin Nagant Bolt fast" (CC0)
 reload: OpenGameArt "Handgun reload" reload.wav (CC0)
 blaster, deflect, parry: Kenney Sci-fi Sounds (laserSmall_000, laserRetro_002, laserLarge_001), CC0
+saber_on, saber_hum, saber_swing: Freesound 47126, 47124, 47125 by gyzhor (CC0)
+saber_off: Freesound 591433 "Laser Sword Turn Off" (CC0)
+force: Freesound 423799 "Little Whoosh 2" (CC0)
+zap: Kenney Sci-fi Sounds forceField_001 (CC0)
