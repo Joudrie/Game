@@ -70,7 +70,7 @@ The ground rules:
   - Suppressed shots don't alert anyone; gunfire alerts anyone not already on high alert.
   - Stealth kills. A guard who spots you yells; kill him before he finishes and nobody else is alerted.
 - **Waves:** no endless waves in the sandbox; a setting for how many enemies at a time (Tests → Performance has 5/10/20/40; the owner suggested 10 as a default).
-  - The first level can be **wave-based with escalating enemy weapons:** pistols, then AKs, then ARs, then snippers. You pick up what they drop, so where you kill them matters: loot a body in the open and you get shot.
+  - The first level can be **wave-based with escalating enemy weapons:** pistols, then AKs, then ARs, then snipers. You pick up what they drop, so where you kill them matters: loot a body in the open and you get shot.
 - **Enemies drop their weapons and you can pick them up.** This is the owner's favourite next step after dismemberment.
 - **Inventory:** a **6-slot hotbar centred at the bottom**; the backpack can be as big as needed.
 - **Art style:** not Lego (animations would look clunky on brick figures). Leaning toward RDR2 / Modern Warfare realism at lower fidelity: **modern special forces in a Naboo-like city**.
