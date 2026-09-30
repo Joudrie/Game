@@ -2,6 +2,19 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v22: the blade decides (dismemberment, part 1)
+Your top priority. The saber no longer does "damage": it cuts exactly where it passes.
+- **Blade contact:** every frame, a moving lit blade is swept from where it was to where it is and tested against each soldier's head, chest, waist, upper arms, forearms, hands, thighs, calves and feet. A fast swing can't skip through someone between frames.
+- **Head, chest, waist or legs: dead, every time,** cut right there: head off, cut through the chest, cut in half at the waist, leg off above or below the knee, foot off.
+- **Hands and arms: they come off and he lives.** He staggers, bleeds from the stump and keeps fighting with the arm he has left.
+  - **Lose the gun hand** (right hand or arm) and he **drops his pistol and runs away** from you.
+- **Dropped guns:** every soldier's pistol falls out of his hand when he dies or loses that hand, and lies on the ground. Picking them up comes later.
+- **Cartoon blood:** the stump spurts for about two seconds; drops fall and leave small splats on the ground for 25 seconds.
+- **Loose pieces fly:** grenades and Force push now throw severed limbs and dropped guns too, not just bodies.
+- **The kill feed names the cut:** "Saber · right hand off", "Saber · cut in half".
+- Fists still hit by reach; only the saber cuts.
+- **Automated test:** `tools/test26-dismember.mjs` covers a real swing, gun hand off (alive, unarmed, gun dropped, runs), left arm off (alive, still armed), head, waist and leg cuts (dead, cut there), blood splats and loose pieces.
+
 ## v21: SWAT soldiers, a performance readout, The Second shelved
 - **The soldiers are SWAT officers** (Quaternius SWAT, CC0) instead of a grey copy of the hero.
   - Dark grey armour, black vest and helmet, visor, knee pads, gloved hands.

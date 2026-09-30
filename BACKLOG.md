@@ -28,6 +28,57 @@ The ground rules:
 - **Inspiration:** the owner's book *Wake* (weapons such as plasma knives, plasma and beryllium rifles, holocloaks, magboots, hoverboards, breaching kits; worlds like Marfeld and Kelton) and the Lego collection's lore (the Snow Jedi, the Purple Shadow, the realm where guns don't work).
 - **Licences still apply:** assets ripped from commercial games (like the Skate 3 or Call of Duty files people pass around) can't go in. We take ideas from those games, and assets only from properly licensed sources.
 
+## ★ Current focus: dismemberment (owner, v22)
+"I really want to ace the dismemberment mechanic." Cartoon, not gory: blood yes, gore no.
+- [x] **v22:** the blade decides. Head, torso and legs kill, cut exactly where the blade passed; hands and arms come off and the soldier lives; the gun hand drops the pistol and he runs; cartoon blood and splats; grenades and pushes throw loose limbs and guns.
+- [ ] **Better reactions to losing a limb:** clutching the stump, a scream (voice lines later), switching the gun to the other hand, one-armed soldiers still shooting.
+- [ ] **Leg cuts that don't kill:** he falls and crawls.
+- [ ] **The cut follows the blade's angle:** a slanted slice through the mesh instead of cutting at a joint.
+- [ ] **Droids fall apart:** sparks instead of blood, and they keep coming with missing parts.
+- [ ] **Energy shields:** a Jackal-style shield, and **juggernauts** whose skin-tight force field (like a starship's shield) takes three saber hits while they shoot you. Not yet.
+- [ ] **Saber duels:** enemies with sabers block instead of dying on contact.
+
+## Design answers (owner, v22)
+- **Saber:** one touch kills (except shields and saber duellists); limbs can come off with a reaction.
+- **Block and parry:**
+  - Holding block stops shots from the front and sides, **not the back**.
+  - The guard **breaks after a lot of bullets**.
+  - **A block timed to the moment an enemy fires sends the bolt straight back at him.** A sniper's scope glint or aim animation is the tell.
+- **Force, Lego Star Wars style:**
+  - Select Force in the inventory and a target marker appears on whoever you look at.
+  - Powers: choke, lightning, saber throw, pull (combo: pull him into your blade).
+  - Cooldowns so it isn't spammed, and a toggle to hide the markers in crowds.
+  - Later: Avatar-style earth powers (stomp to raise a rock wall that stays for a while).
+- **No enemy health bars, ever.** A hard line: you shouldn't see the enemy's cards.
+- **Saber and blaster together** as one inventory item. The blaster has a drawback (for example 4 shots, then a cooldown, or a slower reload). Balance later.
+- **Dead Eye** (RDR2 slow-motion aim): single player only.
+- **Movement:**
+  - Triple jump, each jump higher (more Force each time).
+  - A little wall running, only during the super sprint.
+  - Walls with a special texture you can walk up (magboots, from *Wake*) in campaign missions.
+  - Assassin's Creed climbing: ledges and proper leaps.
+  - Hay bales or water that save you from a fall.
+- **Falls:**
+  - Fall damage depends on the class; Jedi survive huge falls; deadly ledges are marked.
+  - A pickup that grants fall immunity for a while, shown as a faint blue outline.
+- **Dying should be fun (Helldivers):** a full ragdoll; watch your body tumble down a cliff or float down a stream, or press a button to respawn. Helldivers-style **throwable killstreaks**.
+- **Aiming:** snappy (Fortnite / Call of Duty), maybe varying by class later. The **Jedi movement class comes first**: ace that and the rest follows.
+- **Cover:** a snap-to-cover button (keys decided later).
+- **Ammo:** plentiful; a body gives about three magazines.
+- **Enemy AI:** dumb and fun on easy and normal, smarter on hard and extreme.
+  - States: idle, patrol, alerted, targeting you.
+  - Suppressed shots don't alert anyone; gunfire alerts anyone not already on high alert.
+  - Stealth kills. A guard who spots you yells; kill him before he finishes and nobody else is alerted.
+- **Waves:** no endless waves in the sandbox; a setting for how many enemies at a time (Tests → Performance has 5/10/20/40; the owner suggested 10 as a default).
+  - The first level can be **wave-based with escalating enemy weapons:** pistols, then AKs, then ARs, then snippers. You pick up what they drop, so where you kill them matters: loot a body in the open and you get shot.
+- **Enemies drop their weapons and you can pick them up.** This is the owner's favourite next step after dismemberment.
+- **Inventory:** a **6-slot hotbar centred at the bottom**; the backpack can be as big as needed.
+- **Art style:** not Lego (animations would look clunky on brick figures). Leaning toward RDR2 / Modern Warfare realism at lower fidelity: **modern special forces in a Naboo-like city**.
+- **Camera:** a key to swap shoulders, to test.
+- **Blood and dismemberment on humans:** yes (cartoon).
+- **Weapon sounds** would make the owner grin.
+- **Later:** mechs, a hoverboard (a skateboard with no wheels), stealth missions.
+
 ## 0. Next up: your asks from the v20 play test
 (They were on hold for The Second's rig; The Second is now shelved, so these are open.)
 - [ ] **Jetpack off by default;** you turn it on yourself. (The switch exists in the Weapon panel; the default flips.)

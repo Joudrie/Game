@@ -22,7 +22,7 @@ A mobile-first third-person action game in three.js (GTA / Red Dead / Watch Dogs
 - **Tests:** `node tools/testNN-*.mjs` (Playwright, Chromium at `/opt/pw-browsers/chromium` with swiftshader flags; see any test).
   - Headless runs at about 8 fps, so use the `__game.advance(seconds)` hook instead of real waits.
   - Test hooks live on `window.__game`: `setGear`, `selectSlot`, `fillEnemies`, `moveEnemy`, `damageEnemy`, `shootAt`, `setKey`, `advance`, `startLoot`, `startReload`…
-  - Main tests: test17 (enemies), test18 (combat), test23 (dual combos), test24 (The Second, skipped while shelved), test25 (performance), test19 (v14 feel), test20 (loot), test21 (inventory), test22 (reload), test9 (menus and gear).
+  - Main tests: test17 (enemies), test18 (combat), test23 (dual combos), test24 (The Second, skipped while shelved), test25 (performance), test26 (dismemberment), test19 (v14 feel), test20 (loot), test21 (inventory), test22 (reload), test9 (menus and gear).
   - `tools/sheet17.mjs` makes animation contact sheets. Use them to check clips by eye before adding them.
 - **Animation pipeline:** everything is retargeted onto the UE5-mannequin skeleton of the Quaternius Superhero.
   - `tools/retarget.mjs`: `retarget` for sources with a T-pose; `retargetDir` for rigs that don't have one.
@@ -60,9 +60,12 @@ These are added as **API credentials** in the cloud environment. The proxy injec
 - **The city comes later,** once it's scoped.
 - **Inspiration sources the owner owns:** the book *Wake* (`github.com/Joudrie/wake`: 299 encyclopedia entries covering weapons, places, factions and tech) and the Lego collection (`github.com/Joudrie/lego`: 816 figures with lore in `SUMMARY.md`). Use them when choosing weapons, enemies and places.
 
-## Where things stand (v21)
+- **v22 answers:** the full list is under "Design answers" in `BACKLOG.md`. The essentials: dismemberment is the current focus; the saber kills on touch; no enemy health bars, ever; the Jedi movement class comes first.
+
+## Where things stand (v22)
 - **Movement:** classes (light, Force, heavy), slides with momentum, infinite and double jumps, grapple (also onto enemies), jetpack (Mandalorian model), ground pound.
 - **Combat:** five-hit saber combo, four dual-saber combos (Moves → Dual saber combo; left-hand hits are mirrored clips from `tools/bake_mirror.mjs`), fists combo, pistol with aim pitch, 12-round magazine, reload and dropped magazines, Force push, grenades, saber blocking bullets.
+- **Dismemberment (v22):** `bladeCuts()` sweeps each lit blade frame to frame against the soldiers' body segments (`CUTS`). Head, torso and legs kill, severed there (`e.cut` → `goreOnDeath`); arms and hands come off and he lives (gun hand: `dropGun`, `e.unarmed`, flees). `updateBlood` handles stump spurts and splats. Test: test26.
 - **Enemies:** five soldiers with deaths by cause (head, torso, legs, explosion, push, wall impact, grapple, pound), always-on dismemberment, bodies that can be moved, looting.
 - **Items:** hotbar (5 slots, scroll or 1–5) and inventory (drag or tap), saved in localStorage.
 - **Enemies (v21):** SWAT officers, `build/enemy_swat.glb` from `node tools/reskin_swat.mjs` (maps the Quaternius SWAT onto the hero skeleton, one vertex-coloured mesh), embedded as `enemy`. Tests → Performance shows the cost and sets the soldier count; `tools/test25-perf.mjs` measures it.
