@@ -60,6 +60,7 @@ These are added as **API credentials** in the cloud environment. The proxy injec
 - **The city comes later,** once it's scoped.
 - **Inspiration sources the owner owns:** the book *Wake* (`github.com/Joudrie/wake`: 299 encyclopedia entries covering weapons, places, factions and tech) and the Lego collection (`github.com/Joudrie/lego`: 816 figures with lore in `SUMMARY.md`). Use them when choosing weapons, enemies and places.
 
+- **Invincible while testing (owner, v28.1):** the player can't be hurt by default (`difficulty = 'sandbox'`, labelled Invincible; saves are migrated once by `v28-invincible`). Keep it that way until the owner says otherwise; the damage levels are there only to try out.
 - **v22 answers:** the full list is under "Design answers" in `BACKLOG.md`. The essentials: dismemberment is the current focus; the saber kills on touch; no enemy health bars, ever; the Jedi movement class comes first.
 
 ## Where things stand (v22)
