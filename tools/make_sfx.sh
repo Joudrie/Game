@@ -20,4 +20,12 @@ enc reload  $S/opengameart/cc0_handgun-reload/reload.wav 1.2
 enc blaster $S/kenney/kenney_sci-fi-sounds/Audio/laserSmall_000.ogg 0.4
 enc deflect $S/kenney/kenney_sci-fi-sounds/Audio/laserRetro_002.ogg 0.4
 enc parry   $S/kenney/kenney_sci-fi-sounds/Audio/laserLarge_001.ogg 0.6
+F=$S/freesound_cc0_previews
+enc saber_on   $F/lightsaber_ignition__47126_lightsaber4.mp3 1.0
+enc saber_off  $F/laser_sword__591433_Laser_Sword_Turn_Off_1.mp3 0.8
+enc saber_swing $F/lightsaber_swing__47125_lightsaber.mp3 0.6
+enc force      $F/whoosh__423799_Little_Whoosh_2.mp3 0.6
+enc zap        $S/kenney/kenney_sci-fi-sounds/Audio/forceField_001.ogg 0.5
+# the hum loops: a clean second from the middle of the recording
+"$FF" -hide_banner -loglevel error -y -i $F/lightsaber_hum__47124_lightsaber2.mp3 -ss 0.8 -t 1.2 -af "afade=t=in:d=0.05,afade=t=out:st=1.15:d=0.05" -ac 1 -ar 24000 -c:a libopus -b:a 36k build/sfx/saber_hum.ogg
 ls -la build/sfx

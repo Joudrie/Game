@@ -2,6 +2,24 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v25: roadmap batch 3 (the Force, saber throw, saber feel, saber + blaster, triple jump, wall run)
+- **The Force is an item** (Lego Star Wars style). With it selected your saber stays lit, and **a red ring marks the one soldier you're looking at**; switch the ring off in the Weapon panel if you like.
+  - **Left click: Force pull.** He flies to about 1.4 m in front of you, and if your saber is lit **it swings as he arrives: pulled onto the blade.**
+  - **Right click (hold): Force choke.** He's lifted about a metre and kicks; hold 2.2 s and he's dead ("Force choke"). Let go early and he drops. 2.5 s cooldown.
+  - **H or middle click (hold): Force lightning.** Crackling arcs from your left hand to the target and on to one soldier next to him. Up to 3 s, then a cooldown.
+  - **T** is still Force push.
+- **Saber throw: middle click or Y** with the saber lit. It spins out about 13 m along your aim, **cuts anything it passes through** (the same blade-contact system), and comes back to your hand.
+- **Saber feel:**
+  - **A trail** behind the blade when it moves fast (the Lego Star Wars look), in the blade's colour.
+  - **The blade is a light:** it lights your face, body and the ground around you in its colour.
+  - **Cutting the world:** slash the ground or a wall and you get **sparks and a glowing scorch mark** that cools from orange to dark and fades after about 20 s.
+  - **Sound:** ignite, a hum that gets louder and higher as you swing, swing whooshes, and switch-off. All CC0.
+- **Saber + blaster** (a new item): saber in your right hand, blaster in your left. **Right click fires**, and **four quick shots overheat it** for 2.5 s. The heat gauge shows in the corner.
+- **Triple jump** (Force class): the third jump goes 25% higher than the second.
+- **Wall run:** jump alongside a wall at super-sprint speed and you run along it for about a second, arcing up about 2 m. **Jump again to kick off.**
+- **Existing saves** get The Force and the Saber + blaster once, in a free hotbar slot or the backpack (drag them in with I).
+- **Automated test:** `tools/test29-force.mjs` covers the marker, pull, choke, lightning, throw, blade light, scorch, blaster overheat, triple jump and wall run. All 10 earlier suites pass. Build 15.72 MB.
+
 ## v24: roadmap batch 2 (guns, sounds, blaster bolts and the parry)
 - **Three new guns,** already in your hotbar (slots 4–6; existing saves get them once). All are free CC0 models from Quaternius:
   - **AK-47:** fully automatic while you hold the trigger, 30 rounds; the spread grows while you hold it and tightens when you let go.
