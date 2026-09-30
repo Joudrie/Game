@@ -21,6 +21,11 @@ The ground rules:
 - **Fun over everything, and always fast.** No weight system, nothing that slows the player down. Even in a cutscene you can walk around, interact, even wander a little out of frame.
 - **Minecraft-style limits:** the only limit is inventory slots. A scrollable hotbar is your quick hand (Minecraft / Fortnite).
 - **References:** Jedi: Survivor (saber combat, but third person), Red Dead Redemption 2 and GTA V (cover shooting), MW2 Spec Ops (enemy types, killstreaks, the co-op mission "Big Brother"), Fortnite (weapons and gadgets), Black Ops 2 (quickscoping, trickshots), Rainbow Six Siege (destruction), Arkham Knight (grappling), Metal Gear (stealth), Zelda (islands and boats), Portal (the vibe of puzzle areas), Fallout (character creator), Fortnite and Destiny (emotes).
+- **Owner's answers (v21):** PC first (phone only needs to load and look right); no player damage yet; personal and played with friends (maybe sold one day, so keep Star Wars assets swappable, with *Wake*'s plasma blades as the fallback for sabers); duo co-op PvE someday; the city later.
+- **Variety in every weapon's animations** (not just two per weapon, first person included). The owner's lesson from Destiny: the moment-to-moment play has to be fun, and the rewards have to feel worth it.
+- **Story is light:** "go take out these people". But there are characters: a villain, **civilians walking around with overheard chatter (GTA)**, unalerted guards, **Hitman-style disguises**, silly cutscenes, and **voice lines recorded by the owner**.
+- **Character switching like Lego Star Wars.**
+- **Inspiration:** the owner's book *Wake* (weapons such as plasma knives, plasma and beryllium rifles, holocloaks, magboots, hoverboards, breaching kits; worlds like Marfeld and Kelton) and the Lego collection's lore (the Snow Jedi, the Purple Shadow, the realm where guns don't work).
 - **Licences still apply:** assets ripped from commercial games (like the Skate 3 or Call of Duty files people pass around) can't go in. We take ideas from those games, and assets only from properly licensed sources.
 
 ## 0. Next up: your asks from the v20 play test

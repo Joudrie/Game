@@ -9,7 +9,7 @@ A mobile-first third-person action game in three.js (GTA / Red Dead / Watch Dogs
 - **Variety.** Several variants of every animation, selectable in Menu → Moves and rotated in play.
 - **Report problems back.** T-poses, freezes and stuck states are caught by the in-game watchdog and reported. Take reports the owner pastes seriously and fix the root cause.
 - **Keep the docs current.** Add a `CHANGELOG.md` entry for every version (bump `BUILD` in `src/game2.html`), and keep `BACKLOG.md` in sections.
-- **Mobile first.** Every feature needs a touch control, and the layout has to work at 375 px.
+- **PC first (owner, v21).** Mouse and keyboard are the real platform. Phones only need to load the game and look right for a quick look (a friend opening a texted link): keep the layout working at 375 px, but new mechanics don't need full touch controls.
 
 ## Build and test
 - **Game source:** `src/game2.html`, a single file with the module script inside. `python3 tools/build2.py` embeds the models, animations and the jetpack OBJ from `build/` and `assets/`, and writes:
@@ -51,6 +51,14 @@ These are added as **API credentials** in the cloud environment. The proxy injec
     4. Get the owner's default character id from `GET /api/v1/characters/primary`.
   - Convert the FBX, for example with the `fbx2gltf` npm binary, then bake with `mixamoMap('mixamorig')`.
   - Wanted clips: see `ASSET_GUIDE.md` (sword draw and sheath, sword and dual combos, pistol locomotion, rifle pack, deaths by cause, slides, flips, flying).
+
+## The owner's answers so far (v21)
+- **PC first;** phone is a quick look only (see above).
+- **Enemies can't hurt the player yet;** that comes later. It's still a testing sandbox.
+- **Personal, played with friends,** maybe sold one day. Fan-made Star Wars assets are acceptable for now, but keep them swappable. If it's ever sold, the sabers can become **plasma blades from the owner's book *Wake***.
+- **Co-op someday, duo PvE;** no PvP.
+- **The city comes later,** once it's scoped.
+- **Inspiration sources the owner owns:** the book *Wake* (`github.com/Joudrie/wake`: 299 encyclopedia entries covering weapons, places, factions and tech) and the Lego collection (`github.com/Joudrie/lego`: 816 figures with lore in `SUMMARY.md`). Use them when choosing weapons, enemies and places.
 
 ## Where things stand (v21)
 - **Movement:** classes (light, Force, heavy), slides with momentum, infinite and double jumps, grapple (also onto enemies), jetpack (Mandalorian model), ground pound.
