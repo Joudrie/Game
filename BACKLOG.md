@@ -18,6 +18,10 @@ The ground rules:
 - **Every weapon is deadly.** Enemies have little health; difficulty comes from **numbers**, not bullet sponges. Being overwhelmed, not being on round 20 with enemies that soak up 1000 bullets.
 - **Keep the game small** if that buys more enemies on screen.
 - **Mostly droids** as enemies, plus the human soldiers we have.
+- **Fun over everything, and always fast.** No weight system, nothing that slows the player down. Even in a cutscene you can walk around, interact, even wander a little out of frame.
+- **Minecraft-style limits:** the only limit is inventory slots. A scrollable hotbar is your quick hand (Minecraft / Fortnite).
+- **References:** Jedi: Survivor (saber combat, but third person), Red Dead Redemption 2 and GTA V (cover shooting), MW2 Spec Ops (enemy types, killstreaks, the co-op mission "Big Brother"), Fortnite (weapons and gadgets), Black Ops 2 (quickscoping, trickshots), Rainbow Six Siege (destruction), Arkham Knight (grappling), Metal Gear (stealth), Zelda (islands and boats), Portal (the vibe of puzzle areas), Fallout (character creator), Fortnite and Destiny (emotes).
+- **Licences still apply:** assets ripped from commercial games (like the Skate 3 or Call of Duty files people pass around) can't go in. We take ideas from those games, and assets only from properly licensed sources.
 
 ## 0. Next up: your asks from the v20 play test
 (They were on hold for The Second's rig; The Second is now shelved, so these are open.)
@@ -81,6 +85,10 @@ The centrepiece. It should feel like a tool you can do anything with.
 - [ ] **Running with an ignited saber:** a dedicated run clip. *[needs you: Mixamo `Run With Sword`]*
 
 ## 3. Rifle and guns
+- [ ] **Cover shooting (RDR2 / GTA V):** a button to duck behind cover; peek out, aim out and duck back; reload crouched behind cover; blind-fire over the top without exposing yourself.
+- [ ] **First-person mode** with aim down sights, and **leaning** around corners while aiming.
+- [ ] **Snipers that feel like Black Ops 2:** quickscoping matters; optional trickshot mechanics.
+- [ ] **More guns:** shotgun, sniper rifles and more; Fortnite-level variety.
 - [ ] **Attachments from the item menu:** right-click (long-press on a phone) a weapon in the inventory → e.g. "Add suppressor".
 - [ ] **Rifle on the back; draw and holster.** *[needs you: Mixamo `Grab Rifle From Back`, `Put Back Rifle`]*
 - [ ] **Two-handed rifle locomotion.** *[needs you: Mixamo `Rifle 8-Way Locomotion Pack`]*
@@ -114,6 +122,9 @@ The centrepiece. It should feel like a tool you can do anything with.
 - [ ] **The Second's green trail** when he bursts forward, and a Force dash.
 
 ## 6. Gadgets and abilities
+- [ ] **Fortnite-style weapons:** swords with lunges, a plunger-style grappling hook, fun side weapons.
+- [ ] **Grenade types:** impact (done), **fire** (leaves a trail of fire that blocks an enemy's path), **sticky** (sticks to an enemy and kills outright, even armoured ones).
+- [ ] **Grappling that feels like Arkham Knight.**
 - [ ] **Fortnite-inspired gadgets** (inspired, not copied): go through the vaulted-items catalogue and pick ideas, e.g. a thrown orb that teleports you where it lands.
 - [x] ~~Jetpack~~ (v14). Still to do: fuel, a proper model and sound, and hover animations from Mixamo (`Flying`).
 - [x] ~~Impact grenade.~~ Done in v12. Still to do: a grenade model, sound, and a count per life.
@@ -128,7 +139,24 @@ The centrepiece. It should feel like a tool you can do anything with.
 - [ ] **Loot per enemy type** once there are more enemy types.
 - [ ] **Better rummage animations and a quick-loot tap.** *[needs you: Mixamo `Kneeling Pointing`, `Picking Up`, `Searching Pockets`]*
 
+## 6c. Enemy types, killstreaks and modes
+- [ ] **Enemy types like MW2 Spec Ops** (types, not just skins): infantry, **juggernauts** (heavily armoured), **dogs**, and later droids.
+- [ ] **Killstreaks,** e.g. a support gunship or an ally covering you, like the co-op mission "Big Brother" where someone assists you as you run through enemies.
+- [ ] **Health:** slow regenerating health (about a minute to heal fully), with the saber still one-hit lethal to enemies.
+- [ ] **Armour** you find and wear (Skyrim-ish).
+- [ ] **Difficulty modes:** easy, normal, hard, extreme.
+- [ ] **Stealth** (Metal Gear).
+- [ ] **Emotes** (Fortnite / Destiny).
+
+## 6d. Destruction (Rainbow Six Siege)
+Not everything breaks, but some things do, and by material:
+- [ ] **Stone:** buildings; they take marks (bullet holes, saber scorch) but stand.
+- [ ] **Glass:** shatters completely.
+- [ ] **Wood (soft walls):** can be destroyed; the fragments stay on the ground. **Partial destruction:** a grenade in the right corner takes out mostly that corner and leaves the rest of the wall standing.
+- [ ] **Bullet holes** in soft walls you can see through.
+
 ## 7. Your characters
+- [ ] **Character creator like Fallout:** face shape, cheekbones, facial hair and more, with extreme settings allowed. Helmets on a giant head: a "silly" option (the face clips through) or "squish to fit" (the helmet stays on); sensible limits on the sliders.
 - [ ] **Turn the paintings into 3D models,** starting with The Second (turnaround ready). *[needs you: `HF_TOKEN` in the environment settings]*
 - [ ] **Rig them and load them** with the current animation sets.
 - [ ] **Assign each character a class.** *[needs you: which characters are heavy infantry]*
@@ -146,6 +174,8 @@ The centrepiece. It should feel like a tool you can do anything with.
 - [ ] Menu clicks.
 
 ## 9. Look and lighting
+- [ ] **Setting:** an ancient-Roman-style city like Naboo, with close-quarters areas and sniper areas.
+- [ ] **Later areas:** water with islands and boats (Zelda); puzzle areas with a Portal vibe.
 *[later]*
 - [ ] The painted look from your Lego paintings.
 - [ ] Lighting, sky and shadows.
