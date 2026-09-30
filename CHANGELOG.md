@@ -21,6 +21,7 @@ Playable build: `dist/index.html`, also published at the claude.ai artifact link
   - **Mix it up** rotates through what's ticked (as before)
   - **Always my favourites** plays the starred one every time
   - **three packs** save and load the whole set for the class
+- **Fixed:** the dash strike (v28) could throw an error now and then (its finishing cut was picked at random once per cut instead of once).
 - **Tests:** `tools/test33-batch7.mjs` covers all of the above, and `tools/serve.sh` runs a test with its own short-lived server. Build 14.64 MB.
 
 ## v28.1: invincible while testing

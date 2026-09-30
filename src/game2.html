@@ -3094,7 +3094,8 @@ function updateDash(dt) {
   const step = Math.min(18 * dt, Math.max(0, dist - 1.1));
   player.position.addScaledVector(to.normalize(), step); speed = 0;
   if (dist < 1.25 || dash.t > 0.6 || e.state === 'dead') {
-    if (e.state !== 'dead' && dist < 1.8) applyCut(e, CUTS.find((c) => c[0] === (Math.random() < 0.5 ? 'waist' : 'chest')), to.clone().normalize()); // the lunge ends in a cut
+    const name = Math.random() < 0.5 ? 'waist' : 'chest'; // picked once (v29 fix: picking inside find() could match nothing)
+    if (e.state !== 'dead' && dist < 1.8) applyCut(e, CUTS.find((c) => c[0] === name), to.clone().normalize()); // the lunge ends in a cut
     dash = null;
   }
 }
