@@ -45,8 +45,8 @@ await ev(() => __game.advance(1.5));
 c = (await ev(() => __game.cuts())).find((x) => x.id === id3);
 check(c.state !== 'dead' && !c.unarmed && c.gun && c.severed.includes('upperarm_l'), 'left arm off: alive and still armed');
 
-// 4. head, waist, leg: lethal, cut exactly there
-for (const [cut, bone] of [['head', 'Head'], ['waist', 'spine_01'], ['calf_l', 'calf_l']]) {
+// 4. head and waist: lethal, cut exactly there (legs crawl since v23: test27)
+for (const [cut, bone] of [['head', 'Head'], ['waist', 'spine_01']]) {
   const id = await ev((cut) => { const L = __game.cuts().filter((c) => c.state !== 'dead'); const i = L.findIndex((c) => !c.severed.length); __game.moveEnemy(i, 1.5, 3.5, Math.PI); return __game.cutEnemy(i, cut); }, cut);
   await ev(() => __game.advance(0.3));
   if (cut === 'waist') await p.screenshot({ path: `${OUT}/v22-waist.png` });

@@ -2,6 +2,24 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v23: roadmap batch 1 (fixes, limb loss, pickups, 6-slot hotbar)
+- **The pistol no longer climbs to the sky.** This was your report, and the root cause was an engine detail.
+  - three.js only rewrites a bone when the animation's value changes. While you aim without moving the mouse, the aim pose never changes, so each shot's recoil kick (a direct rotation of the arms and chest) was never undone and piled up on the last one: +25° on the arms after 12 shots. Moving the mouse changed the pose and snapped it back.
+  - Now every bone returns to the animation's own pose before each update (`mixHero`). That also protects the fists, the draw reach and the air guard, which adjust bones the same way.
+  - The camera kick from each shot also eases back, instead of leaving you looking a little higher every time.
+  - Measured: after 12 aimed shots the barrel moves about 1° and the view returns exactly.
+- **The jetpack is off by default.** Switch it on in the Weapon panel. Your saved setting was reset once.
+- **Bullet holes:** shots that hit nothing alive leave a small scorched hole on walls (with sparks) or on the ground (with a puff). Enemy misses too. They fade after 20 seconds.
+- **Losing a limb:**
+  - **An arm or hand:** the soldier clutches himself (Mesh2Motion's hurt stance) and carries on.
+  - **His gun hand:** he drops the pistol and panics for about 2.5 seconds, then **draws a backup pistol with his other hand** and fights on one-handed. Lose that hand too and he just runs.
+  - **A leg** (thigh, below the knee, or a foot): he no longer dies. **He goes down and army-crawls after you** (Mesh2Motion "Crawl", CC0, newly baked in). Cut him again to finish him.
+  - **Severed limbs and dropped guns stay for 3 minutes,** even after the body fades (up to 60 at a time).
+- **Picking up weapons:** walk over a dropped pistol and you take it: 12 rounds, and the pistol itself if you don't have one. **Every body you search now has about three magazines** (30 to 36 rounds). Reloads were already arcade: leftover rounds are never lost.
+- **6-slot hotbar, centred** at the bottom of the screen; keys 1–6 and the scroll wheel.
+- **B swaps the camera shoulder** (right or left), and it's remembered.
+- **Automated test:** `tools/test27-batch1.mjs` covers all of the above; test26 now expects legs to crawl.
+
 ## v22: the blade decides (dismemberment, part 1)
 Your top priority. The saber no longer does "damage": it cuts exactly where it passes.
 - **Blade contact:** every frame, a moving lit blade is swept from where it was to where it is and tested against each soldier's head, chest, waist, upper arms, forearms, hands, thighs, calves and feet. A fast swing can't skip through someone between frames.
