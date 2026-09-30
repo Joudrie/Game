@@ -26,6 +26,15 @@ enc saber_off  $F/laser_sword__591433_Laser_Sword_Turn_Off_1.mp3 0.8
 enc saber_swing $F/lightsaber_swing__47125_lightsaber.mp3 0.6
 enc force      $F/whoosh__423799_Little_Whoosh_2.mp3 0.6
 enc zap        $S/kenney/kenney_sci-fi-sounds/Audio/forceField_001.ogg 0.5
+# v27: the AR, a suppressed shot (the pistol, muffled), breaking glass and wood, grenade blasts
+enc ar      $S/free_firearm_library/AR-15_D_24P.ogg 0.5
+"$FF" -hide_banner -loglevel error -y -i $S/free_firearm_library/Walther_PPQ_X_31P.ogg -t 0.35 -af "lowpass=f=700,volume=0.6,afade=t=out:st=0.2:d=0.15" -ac 1 -ar 24000 -c:a libopus -b:a 32k build/sfx/suppressed.ogg
+K=$S/kenney/kenney_impact-sounds/Audio
+enc glass   $K/impactGlass_heavy_000.ogg 0.8
+enc glass2  $K/impactGlass_heavy_003.ogg 0.8
+enc wood    $K/impactWood_heavy_001.ogg 0.6
+enc wood2   $K/impactPlank_medium_002.ogg 0.5
+enc boom    "$F/grenade_explosion__609587_Grenade_Explosion_SFX_medium-sized_meaty_realistic.mp3" 1.4
 # the hum loops: a clean second from the middle of the recording
 "$FF" -hide_banner -loglevel error -y -i $F/lightsaber_hum__47124_lightsaber2.mp3 -ss 0.8 -t 1.2 -af "afade=t=in:d=0.05,afade=t=out:st=1.15:d=0.05" -ac 1 -ar 24000 -c:a libopus -b:a 36k build/sfx/saber_hum.ogg
 ls -la build/sfx

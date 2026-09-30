@@ -2,6 +2,30 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v27: roadmap batch 5 (the courtyard, Mission 1, gear you keep, attachments, creative)
+- **The courtyard** (Missions → Go to the courtyard, or 175 m north of the start): a walled arena with pillars, crates, a tall corner tower and **a balcony 3.4 m up** with stairs at both ends (a ledge to fall or be pushed from).
+  - **Glass shatters** at the first hit and shots carry on through. Soldiers can see you through it.
+  - **Wooden walls are built from boards** that break one at a time (about three pistol shots each), so walls come apart partly. **Crates** break whole. The pieces fall and stay for 40 s.
+  - **What breaks them:** bullets, blaster bolts, grenades, the Force push, the saber (it goes straight through), and **soldiers thrown into them crash through**.
+  - **Stone** only takes marks.
+- **Mission 1: The courtyard** (the new **Missions** button). Four waves: pistols, AK-47s, M4 carbines, then **snipers on the balcony** with carbines below.
+  - **Snipers** show a red laser and a scope glint before a heavy shot (two hits' worth).
+  - **Your kit:** a saber, a pistol, 3 grenades and 2 stims, plus gear you've earned. **Loot the rest** from bodies and dropped guns.
+  - **Dying** offers **Retry mission** or **Quit mission**.
+  - **Your sandbox inventory** is put back when you leave, even if you reload the page mid-mission.
+- **Gear you keep forever:** finishing Mission 1 earns the **grappling hook**. In missions you can only grapple once you've earned it; the sandbox always has everything. The jetpack stays a sandbox gadget for now. Best times are saved.
+- **The M4 carbine** (new gun, in your backpack once): automatic, 30 rounds, rifle ammo, its own sound. Soldiers carry it too (bursts of four).
+- **Attachments:** in the inventory, **tap a gun** and its attachment switches appear.
+  - **Suppressor:** soldiers only hear the shot within 8 m, with a muffled sound and no muzzle flash.
+  - **Scope:** aiming zooms 2.5× with the scope view.
+  - Pistol, AK and M4 take both; the shotgun takes a scope, the sniper a suppressor.
+- **Creative:** the inventory lists **every item**; click one to add it (sandbox only).
+- **Stim packs heal** half your health.
+- **Grenades have a sound** now.
+- **Build size:** the animation data is packed at build time (shared keyframe times stored once, tracks that never change keep one key), which saved 1.4 MB. The build is now **14.6 MB**, including the new models and sounds.
+- **Phones:** the top bar fits at 375 px again.
+- **Automated test:** `tools/test31-batch5.mjs` covers the M4, the scope and suppressor, glass, boards and blasts, all four waves, the reward, retry, stims, the creative catalogue and the attachment switches.
+
 ## v26: roadmap batch 4 (enemies that think, your health, ragdolls, takedowns, cover)
 - **Soldiers start on patrol.** They stroll between spots near their post and stop to idle.
   - **They notice you:** a **?** over a soldier's head means he's seen something; he stops and looks. It fills faster the closer you are, and slower if you crouch or sit in cover. Walking up behind him is fine; running up isn't.

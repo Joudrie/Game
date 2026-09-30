@@ -52,9 +52,10 @@ await p.screenshot({ path: `${OUT}/v23-lefthand.png` });
 const guns = await ev(() => __game.gunsNear());
 check(guns.length > 0, `dropped pistols on the ground: ${guns.length}`);
 const g = guns.find((x) => x[2]) || guns[0];
-const ammo0 = await ev(() => __game.countItem('ammo'));
+const ammoId = { pistol: 'ammo', ak: 'ammo_rifle', ar: 'ammo_rifle', sniper: 'ammo_sniper', shotgun: 'ammo_shells' }[g[3] || 'pistol']; // a soldier may have dropped a rifle
+const ammo0 = await ev((id) => __game.countItem(id), ammoId);
 await ev((g) => { __game.place(g[0] + 0.3, g[1]); __game.advance(0.4); }, g); // walking over it picks it up
-const ammo1 = await ev(() => __game.countItem('ammo'));
+const ammo1 = await ev((id) => __game.countItem(id), ammoId);
 check(ammo1 >= ammo0 + 12, `walked over it and picked it up: ammo ${ammo0} → ${ammo1}`);
 check(!(await ev(() => __game.gunsNear())).some((x) => Math.hypot(x[0] - g[0], x[1] - g[1]) < 0.05), 'that pistol is gone from the ground');
 check(!errs.length, 'no page errors');

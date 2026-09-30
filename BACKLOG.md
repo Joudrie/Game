@@ -62,7 +62,7 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 4. **Dying is fun:** full ragdoll; your own grenade blows you apart like anyone else; watch the body or respawn.
 5. **Snap-to-cover** with peeking, blind fire and reloading behind cover.
 
-**Batch 5: a proper sandbox and the first mission** *(next)*
+**Batch 5: a proper sandbox and the first mission** ✅ *done in v27* (the grappling hook is the first gear you keep; more missions add more)
 1. **A better test arena:** a courtyard with cover, a wooden wall that breaks (in pieces, partly), glass that shatters, stone that only takes marks, ledges to fall from.
 2. **Mission 1, waves:** pistols, then AKs, then ARs, then snipers. Loot what they drop. Replayable.
 3. **Gear you keep forever** from each mission (for example, the grappling hook).
