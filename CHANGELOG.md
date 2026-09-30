@@ -2,6 +2,11 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v14.1: dismemberment always on, scroll to switch weapons
+- **Dismemberment is always on.** The switch is gone from the Weapon panel.
+- **Scroll wheel switches weapons:** fists → hilt → saber → pistol, and back around, one step per notch, with the draw or holster animation each time. A small label shows the new weapon.
+- **Shift + scroll zooms the camera** (it used to be plain scroll). Windows sends Shift + wheel as a sideways scroll; that's handled.
+
 ## v14: combat feel, pistol rework, draw and holster, jetpack, bodies you can move, new look, Weapon panel
 **Fixes from your PC play test**
 - **No more freezing after a saber swing.**
