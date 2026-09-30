@@ -42,14 +42,14 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 4. **6-slot hotbar, centred** at the bottom.
 5. **A key to swap shoulders** (camera).
 
-**Batch 2: guns** *(next)*
+**Batch 2: guns** ✅ *done in v24* (soldiers hold their AKs pistol-style for now; the player's rifle hold uses arm IK)
 1. **AK-47, pump shotgun, sniper** (free CC0 models already in `assets/weapons/quaternius-ultimate-guns`), each with several animations and its own feel.
 2. **Weapon sounds** (free sounds already in `assets/misc/sounds`).
 3. **Bullets vs blasters:** only blaster bolts can be deflected.
 4. **Block and parry:** holding block covers the front and sides, not the back; the guard breaks after many hits; a block timed to the shot sends the bolt back at the shooter (a sniper's scope glint is the tell).
 5. Soldiers carry these weapons and drop them.
 
-**Batch 3: Jedi powers and movement** (the Jedi class first)
+**Batch 3: Jedi powers and movement** *(next)* (the Jedi class first)
 1. **Force targeting like Lego Star Wars** (a marker on whoever you look at, with an on/off toggle and cooldowns): pull (into your blade), choke, lightning, saber throw.
 2. **Saber feel:** blade trail, the blade lights faces and rooms, sparks and scorch marks on walls and ground, the hum and ignite sounds.
 3. **Triple jump,** each jump higher; a little wall running during the super sprint.
