@@ -76,7 +76,7 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 
 ## 6b. Looting and inventory
 - [x] ~~Loot bodies (kneel, rummage, items pop up).~~ Done in v15, cosmetic.
-- [ ] **Inventory:** keep what you loot. Ammo, grenades and stims actually count; credits for later.
+- [x] ~~Inventory: hotbar and backpack, loot is kept.~~ Done in v16. Still to do: pistol ammo and reloads using the ammo you carry, stims healing once health exists, dropping items, and credits for something.
 - [ ] **Loot per enemy type** once there are more enemy types.
 - [ ] **Better rummage animations and a quick-loot tap.** *[needs you: Mixamo `Kneeling Pointing`, `Picking Up`, `Searching Pockets`]*
 

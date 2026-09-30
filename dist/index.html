@@ -27,6 +27,27 @@ html { overscroll-behavior: none; }
 .hud { position: fixed; z-index: 2; font-size: 12px; line-height: 1.5; pointer-events: none; }
 /* only real controls take touches; the readout and hints let a thumb fall through to the joystick */
 .hud button, .hud label, .hud input, .hud textarea, #alert { pointer-events: auto; }
+/* hotbar and inventory: one slot style everywhere */
+#hotbar { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); right: var(--s4); display: flex; gap: var(--s1); pointer-events: auto; }
+.slot { position: relative; width: 56px; height: 56px; padding: 0; display: grid; place-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); color: var(--ink); touch-action: none; }
+.slot svg { width: 30px; height: 30px; }
+.slot .k { position: absolute; left: 4px; top: 2px; font: 500 10px var(--font-mono); color: var(--ink-soft); }
+.slot .n { position: absolute; right: 4px; bottom: 2px; font: 500 11px var(--font-mono); }
+.slot .t { position: absolute; left: 0; right: 0; bottom: 2px; font: 500 9px var(--font-ui); text-align: center; color: var(--ink-soft); }
+.slot.on { border: 2px solid var(--ink); }
+.slot.pick { border: 2px dashed var(--signal); }
+.slot.over { border-color: var(--signal); }
+.slot.rare svg { color: var(--signal); }
+@media (max-width: 420px) { .slot { width: 48px; height: 48px; } .slot svg { width: 26px; height: 26px; } }
+#inv { position: fixed; z-index: 6; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(420px, calc(100vw - 2 * var(--s4))); max-height: 86vh; display: flex; flex-direction: column; padding: 0; pointer-events: auto; }
+#inv header { display: flex; align-items: center; gap: var(--s2); padding: var(--s3) var(--s4); border-bottom: 1px solid var(--line); }
+#inv header h2 { font-size: 14px; letter-spacing: .06em; text-transform: uppercase; margin: 0; }
+#inv header .hint { flex: 1; color: var(--ink-soft); font-size: 11px; }
+#inv .invbody { overflow-y: auto; padding: 0 var(--s4) var(--s4); }
+#inv .grid { display: grid; grid-template-columns: repeat(5, 56px); gap: var(--s1); justify-content: start; }
+@media (max-width: 420px) { #inv .grid { grid-template-columns: repeat(5, 48px); } }
+body.moves-open #hotbar { display: none; }
+#dragghost { position: fixed; z-index: 10; pointer-events: none; opacity: .85; transform: translate(-50%, -50%); }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); }
 button { font: 500 12px/1 var(--font-ui); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: var(--s2) var(--s3); cursor: pointer; touch-action: manipulation; }
 button:hover { border-color: var(--ink-soft); }
@@ -42,7 +63,7 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 
 #readout { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); left: var(--s4); font-family: var(--font-mono); font-size: 12px; font-variant-numeric: tabular-nums; padding: var(--s2) var(--s3); }
 #readout .gait.hot { color: var(--signal); }
-#help { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); right: var(--s4); padding: var(--s2) var(--s3); color: var(--ink-soft); white-space: nowrap; }
+#help { bottom: calc(var(--s4) + 72px + env(safe-area-inset-bottom, 0px)); right: var(--s4); padding: var(--s2) var(--s3); color: var(--ink-soft); white-space: nowrap; }
 #help kbd { font-family: var(--font-mono); font-size: 11px; color: var(--ink); background: var(--key); border: 1px solid var(--line); border-radius: 3px; padding: 0 var(--s1); }
 @media (max-width: 1500px) { #help { display: none; } }
 #alert { top: calc(64px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); z-index: 6; width: min(420px, calc(100vw - 32px)); padding: var(--s3); border-color: var(--signal); display: grid; gap: var(--s1); }
@@ -63,7 +84,7 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #joy { position: fixed; z-index: 3; width: 112px; height: 112px; margin: -56px 0 0 -56px; border: 1px solid var(--line); border-radius: 50%; background: rgba(255,255,255,.55); pointer-events: none; }
 #joy i { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px; border-radius: 50%; background: var(--ink); opacity: .7; }
 #joy.sprint i { background: var(--signal); opacity: .9; }
-#pad { bottom: calc(var(--s6) + env(safe-area-inset-bottom, 0px)); right: var(--s4); display: none; gap: var(--s3); align-items: flex-end; }
+#pad { bottom: calc(var(--s6) + 64px + env(safe-area-inset-bottom, 0px)); right: var(--s4); display: none; gap: var(--s3); align-items: flex-end; }
 #pad button { width: 64px; height: 64px; border-radius: 50%; padding: 0; }
 #pad #jumpbtn, #pad #atkbtn { width: 76px; height: 76px; }
 #pad { flex-wrap: wrap; justify-content: flex-end; max-width: 222px; }
@@ -93,11 +114,11 @@ body.fists #pad #atkbtn { display: inline-block; }
 #xhair.on { border-color: var(--signal); opacity: 1; }
 body.moves-open #xhair { display: none; }
 body.gun #pad .gun-only { display: inline-block; }
-body.armed #readout { bottom: calc(196px + env(safe-area-inset-bottom, 0px)); }
+body.armed #readout { bottom: calc(260px + env(safe-area-inset-bottom, 0px)); }
 .swatches { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
 .swatches button { display: flex; align-items: center; gap: var(--s2); min-height: 40px; }
 .swatches i { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--line); flex: none; }
-@media (pointer: coarse) { #pad { display: flex; } #readout { bottom: calc(240px + env(safe-area-inset-bottom, 0px)); } }
+@media (pointer: coarse) { #pad { display: flex; } #readout { bottom: calc(304px + env(safe-area-inset-bottom, 0px)); } } /* above the pad and hotbar */
 @media (pointer: fine) { body.armed #readout { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); } }
 
 /* Moves sheet */
@@ -148,8 +169,19 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
   <button type="button" id="classchip" class="panel" aria-label="Change class"><b id="classname">Light infantry</b><span id="classstats"></span></button>
   <div class="spacer"></div>
   <button type="button" id="gearbtn" aria-expanded="false" aria-controls="weapon">Weapon</button>
+  <button type="button" id="invbtn" aria-expanded="false" aria-controls="inv">Inventory</button>
   <button type="button" id="movesbtn">Menu</button>
 </div>
+<div id="hotbar" class="hud" role="toolbar" aria-label="Hotbar"></div>
+<section id="inv" class="hud panel" hidden aria-label="Inventory">
+  <header><h2>Inventory</h2><span class="hint">Drag to move · or tap one, then another</span><button type="button" id="invclose">Close</button></header>
+  <div class="invbody">
+    <h3>Hotbar <small>scroll or 1–5 in play</small></h3><div class="grid hot" id="invhot"></div>
+    <h3>Backpack</h3><div class="grid" id="invbag"></div>
+    <p class="note" id="invinfo" aria-live="polite">&nbsp;</p>
+  </div>
+</section>
+<div id="dragghost" hidden></div>
 <section id="weapon" class="hud panel" hidden aria-label="Weapon and class">
   <header><h2>Weapon and class</h2><button type="button" id="weaponclose">Close</button></header>
   <div class="body" id="weaponbody"></div>
@@ -157,7 +189,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
 <div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
-<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>G</kbd> loot a body · scroll or <kbd>1</kbd>–<kbd>4</kbd> weapons · <kbd>Shift</kbd>+scroll zoom · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
+<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>G</kbd> loot a body · scroll or <kbd>1</kbd>–<kbd>5</kbd> hotbar · <kbd>I</kbd> inventory · <kbd>Shift</kbd>+scroll zoom · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
 <div id="toast" class="hud panel" role="status" hidden></div>
 <div id="feed" class="hud" aria-live="polite"></div>
 <div id="lootprompt" class="hud panel" hidden><kbd>G</kbd> Loot body</div>
@@ -322,7 +354,7 @@ const savePool = () => { try { localStorage.setItem('moves-pools', JSON.stringif
 let klass = 'light';
 try { const k = localStorage.getItem('moves-class'); if (CLASSES[k]) klass = k; } catch (_) {}
 // switches for play testing
-const testCfg = { infiniteJumps: true };
+const testCfg = { infiniteJumps: true, infiniteNades: true };
 try { Object.assign(testCfg, JSON.parse(localStorage.getItem('testcfg') || '{}')); } catch (_) {}
 const saveTest = () => { try { localStorage.setItem('testcfg', JSON.stringify(testCfg)); } catch (_) {} };
 let pool = pools[klass];
@@ -522,7 +554,8 @@ async function boot() {
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
   $('loading').hidden = true;
-  renderClass(); buildMoves();
+  renderClass(); buildMoves(); setupInventoryUI();
+  gear = ITEMS[inv.hot[inv.active]?.id]?.gear || 'none'; // start holding whatever the selected hotbar slot holds
   start();
 }
 boot().catch((e) => { console.error(e); $('loadmsg').textContent = 'The character failed to load: ' + (e.message || e); document.querySelector('#loading .bar').hidden = true; });
@@ -905,6 +938,7 @@ function attackCancelable() {
 function attackPress() {
   atkHeld = true; atkHeldT = 0;
   if (looting) { stopLoot(false); return; }
+  if (gear === 'none' && mode === 'ground' && useActiveItem()) return;
   if (gear === 'pistol') { firePistol(); return; }
   if (tryGroundPound()) return;
   if (!canFight() || blocking) return;
@@ -1735,6 +1769,7 @@ const grenades = [];
 let nadeCd = 0;
 function throwGrenade() {
   if (movesOpen || !hero || nadeCd > 0) return;
+  if (!testCfg.infiniteNades) { if (!countItem('grenade')) { toast('No grenades: loot some', 1200); return; } takeItem('grenade'); }
   nadeCd = 0.6;
   const dir = camera.getWorldDirection(new V3());
   const m = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), new THREE.MeshStandardMaterial({ color: 0x3b4a3a, roughness: 0.6 }));
@@ -1869,7 +1904,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v15 · 2026-09-30';
+const BUILD = 'v16 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -1967,6 +2002,7 @@ const GAME_KEYS = ['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft'
 addEventListener('keydown', (e) => {
   if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
   if (movesOpen) { if (e.code === 'Escape') closeMoves(); return; }
+  if (e.code === 'Escape' && !$('inv').hidden) { toggleInv(false); return; }
   if (GAME_KEYS.includes(e.code)) e.preventDefault();
   if (e.repeat) return;
   if (!keys.has(e.code) && /^(Key[WASD]|Arrow)/.test(e.code)) log('key', e.code);
@@ -1981,7 +2017,8 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyG') startLoot();
   if (e.code === 'Tab') { e.preventDefault(); toggleWeapon(); }
   if (e.code === 'KeyE') setGear(gear === 'lit' ? 'none' : 'lit');
-  if (/^Digit[1-4]$/.test(e.code)) setGear(GEAR_ORDER[+e.code.slice(5) - 1]);
+  if (/^Digit[1-5]$/.test(e.code)) selectSlot(+e.code.slice(5) - 1);
+  if (e.code === 'KeyI') toggleInv();
   if (e.code === 'KeyF') attackPress();
   if (e.code === 'KeyQ') { if (gear === 'pistol') aimHeld = true; else blockPress(); }
 });
@@ -2065,8 +2102,7 @@ canvas.addEventListener('wheel', (e) => {
   const now = performance.now();
   if (Math.abs(wheelAcc) < 40 || now - wheelT < 180) return; // one weapon per notch, trackpads included
   const step = Math.sign(wheelAcc); wheelAcc = 0; wheelT = now;
-  const g = GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + step + GEAR_ORDER.length) % GEAR_ORDER.length];
-  setGear(g); toast('Weapon: ' + GEARS[g], 900);
+  selectSlot(inv.active + step); // scroll moves along the hotbar
 }, { passive: false });
 
 const joy = { id: null, ox: 0, oy: 0, x: 0, y: 0 }, lookT = { id: null, x: 0, y: 0 }, JOY_R = 56;
@@ -2186,9 +2222,148 @@ function endSlide(cancel) {
   if (s2) playOvr(s2, { speed: 1.3, fade: 0.1, then: () => stopOvr(0.2) }); else stopOvr(0.2);
 }
 
+// ---------------- inventory ----------------
+// Five hotbar slots (bottom right, scroll or 1–5) and a 20-slot backpack. Weapons and items can be dragged
+// anywhere in the Inventory panel. Picking a weapon slot draws it; an item slot leaves your hands free and
+// Attack uses the item (throws a grenade, uses a stim). Everything you loot lands here.
+const ITEMS = {
+  saber:   { name: 'Lightsaber', gear: 'lit', icon: 'saber' },
+  pistol:  { name: 'Pistol', gear: 'pistol', icon: 'pistol' },
+  grenade: { name: 'Frag grenade', stack: 10, icon: 'grenade', use: 'throw' },
+  stim:    { name: 'Stim pack', stack: 5, icon: 'stim', use: 'stim' },
+  credits: { name: 'Credits', stack: 9999, icon: 'coin' },
+  ammo:    { name: 'Pistol ammo', stack: 120, icon: 'ammo' },
+  cell:    { name: 'Power cell', stack: 10, icon: 'cell' },
+  ration:  { name: 'Ration bar', stack: 10, icon: 'box', tag: 'Food' },
+  chip:    { name: 'Data chip', stack: 10, icon: 'chip' },
+  keycard: { name: 'Keycard', stack: 5, icon: 'card' },
+  comlink: { name: 'Comlink', stack: 1, icon: 'box', tag: 'Com' },
+  kyber:   { name: 'Kyber shard', stack: 5, icon: 'gem', rare: true },
+};
+const LOOT_IDS = { Credits: 'credits', 'Pistol ammo': 'ammo', 'Power cell': 'cell', 'Stim pack': 'stim', 'Frag grenade': 'grenade',
+  'Ration bar': 'ration', 'Data chip': 'chip', Keycard: 'keycard', Comlink: 'comlink', 'Kyber shard': 'kyber' };
+const ICON = {
+  saber: '<path d="M6 26 L22 10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M4 28 L8 24" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>',
+  pistol: '<path d="M5 11h20v5H14l-1 9H8l1-9H5z" fill="currentColor"/>',
+  grenade: '<circle cx="15" cy="18" r="8" fill="currentColor"/><rect x="12" y="6" width="6" height="5" rx="1" fill="currentColor"/>',
+  stim: '<rect x="11" y="4" width="8" height="22" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 10v10M10 15h10" stroke="currentColor" stroke-width="2"/>',
+  coin: '<circle cx="15" cy="15" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M15 10v10" stroke="currentColor" stroke-width="2"/>',
+  ammo: '<rect x="7" y="9" width="4" height="14" rx="2" fill="currentColor"/><rect x="13" y="9" width="4" height="14" rx="2" fill="currentColor"/><rect x="19" y="9" width="4" height="14" rx="2" fill="currentColor"/>',
+  cell: '<rect x="8" y="7" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="12" y="4" width="6" height="3" fill="currentColor"/><path d="M16 11l-3 6h4l-3 6" stroke="currentColor" stroke-width="1.8" fill="none"/>',
+  chip: '<rect x="8" y="8" width="14" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 5v3M15 5v3M19 5v3M11 22v3M15 22v3M19 22v3" stroke="currentColor" stroke-width="1.6"/>',
+  card: '<rect x="5" y="9" width="20" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="13" width="6" height="4" fill="currentColor"/>',
+  gem: '<path d="M15 4l7 9-7 13-7-13z" fill="currentColor"/>',
+  box: '<rect x="7" y="9" width="16" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 13h16" stroke="currentColor" stroke-width="2"/>',
+};
+const inv = { hot: [{ id: 'saber', qty: 1 }, { id: 'pistol', qty: 1 }, { id: 'grenade', qty: 5 }, null, null], bag: new Array(20).fill(null), active: 0 };
+try { const s = JSON.parse(localStorage.getItem('inv') || 'null'); if (s && s.hot?.length === 5 && s.bag?.length === 20) Object.assign(inv, s); } catch (_) {}
+const saveInv = () => { try { localStorage.setItem('inv', JSON.stringify(inv)); } catch (_) {} };
+const slotAt = (where, i) => (where === 'hot' ? inv.hot : inv.bag)[i];
+const setSlot = (where, i, v) => { (where === 'hot' ? inv.hot : inv.bag)[i] = v; };
+function slotHTML(it, where, i) {
+  const def = it && ITEMS[it.id];
+  const icon = def ? `<svg viewBox="0 0 30 30" aria-hidden="true">${ICON[def.icon]}</svg>` : '';
+  const key = where === 'hot' ? `<span class="k">${i + 1}</span>` : '';
+  const n = def && def.stack && it.qty > 1 ? `<span class="n">${testCfg.infiniteNades && it.id === 'grenade' ? '∞' : it.qty}</span>` : '';
+  const t = def && def.tag ? `<span class="t">${def.tag}</span>` : '';
+  const label = def ? `${def.name}${it.qty > 1 ? ' ×' + it.qty : ''}` : 'Empty';
+  return `<button type="button" class="slot${where === 'hot' && i === inv.active ? ' on' : ''}${def?.rare ? ' rare' : ''}" data-where="${where}" data-i="${i}" aria-label="Slot ${i + 1}: ${label}" title="${label}">${key}${icon}${n}${t}</button>`;
+}
+function renderInv() {
+  $('hotbar').innerHTML = inv.hot.map((it, i) => slotHTML(it, 'hot', i)).join('');
+  if (!$('inv').hidden) {
+    $('invhot').innerHTML = inv.hot.map((it, i) => slotHTML(it, 'hot', i)).join('');
+    $('invbag').innerHTML = inv.bag.map((it, i) => slotHTML(it, 'bag', i)).join('');
+    if (invPick) document.querySelector(`#inv .slot[data-where="${invPick.where}"][data-i="${invPick.i}"]`)?.classList.add('pick');
+  }
+}
+// pick a hotbar slot: a weapon is drawn, anything else leaves the hands free (fists)
+function selectSlot(i, quiet) {
+  inv.active = (i + 5) % 5; saveInv();
+  const it = inv.hot[inv.active], def = it && ITEMS[it.id];
+  const want = def?.gear || 'none';
+  if (want !== gear) setGear(want);
+  if (!quiet) toast(def ? def.name + (def.stack && it.qty > 1 ? ' ×' + it.qty : '') : 'Fists', 800);
+  renderInv();
+}
+const activeItem = () => { const it = inv.hot[inv.active]; return it && ITEMS[it.id] ? { ...it, def: ITEMS[it.id] } : null; };
+// add looted items: fill matching stacks first (hotbar, then backpack), then empty backpack slots
+function addItem(id, qty) {
+  const def = ITEMS[id]; if (!def) return qty;
+  const max = def.stack || 1;
+  for (const arr of [inv.hot, inv.bag]) for (const it of arr) if (it && it.id === id && it.qty < max && qty > 0) { const k = Math.min(qty, max - it.qty); it.qty += k; qty -= k; }
+  for (let i = 0; i < inv.bag.length && qty > 0; i++) if (!inv.bag[i]) { const k = Math.min(qty, max); inv.bag[i] = { id, qty: k }; qty -= k; }
+  saveInv(); renderInv();
+  return qty; // what didn't fit
+}
+function takeItem(id, n = 1) {
+  for (const arr of [inv.hot, inv.bag]) for (let i = 0; i < arr.length; i++) if (arr[i] && arr[i].id === id) {
+    const k = Math.min(n, arr[i].qty); arr[i].qty -= k; n -= k; if (arr[i].qty <= 0) arr[i] = null; if (n <= 0) { saveInv(); renderInv(); return true; }
+  }
+  saveInv(); renderInv(); return n <= 0;
+}
+const countItem = (id) => [...inv.hot, ...inv.bag].reduce((a, it) => a + (it && it.id === id ? it.qty : 0), 0);
+// Attack with an item slot selected
+function useActiveItem() {
+  const it = activeItem(); if (!it || !it.def.use) return false;
+  if (it.def.use === 'throw') { throwGrenade(); return true; }
+  if (it.def.use === 'stim') { takeItem('stim'); toast('Stim pack used (health comes later)', 1400); flash(player.position.clone().add(new V3(0, 1.2, 0))); log('stim'); return true; }
+  return false;
+}
+// move or swap between any two slots; the same stackable item merges
+function moveItem(a, b) {
+  if (a.where === b.where && a.i === b.i) return;
+  const A = slotAt(a.where, a.i), B = slotAt(b.where, b.i);
+  if (A && B && A.id === B.id && ITEMS[A.id].stack) {
+    const max = ITEMS[A.id].stack, k = Math.min(A.qty, max - B.qty);
+    B.qty += k; A.qty -= k; if (A.qty <= 0) setSlot(a.where, a.i, null);
+  } else { setSlot(a.where, a.i, B); setSlot(b.where, b.i, A); }
+  saveInv(); renderInv();
+  selectSlot(inv.active, true); // the held weapon follows whatever is now in the active slot
+  log('inventory move', a.where + a.i, '→', b.where + b.i);
+}
+let invPick = null, drag = null;
+function toggleInv(open = $('inv').hidden) {
+  $('inv').hidden = !open; $('invbtn').setAttribute('aria-expanded', String(open)); invPick = null;
+  if (open) { toggleWeapon(false); if (isLocked()) document.exitPointerLock?.(); }
+  renderInv();
+}
+function slotFromPoint(x, y) { const el = document.elementFromPoint(x, y)?.closest('#inv .slot'); return el ? { where: el.dataset.where, i: +el.dataset.i, el } : null; }
+function setupInventoryUI() {
+  $('invbtn').addEventListener('click', () => toggleInv());
+  $('invclose').addEventListener('click', () => toggleInv(false));
+  $('hotbar').addEventListener('pointerdown', (e) => { const b = e.target.closest('.slot'); if (!b) return; e.preventDefault(); e.stopPropagation(); selectSlot(+b.dataset.i); });
+  $('inv').addEventListener('pointerdown', (e) => {
+    const b = e.target.closest('.slot'); if (!b) return;
+    e.preventDefault();
+    drag = { from: { where: b.dataset.where, i: +b.dataset.i }, x: e.clientX, y: e.clientY, moved: false, id: e.pointerId };
+  });
+  addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 6 && slotAt(drag.from.where, drag.from.i)) {
+      drag.moved = true; const g = $('dragghost'); g.innerHTML = slotHTML(slotAt(drag.from.where, drag.from.i), 'bag', 0); g.hidden = false;
+    }
+    if (drag.moved) {
+      const g = $('dragghost'); g.style.left = e.clientX + 'px'; g.style.top = e.clientY + 'px';
+      document.querySelectorAll('#inv .slot.over').forEach((x) => x.classList.remove('over'));
+      slotFromPoint(e.clientX, e.clientY)?.el.classList.add('over');
+    }
+  });
+  addEventListener('pointerup', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const d = drag; drag = null; $('dragghost').hidden = true;
+    if (d.moved) { const to = slotFromPoint(e.clientX, e.clientY); if (to) moveItem(d.from, to); else renderInv(); return; }
+    // tap: pick a slot, then tap where it should go
+    const it = slotAt(d.from.where, d.from.i);
+    if (!invPick) { if (it) { invPick = d.from; $('invinfo').textContent = `${ITEMS[it.id].name}${it.qty > 1 ? ' ×' + it.qty : ''}: tap a slot to move it there`; } renderInv(); return; }
+    const from = invPick; invPick = null; moveItem(from, d.from); $('invinfo').innerHTML = '&nbsp;';
+  });
+  renderInv();
+}
+
 // ---------------- looting ----------------
 // Walk up to a body and press G (or Loot): kneel, rummage, and whatever turns up pops up one item at a time.
-// Cosmetic for now: nothing is kept, but every find is logged in lootLog for the inventory later.
+// Everything found goes into the inventory (lootLog keeps a record of each find too).
 const LOOT_R = 1.9, LOOT_TIME = 2.2;
 const LOOT_TABLE = [ // [name, min, max, weight, rare]
   ['Credits', 10, 60, 10], ['Pistol ammo', 6, 18, 9], ['Power cell', 1, 2, 6], ['Stim pack', 1, 1, 5], ['Frag grenade', 1, 2, 4],
@@ -2246,7 +2421,8 @@ function updateLoot(dt, inp) {
     while (L.shown < due) {
       const it = L.items[L.shown++];
       lootLog.push({ ...it, at: Date.now(), from: L.e.id });
-      const li = document.createElement('li'); li.textContent = `+ ${it.name}${it.qty > 1 ? ' ×' + it.qty : ''}`; if (it.rare) li.className = 'rare';
+      const left = addItem(LOOT_IDS[it.name], it.qty);
+      const li = document.createElement('li'); li.textContent = `+ ${it.name}${it.qty > 1 ? ' ×' + it.qty : ''}${left ? ' (no room for ' + left + ')' : ''}`; if (it.rare) li.className = 'rare';
       $('lootitems').appendChild(li); log('looted', it.name, it.qty);
     }
     if (L.t >= LOOT_TIME) stopLoot(true);
@@ -2622,7 +2798,7 @@ function buildMoves() {
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p><p class="note">Everything ticked below is for <b id="movesfor">${CLASSES[klass].label}</b>. Each class keeps its own set.</p>`);
-  h.push(`<h3>Equipment <small>scroll wheel or keys 1–4</small></h3><div class="seg" role="group" aria-label="Equipment" style="grid-template-columns:repeat(2,1fr)">`);
+  h.push(`<h3>Equipment <small>for testing; in play use the hotbar</small></h3><div class="seg" role="group" aria-label="Equipment" style="grid-template-columns:repeat(2,1fr)">`);
   for (const g of GEAR_ORDER) h.push(`<button type="button" data-gear="${g}" aria-pressed="${gear === g}">${GEARS[g][0].toUpperCase() + GEARS[g].slice(1)}</button>`);
   h.push(`</div><p class="note">No gear or hilt: jab, cross, kick, hook. Saber lit: the five-hit combo (dual sabers mix in dual-wield chops). Pistol: two hands, right-click or Aim to aim, fire from the hip or while aiming. Switching plays a draw or holster; the pistol gets a spin before it goes back.</p>`);
   h.push(`<h3>Saber</h3><div class="seg" role="group" aria-label="Saber style">`);
@@ -2635,8 +2811,9 @@ function buildMoves() {
   h.push(`<h3>Settings</h3>` +
     `<label class="switch"><input type="checkbox" id="jeton" ${gadgets.jetpack ? 'checked' : ''}> Jetpack: hold Jump in the air to fly, hold C (or Slide) to hover, sprint to fly flat out</label>` +
     `<label class="switch"><input type="checkbox" id="pushbodies" ${enemyCfg.pushBodies ? 'checked' : ''}> Force push moves bodies (grenades always do)</label>` +
-    `<label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>`);
-  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, <kbd>G</kbd> loot a body, scroll wheel, <kbd>1</kbd>–<kbd>4</kbd> or <kbd>E</kbd> weapons, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
+    `<label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>` +
+    `<label class="switch"><input type="checkbox" id="infnades" ${testCfg.infiniteNades ? 'checked' : ''}> Infinite grenades (off: each throw uses one from your inventory)</label>`);
+  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, <kbd>G</kbd> loot a body, scroll wheel or <kbd>1</kbd>–<kbd>5</kbd> hotbar, <kbd>I</kbd> inventory, <kbd>E</kbd> saber on/off, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
   h.push(`</section>`);
   $('weaponbody').innerHTML = h.join(''); h.length = 0;
   h.push(`<section data-panel="moves">`);
@@ -2691,6 +2868,7 @@ function buildMoves() {
     if (e.target.closest('#enemyreset')) { [...enemies].filter((x) => x.state !== 'dead').forEach(removeEnemy); respawnT = 0; filled = false; renderEnemyTests(); }
     if (e.target.closest('#enemyclear')) { [...enemies].filter((x) => x.state === 'dead').forEach(removeEnemy); renderEnemyTests(); }
   });
+  wb.addEventListener('change', (e) => { if (e.target.id === 'infnades') { testCfg.infiniteNades = e.target.checked; saveTest(); renderInv(); } });
   wb.addEventListener('change', (e) => { if (e.target.id === 'infjumps') { testCfg.infiniteJumps = e.target.checked; saveTest(); log('infinite jumps', testCfg.infiniteJumps); } });
   body.addEventListener('click', (e) => {
     if (!e.target.closest('#clipsweep')) return;
@@ -2805,6 +2983,7 @@ function start() {
     setKey(code, down) { if (down) { keys.add(code); if (code === 'Space') { jumpQueued = true; jumpHeld = true; } if (code === 'KeyC') { slideQueued = true; slideHeld = true; } } else { keys.delete(code); if (code === 'Space') jumpHeld = false; if (code === 'KeyC') slideHeld = false; } }, get vy() { return vy; }, get y() { return player.position.y; },
     explodeAt(x, y, z) { explode(new V3(x, y, z)); },
     startLoot, get looting() { return looting ? { t: +looting.t.toFixed(2), shown: looting.shown, n: looting.items.length } : null; }, get lootLog() { return lootLog.slice(); }, get lootTarget() { return lootTarget ? lootTarget.id : null; },
+    inv, selectSlot, moveItem, addItem, toggleInv, countItem,
     fillEnemies() { while (enemies.filter((x) => x.state !== 'dead').length < ENEMY_COUNT) spawnEnemy(openSpot(20, 34)); },
     moveEnemy(i, x, z, yawR) { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) { e.g.position.set(x, groundAt(x, z, 99), z); if (yawR !== undefined) e.yaw = yawR; e.state = 'hit'; e.hitT = 5; e.g.updateMatrixWorld(true); } }, killFeed, damageEnemy: (i, amt, zone, kind) => { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) damageEnemy(e, amt, zone, kind); return !!e; },
     playOnEnemy(i, name, from = 0, speed = 1) { const e = enemies.filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },

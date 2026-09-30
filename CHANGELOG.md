@@ -2,6 +2,21 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v16: hotbar and inventory
+- **Hotbar:** five slots in the bottom right, Fortnite/Minecraft style. **Scroll** (or keys **1–5**, or tap a slot on a phone) picks a slot.
+  - A weapon slot (lightsaber or pistol) draws that weapon, with the draw/holster animation.
+  - An empty slot or an item slot leaves your hands free: Attack punches, or uses the item. From a grenade slot Attack throws a grenade; from a stim slot it uses a stim (health comes later).
+  - You start with the lightsaber, the pistol and 5 frag grenades.
+- **Inventory** (the Inventory button, or **I**): the hotbar plus a 20-slot backpack.
+  - Drag anything to any slot to move it or swap two. On a phone you can tap one slot, then another.
+  - The same items stack together up to a limit (grenades 10, stims 5, ammo 120, credits 9999…).
+  - Moving a weapon out of the active slot puts it away.
+- **Loot goes into the inventory now:** matching stacks fill first, then empty backpack slots. If there's no room, the loot list says so.
+- **Grenades come from the inventory** once "Infinite grenades" is off (Weapon panel → Settings; it starts on so you can keep testing). The X key still throws.
+- The inventory is saved in the browser, so it's still there next time.
+- **Layout:** the hotbar sits in the bottom right, so the PC key hints and the phone buttons move up above it. On phones the speed readout sits above the buttons.
+- **Automated test:** `tools/test21-inventory.mjs`.
+
 ## v15: looting
 - **Loot bodies:** walk up to a body and a "Loot body" prompt appears. Press **G** (the **Loot** button on a phone, or D-pad down on a gamepad).
   - You kneel and rummage for about 2 seconds, using `Fixing_Kneeling` from the free pack (now packed). A lit saber switches off while you search and relights after.
