@@ -10,7 +10,7 @@ Most assets are CC0 (public domain) and need no credit. The ones below need cred
 - **CMU Graphics Lab Motion Capture Database** (free for any use): mocap.cs.cmu.edu. BVH conversion by cgspeed.
 - **KayKit Character Animations 1.1** by Kay Lousberg (CC0): kneel-and-fall death, two hit reactions, dual-wield chop, slice and stab. kaylousberg.itch.io
 - **"Boba Fett/Mandalorian Jet Pack"** by Jace1969 on Printables (CC BY 4.0): the jetpack model. printables.com/model/23735
-- **Quaternius Swat** soldier animations (CC0): enemy run, strafe, shoot and death clips.
+- **Quaternius Swat** (CC0): the enemy soldiers' body since v21 (`build/enemy_swat.glb`, via `tools/reskin_swat.mjs`), and their run, strafe, shoot and death clips.
 - **three.js** example Soldier model (MIT repository; animations from Mixamo).
 
 ## In `assets/` (downloaded, not all used yet)
