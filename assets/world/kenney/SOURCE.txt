@@ -1,0 +1,6 @@
+Kenney (kenney.nl), all CC0 (License.txt in each zip). Downloaded 2026-09-30.
+- City Kit (Commercial) 2.1: https://kenney.nl/assets/city-kit-commercial
+- City Kit (Industrial) 2.0: https://kenney.nl/assets/city-kit-industrial
+- Nature Kit: https://kenney.nl/assets/nature-kit
+tools/pack_buildings.mjs picks models from these zips and packs them (welded, quantized, meshopt) into
+build/world_buildings.glb and build/world_nature.glb for the sandbox world (v31).
