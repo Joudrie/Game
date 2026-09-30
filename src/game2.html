@@ -28,9 +28,18 @@ html { overscroll-behavior: none; }
 /* only real controls take touches; the readout and hints let a thumb fall through to the joystick */
 .hud button, .hud label, .hud input, .hud textarea, #alert { pointer-events: auto; }
 /* hotbar and inventory: one slot style everywhere */
+#ammo { bottom: calc(var(--s4) + 64px + env(safe-area-inset-bottom, 0px)); right: var(--s4); padding: var(--s1) var(--s3); font-family: var(--font-mono); display: flex; align-items: baseline; gap: var(--s1); }
+#ammo b { font-size: 20px; font-weight: 500; }
+#ammo span { color: var(--ink-soft); }
+#ammo i { font-style: normal; font-size: 11px; color: var(--signal); margin-left: var(--s2); }
+#ammo.low b { color: var(--signal); }
+@media (pointer: fine) { #help { bottom: calc(var(--s4) + 110px + env(safe-area-inset-bottom, 0px)); } }
+@media (pointer: coarse) { #ammo { bottom: auto; top: calc(var(--s4) + 72px + env(safe-area-inset-top, 0px)); } }
 #hotbar { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); right: var(--s4); display: flex; gap: var(--s1); pointer-events: auto; }
 .slot { position: relative; width: 56px; height: 56px; padding: 0; display: grid; place-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); color: var(--ink); touch-action: none; }
 .slot svg { width: 30px; height: 30px; }
+.slot img { width: 44px; height: 44px; object-fit: contain; pointer-events: none; }
+@media (max-width: 420px) { .slot img { width: 38px; height: 38px; } }
 .slot .k { position: absolute; left: 4px; top: 2px; font: 500 10px var(--font-mono); color: var(--ink-soft); }
 .slot .n { position: absolute; right: 4px; bottom: 2px; font: 500 11px var(--font-mono); }
 .slot .t { position: absolute; left: 0; right: 0; bottom: 2px; font: 500 9px var(--font-ui); text-align: center; color: var(--ink-soft); }
@@ -173,6 +182,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
   <button type="button" id="movesbtn">Menu</button>
 </div>
 <div id="hotbar" class="hud" role="toolbar" aria-label="Hotbar"></div>
+<div id="ammo" class="hud panel" hidden aria-live="polite"></div>
 <section id="inv" class="hud panel" hidden aria-label="Inventory">
   <header><h2>Inventory</h2><span class="hint">Drag to move · or tap one, then another</span><button type="button" id="invclose">Close</button></header>
   <div class="invbody">
@@ -189,7 +199,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
 <div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
-<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>G</kbd> loot a body · scroll or <kbd>1</kbd>–<kbd>5</kbd> hotbar · <kbd>I</kbd> inventory · <kbd>Shift</kbd>+scroll zoom · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
+<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>G</kbd> loot a body · <kbd>Z</kbd> reload · scroll or <kbd>1</kbd>–<kbd>5</kbd> hotbar · <kbd>I</kbd> inventory · <kbd>Shift</kbd>+scroll zoom · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
 <div id="toast" class="hud panel" role="status" hidden></div>
 <div id="feed" class="hud" aria-live="polite"></div>
 <div id="lootprompt" class="hud panel" hidden><kbd>G</kbd> Loot body</div>
@@ -203,6 +213,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
   <button type="button" id="aimbtn" class="gun-only">Aim</button>
   <button type="button" id="atkbtn" class="armed-only">Attack</button>
   <button type="button" id="firebtn" class="gun-only">Fire</button>
+  <button type="button" id="reloadbtn" class="gun-only">Reload</button>
   <button type="button" id="pushbtn" class="force-only">Push</button>
   <button type="button" id="nadebtn">Grenade</button>
   <button type="button" id="lootbtn" class="loot-only">Loot</button>
@@ -354,7 +365,7 @@ const savePool = () => { try { localStorage.setItem('moves-pools', JSON.stringif
 let klass = 'light';
 try { const k = localStorage.getItem('moves-class'); if (CLASSES[k]) klass = k; } catch (_) {}
 // switches for play testing
-const testCfg = { infiniteJumps: true, infiniteNades: true };
+const testCfg = { infiniteJumps: true, infiniteNades: true, infiniteAmmo: true };
 try { Object.assign(testCfg, JSON.parse(localStorage.getItem('testcfg') || '{}')); } catch (_) {}
 const saveTest = () => { try { localStorage.setItem('testcfg', JSON.stringify(testCfg)); } catch (_) {} };
 let pool = pools[klass];
@@ -549,7 +560,7 @@ async function boot() {
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
   poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
-  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildFist(); buildGuardPose(); buildJetpack();
+  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildFist(); buildGuardPose(); buildJetpack(); buildMags(); renderThumbs();
   mixer = new THREE.AnimationMixer(hero);
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
@@ -806,6 +817,7 @@ function setGear(g, instant) {
   document.body.classList.toggle('armed', g === 'lit');
   document.body.classList.toggle('gun', g === 'pistol');
   document.body.classList.toggle('fists', g === 'none' || g === 'hilt');
+  renderAmmo();
   if (g !== 'pistol') aimHeld = false;
   $('gearbtn').textContent = 'Weapon: ' + { none: 'fists', hilt: 'hilt', lit: 'saber', pistol: 'pistol' }[g];
   $('gearlbl').textContent = GEARS[g];
@@ -1540,8 +1552,11 @@ function rayZones(o, dir, far) {
 }
 let fireCd = 0;
 function firePistol(aimDir) {
-  if (movesOpen || gear !== 'pistol' || !pistolInHand || drawing || !hero || fireCd > 0) return;
+  if (movesOpen || gear !== 'pistol' || !pistolInHand || drawing || !hero || fireCd > 0 || reload) return;
+  if (ammo.mag <= 0) { fireCd = 0.25; if (!startReload()) toast('Out of pistol ammo: loot some', 1300); return; } // dry: reload if you can
   fireCd = 0.16; recoil = 1; fireRaiseT = 0.7;
+  ammo.mag--; saveAmmo(); renderAmmo();
+  if (ammo.mag === 0) setTimeout(() => { if (ammo.mag === 0 && gear === 'pistol') startReload(); }, 250); // empty: reload on its own
   const dir = aimDir || camera.getWorldDirection(new V3()), o = camera.position.clone();
   aimRay.set(o, dir); aimRay.far = 300;
   const wall = aimRay.intersectObjects(blockMeshes, false)[0];
@@ -1764,6 +1779,96 @@ function forcePush() {
   }
   log('force push', n);
 }
+// ---------------- pistol ammo and reload ----------------
+// 12 rounds in the magazine; spare rounds are the Pistol ammo in your inventory ("Infinite ammo" keeps them from running out).
+// An empty reload drops the spent magazine, which clatters to the ground and stays; a reload with rounds left keeps it.
+const MAG_SIZE = 12;
+const ammo = { mag: MAG_SIZE };
+try { const a = JSON.parse(localStorage.getItem('ammo') || 'null'); if (a && a.mag >= 0) ammo.mag = Math.min(MAG_SIZE, a.mag); } catch (_) {}
+const saveAmmo = () => { try { localStorage.setItem('ammo', JSON.stringify(ammo)); } catch (_) {} };
+let reload = null, reloadBlend = 0, magOut = false;
+const mags = [], MAX_MAGS = 24;
+const magMat = new THREE.MeshStandardMaterial({ color: 0x2b2d31, metalness: 0.5, roughness: 0.5 });
+const magGeo = new THREE.BoxGeometry(0.034, 0.14, 0.046); // a touch bigger than life so you can spot it on the ground
+let gunMag = null, handMag = null;
+const reserve = () => (testCfg.infiniteAmmo ? Infinity : countItem('ammo'));
+function buildMags() {
+  if (!pistol) return;
+  gunMag = new THREE.Mesh(magGeo, magMat); gunMag.position.set(0.012, -0.055, 0); gunMag.castShadow = true; pistol.root.add(gunMag); // sits in the grip
+  handMag = new THREE.Mesh(magGeo, magMat); handMag.visible = false; handMag.castShadow = true;
+  const m = mounts.hand_l; m.bone.add(handMag); handMag.position.copy(m.p); handMag.quaternion.copy(m.q); handMag.scale.copy(m.s);
+}
+function startReload() {
+  if (reload || gear !== 'pistol' || !pistolInHand || drawing || movesOpen) return false;
+  if (ammo.mag >= MAG_SIZE) return false;
+  if (reserve() <= 0) return false;
+  const empty = ammo.mag === 0;
+  reload = { t: 0, dur: empty ? 1.35 : 1.05, empty, dropped: false, shown: false, done: false };
+  log('reload', empty ? 'empty' : 'tactical', ammo.mag);
+  return true;
+}
+function dropMag() {
+  if (!gunMag) return;
+  gunMag.updateMatrixWorld(true);
+  const m = new THREE.Mesh(magGeo, magMat); m.castShadow = true;
+  gunMag.getWorldPosition(m.position); gunMag.getWorldQuaternion(m.quaternion); scene.add(m);
+  const side = new V3(Math.cos(yaw), 0, -Math.sin(yaw)); // to the right of where you face
+  mags.push({ m, vel: side.multiplyScalar(1.2 + Math.random() * 0.6).add(new V3(0, 0.6, 0)), spin: new V3(Math.random() * 12, Math.random() * 6, Math.random() * 12), rest: false, t: 0 });
+  if (mags.length > MAX_MAGS) { const old = mags.shift(); scene.remove(old.m); }
+  magOut = true; log('magazine dropped');
+}
+function updateReload(dt) {
+  for (const g of mags) { // spent magazines: fall, bounce, settle
+    g.t += dt; if (g.rest) continue;
+    g.vel.y -= 14 * dt; g.m.position.addScaledVector(g.vel, dt);
+    g.m.rotation.x += g.spin.x * dt; g.m.rotation.y += g.spin.y * dt; g.m.rotation.z += g.spin.z * dt;
+    const gy = groundAt(g.m.position.x, g.m.position.z, g.m.position.y + 0.3) + 0.015;
+    if (g.m.position.y < gy) {
+      g.m.position.y = gy;
+      if (!g.hit) { g.hit = true; dust(g.m.position, 0.18); } // a little puff where it first lands
+      if (Math.abs(g.vel.y) < 1) { g.rest = true; const yw = g.m.rotation.y; g.m.rotation.set(0, 0, 0); g.m.rotateY(yw); g.m.rotateX(Math.PI / 2); g.m.position.y = gy - 0.015 + 0.023; continue; } // lies flat on its side
+      g.vel.set(g.vel.x * 0.4, -g.vel.y * 0.35, g.vel.z * 0.4); g.spin.multiplyScalar(0.5);
+    }
+  }
+  if (!reload) { if (handMag) handMag.visible = false; if (gunMag) gunMag.visible = !magOut; return; }
+  if (gear !== 'pistol' || !pistolInHand || drawing) { reload = null; log('reload cancelled'); return; }
+  const r = reload; r.t += dt; const k = r.t / r.dur;
+  if (r.empty && !r.dropped && k > 0.12) { r.dropped = true; dropMag(); }
+  if (!r.empty && !r.done && k > 0.15) magOut = true; // tactical: the old one goes in a pocket
+  if (!r.shown && k > 0.3) r.shown = true;
+  if (!r.done && k > 0.68) { // the new magazine goes in
+    r.done = true; magOut = false;
+    const need = MAG_SIZE - ammo.mag, take = Math.min(need, reserve());
+    if (!testCfg.infiniteAmmo) takeItem('ammo', take);
+    ammo.mag += take; saveAmmo();
+  }
+  if (handMag) handMag.visible = r.shown && !r.done;
+  if (gunMag) gunMag.visible = !magOut;
+  if (k >= 1) { reload = null; log('reload done', ammo.mag); }
+  renderAmmo();
+}
+// ammo counter above the hotbar while the pistol is out
+function renderAmmo() {
+  const el = $('ammo'); if (!el) return;
+  el.hidden = gear !== 'pistol';
+  const res = testCfg.infiniteAmmo ? '∞' : countItem('ammo');
+  el.innerHTML = `<b>${ammo.mag}</b><span>/ ${res}</span>${reload ? '<i>Reloading</i>' : ammo.mag === 0 ? '<i>Reload</i>' : ''}`;
+  el.classList.toggle('low', ammo.mag <= 3);
+  if (renderAmmo.last !== ammo.mag) { renderAmmo.last = ammo.mag; renderInv(); }
+}
+
+// frag grenade: olive body with a grooved band, fuse cap, lever and pin ring
+function makeGrenade() {
+  const g = new THREE.Group();
+  const olive = new THREE.MeshStandardMaterial({ color: 0x4a5a3c, roughness: 0.65 }), metal = new THREE.MeshStandardMaterial({ color: 0x8d9297, metalness: 0.7, roughness: 0.35 });
+  const body = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 12), olive); body.scale.y = 1.15; g.add(body);
+  const band = new THREE.Mesh(new THREE.TorusGeometry(0.075, 0.008, 6, 20), olive); band.rotation.x = Math.PI / 2; g.add(band);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.03, 0.035, 12), metal); cap.position.y = 0.095; g.add(cap);
+  const lever = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.1, 0.008), metal); lever.position.set(0.03, 0.06, 0); lever.rotation.z = -0.25; g.add(lever);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.018, 0.003, 6, 16), metal); ring.position.set(-0.03, 0.105, 0); g.add(ring);
+  g.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+  return g;
+}
 // impact grenade: arcs from you toward the crosshair and goes off on first contact
 const grenades = [];
 let nadeCd = 0;
@@ -1772,7 +1877,7 @@ function throwGrenade() {
   if (!testCfg.infiniteNades) { if (!countItem('grenade')) { toast('No grenades: loot some', 1200); return; } takeItem('grenade'); }
   nadeCd = 0.6;
   const dir = camera.getWorldDirection(new V3());
-  const m = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), new THREE.MeshStandardMaterial({ color: 0x3b4a3a, roughness: 0.6 }));
+  const m = makeGrenade();
   m.position.copy(player.position).add(new V3(0, 1.6, 0)).addScaledVector(dir, 0.6); m.castShadow = true; scene.add(m);
   grenades.push({ m, vel: dir.multiplyScalar(22).add(new V3(0, 4, 0)).add(new V3(Math.sin(moveYaw) * speed, 0, Math.cos(moveYaw) * speed)), t: 0 });
   if (mode === 'ground' && !atk) playOvr('OverhandThrow', { from: 0.25, speed: 1.8, fade: 0.06, then: () => stopOvr(0.2) });
@@ -1904,7 +2009,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v16 · 2026-09-30';
+const BUILD = 'v17 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -2015,6 +2120,7 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyX') throwGrenade();
   if (e.code === 'KeyM') openMoves();
   if (e.code === 'KeyG') startLoot();
+  if (e.code === 'KeyZ') startReload();
   if (e.code === 'Tab') { e.preventDefault(); toggleWeapon(); }
   if (e.code === 'KeyE') setGear(gear === 'lit' ? 'none' : 'lit');
   if (/^Digit[1-5]$/.test(e.code)) selectSlot(+e.code.slice(5) - 1);
@@ -2040,6 +2146,7 @@ press($('firebtn'), () => firePistol());
 press($('pushbtn'), () => forcePush());
 press($('nadebtn'), () => throwGrenade());
 press($('lootbtn'), () => startLoot());
+press($('reloadbtn'), () => startReload());
 press($('slidebtn'), () => { slideQueued = true; slideHeld = true; });
 $('slidebtn').addEventListener('pointerup', () => { slideHeld = false; });
 $('slidebtn').addEventListener('pointercancel', () => { slideHeld = false; });
@@ -2155,6 +2262,7 @@ function readInput(dt) {
     if (b(3) && !padPrev[3]) setGear(GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + 1) % GEAR_ORDER.length]);
     if (b(7) && !padPrev[7]) grapplePress();
     if (b(13) && !padPrev[13]) startLoot(); // d-pad down
+    if (b(12) && !padPrev[12]) startReload(); // d-pad up
     padPrev = [b(0), b(1), b(2), b(3), b(4), 0, 0, b(7)];
     break;
   }
@@ -2234,27 +2342,61 @@ const ITEMS = {
   credits: { name: 'Credits', stack: 9999, icon: 'coin' },
   ammo:    { name: 'Pistol ammo', stack: 120, icon: 'ammo' },
   cell:    { name: 'Power cell', stack: 10, icon: 'cell' },
-  ration:  { name: 'Ration bar', stack: 10, icon: 'box', tag: 'Food' },
+  ration:  { name: 'Ration bar', stack: 10, icon: 'ration' },
   chip:    { name: 'Data chip', stack: 10, icon: 'chip' },
   keycard: { name: 'Keycard', stack: 5, icon: 'card' },
-  comlink: { name: 'Comlink', stack: 1, icon: 'box', tag: 'Com' },
+  comlink: { name: 'Comlink', stack: 1, icon: 'comlink' },
   kyber:   { name: 'Kyber shard', stack: 5, icon: 'gem', rare: true },
 };
 const LOOT_IDS = { Credits: 'credits', 'Pistol ammo': 'ammo', 'Power cell': 'cell', 'Stim pack': 'stim', 'Frag grenade': 'grenade',
   'Ration bar': 'ration', 'Data chip': 'chip', Keycard: 'keycard', Comlink: 'comlink', 'Kyber shard': 'kyber' };
+// item pictures: the lightsaber, pistol and grenade are rendered from their 3D models at load (see renderThumbs);
+// everything else is a two-tone drawing
+const thumbs = {};
 const ICON = {
-  saber: '<path d="M6 26 L22 10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M4 28 L8 24" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".55"/>',
-  pistol: '<path d="M5 11h20v5H14l-1 9H8l1-9H5z" fill="currentColor"/>',
-  grenade: '<circle cx="15" cy="18" r="8" fill="currentColor"/><rect x="12" y="6" width="6" height="5" rx="1" fill="currentColor"/>',
-  stim: '<rect x="11" y="4" width="8" height="22" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 10v10M10 15h10" stroke="currentColor" stroke-width="2"/>',
-  coin: '<circle cx="15" cy="15" r="9" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M15 10v10" stroke="currentColor" stroke-width="2"/>',
-  ammo: '<rect x="7" y="9" width="4" height="14" rx="2" fill="currentColor"/><rect x="13" y="9" width="4" height="14" rx="2" fill="currentColor"/><rect x="19" y="9" width="4" height="14" rx="2" fill="currentColor"/>',
-  cell: '<rect x="8" y="7" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="12" y="4" width="6" height="3" fill="currentColor"/><path d="M16 11l-3 6h4l-3 6" stroke="currentColor" stroke-width="1.8" fill="none"/>',
-  chip: '<rect x="8" y="8" width="14" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="2"/><path d="M11 5v3M15 5v3M19 5v3M11 22v3M15 22v3M19 22v3" stroke="currentColor" stroke-width="1.6"/>',
-  card: '<rect x="5" y="9" width="20" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><rect x="8" y="13" width="6" height="4" fill="currentColor"/>',
-  gem: '<path d="M15 4l7 9-7 13-7-13z" fill="currentColor"/>',
+  saber: '<path d="M6 24 L22 8" stroke="#35e06a" stroke-width="3" stroke-linecap="round"/><path d="M4 27 L9 22" stroke="currentColor" stroke-width="5" stroke-linecap="round"/>',
+  pistol: '<path d="M4 10h21v5h-9l-1.5 10H9l1.5-10H4z" fill="currentColor"/>',
+  grenade: '<ellipse cx="15" cy="18" rx="8" ry="9" fill="#4a5a3c"/><rect x="12" y="5" width="6" height="5" rx="1" fill="currentColor"/>',
+  stim: '<rect x="12" y="3" width="6" height="3" rx="1" fill="currentColor"/><rect x="10" y="6" width="10" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="11.5" y="13" width="7" height="8.5" rx="1" fill="#3aa361" opacity=".85"/><path d="M15 23v5" stroke="currentColor" stroke-width="1.6"/><path d="M15 8v3M13.5 9.5h3" stroke="currentColor" stroke-width="1.4"/>',
+  coin: '<ellipse cx="15" cy="21" rx="9" ry="3.5" fill="#b8912e"/><ellipse cx="15" cy="17" rx="9" ry="3.5" fill="#d4a83a"/><ellipse cx="15" cy="13" rx="9" ry="3.5" fill="#e8c05a" stroke="#9a7722" stroke-width=".8"/><path d="M15 11v4" stroke="#9a7722" stroke-width="1.4"/>',
+  ammo: '<g fill="#c8963a"><rect x="6" y="12" width="4.5" height="13" rx=".8"/><rect x="12.75" y="12" width="4.5" height="13" rx=".8"/><rect x="19.5" y="12" width="4.5" height="13" rx=".8"/></g><g fill="#9a6b22"><path d="M6 12q2.25-6 4.5 0z"/><path d="M12.75 12q2.25-6 4.5 0z"/><path d="M19.5 12q2.25-6 4.5 0z"/></g>',
+  cell: '<rect x="8" y="7" width="14" height="19" rx="2.5" fill="currentColor" opacity=".85"/><rect x="12" y="4" width="6" height="3" rx=".8" fill="currentColor"/><path d="M16.5 10l-4 7h3.5l-2.5 6 5.5-8H15.5z" fill="#ffd33d"/>',
+  chip: '<rect x="8" y="8" width="14" height="14" rx="1.5" fill="currentColor"/><rect x="11.5" y="11.5" width="7" height="7" rx=".8" fill="#3a8dff"/><path d="M11 5v3M15 5v3M19 5v3M11 22v3M15 22v3M19 22v3M5 11h3M5 15h3M5 19h3M22 11h3M22 15h3M22 19h3" stroke="currentColor" stroke-width="1.4"/>',
+  card: '<rect x="4" y="8" width="22" height="15" rx="2" fill="currentColor"/><rect x="4" y="11" width="22" height="3" fill="#c2410c"/><rect x="7" y="16" width="7" height="4" rx=".6" fill="#ffd33d"/><path d="M17 17h6M17 19.5h4" stroke="#fff" stroke-width="1" opacity=".7"/>',
+  gem: '<path d="M15 3l6 7-6 17-6-17z" fill="#8fd3ff"/><path d="M15 3l6 7h-12z" fill="#c9ecff"/><path d="M15 10v17" stroke="#fff" stroke-width=".8" opacity=".7"/>',
+  ration: '<rect x="5" y="11" width="20" height="9" rx="2" fill="#8a6a3a"/><rect x="5" y="13.5" width="20" height="4" fill="#c2410c" opacity=".85"/><path d="M8 11v9M22 11v9" stroke="#5e4522" stroke-width="1"/>',
+  comlink: '<rect x="10" y="7" width="10" height="19" rx="2" fill="currentColor"/><rect x="12" y="10" width="6" height="5" rx=".6" fill="#3aa361"/><path d="M13 3v4" stroke="currentColor" stroke-width="1.6"/><circle cx="15" cy="20" r="1.6" fill="#fff" opacity=".7"/>',
   box: '<rect x="7" y="9" width="16" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 13h16" stroke="currentColor" stroke-width="2"/>',
 };
+// render a model to a small transparent picture (once, at load)
+function thumbOf(obj, { yaw = 0.6, pitch = 0.35, roll = 0, fill = 0.8 } = {}) {
+  const S = 128, rt = new THREE.WebGLRenderTarget(S, S);
+  const sc = new THREE.Scene(); sc.add(new THREE.HemisphereLight(0xffffff, 0x777777, 2.2)); const d = new THREE.DirectionalLight(0xffffff, 1.6); d.position.set(1, 2, 3); sc.add(d);
+  const holder = new THREE.Group(); holder.add(obj); holder.rotation.set(pitch, yaw, roll); sc.add(holder); holder.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(holder), c = box.getCenter(new V3()), size = box.getSize(new V3());
+  holder.position.sub(c);
+  const r = Math.max(size.x, size.y) / 2 / fill, cam = new THREE.OrthographicCamera(-r, r, r, -r, 0.01, 10); cam.position.set(0, 0, 3);
+  const prevT = renderer.getRenderTarget(), prevC = renderer.getClearColor(new THREE.Color()), prevA = renderer.getClearAlpha();
+  renderer.setRenderTarget(rt); renderer.setClearColor(0x000000, 0); renderer.clear(); renderer.render(sc, cam);
+  const px = new Uint8Array(S * S * 4); renderer.readRenderTargetPixels(rt, 0, 0, S, S, px);
+  renderer.setRenderTarget(prevT); renderer.setClearColor(prevC, prevA); rt.dispose();
+  const cv = document.createElement('canvas'); cv.width = cv.height = S; const ctx = cv.getContext('2d'), img = ctx.createImageData(S, S);
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) { // flip rows; linear to sRGB
+    const i = ((S - 1 - y) * S + x) * 4, o = (y * S + x) * 4, a = px[i + 3];
+    for (let k = 0; k < 3; k++) { const v = a ? px[i + k] / a : 0; img.data[o + k] = Math.round(255 * Math.pow(Math.min(1, v), 1 / 2.2)); }
+    img.data[o + 3] = a;
+  }
+  ctx.putImageData(img, 0, 0); return cv.toDataURL();
+}
+function renderThumbs() {
+  try {
+    if (pistolModel) thumbs.pistol = thumbOf(pistol.root.children[0].clone(true), { yaw: 0, pitch: 0, fill: 0.95 });
+    const sb = makeSaber(false); for (const b of sb.blades) { b.visible = true; b.scale.y = 1; }
+    thumbs.saber = thumbOf(sb.root, { yaw: 0.3, pitch: 0, roll: -0.8, fill: 0.92 });
+    thumbs.grenade = thumbOf(makeGrenade(), { yaw: 0.4, pitch: 0.2, fill: 0.85 });
+  } catch (e) { log('thumbs failed', e.message); }
+  renderInv();
+}
 const inv = { hot: [{ id: 'saber', qty: 1 }, { id: 'pistol', qty: 1 }, { id: 'grenade', qty: 5 }, null, null], bag: new Array(20).fill(null), active: 0 };
 try { const s = JSON.parse(localStorage.getItem('inv') || 'null'); if (s && s.hot?.length === 5 && s.bag?.length === 20) Object.assign(inv, s); } catch (_) {}
 const saveInv = () => { try { localStorage.setItem('inv', JSON.stringify(inv)); } catch (_) {} };
@@ -2262,9 +2404,9 @@ const slotAt = (where, i) => (where === 'hot' ? inv.hot : inv.bag)[i];
 const setSlot = (where, i, v) => { (where === 'hot' ? inv.hot : inv.bag)[i] = v; };
 function slotHTML(it, where, i) {
   const def = it && ITEMS[it.id];
-  const icon = def ? `<svg viewBox="0 0 30 30" aria-hidden="true">${ICON[def.icon]}</svg>` : '';
+  const icon = !def ? '' : thumbs[it.id] ? `<img src="${thumbs[it.id]}" alt="" draggable="false">` : `<svg viewBox="0 0 30 30" aria-hidden="true">${ICON[def.icon]}</svg>`;
   const key = where === 'hot' ? `<span class="k">${i + 1}</span>` : '';
-  const n = def && def.stack && it.qty > 1 ? `<span class="n">${testCfg.infiniteNades && it.id === 'grenade' ? '∞' : it.qty}</span>` : '';
+  const n = it?.id === 'pistol' ? `<span class="n">${ammo.mag}</span>` : def && def.stack && it.qty > 1 ? `<span class="n">${testCfg.infiniteNades && it.id === 'grenade' ? '∞' : it.qty}</span>` : '';
   const t = def && def.tag ? `<span class="t">${def.tag}</span>` : '';
   const label = def ? `${def.name}${it.qty > 1 ? ' ×' + it.qty : ''}` : 'Empty';
   return `<button type="button" class="slot${where === 'hot' && i === inv.active ? ' on' : ''}${def?.rare ? ' rare' : ''}" data-where="${where}" data-i="${i}" aria-label="Slot ${i + 1}: ${label}" title="${label}">${key}${icon}${n}${t}</button>`;
@@ -2567,6 +2709,7 @@ function step(dt) {
   lean.rotation.z = roll;
 
   updateDraw(dt);
+  updateReload(dt);
   updateJetpackLook();
   updateCombat(dt);
   updateSaber(dt);
@@ -2648,16 +2791,22 @@ function animateLoco(dt, C) {
     else a.timeScale = 1;
     a.setEffectiveWeight(a.getEffectiveWeight() + w);
   };
+  reloadBlend = moveTo(reloadBlend, reload && gear === 'pistol' ? 1 : 0, dt / 0.12);
+  if (split && reloadBlend > 0.001) { // reload: the upper body plays the reload, timed to the reload's progress
+    const a = useLoop(masked('Pistol_Reload', 'upper'));
+    if (a) { a.timeScale = 0; a.time = clamp(reload ? reload.t / reload.dur : 1, 0, 0.999) * a.getClip().duration; a.setEffectiveWeight(a.getEffectiveWeight() + reloadBlend * locoW); }
+  }
+  const nr = 1 - reloadBlend; // everything else in the upper body makes room for the reload
   if (split) {
     const g = guardBlend;
-    layer(masked(upper, 'upper'), (1 - m) * (1 - g) * locoW); layer(masked(upper, 'arm'), m * locoW);
+    layer(masked(upper, 'upper'), nr * (1 - m) * (1 - g) * locoW); layer(masked(upper, 'arm'), nr * m * locoW);
     if (gear === 'pistol' && clips.has('Pistol_Aim_Up')) {
       // aim follows the camera: blend the level aim with the straight-up and straight-down aims
       const k = clamp(-camPitch / (Math.PI / 2), -1, 1), up = Math.max(0, k), dn = Math.max(0, -k);
-      layer(masked('Pistol_Aim_Neutral', 'upper'), (1 - m) * g * locoW * (1 - up - dn));
-      layer(masked('Pistol_Aim_Up', 'upper'), (1 - m) * g * locoW * up);
-      layer(masked('Pistol_Aim_Down', 'upper'), (1 - m) * g * locoW * dn);
-    } else layer(masked(guardUpper, 'upper'), (1 - m) * g * locoW);
+      layer(masked('Pistol_Aim_Neutral', 'upper'), nr * (1 - m) * g * locoW * (1 - up - dn));
+      layer(masked('Pistol_Aim_Up', 'upper'), nr * (1 - m) * g * locoW * up);
+      layer(masked('Pistol_Aim_Down', 'upper'), nr * (1 - m) * g * locoW * dn);
+    } else layer(masked(guardUpper, 'upper'), nr * (1 - m) * g * locoW);
   }
   if (gripOnly) layer(masked('Sword_Idle', 'grip'), locoW);
   for (const [rawId, w] of wts) {
@@ -2812,8 +2961,9 @@ function buildMoves() {
     `<label class="switch"><input type="checkbox" id="jeton" ${gadgets.jetpack ? 'checked' : ''}> Jetpack: hold Jump in the air to fly, hold C (or Slide) to hover, sprint to fly flat out</label>` +
     `<label class="switch"><input type="checkbox" id="pushbodies" ${enemyCfg.pushBodies ? 'checked' : ''}> Force push moves bodies (grenades always do)</label>` +
     `<label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>` +
-    `<label class="switch"><input type="checkbox" id="infnades" ${testCfg.infiniteNades ? 'checked' : ''}> Infinite grenades (off: each throw uses one from your inventory)</label>`);
-  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, <kbd>G</kbd> loot a body, scroll wheel or <kbd>1</kbd>–<kbd>5</kbd> hotbar, <kbd>I</kbd> inventory, <kbd>E</kbd> saber on/off, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
+    `<label class="switch"><input type="checkbox" id="infnades" ${testCfg.infiniteNades ? 'checked' : ''}> Infinite grenades (off: each throw uses one from your inventory)</label>` +
+    `<label class="switch"><input type="checkbox" id="infammo" ${testCfg.infiniteAmmo ? 'checked' : ''}> Infinite spare ammo (off: reloads use the pistol ammo in your inventory; the magazine always empties)</label>`);
+  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, <kbd>G</kbd> loot a body, <kbd>Z</kbd> reload (it also reloads itself when empty), scroll wheel or <kbd>1</kbd>–<kbd>5</kbd> hotbar, <kbd>I</kbd> inventory, <kbd>E</kbd> saber on/off, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
   h.push(`</section>`);
   $('weaponbody').innerHTML = h.join(''); h.length = 0;
   h.push(`<section data-panel="moves">`);
@@ -2868,7 +3018,7 @@ function buildMoves() {
     if (e.target.closest('#enemyreset')) { [...enemies].filter((x) => x.state !== 'dead').forEach(removeEnemy); respawnT = 0; filled = false; renderEnemyTests(); }
     if (e.target.closest('#enemyclear')) { [...enemies].filter((x) => x.state === 'dead').forEach(removeEnemy); renderEnemyTests(); }
   });
-  wb.addEventListener('change', (e) => { if (e.target.id === 'infnades') { testCfg.infiniteNades = e.target.checked; saveTest(); renderInv(); } });
+  wb.addEventListener('change', (e) => { if (e.target.id === 'infnades') { testCfg.infiniteNades = e.target.checked; saveTest(); renderInv(); } if (e.target.id === 'infammo') { testCfg.infiniteAmmo = e.target.checked; saveTest(); renderAmmo(); } });
   wb.addEventListener('change', (e) => { if (e.target.id === 'infjumps') { testCfg.infiniteJumps = e.target.checked; saveTest(); log('infinite jumps', testCfg.infiniteJumps); } });
   body.addEventListener('click', (e) => {
     if (!e.target.closest('#clipsweep')) return;
@@ -2890,7 +3040,7 @@ function buildMoves() {
       if (sb.dataset.sstyle) saberCfg.style = sb.dataset.sstyle;
       if (sb.dataset.sgrip) saberCfg.grip = sb.dataset.sgrip;
       if (sb.dataset.scolor) saberCfg.color = sb.dataset.scolor;
-      saveSaber(); rebuildSabers();
+      saveSaber(); rebuildSabers(); renderThumbs();
       for (const [attr, key] of [['sstyle', 'style'], ['sgrip', 'grip'], ['scolor', 'color']])
         document.querySelectorAll(`[data-${attr}]`).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset[attr] === saberCfg[key])));
       if (!movesOpen) { if (gear !== 'lit') setGear('lit'); return; }
@@ -2984,6 +3134,7 @@ function start() {
     explodeAt(x, y, z) { explode(new V3(x, y, z)); },
     startLoot, get looting() { return looting ? { t: +looting.t.toFixed(2), shown: looting.shown, n: looting.items.length } : null; }, get lootLog() { return lootLog.slice(); }, get lootTarget() { return lootTarget ? lootTarget.id : null; },
     inv, selectSlot, moveItem, addItem, toggleInv, countItem,
+    ammo, startReload, get reload() { return reload ? { t: +reload.t.toFixed(2), empty: reload.empty } : null; }, get mags() { return mags.length; }, get magPos() { return mags.map((g) => g.m.position.toArray().map((v) => +v.toFixed(2)).concat(g.rest ? 'rest' : 'moving')); }, magDebug(big) { const g = mags[0]; if (!g) return null; if (big) g.m.scale.setScalar(big); const v = g.m.position.clone().project(camera); return { inScene: g.m.parent === scene, visible: g.m.visible, scale: g.m.scale.toArray(), screen: [+((v.x + 1) / 2 * innerWidth).toFixed(0), +((1 - v.y) / 2 * innerHeight).toFixed(0), +v.z.toFixed(3)], gunMagWorld: gunMag.getWorldScale(new V3()).toArray().map((x) => +x.toFixed(3)) }; }, get thumbs() { return Object.keys(thumbs); }, get magOut() { return magOut; },
     fillEnemies() { while (enemies.filter((x) => x.state !== 'dead').length < ENEMY_COUNT) spawnEnemy(openSpot(20, 34)); },
     moveEnemy(i, x, z, yawR) { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) { e.g.position.set(x, groundAt(x, z, 99), z); if (yawR !== undefined) e.yaw = yawR; e.state = 'hit'; e.hitT = 5; e.g.updateMatrixWorld(true); } }, killFeed, damageEnemy: (i, amt, zone, kind) => { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) damageEnemy(e, amt, zone, kind); return !!e; },
     playOnEnemy(i, name, from = 0, speed = 1) { const e = enemies.filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },

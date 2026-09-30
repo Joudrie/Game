@@ -2,6 +2,24 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v17: better icons, pistol magazine and reload
+- **Better item icons:**
+  - The lightsaber, pistol and frag grenade icons are pictures of their actual 3D models, rendered when the game loads. The saber icon shows your blade colour and updates when you change it.
+  - Every other item has a detailed two-colour drawing: a stack of gold credits, brass rounds, a power cell with a charge bolt, a data chip, a keycard, a stim, a ration bar, a comlink, and a pale blue kyber shard.
+- **The thrown grenade** is the same model as the icon (olive body, band, fuse cap, lever and pin ring) instead of a plain ball.
+- **Pistol magazine:**
+  - 12 rounds. The count shows on the pistol's hotbar slot, and a counter above the hotbar reads "rounds / spare"; it turns orange at 3 or fewer.
+  - Spare rounds are the Pistol ammo in your inventory. "Infinite spare ammo" (Weapon → Settings, on by default for testing) keeps them from running out, but the magazine still empties.
+- **Reload:**
+  - **Z** (the Reload button on a phone, D-pad up on a gamepad), or automatically when you fire the last round.
+  - The upper body plays the reload from the free animation pack, so you can reload while running.
+  - An empty reload drops the spent magazine: it flies out to your right, clatters, kicks up a small puff of dust, and lies flat on the ground. Up to 24 stay.
+  - A reload with rounds left keeps the old magazine (it goes in a pocket) and is faster (1.05 s against 1.35 s).
+  - A fresh magazine appears in your left hand and goes into the gun partway through.
+  - Pulling the trigger with an empty magazine and no spare ammo tells you to loot some.
+  - Holstering or switching weapons cancels a reload. If the spent magazine was already out, the gun stays empty until you reload.
+- **Automated test:** `tools/test22-reload.mjs`.
+
 ## v16: hotbar and inventory
 - **Hotbar:** five slots in the bottom right, Fortnite/Minecraft style. **Scroll** (or keys **1–5**, or tap a slot on a phone) picks a slot.
   - A weapon slot (lightsaber or pistol) draws that weapon, with the draw/holster animation.
