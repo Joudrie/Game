@@ -55,14 +55,14 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 3. **Triple jump,** each jump higher; a little wall running during the super sprint.
 4. **Saber + blaster** as one item (the blaster overheats after about 4 shots).
 
-**Batch 4: enemies that think, and you can die** *(next)*
+**Batch 4: enemies that think, and you can die** ✅ *done in v26* (suppressors wait for the batch 5 attachments; the noise rule is ready for them)
 1. **Enemy states:** idle, patrol, alerted, targeting. An idle guard who sees someone die panics for a moment. A guard who spots you yells, and killing him before he finishes keeps it quiet. Suppressors are silent; gunfire alerts everyone.
 2. **Stealth kills.**
 3. **Player damage** (hits to kill set by difficulty), slow regenerating health, easy / normal / hard / extreme (smarter AI on the hard ones).
 4. **Dying is fun:** full ragdoll; your own grenade blows you apart like anyone else; watch the body or respawn.
 5. **Snap-to-cover** with peeking, blind fire and reloading behind cover.
 
-**Batch 5: a proper sandbox and the first mission**
+**Batch 5: a proper sandbox and the first mission** *(next)*
 1. **A better test arena:** a courtyard with cover, a wooden wall that breaks (in pieces, partly), glass that shatters, stone that only takes marks, ledges to fall from.
 2. **Mission 1, waves:** pistols, then AKs, then ARs, then snipers. Loot what they drop. Replayable.
 3. **Gear you keep forever** from each mission (for example, the grappling hook).
