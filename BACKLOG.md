@@ -1,6 +1,7 @@
 # Backlog
 
 Everything asked for so far that isn't built yet, grouped so nothing gets lost. Done items move to `CHANGELOG.md`.
+The owner's game references and ideas, with what's built, are in `IDEAS.md`.
 
 **Tags:**
 - **[needs you]:** waiting on something only you can do (a token, a login download, a decision).
