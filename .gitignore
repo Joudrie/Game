@@ -4,3 +4,4 @@ dist/preview*.html
 *.png
 !assets/**/*.png
 assets/deaths/_UNLICENSED_*/
+package-lock.json
