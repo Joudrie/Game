@@ -28,6 +28,61 @@ The ground rules:
 - **Inspiration:** the owner's book *Wake* (weapons such as plasma knives, plasma and beryllium rifles, holocloaks, magboots, hoverboards, breaching kits; worlds like Marfeld and Kelton) and the Lego collection's lore (the Snow Jedi, the Purple Shadow, the realm where guns don't work).
 - **Licences still apply:** assets ripped from commercial games (like the Skate 3 or Call of Duty files people pass around) can't go in. We take ideas from those games, and assets only from properly licensed sources.
 
+## ★ Roadmap (agreed v22): build in this order
+Each batch ends with a play-link update for the owner to try. Order can change whenever the owner says so.
+
+**Batch 1: finish the saber cutting and fix the basics** *(now)*
+1. Play-test fixes: jetpack off by default; the pistol stuck pointing up after recoil (root cause); short-lived bullet holes on walls and ground.
+2. Dismemberment part 2:
+   - soldiers react to losing a limb (clutching the stump)
+   - one-armed soldiers switch the gun to the other hand and keep shooting
+   - a leg cut drops him to crawl instead of killing him
+   - limbs stay on the ground longer
+3. **Pick up dropped weapons** (walk over them or press the loot key); a body gives about 3 magazines. Arcade reloads: rounds are never lost.
+4. **6-slot hotbar, centred** at the bottom.
+5. **A key to swap shoulders** (camera).
+
+**Batch 2: guns**
+1. **AK-47, pump shotgun, sniper** (free CC0 models already in `assets/weapons/quaternius-ultimate-guns`), each with several animations and its own feel.
+2. **Weapon sounds** (free sounds already in `assets/misc/sounds`).
+3. **Bullets vs blasters:** only blaster bolts can be deflected.
+4. **Block and parry:** holding block covers the front and sides, not the back; the guard breaks after many hits; a block timed to the shot sends the bolt back at the shooter (a sniper's scope glint is the tell).
+5. Soldiers carry these weapons and drop them.
+
+**Batch 3: Jedi powers and movement** (the Jedi class first)
+1. **Force targeting like Lego Star Wars** (a marker on whoever you look at, with an on/off toggle and cooldowns): pull (into your blade), choke, lightning, saber throw.
+2. **Saber feel:** blade trail, the blade lights faces and rooms, sparks and scorch marks on walls and ground, the hum and ignite sounds.
+3. **Triple jump,** each jump higher; a little wall running during the super sprint.
+4. **Saber + blaster** as one item (the blaster overheats after about 4 shots).
+
+**Batch 4: enemies that think, and you can die**
+1. **Enemy states:** idle, patrol, alerted, targeting. An idle guard who sees someone die panics for a moment. A guard who spots you yells, and killing him before he finishes keeps it quiet. Suppressors are silent; gunfire alerts everyone.
+2. **Stealth kills.**
+3. **Player damage** (hits to kill set by difficulty), slow regenerating health, easy / normal / hard / extreme (smarter AI on the hard ones).
+4. **Dying is fun:** full ragdoll; your own grenade blows you apart like anyone else; watch the body or respawn.
+5. **Snap-to-cover** with peeking, blind fire and reloading behind cover.
+
+**Batch 5: a proper sandbox and the first mission**
+1. **A better test arena:** a courtyard with cover, a wooden wall that breaks (in pieces, partly), glass that shatters, stone that only takes marks, ledges to fall from.
+2. **Mission 1, waves:** pistols, then AKs, then ARs, then snipers. Loot what they drop. Replayable.
+3. **Gear you keep forever** from each mission (for example, the grappling hook).
+4. **Creative menu:** a catalogue of every weapon and item to drag into the inventory; attachments from each item's menu (suppressor, scope).
+
+**Later** (in the sections below): first person with ADS, leaning and quickscoping; droids; co-op (duo PvE); killstreaks and throwables; fire and sticky grenades; juggernauts and shields; saber duels; Dead Eye; stealth missions and climbing; the character creator; the Naboo city; the hoverboard; mechs; emotes; civilians and voice lines.
+
+## Owner's answers (v22, round 3)
+- **Cuts at full speed** (no slow motion). **Severed limbs stay a while.**
+- **An idle guard who sees someone die panics for a moment** (stealth missions).
+- **The player:** intact for now, but **your own explosion blows you apart** like anyone else.
+- **Character:** keep the current hero. **Classes:** don't worry about them for now.
+- **Weapon switching:** scroll wheel and number keys (as now, Fortnite-style).
+- **First guns after the pistol:** AK-47, pump shotgun, sniper.
+- **Only blaster bolts can be deflected;** bullets can't.
+- **Arcade reloads:** never lose rounds.
+- **Droids:** set aside for now.
+- **Hits to kill the player:** set by difficulty.
+- **Rewards:** new gear each mission that you keep forever (e.g. the grappling hook); missions are replayable; the sandbox has everything.
+
 ## ★ Current focus: dismemberment (owner, v22)
 "I really want to ace the dismemberment mechanic." Cartoon, not gory: blood yes, gore no.
 - [x] **v22:** the blade decides. Head, torso and legs kill, cut exactly where the blade passed; hands and arms come off and the soldier lives; the gun hand drops the pistol and he runs; cartoon blood and splats; grenades and pushes throw loose limbs and guns.
