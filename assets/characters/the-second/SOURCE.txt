@@ -1,0 +1,13 @@
+The Second: the owner's own character.
+
+front.png, back.png, left.png, right.png
+  Turnaround images supplied by the owner (2026-09-30). left = the character's left side (metal arm), right = his right side.
+
+hunyuan3d_2mv_shape.glb
+  Untextured shape generated from the four images with Tencent Hunyuan3D-2mv (turbo), Hugging Face Space tencent/Hunyuan3D-2mv,
+  /shape_generation, 30 steps, guidance 5, seed 1234, octree 380, background removal on.
+  Licence: Tencent Hunyuan 3D 2.0 Community License (https://huggingface.co/tencent/Hunyuan3D-2/blob/main/LICENSE.txt).
+  Tencent claims no rights in outputs (section 5d). The licence excludes the EU, UK and South Korea.
+
+build/the_second.glb          tools/bake_the_second.py  (decimate to 20k faces, xatlas UVs, texture projected from the four images)
+build/the_second_rigged.glb   tools/rig_the_second.mjs  (skinned to the Quaternius Superhero skeleton, bind pose = its T-pose)

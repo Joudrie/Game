@@ -26,6 +26,11 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 - [ ] **Dismemberment polish:** choose the cut from where the blade actually passed; limbs cut off living soldiers (they keep fighting one-armed); blood decals on the ground.
 - [ ] **More combat moves:** air slash combos, a dash strike, a grapple yank (pull the enemy to you instead), a finisher on stunned soldiers.
 
+## 1b. The Second
+- [x] **Playable 3D model from the turnarounds** (v20).
+- [ ] **Polish:** longer arms in the skeleton (the model's hands hang about 7 cm past the rig's wrists), finger bones for a real grip, and a sharper texture (2048 px if the size budget allows).
+- [ ] **More characters** from the owner's paintings and Lego figures, using the same pipeline.
+
 ## 2. Lightsaber
 - [ ] **Draw and holster animations.** v14 does it with live arm IK. Mixamo clips would look better. *[needs you: Mixamo `Draw Sword 1`/`2`, `Sheath Sword 1`/`2`]*
 - [ ] **Many more combos,** simple but plentiful, Fortnite-style. *[needs you: Mixamo Great Sword Pack, `One Hand Sword Combo`, `Two Hand Sword Combo`]*

@@ -2,7 +2,7 @@ import base64, json, pathlib, sys
 B = pathlib.Path('build')
 b64 = lambda f: base64.b64encode((B/f).read_bytes()).decode()
 extra = json.loads((B/'extra.json').read_text()) if (B/'extra.json').exists() else {"clips": [], "moves": {}}
-assets = {"hero": b64('hero.glb'), "ual1": b64('ual1_anims.glb'), "ual2": b64('ual2_anims.glb'), "rifle": b64('rifle.glb'), "pistol": b64('pistol.glb'), "jetpack": base64.b64encode(pathlib.Path('assets/jetpack/boba_fett_jetpack.obj').read_bytes()).decode(), "extra": extra}
+assets = {"hero": b64('hero.glb'), "ual1": b64('ual1_anims.glb'), "ual2": b64('ual2_anims.glb'), "rifle": b64('rifle.glb'), "pistol": b64('pistol.glb'), "second": b64('the_second_rigged.glb'), "jetpack": base64.b64encode(pathlib.Path('assets/jetpack/boba_fett_jetpack.obj').read_bytes()).decode(), "extra": extra}
 src = pathlib.Path('src/game2.html').read_text()
 out = src.replace('__ASSETS_JSON__', json.dumps(assets))
 pathlib.Path('dist').mkdir(exist_ok=True)

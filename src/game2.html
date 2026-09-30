@@ -552,14 +552,21 @@ async function boot() {
   fillMissingTracks();
   try { rifleModel = (await parseGLB(A.rifle)).scene; pistolModel = (await parseGLB(A.pistol)).scene; } catch (e) { report('error', 'Weapon model failed: ' + e.message); }
   try { if (A.jetpack) jetpackModel = new OBJLoader().parse(new TextDecoder().decode(decodeB64(A.jetpack))); } catch (e) { report('error', 'Jetpack model failed: ' + e.message); }
-  hero = h.scene;
-  hero.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
-  lf = boneByName(hero, 'ball_l') || boneByName(hero, 'foot_l'); rf = boneByName(hero, 'ball_r') || boneByName(hero, 'foot_r');
   // height to 1.8 m, feet on the ground
-  hero.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(hero);
-  hero.scale.setScalar(1.8 / (box.max.y - box.min.y));
-  hero.updateMatrixWorld(true); box.setFromObject(hero); hero.position.y = -box.min.y; hero.updateMatrixWorld(true);
+  const fit = (m) => {
+    m.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.frustumCulled = false; } });
+    m.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(m);
+    m.scale.setScalar(1.8 / (box.max.y - box.min.y));
+    m.updateMatrixWorld(true); box.setFromObject(m); m.position.y = -box.min.y; m.updateMatrixWorld(true);
+    return m;
+  };
+  const soldierBody = fit(h.scene); // the soldiers keep the Superhero body
+  hero = soldierBody;
+  if (charCfg === 'second' && A.second) {
+    try { const sc = (await parseGLB(A.second)).scene; sc.traverse((o) => { if (o.isMesh && !o.geometry.attributes.normal) o.geometry.computeVertexNormals(); }); hero = fit(sc); } catch (e) { report('error', 'The Second failed to load: ' + e.message); }
+  }
+  lf = boneByName(hero, 'ball_l') || boneByName(hero, 'foot_l'); rf = boneByName(hero, 'ball_r') || boneByName(hero, 'foot_r');
   // measure stride speed of every locomotion loop so feet stay planted
   const DEF = { walk: 1.5, jog: 5, sprint: 8, crouch: 1.2 };
   for (const slot of ['walk', 'jog', 'sprint', 'crouch']) {
@@ -576,8 +583,8 @@ async function boot() {
   // travel angle of each clip relative to forward (+ = character's left), measured from its planted foot
   const f0 = Math.atan2(f.x, f.z);
   for (const [id, c] of Object.entries(cal)) c.angle = wrapAngle(Math.atan2(c.fwd.x, c.fwd.z) - f0);
-  hero.rotation.y = -Math.atan2(f.x, f.z);
-  enemyTemplate = cloneSkinned(hero);
+  hero.rotation.y = soldierBody.rotation.y = -Math.atan2(f.x, f.z);
+  enemyTemplate = cloneSkinned(soldierBody);
   enemyTemplate.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.color = new THREE.Color(0x6a7482); } });
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
@@ -667,6 +674,9 @@ function updateOvr(dt) {
 
 // ---------------- lightsaber ----------------
 const SABER_COLORS = { Green: 0x35e06a, Blue: 0x3a8dff, Purple: 0x9b5cff, Red: 0xff3b30, Yellow: 0xffd33d, White: 0xf4f4f4 };
+// who you play: The Second (the owner's character, built from their turnaround images) or the Quaternius Superhero
+let charCfg = 'second';
+try { const c = localStorage.getItem('character'); if (c === 'second' || c === 'superhero') charCfg = c; } catch (_) {}
 const saberCfg = { style: 'dual', grip: 'normal', color: 'Green' };
 try { Object.assign(saberCfg, JSON.parse(localStorage.getItem('saber') || '{}')); } catch (_) {}
 const saveSaber = () => { try { localStorage.setItem('saber', JSON.stringify(saberCfg)); } catch (_) {} };
@@ -764,7 +774,11 @@ function buildJetpack() {
   const root = new THREE.Group();
   const flames = [];
   const flameMat = new THREE.MeshBasicMaterial({ color: 0xffb347, transparent: true, opacity: 0.85, depthWrite: false });
-  if (jetpackModel) {
+  let own = false; hero.traverse((o) => { if (o.name === 'TheSecond') own = true; });
+  if (own) { // The Second wears his own tank on his back: no extra model, one flame under the tank
+    const f = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.4, 10, 1, true), flameMat.clone());
+    f.rotation.x = Math.PI; f.position.set(0.02, -0.34, 0.02); root.add(f); flames.push(f);
+  } else if (jetpackModel) {
     // the file stands upright with its tanks on +X and the flat mounting plate on -X; turn it so the plate faces the wearer's back
     const g = jetpackModel, box = new THREE.Box3().setFromObject(g), size = box.getSize(new V3()), c = box.getCenter(new V3());
     const k = JET_H / size.y;
@@ -2053,7 +2067,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v19 · 2026-09-30';
+const BUILD = 'v20 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -2988,6 +3002,9 @@ function buildMoves() {
   const body = $('movesbody');
   const h = [];
   h.push(`<section data-panel="setup">`);
+  h.push(`<h3>Character <small>reloads the game</small></h3><div class="seg" role="group" aria-label="Character" style="grid-template-columns:repeat(2,1fr)">`);
+  for (const [k, l] of [['second', 'The Second'], ['superhero', 'Superhero']]) h.push(`<button type="button" data-char="${k}" aria-pressed="${charCfg === k}">${l}</button>`);
+  h.push(`</div>`);
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p><p class="note">Everything ticked below is for <b id="movesfor">${CLASSES[klass].label}</b>. Each class keeps its own set.</p>`);
@@ -3079,6 +3096,8 @@ function buildMoves() {
     const gb = e.target.closest('[data-gear]');
     if (gb && !movesOpen) { setGear(gb.dataset.gear); return; } // in play: draw or holster with the animation
     if (gb) { movesGear = gb.dataset.gear; setGear(movesGear, true); preview(previewing || { kind: 'slot', slot: 'jog', id: pool.jog[0], key: `jog:${pool.jog[0]}` }); return; }
+    const chb = e.target.closest('[data-char]');
+    if (chb) { if (chb.dataset.char !== charCfg) { try { localStorage.setItem('character', chb.dataset.char); } catch (_) {} location.reload(); } return; }
     const sb = e.target.closest('[data-sstyle],[data-sgrip],[data-scolor]');
     if (sb) {
       if (sb.dataset.sstyle) saberCfg.style = sb.dataset.sstyle;
@@ -3157,7 +3176,7 @@ function start() {
     renderer.render(scene, camera);
   });
   setGear(gear, true);
-  window.__game = { enemies: () => enemies.map((e) => ({ id: e.id, state: e.state, hp: e.hp, pos: e.g.position.toArray().map((v) => +v.toFixed(1)), death: e.deathType || null, clip: e.actName })),
+  window.__game = { character: () => { let n = null; hero.traverse((o) => { if (!n && o.isSkinnedMesh) n = o.name; }); return n; }, enemies: () => enemies.map((e) => ({ id: e.id, state: e.state, hp: e.hp, pos: e.g.position.toArray().map((v) => +v.toFixed(1)), death: e.deathType || null, clip: e.actName })),
     firePistol, forcePush, throwGrenade, deathCounts,
     // test hook: shoot from the camera at a zone of the i-th living enemy (head, torso or legs)
     shootAt(i, zone) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e) return null; fireCd = 0;

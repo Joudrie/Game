@@ -3,6 +3,7 @@
 Most assets are CC0 (public domain) and need no credit. The ones below need credit or have conditions. Per-folder details are in each `SOURCE.txt` and in `assets/*/REPORT.md`.
 
 ## Used in the playable build
+- **The Second**: the owner's character, from their own turnaround images. Shape generated with **Tencent Hunyuan3D-2mv** (Tencent Hunyuan 3D 2.0 Community License; Tencent claims no rights in outputs; not licensed in the EU, UK or South Korea). Details in `assets/characters/the-second/SOURCE.txt`.
 - **Quaternius**: Universal Animation Library 1 and 2, Superhero base character (CC0). The `MR_` clips are our left-to-right mirrors of its sword hits (`tools/bake_mirror.mjs`). quaternius.com
 - **Mesh2Motion**: human add-on animations (CC0). github.com/scottpetrovic/mesh2motion-app
 - **100STYLE dataset** (CC BY 4.0): I. Mason, S. Starke, T. Komura, "Real-Time Style Modelling of Human Locomotion via Feature-Wise Transformations and Local Motion Phases", 2022.
