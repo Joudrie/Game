@@ -75,7 +75,10 @@ Each batch ends with a play-link update for the owner to try. Order can change w
 3. **Grapple swing** (Spider-Man), a setting next to the zip-line.
 4. **Mission 2: Hold the courtyard.** Survive 3 minutes of reinforcements; the reward is the jetpack, for good.
 
-**Ideas for Batch 7** (the owner picks): juggernauts and shields; saber duels (enemies who block); droids that fall apart; fall damage and deadly ledges; killstreaks; first person with aim-down-sights; a first city block (Naboo-style) to fight through; customisable, saved sabers; the slanted cut that follows the blade's angle.
+**Batch 7: enemies worth a saber, stealth that counts** ✅ *done in v29* (the owner said go)
+1. Juggernauts and Jackal-style shields; 2. saber duellists (block, guard break, parry); 3. a sneak button, the holocloak and Mission 3 (infiltration); 4. move presets (favourites and packs); 5. falls (by class, deadly ledges, the blue berry).
+
+**Ideas for Batch 8** (the owner picks): droids that fall apart; killstreaks; first person with aim-down-sights; a first city block (Naboo-style) to fight through; customisable, saved sabers; the slanted cut that follows the blade's angle.
 
 **Later** (in the sections below): first person with ADS, leaning and quickscoping; droids; co-op (duo PvE); killstreaks and throwables; fire and sticky grenades; juggernauts and shields; saber duels; Dead Eye; stealth missions and climbing; the character creator; the Naboo city; the hoverboard; mechs; emotes; civilians and voice lines.
 

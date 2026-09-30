@@ -11,7 +11,7 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 - ✅ Force powers: push, pull, choke, lightning, saber throw
 - 🟡 Combos: plenty is the goal ("simple but plentiful"). We have a handful; free animation sources are the limit (Mixamo is broken)
 - ⬜ More stances, including a proper reverse grip (Ahsoka)
-- ⬜ **Saber duels:** enemies with sabers who block instead of dying on contact
+- ✅ **Saber duels:** duellists block from the front, bat away shots, and stagger when parried or when their guard breaks (v29)
 - ✅ **The dismemberment mod:** the blade kills on touch, cuts where it passes, hands and arms come off and the soldier keeps fighting, a cut leg makes him crawl
 - ⬜ Cuts that follow the blade's angle (a slanted slice, not at a joint)
 - ⬜ Droids that actually come apart when you slice them (sparks, not blood); droids are set aside for now
@@ -31,7 +31,7 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 
 ### Modern Warfare 2 (Spec Ops)
 - 🟡 **Enemy types, not skins:** infantry with pistols, AKs, M4s and snipers are in
-- ⬜ **Juggernauts:** a skin-tight force field (like a starship's shield, or Halo), three saber hits to kill, shooting you meanwhile
+- ✅ **Juggernauts:** a skin-tight force field, three saber hits to drop it, walks at you firing; a sticky kills him outright (v29)
 - ⬜ **Dogs**
 - ⬜ **Killstreaks,** e.g. a support gunship
 - ⬜ **"Big Brother":** co-op where one player runs through enemies while the other covers them from above
@@ -41,8 +41,8 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 - ⬜ Trickshot mechanics, as an option
 
 ### Halo
-- ⬜ **Jackal-style energy shields:** the saber doesn't one-shot a shielded enemy
-- ⬜ Juggernaut shields (see MW2)
+- ✅ **Jackal-style energy shields:** the shield covers his front; get round him or break it (v29)
+- ✅ Juggernaut force fields (see MW2)
 
 ### Minecraft
 - ✅ The only limit is inventory slots: no weight, ever
@@ -56,7 +56,7 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 - ✅ A lunge with a sword (the saber's dash strike)
 - ✅ Attachments from the item's own menu (suppressor, scope)
 - ⬜ **Go through the vaulted-weapons list** and take ideas (inspired, not copied)
-- ⬜ **Fall-damage immunity pickup** with a faint blue outline while it lasts
+- ✅ **Fall-damage immunity pickup:** the blue berry, with a blue sheen while it lasts (v29)
 - ⬜ **A rock wall you raise by stomping** (also an Avatar earth power)
 - ⬜ **Emotes** (with Destiny)
 - ⬜ More weapon variety and fun side weapons
@@ -79,8 +79,8 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
   - takedowns from behind
   - crouching (C) and cover make you harder to see
   - suppressors are quiet
-- ⬜ **A proper sneak button** (a slow, quiet walk that's separate from crouch; crouch-walking is what we have)
-- ⬜ **Stealth missions** (with Assassin's Creed climbing)
+- ✅ **A sneak button:** V, a slow, quiet stealth walk (v29)
+- 🟡 **Stealth missions:** Mission 3, Infiltration (v29); climbing still to come
 - ⬜ Hiding bodies, distractions (ideas)
 
 ### Hitman
@@ -136,7 +136,8 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 - **Your book *Wake*:**
   - ⬜ **Magboots:** walls with a special texture you can walk up
   - ⬜ Plasma knives, plasma and beryllium rifles
-  - ⬜ Holocloaks, breaching kits
+  - ✅ Holocloaks: 8 s of near-invisibility, the Mission 3 reward (v29)
+  - ⬜ Breaching kits
   - ⬜ Hoverboards
   - ⬜ Worlds like Marfeld and Kelton
   - 🟡 Plasma blades as the fallback for lightsabers if the game is ever sold (keep sabers swappable)
@@ -151,7 +152,7 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 
 **Movement**
 - ✅ Triple jump (each jump higher), wall run during the super sprint, slides, double jump, jetpack, ground pound
-- ⬜ **Fall damage by class:** Jedi survive huge falls; deadly ledges are marked
+- ✅ **Fall damage by class:** the Force class shrugs it off, deadly ledges are striped, soldiers die from high falls (v29)
 - ⬜ Mechs (someday)
 
 **Combat and enemies**
@@ -168,5 +169,5 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 
 **Animation and presets**
 - ⬜ **First person** with aim down sights and leaning around corners
-- ⬜ **Move presets:** pick a default animation per move instead of random rotation (your v20 ask)
+- ✅ **Move presets:** favourites (★), "Always my favourites", three packs (v29)
 - ⬜ A better pistol model
