@@ -29,7 +29,8 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 ## 2. Lightsaber
 - [ ] **Draw and holster animations.** v14 does it with live arm IK. Mixamo clips would look better. *[needs you: Mixamo `Draw Sword 1`/`2`, `Sheath Sword 1`/`2`]*
 - [ ] **Many more combos,** simple but plentiful, Fortnite-style. *[needs you: Mixamo Great Sword Pack, `One Hand Sword Combo`, `Two Hand Sword Combo`]*
-- [ ] **Dual-wield attacks for The Second.** *[needs you: Mixamo `Dual Weapon Combo`]*
+- [x] **Dual-wield attacks for The Second.** v19: four dual combos from KayKit dual strikes and mirrored Quaternius hits (CC0).
+  - [ ] More dual moves: a dual spin and dual air attacks. Mixamo is out (sign-in is broken for the owner), so these need another free source. Sketchfab blocks this container with a bot challenge.
 - [ ] **More stances,** including a proper reverse-grip set (Ahsoka). *[needs you: Mixamo Great Sword idles, `Stabbing (Reverse Grip)`]*
 - [ ] **Fix saber clipping:** 51 animations cut into the body. See `SABER_CLIPPING.md`. Priority: High guard while moving (legs), and combo hit B.
 - [ ] **Blade trail and clash effects.**
