@@ -2,6 +2,19 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v20: The Second is playable
+- **You now play as The Second**, a 3D model made from your four turnaround images (front, back, left, right).
+  - He has the helmet with its silver stripes, the chest plate markings, the metal left arm, the thigh pouches and boots, and the tank and hose on his back.
+  - He uses every animation the old hero had: runs, flips, slides, saber combos including the dual ones, pistol, grapple, deaths.
+- **How he was made:**
+  - Tencent's Hunyuan3D-2mv (free, on Hugging Face) turned the four images into a shape.
+  - `tools/bake_the_second.py` reduces it to 20k triangles and paints it by projecting your images onto the surface, so the colours are yours, not AI-invented.
+  - `tools/rig_the_second.mjs` attaches it to the game's skeleton.
+- **His own tank is the jetpack:** the Mandalorian jetpack model is hidden when you play him, and the flame comes out from under his tank.
+- **Menu → Setup → Character** switches between The Second and the old Superhero (the game reloads).
+- The soldiers keep the old body.
+- **Automated test:** `tools/test24-the-second.mjs`.
+
 ## v19: dual-saber combos
 - **Four dual-saber combos**, now with both hands striking. They're picked in **Menu → Moves → Dual saber combo**; the ticked ones rotate, a different one each time you start a new chain (the first three are ticked by default).
   - **Flurry:** right, left, right, left, then a cross-slash and a double chop (6 hits).

@@ -22,7 +22,7 @@ A mobile-first third-person action game in three.js (GTA / Red Dead / Watch Dogs
 - **Tests:** `node tools/testNN-*.mjs` (Playwright, Chromium at `/opt/pw-browsers/chromium` with swiftshader flags; see any test).
   - Headless runs at about 8 fps, so use the `__game.advance(seconds)` hook instead of real waits.
   - Test hooks live on `window.__game`: `setGear`, `selectSlot`, `fillEnemies`, `moveEnemy`, `damageEnemy`, `shootAt`, `setKey`, `advance`, `startLoot`, `startReload`…
-  - Main tests: test17 (enemies), test18 (combat), test23 (dual combos), test19 (v14 feel), test20 (loot), test21 (inventory), test22 (reload), test9 (menus and gear).
+  - Main tests: test17 (enemies), test18 (combat), test23 (dual combos), test24 (The Second), test19 (v14 feel), test20 (loot), test21 (inventory), test22 (reload), test9 (menus and gear).
   - `tools/sheet17.mjs` makes animation contact sheets. Use them to check clips by eye before adding them.
 - **Animation pipeline:** everything is retargeted onto the UE5-mannequin skeleton of the Quaternius Superhero.
   - `tools/retarget.mjs`: `retarget` for sources with a T-pose; `retargetDir` for rigs that don't have one.
@@ -52,11 +52,12 @@ These are added as **API credentials** in the cloud environment. The proxy injec
   - Convert the FBX, for example with the `fbx2gltf` npm binary, then bake with `mixamoMap('mixamorig')`.
   - Wanted clips: see `ASSET_GUIDE.md` (sword draw and sheath, sword and dual combos, pistol locomotion, rifle pack, deaths by cause, slides, flips, flying).
 
-## Where things stand (v19)
+## Where things stand (v20)
 - **Movement:** classes (light, Force, heavy), slides with momentum, infinite and double jumps, grapple (also onto enemies), jetpack (Mandalorian model), ground pound.
 - **Combat:** five-hit saber combo, four dual-saber combos (Moves → Dual saber combo; left-hand hits are mirrored clips from `tools/bake_mirror.mjs`), fists combo, pistol with aim pitch, 12-round magazine, reload and dropped magazines, Force push, grenades, saber blocking bullets.
 - **Enemies:** five soldiers with deaths by cause (head, torso, legs, explosion, push, wall impact, grapple, pound), always-on dismemberment, bodies that can be moved, looting.
 - **Items:** hotbar (5 slots, scroll or 1–5) and inventory (drag or tap), saved in localStorage.
+- **Player character:** The Second (v20), made from the owner's turnarounds in `assets/characters/the-second/`. Pipeline: Hunyuan3D-2mv Space `/shape_generation` (the `/generation_all` texture step failed with a PyMeshLab error) → `python3 tools/bake_the_second.py <shape.glb> 20000` → `node tools/rig_the_second.mjs` (needs the dist server) → `build/the_second_rigged.glb`, embedded by `build2.py` as `second`. Soldiers still use `hero.glb`. The build is about 15.9 MB against the 16 MB artifact cap, so keep new embedded assets small.
 - **Look:** sand ground, pale blue sky, grey boxes, grid always on.
 - **Next:** see `BACKLOG.md`. The owner's asks: better assets through the new credentials, The Second as a 3D character, free replacements for the IK draw/holster and more combos (Mixamo is unavailable).
 - **Sketchfab:** in v19 the API returned `202` with an AWS WAF bot challenge for every request from the container. Don't try to get around it; ask the owner to download models by hand if needed.
