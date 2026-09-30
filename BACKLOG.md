@@ -74,6 +74,12 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 - [ ] **Ability pool assigned per character** as each one is added. Examples: wrist grapple, Force push, dash, grenades.
 - [ ] **Force moves:** push is done (v12); pull and levitate still to do. *[free assets: Power Up, Levitate clips]*
 
+## 6b. Looting and inventory
+- [x] ~~Loot bodies (kneel, rummage, items pop up).~~ Done in v15, cosmetic.
+- [ ] **Inventory:** keep what you loot. Ammo, grenades and stims actually count; credits for later.
+- [ ] **Loot per enemy type** once there are more enemy types.
+- [ ] **Better rummage animations and a quick-loot tap.** *[needs you: Mixamo `Kneeling Pointing`, `Picking Up`, `Searching Pockets`]*
+
 ## 7. Your characters
 - [ ] **Turn the paintings into 3D models,** starting with The Second (turnaround ready). *[needs you: `HF_TOKEN` in the environment settings]*
 - [ ] **Rig them and load them** with the current animation sets.

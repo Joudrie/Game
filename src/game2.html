@@ -71,6 +71,15 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #pad #jumpbtn, #pad #atkbtn, #pad #firebtn { width: 68px; height: 68px; }
 #pad .force-only { display: none; }
 body.force #pad .force-only { display: inline-block; }
+#lootprompt { left: 50%; bottom: calc(33% + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); font-size: 13px; padding: var(--s2) var(--s3); }
+#lootprompt kbd { margin-right: var(--s1); }
+@media (hover: none) { #lootprompt kbd { display: none; } }
+#lootlist { left: 50%; top: calc(var(--s4) + 56px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); min-width: 200px; padding: var(--s3); font-size: 13px; }
+#lootlist b { display: block; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: var(--s1); }
+#lootlist ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s1); font: 500 12px var(--font-mono); }
+#lootlist li.rare { color: var(--signal); }
+#pad .loot-only { display: none; }
+body.can-loot #pad .loot-only { display: inline-block; }
 #feed { top: calc(64px + env(safe-area-inset-top, 0px)); right: var(--s4); display: grid; gap: var(--s1); justify-items: end; }
 #feed span { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 2px var(--s2); font: 500 11px var(--font-mono); }
 #feed span.head { border-color: var(--signal); color: var(--signal); }
@@ -148,9 +157,11 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
 <div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
-<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · scroll or <kbd>1</kbd>–<kbd>4</kbd> weapons · <kbd>Shift</kbd>+scroll zoom · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
+<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>G</kbd> loot a body · scroll or <kbd>1</kbd>–<kbd>4</kbd> weapons · <kbd>Shift</kbd>+scroll zoom · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
 <div id="toast" class="hud panel" role="status" hidden></div>
 <div id="feed" class="hud" aria-live="polite"></div>
+<div id="lootprompt" class="hud panel" hidden><kbd>G</kbd> Loot body</div>
+<div id="lootlist" class="hud panel" hidden aria-live="polite"><b>Searching…</b><ul id="lootitems"></ul></div>
 
 <div id="joy" hidden><i></i></div>
 <div id="xhair" class="hud" aria-hidden="true"></div>
@@ -162,6 +173,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
   <button type="button" id="firebtn" class="gun-only">Fire</button>
   <button type="button" id="pushbtn" class="force-only">Push</button>
   <button type="button" id="nadebtn">Grenade</button>
+  <button type="button" id="lootbtn" class="loot-only">Loot</button>
   <button type="button" id="slidebtn">Slide</button>
   <button type="button" id="jumpbtn">Jump</button>
 </div>
@@ -770,7 +782,7 @@ function setGear(g, instant) {
 function setArmed(on, instant) { setGear(on ? 'lit' : 'none', instant); }
 function updateSaber(dt) {
   const prev = ignite;
-  igniteTarget = gear === 'lit' && armed && !drawing ? 1 : 0; // lights only once it's in hand
+  igniteTarget = gear === 'lit' && armed && !drawing && !looting ? 1 : 0; // lights only once it's in hand; off while rummaging
   ignite = moveTo(ignite, igniteTarget, dt / (igniteTarget ? 0.22 : 0.16));
   if (ignite !== prev) showBlades();
   // holster only after the blade has fully retracted
@@ -892,6 +904,7 @@ function attackCancelable() {
 }
 function attackPress() {
   atkHeld = true; atkHeldT = 0;
+  if (looting) { stopLoot(false); return; }
   if (gear === 'pistol') { firePistol(); return; }
   if (tryGroundPound()) return;
   if (!canFight() || blocking) return;
@@ -1856,7 +1869,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v14.1 · 2026-09-30';
+const BUILD = 'v15 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -1965,6 +1978,7 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyT') forcePush();
   if (e.code === 'KeyX') throwGrenade();
   if (e.code === 'KeyM') openMoves();
+  if (e.code === 'KeyG') startLoot();
   if (e.code === 'Tab') { e.preventDefault(); toggleWeapon(); }
   if (e.code === 'KeyE') setGear(gear === 'lit' ? 'none' : 'lit');
   if (/^Digit[1-4]$/.test(e.code)) setGear(GEAR_ORDER[+e.code.slice(5) - 1]);
@@ -1988,6 +2002,7 @@ press($('grapplebtn'), () => grapplePress());
 press($('firebtn'), () => firePistol());
 press($('pushbtn'), () => forcePush());
 press($('nadebtn'), () => throwGrenade());
+press($('lootbtn'), () => startLoot());
 press($('slidebtn'), () => { slideQueued = true; slideHeld = true; });
 $('slidebtn').addEventListener('pointerup', () => { slideHeld = false; });
 $('slidebtn').addEventListener('pointercancel', () => { slideHeld = false; });
@@ -2103,6 +2118,7 @@ function readInput(dt) {
     if (!b(4) && padPrev[4]) { aimHeld = false; blockRelease(); }
     if (b(3) && !padPrev[3]) setGear(GEAR_ORDER[(GEAR_ORDER.indexOf(gear) + 1) % GEAR_ORDER.length]);
     if (b(7) && !padPrev[7]) grapplePress();
+    if (b(13) && !padPrev[13]) startLoot(); // d-pad down
     padPrev = [b(0), b(1), b(2), b(3), b(4), 0, 0, b(7)];
     break;
   }
@@ -2170,6 +2186,79 @@ function endSlide(cancel) {
   if (s2) playOvr(s2, { speed: 1.3, fade: 0.1, then: () => stopOvr(0.2) }); else stopOvr(0.2);
 }
 
+// ---------------- looting ----------------
+// Walk up to a body and press G (or Loot): kneel, rummage, and whatever turns up pops up one item at a time.
+// Cosmetic for now: nothing is kept, but every find is logged in lootLog for the inventory later.
+const LOOT_R = 1.9, LOOT_TIME = 2.2;
+const LOOT_TABLE = [ // [name, min, max, weight, rare]
+  ['Credits', 10, 60, 10], ['Pistol ammo', 6, 18, 9], ['Power cell', 1, 2, 6], ['Stim pack', 1, 1, 5], ['Frag grenade', 1, 2, 4],
+  ['Ration bar', 1, 3, 5], ['Data chip', 1, 1, 3], ['Keycard', 1, 1, 2], ['Comlink', 1, 1, 2], ['Kyber shard', 1, 1, 0.6, true],
+];
+const lootLog = [];
+let looting = null, lootTarget = null, lootHideT = 0;
+function rollLoot() {
+  const n = 1 + Math.floor(Math.random() * 3), out = [], total = LOOT_TABLE.reduce((a, r) => a + r[3], 0);
+  for (let i = 0; i < n; i++) {
+    let x = Math.random() * total, r = LOOT_TABLE[0];
+    for (const row of LOOT_TABLE) { x -= row[3]; if (x <= 0) { r = row; break; } }
+    const qty = r[1] + Math.floor(Math.random() * (r[2] - r[1] + 1));
+    const same = out.find((o) => o.name === r[0]); if (same) same.qty += qty; else out.push({ name: r[0], qty, rare: !!r[4] });
+  }
+  return out;
+}
+// nearest unlooted body in reach, checked a few times a second
+function findLootable() {
+  let best = null, bd = LOOT_R;
+  for (const e of enemies) {
+    if (e.state !== 'dead' || e.looted || e.deadT > CORPSE_TIME || e.vel.lengthSq() > 0.5) continue;
+    const d = Math.hypot(e.g.position.x - player.position.x, e.g.position.z - player.position.z);
+    if (d < bd && Math.abs(e.g.position.y - player.position.y) < 1) { bd = d; best = e; }
+  }
+  return best;
+}
+function startLoot() {
+  if (looting || movesOpen || mode !== 'ground' || drawing) return;
+  const e = lootTarget || findLootable(); if (!e) return;
+  atk = null; blocking = false; crouch = false; speed = 0;
+  yaw = moveYaw = Math.atan2(e.g.position.x - player.position.x, e.g.position.z - player.position.z);
+  looting = { e, t: 0, items: rollLoot(), shown: 0, relight: gear === 'lit' };
+  e.looted = true; e.deadT = Math.min(e.deadT, CORPSE_TIME - 10); // a searched body stays a little longer
+  playOvr('Fixing_Kneeling', { loop: true, fade: 0.35 });
+  $('lootitems').innerHTML = ''; $('lootlist').querySelector('b').textContent = 'Searching…'; $('lootlist').hidden = false; lootHideT = 0;
+  log('loot start', e.id);
+}
+function stopLoot(done) {
+  if (!looting) return;
+  const L = looting; looting = null;
+  stopOvr(0.35);
+  if (done) { $('lootlist').querySelector('b').textContent = L.items.length ? 'Found' : 'Nothing'; lootHideT = 2.5; }
+  else { $('lootlist').hidden = true; L.e.looted = L.shown > 0; } // interrupted early: come back for the rest
+  log(done ? 'loot done' : 'loot cancelled', L.shown + '/' + L.items.length);
+}
+function updateLoot(dt, inp) {
+  if (looting) {
+    const L = looting;
+    // moving, jumping, sliding, attacking or switching weapons stops the search
+    if (inp.mag > 0.3 || jumpQueued || slideQueued || atk || grapple.state !== 'idle' || mode !== 'ground' || L.e.state !== 'dead') { jumpQueued = jumpQueued && inp.mag > 0.3; stopLoot(false); return; }
+    speed = 0; L.t += dt;
+    // items turn up one at a time through the rummage
+    const due = Math.min(L.items.length, Math.floor((L.t / LOOT_TIME) * (L.items.length + 1)));
+    while (L.shown < due) {
+      const it = L.items[L.shown++];
+      lootLog.push({ ...it, at: Date.now(), from: L.e.id });
+      const li = document.createElement('li'); li.textContent = `+ ${it.name}${it.qty > 1 ? ' ×' + it.qty : ''}`; if (it.rare) li.className = 'rare';
+      $('lootitems').appendChild(li); log('looted', it.name, it.qty);
+    }
+    if (L.t >= LOOT_TIME) stopLoot(true);
+  } else if (lootHideT > 0 && (lootHideT -= dt) <= 0) $('lootlist').hidden = true;
+  // prompt
+  if ((hudN & 3) === 0) {
+    lootTarget = !looting && mode === 'ground' && !movesOpen ? findLootable() : null;
+    $('lootprompt').hidden = !lootTarget;
+    document.body.classList.toggle('can-loot', !!lootTarget);
+  }
+}
+
 // ---------------- jetpack ----------------
 // Hold Jump in the air: thrust up. Hold C: hover in place. Sprint: fly flat out, Mandalorian style.
 // Let go of everything and you fall with the pack idling; landing ends the flight.
@@ -2210,6 +2299,8 @@ function step(dt) {
   }
   if (crouch && (inp.sprint || jumpQueued)) crouch = false;
   if (C._frozen) target = 0; // test hook: simulates a character that ignores input
+  updateLoot(dt, inp);
+  if (looting) { target = 0; jumpQueued = false; slideQueued = false; }
   if (blocking) target = Math.min(target, C.walk);          // no sprinting while blocking
   // a swing commits you until its cancel point; after that, moving, jumping or sliding ends it
   if (atk && !atk.queued && (inp.mag > 0.3 || jumpQueued || slideQueued) && attackCancelable()) { log('attack ended by input'); atk = null; stopOvr(0.18); }
@@ -2453,7 +2544,7 @@ function hud(C) {
   if (hudN % 4 === 0) $('xhair').classList.toggle('on', grapple.state === 'idle' && !!grappleTarget());
   if ((hudN += 1) % 6) return;
   $('spd').textContent = speed.toFixed(1);
-  const g = mode === 'grapple' ? 'Grappling' : grapple.state === 'fire' ? 'Hook out' : isStrafing() ? (gear === 'pistol' ? 'Aim' : 'Guard') + (speed > 0.1 ? ' · strafe' : '') : blocking ? 'Block' : atk ? (atk.heavy ? 'Heavy attack' : 'Attack ' + (atk.i + 1)) :
+  const g = looting ? 'Looting' : mode === 'grapple' ? 'Grappling' : grapple.state === 'fire' ? 'Hook out' : isStrafing() ? (gear === 'pistol' ? 'Aim' : 'Guard') + (speed > 0.1 ? ' · strafe' : '') : blocking ? 'Block' : atk ? (atk.heavy ? 'Heavy attack' : 'Attack ' + (atk.i + 1)) :
     mode === 'jet' ? (jet.boost ? 'Jetpack boost' : jet.hover ? 'Jetpack hover' : 'Jetpack') : mode === 'air' ? (jumps === 2 ? 'Double jump' : 'Airborne') : mode === 'slide' ? 'Slide' :
     { idle: 'Idle', walk: 'Walk', jog: 'Run', sprint: 'Sprint', crouch: 'Crouch', crouchwalk: 'Crouch' }[gait];
   const el = $('gait'); el.textContent = g; el.classList.toggle('hot', g === 'Sprint' || g === 'Slide' || g === 'Double jump');
@@ -2545,7 +2636,7 @@ function buildMoves() {
     `<label class="switch"><input type="checkbox" id="jeton" ${gadgets.jetpack ? 'checked' : ''}> Jetpack: hold Jump in the air to fly, hold C (or Slide) to hover, sprint to fly flat out</label>` +
     `<label class="switch"><input type="checkbox" id="pushbodies" ${enemyCfg.pushBodies ? 'checked' : ''}> Force push moves bodies (grenades always do)</label>` +
     `<label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>`);
-  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, scroll wheel, <kbd>1</kbd>–<kbd>4</kbd> or <kbd>E</kbd> weapons, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
+  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> grenade, <kbd>G</kbd> loot a body, scroll wheel, <kbd>1</kbd>–<kbd>4</kbd> or <kbd>E</kbd> weapons, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
   h.push(`</section>`);
   $('weaponbody').innerHTML = h.join(''); h.length = 0;
   h.push(`<section data-panel="moves">`);
@@ -2713,6 +2804,7 @@ function start() {
     get blockedShots() { return blockedShots; },
     setKey(code, down) { if (down) { keys.add(code); if (code === 'Space') { jumpQueued = true; jumpHeld = true; } if (code === 'KeyC') { slideQueued = true; slideHeld = true; } } else { keys.delete(code); if (code === 'Space') jumpHeld = false; if (code === 'KeyC') slideHeld = false; } }, get vy() { return vy; }, get y() { return player.position.y; },
     explodeAt(x, y, z) { explode(new V3(x, y, z)); },
+    startLoot, get looting() { return looting ? { t: +looting.t.toFixed(2), shown: looting.shown, n: looting.items.length } : null; }, get lootLog() { return lootLog.slice(); }, get lootTarget() { return lootTarget ? lootTarget.id : null; },
     fillEnemies() { while (enemies.filter((x) => x.state !== 'dead').length < ENEMY_COUNT) spawnEnemy(openSpot(20, 34)); },
     moveEnemy(i, x, z, yawR) { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) { e.g.position.set(x, groundAt(x, z, 99), z); if (yawR !== undefined) e.yaw = yawR; e.state = 'hit'; e.hitT = 5; e.g.updateMatrixWorld(true); } }, killFeed, damageEnemy: (i, amt, zone, kind) => { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) damageEnemy(e, amt, zone, kind); return !!e; },
     playOnEnemy(i, name, from = 0, speed = 1) { const e = enemies.filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },
