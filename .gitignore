@@ -5,3 +5,6 @@ dist/preview*.html
 !assets/**/*.png
 assets/deaths/_UNLICENSED_*/
 package-lock.json
+
+# Kenney source zips (re-download with the links in assets/world/kenney/SOURCE.txt)
+assets/world/kenney/*.zip

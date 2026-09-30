@@ -65,15 +65,15 @@ Your play-by-play, item by item. v30 takes the fixes, and v31 the downloaded ass
 
 **Enemies**
 - [x] **When they shoot, they don't aim at you.**
-- [ ] **Different skins,** rotated between spawns (for example a desert SWAT); **heads too big** (too cartoon, not serious); **mixed weapons**.
+- [x] **Different skins,** rotated between spawns (for example a desert SWAT); **heads too big** (too cartoon, not serious); **mixed weapons**.
 - [~] **Shield soldier:** the shield on his arm *(v30: held at his hand, and it takes one blast; the one-handed stance comes in v31)*, a one-handed pistol stance; a sticky grenade on the shield can leave him alive.
 - [x] **Cutting a soldier in half turns his whole body red:** blood belongs at the cut.
 - [x] **More enemies** in the sandbox.
 
 **The world** *(download free assets rather than building them; any theme, modern or fantasy, just not cartoon)*
-- [ ] **Buildings** from free asset packs, for a more interesting sandbox.
-- [ ] **Clouds** in the sky.
-- [ ] **Patches of grass and pathways.**
+- [x] **Buildings** from free asset packs, for a more interesting sandbox.
+- [x] **Clouds** in the sky.
+- [x] **Patches of grass and pathways.** *(v31: Kenney City Kits and Nature Kit, CC0)*
 
 **What you liked:** the grappling hook (the best thing so far), the saber glow, the saber cutting whoever walks into it, the triple jump, juggernauts, the duellist, the holocloak idea, the courtyard temple, the Force pull.
 

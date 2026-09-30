@@ -304,6 +304,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 window.__booted = true;
 
 const $ = (id) => document.getElementById(id);
@@ -497,14 +498,14 @@ const blocks = [];
 function buildCity() {
   let seed = 20260929; const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
   const mat = new THREE.MeshLambertMaterial({ color: 0xbdbdbd }), edge = new THREE.LineBasicMaterial({ color: 0x8e8e8e });
-  const add = (x, z, w, d, h) => {
+  const add = (x, z, w, d, h, city = true) => {
     const box = new THREE.Box3(new V3(x - w / 2, 0, z - d / 2), new V3(x + w / 2, h, z + d / 2));
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); mesh.position.set(x, h / 2, z);
     mesh.castShadow = mesh.receiveShadow = true;
     mesh.add(new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry), edge));
-    scene.add(mesh); blocks.push({ box, mesh });
+    scene.add(mesh); blocks.push({ box, mesh, city }); // city: dressed as a real building once the models load (v31)
   };
-  add(9, 7, 4, 4, 1.4); add(-10, -6, 5, 5, 3.2); add(4, -13, 8, 6, 6); // low ones near the start to hop and grapple onto
+  add(9, 7, 4, 4, 1.4, false); add(-10, -6, 5, 5, 3.2, false); add(4, -13, 8, 6, 6, false); // low ones near the start to hop and grapple onto
   // a ring of tall towers far out, for long-range grapples
   for (let i = 0; i < 12; i++) { const a = (i / 12) * Math.PI * 2 + rnd() * 0.3, r = 220 + rnd() * 230; add(Math.cos(a) * r, Math.sin(a) * r, 14 + rnd() * 12, 14 + rnd() * 12, 40 + Math.floor(rnd() * 50)); }
   const H = [4, 6, 8, 11, 14, 18, 24, 32];
@@ -591,6 +592,7 @@ function resolveCollisions() {
 // ---------------- load ----------------
 function decodeB64(b64) { const bin = atob(b64), out = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out.buffer; }
 const loader = new GLTFLoader();
+loader.setMeshoptDecoder(MeshoptDecoder); // the Kenney world packs are meshopt-compressed (tools/pack_buildings.mjs)
 // Decode embedded textures straight from memory. The stock loader goes through blob: URLs, which a strict page
 // policy (like the Claude app's) can block, leaving every character plain white.
 loader.register((parser) => {
@@ -654,6 +656,7 @@ async function boot() {
   try { rifleModel = (await parseGLB(A.rifle)).scene; pistolModel = (await parseGLB(A.pistol)).scene; } catch (e) { report('error', 'Weapon model failed: ' + e.message); }
   for (const [k, v] of Object.entries(A.att || {})) { try { attModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Attachment ${k} failed: ` + e.message); } }
   for (const [k, v] of Object.entries(A.guns || {})) { try { gunModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Gun model ${k} failed: ` + e.message); } }
+  if (A.world) { try { const [wb, wn] = await Promise.all([parseGLB(A.world.buildings), parseGLB(A.world.nature)]); dressWorld(wb.scene, wn.scene); } catch (e) { report('error', 'World models failed: ' + e.message); } }
   try { if (A.jetpack) jetpackModel = new OBJLoader().parse(new TextDecoder().decode(decodeB64(A.jetpack))); } catch (e) { report('error', 'Jetpack model failed: ' + e.message); }
   // height to 1.8 m, feet on the ground
   const fit = (m) => {
@@ -1649,6 +1652,139 @@ function pullGrapple(dt, wx = 0, wz = 0) {
   else if (dist < Math.max(1.1, grapple.vel.length() * dt * 1.5) || grapple.t > 30 || stalled) arriveGrapple();
 }
 
+// ---------------- the dressed world (v31) ----------------
+// Kenney's City Kits (commercial, industrial) and Nature Kit, CC0, packed by tools/pack_buildings.mjs. Each grey city
+// block gets the building that fits its footprint best; the grey box stays, hidden, for collision, shots and the grapple,
+// resized to the building. Grass patches, flowers, bushes, rocks, trees and a stone path are scattered as instances.
+const worldModels = {};
+const NATURE_COL = { grass: 0x71903f, leafsGreen: 0x4f7532, stone: 0x9d9a90, stoneDark: 0x7a776f, dirt: 0x7d5c3d, colorRed: 0xb83a30, colorYellow: 0xdcb23e, colorPurple: 0x8b72c4 }; // the kit's teal greens toned down (owner: not cartoon)
+const worldStats = { buildings: 0, instances: 0, trees: 0, paths: 0 };
+function dressWorld(bld, nat) {
+  for (const g of [bld, nat]) { g.updateMatrixWorld(true); for (const n of g.children) worldModels[n.name] = n; }
+  let seed = 31031; const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const names = Object.keys(worldModels), TALL = names.filter((n) => n.includes('skyscraper')), ALL = names.filter((n) => /^[ci]-building/.test(n));
+  const sizeOf = {}; for (const n of ALL) sizeOf[n] = new THREE.Box3().setFromObject(worldModels[n]).getSize(new V3());
+  for (const m of ALL) worldModels[m].traverse((o) => { if (o.isMesh) { o.material.metalness = 0; o.material.roughness = 0.9; } });
+  for (const b of blocks) {
+    if (!b.city) continue;
+    const B = b.box, w = B.max.x - B.min.x, d = B.max.z - B.min.z, h = B.max.y;
+    let best = null;
+    for (const name of (h > 36 ? TALL : ALL)) for (const rot of [0, 1]) {
+      const s0 = sizeOf[name], mw = rot ? s0.z : s0.x, md = rot ? s0.x : s0.z;
+      const s = Math.min(w / mw, d / md), sy = clamp(h / (s0.y * s), 0.8, 1.3);
+      const score = Math.abs(Math.log((s0.y * s * sy) / h)) + (1 - (mw * md * s * s) / (w * d)) * 0.6 + rnd() * 0.4;
+      if (!best || score < best.score) best = { name, rot, s, sy, score };
+    }
+    const m = worldModels[best.name].clone();
+    m.scale.set(best.s, best.s * best.sy, best.s); m.rotation.y = best.rot * Math.PI / 2 + (rnd() < 0.5 ? Math.PI : 0);
+    m.traverse((o) => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; } });
+    const c = B.getCenter(new V3()); m.position.set(c.x, 0, c.z); m.updateMatrixWorld(true);
+    const nb = new THREE.Box3().setFromObject(m), nc = nb.getCenter(new V3());
+    m.position.x += c.x - nc.x; m.position.z += c.z - nc.z; m.updateMatrixWorld(true); nb.setFromObject(m); nb.min.y = 0;
+    b.box.copy(nb); const sz = nb.getSize(new V3());
+    b.mesh.geometry.dispose(); b.mesh.geometry = new THREE.BoxGeometry(sz.x, sz.y, sz.z); nb.getCenter(b.mesh.position);
+    b.mesh.visible = false; b.model = m; b.building = best.name; scene.add(m); worldStats.buildings++;
+  }
+  scatterNature(rnd);
+  buildClouds(rnd);
+  log('world dressed', JSON.stringify(worldStats));
+}
+function scatterNature(rnd) {
+  const courtZone = new THREE.Box3(new V3(COURT.x - COURT.half - 4, -1, COURT.z - COURT.half - 4), new V3(COURT.x + COURT.half + 4, 99, COURT.z + COURT.half + 4));
+  const free = (x, z, pad) => !blocks.some(({ box: B }) => x > B.min.x - pad && x < B.max.x + pad && z > B.min.z - pad && z < B.max.z + pad) && !courtZone.containsPoint(new V3(x, 0, z));
+  const lists = {}; const put = (name, x, z, s, r = rnd() * 6.283) => { if (worldModels[name]) (lists[name] = lists[name] || []).push({ x, z, s, r }); };
+  // a stone path from the start to the courtyard gate, and a round plaza where you start
+  for (let i = 0; i < 7; i++) { const a = i / 7 * 6.283; put('n-path_stoneCircle', Math.cos(a) * 2.6, Math.sin(a) * 2.6 + 1, 2.2); } // stepping stones round the start
+  for (let z = 4; z < COURT.z - COURT.half - 1; z += 1.5) { const x = Math.sin(z * 0.045) * 3; if (free(x, z, 0.3)) { put('n-path_stone', x + (rnd() - 0.5) * 0.3, z, 2.2, Math.PI / 2 + (rnd() - 0.5) * 0.2); worldStats.paths++; } }
+  // grass patches with the odd flower and bush
+  const TUFTS = ['n-grass', 'n-grass_large', 'n-grass_leafs'], FLOWERS = ['n-flower_redA', 'n-flower_yellowA', 'n-flower_purpleA'];
+  for (let p = 0; p < 70; p++) {
+    const a = rnd() * 6.283, r = 10 + Math.sqrt(rnd()) * 150, cx = Math.cos(a) * r, cz = Math.sin(a) * r;
+    if (!free(cx, cz, 2)) continue;
+    const n = 8 + Math.floor(rnd() * 14), R = 2 + rnd() * 3;
+    for (let i = 0; i < n; i++) {
+      const b = rnd() * 6.283, q = Math.sqrt(rnd()) * R, x = cx + Math.cos(b) * q, z = cz + Math.sin(b) * q;
+      if (!free(x, z, 0.3)) continue;
+      const k = rnd();
+      if (k < 0.78) put(TUFTS[Math.floor(rnd() * 3)], x, z, 2 + rnd() * 1.4);
+      else if (k < 0.93) put(FLOWERS[Math.floor(rnd() * 3)], x, z, 2.2 + rnd());
+      else put(rnd() < 0.5 ? 'n-plant_bush' : 'n-plant_bushSmall', x, z, 3 + rnd() * 1.5);
+    }
+  }
+  // rocks, and trees with a trunk you bump into (and can land on)
+  for (let i = 0; i < 40; i++) { const a = rnd() * 6.283, r = 12 + rnd() * 160, x = Math.cos(a) * r, z = Math.sin(a) * r; if (free(x, z, 1)) put(rnd() < 0.5 ? 'n-rock_smallA' : 'n-rock_smallC', x, z, 2.5 + rnd() * 2); }
+  const TREES = ['n-tree_palmTall', 'n-tree_palmDetailedShort', 'n-tree_oak', 'n-tree_default'], trunkMat = new THREE.MeshBasicMaterial({ visible: false });
+  const solid = (x, z, r, h) => { const box = new THREE.Box3(new V3(x - r, 0, z - r), new V3(x + r, h, z + r)); const mesh = new THREE.Mesh(new THREE.BoxGeometry(2 * r, h, 2 * r), trunkMat); mesh.position.set(x, h / 2, z); mesh.visible = false; scene.add(mesh); blocks.push({ box, mesh, nature: true }); blockMeshes.push(mesh); };
+  for (let i = 0; i < 60; i++) {
+    const a = rnd() * 6.283, r = 14 + rnd() * 170, x = Math.cos(a) * r, z = Math.sin(a) * r;
+    if (!free(x, z, 3)) continue;
+    const name = TREES[Math.floor(rnd() * TREES.length)], s = 3.5 + rnd() * 2;
+    put(name, x, z, s); solid(x, z, 0.28, (name.includes('palm') ? 1.1 : 1.4) * s * 0.9); worldStats.trees++;
+  }
+  for (let i = 0; i < 8; i++) { const a = rnd() * 6.283, r = 25 + rnd() * 150, x = Math.cos(a) * r, z = Math.sin(a) * r; if (!free(x, z, 3)) continue; const s = 3 + rnd() * 1.5; put('n-rock_tallB', x, z, s); solid(x, z, 0.3 * s, 0.8 * s); }
+  const mats = {}, M = new THREE.Matrix4(), Q = new THREE.Quaternion(), UP = new V3(0, 1, 0), inv = new THREE.Matrix4();
+  for (const [name, list] of Object.entries(lists)) {
+    const src = worldModels[name]; inv.copy(src.matrixWorld).invert();
+    const shadow = /tree|rock_tall|bush/.test(name);
+    src.traverse((o) => {
+      if (!o.isMesh) return;
+      const key = o.material.name, local = inv.clone().multiply(o.matrixWorld);
+      const mat = mats[key] || (mats[key] = new THREE.MeshLambertMaterial({ color: NATURE_COL[key] ?? o.material.color.getHex(), side: THREE.DoubleSide }));
+      const im = new THREE.InstancedMesh(o.geometry, mat, list.length);
+      list.forEach((t, i) => { Q.setFromAxisAngle(UP, t.r); M.compose(new V3(t.x, 0.05 * t.s + (name.includes('path') ? 0.01 : 0), t.z), Q, new V3(t.s, t.s, t.s)); im.setMatrixAt(i, M.multiply(local)); });
+      im.castShadow = shadow; im.receiveShadow = true; im.computeBoundingSphere(); im.name = 'nature:' + name; scene.add(im);
+      worldStats.instances += list.length;
+    });
+  }
+}
+// clouds: soft white sprites made from the Kenney smoke puff, drifting slowly high above the city
+const clouds = [];
+function buildClouds(rnd) {
+  const A = window.__ASSETS.tex || {}; if (!A.smoke) return;
+  const tex = new THREE.TextureLoader().load('data:image/png;base64,' + A.smoke); tex.colorSpace = THREE.SRGBColorSpace;
+  const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.8, depthWrite: false, fog: false }); mat.color.setRGB(2.4, 2.4, 2.5); // the grey puff pushed to white
+  for (let i = 0; i < 26; i++) {
+    const g = new THREE.Group(), a = rnd() * 6.283, r = 120 + rnd() * 700;
+    g.position.set(Math.cos(a) * r, 150 + rnd() * 110, Math.sin(a) * r);
+    const n = 4 + Math.floor(rnd() * 4), W = 60 + rnd() * 70;
+    for (let j = 0; j < n; j++) { const s = new THREE.Sprite(mat); const k = 0.6 + rnd() * 0.6; s.scale.set(W * k, W * k * 0.6, 1); s.position.set((rnd() - 0.5) * W * 1.3, (rnd() - 0.5) * W * 0.18, (rnd() - 0.5) * W * 0.6); g.add(s); }
+    scene.add(g); clouds.push(g);
+  }
+}
+function updateClouds(dt) { for (const c of clouds) { c.position.x += dt * 1.6; if (c.position.x > 900) c.position.x -= 1800; } }
+// soldiers (v31): four uniforms, four skin tones and a smaller head, from recoloured copies of the SWAT mesh's vertex colours
+const UNIFORMS = { // gear (the darkest vertex colour) and cloth (the navy), as linear RGB
+  urban:    null,
+  desert:   [[0.16, 0.12, 0.07], [0.42, 0.33, 0.19]],
+  woodland: [[0.04, 0.05, 0.03], [0.11, 0.14, 0.06]],
+  arctic:   [[0.10, 0.10, 0.11], [0.62, 0.64, 0.67]],
+};
+const SKIN_TONES = [[0.616, 0.42, 0.239], [0.46, 0.28, 0.15], [0.25, 0.14, 0.08], [0.78, 0.57, 0.42]];
+const skinGeos = new Map();
+function soldierGeo(base, uniform, tone) {
+  const key = uniform + tone; if (skinGeos.has(key)) return skinGeos.get(key);
+  const g = base.clone(), C = g.attributes.color; if (!C) return base;
+  const U = UNIFORMS[uniform], S = SKIN_TONES[tone];
+  const ref = [[0.031, 0.027, 0.024], [0.078, 0.086, 0.102], [0.616, 0.42, 0.239]]; // gear, cloth, skin in the SWAT model
+  const col = C.clone(); g.setAttribute('color', col);
+  for (let i = 0; i < col.count; i++) {
+    const r = col.getX(i), gg = col.getY(i), b = col.getZ(i);
+    let k = -1, bd = 0.004; ref.forEach((c, j) => { const dd = (c[0] - r) ** 2 + (c[1] - gg) ** 2 + (c[2] - b) ** 2; if (dd < bd) { bd = dd; k = j; } });
+    const to = k === 2 ? S : k >= 0 && U ? U[k] : null;
+    if (to) col.setXYZ(i, to[0], to[1], to[2]);
+  }
+  skinGeos.set(key, g); return g;
+}
+const soldierLook = { uniform: 'mixed' }; // Tests can pin one uniform
+function dressSoldier(e) {
+  const keys = Object.keys(UNIFORMS);
+  e.uniform = soldierLook.uniform !== 'mixed' && UNIFORMS[soldierLook.uniform] !== undefined ? soldierLook.uniform : keys[Math.floor(Math.random() * keys.length)];
+  e.tone = Math.floor(Math.random() * SKIN_TONES.length);
+  e.root.traverse((o) => { if (o.isSkinnedMesh && o.geometry.attributes.color) { o.geometry = e.skinGeo = soldierGeo(o.geometry, e.uniform, e.tone); } });
+  if (e.bones.Head) e.bones.Head.scale.setScalar(0.86); // owner: the heads looked too big and cartoon-like
+}
+function randomLoadout() { const r = Math.random(); return r < 0.5 || !guns.ak ? 'pistol' : r < 0.7 ? 'ak' : r < 0.88 && guns.ar ? 'ar' : guns.shotgun ? 'shotgun' : 'ak'; }
+
 // ---------------- enemies ----------------
 // Five soldiers who close in, strafe and shoot at you (always missing). They take hits by zone and die
 // differently by cause. Bodies stay 90 s, then fade; a new soldier spawns to keep five alive.
@@ -1698,7 +1834,7 @@ function spawnEnemy(at, kind, mind) {
   const g = new THREE.Group(); g.add(root); g.position.copy(at); scene.add(g);
   const bones = {}; root.traverse((o) => { if (ENEMY_BONES.includes(o.name)) bones[o.name] = o; });
   let gun = null;
-  const gunKind = kind && guns[kind] ? kind : guns.ak && Math.random() < 0.3 ? 'ak' : 'pistol'; // most carry blaster pistols; about a third carry AK-47s
+  const gunKind = kind && guns[kind] ? kind : randomLoadout(); // v31: pistols, AKs, M4s and shotguns (owner: varied weapons)
   if (pistolModel && mounts.pistolHand) {
     gun = guns[gunKind].root.clone(true); gun.getObjectByName('att')?.removeFromParent(); bones.hand_r.add(gun);
     gun.position.copy(mounts.pistolHand.p); gun.quaternion.copy(mounts.pistolHand.q); gun.scale.copy(mounts.pistolHand.s);
@@ -1707,6 +1843,7 @@ function spawnEnemy(at, kind, mind) {
     state: 'engage', yaw: Math.atan2(player.position.x - at.x, player.position.z - at.z), vel: new V3(), fireT: 1 + Math.random() * 2,
     strafe: Math.random() < 0.5 ? 1 : -1, strafeT: 2 + Math.random() * 2, hitT: 0, deadT: 0, id: Math.random().toString(36).slice(2, 6), hitBy: new Set(), gun, gunKind,
     mind: mind || (enemies.some((o) => o.state !== 'dead' && o.mind === 'combat') ? 'combat' : 'patrol') }; // reinforcements join a fight already on
+  dressSoldier(e);
   enemies.push(e); eplay(e, 'SW_Idle_Gun_Pointing');
   return e;
 }
@@ -1856,7 +1993,7 @@ function updateEnemies(dt) {
       // shoot: blaster pistols fire bolts you can see, block and parry; AK-47s fire bursts of bullets you can't deflect
       e.fireT -= dt;
       if (!e.los) e.fireT = Math.max(e.fireT, 0.5);
-      const range = e.gunKind === 'sniper' ? 120 : 50, rifle = e.gunKind === 'ak' || e.gunKind === 'ar';
+      const range = e.gunKind === 'sniper' ? 120 : e.gunKind === 'shotgun' ? 20 : 50, rifle = e.gunKind === 'ak' || e.gunKind === 'ar' || e.gunKind === 'shotgun';
       if (!rifle && e.fireT < 0.4 && !e.tell && dist < range) { e.tell = true; glint(muzzleOf(e)); } // the tell before a bolt (or a sniper's scope glint): time your block to it
       if (e.gunKind === 'sniper') sniperLaser(e, e.los && e.fireT < 1.3 && dist < range);
       if (e.fireT <= 0 && dist < range) {
@@ -1864,6 +2001,7 @@ function updateEnemies(dt) {
         if (e.gunKind === 'ak') { e.fireT = (1.6 + Math.random() * 1.6) * DF().react * (e.jugg ? 0.6 : 1); e.burst = e.jugg ? 5 : 3; e.burstT = 0; }
         else if (e.gunKind === 'ar') { e.fireT = (1.3 + Math.random() * 1.2) * DF().react; e.burst = 4; e.burstT = 0; }
         else if (e.gunKind === 'sniper') { e.fireT = (3 + Math.random() * 1.5) * DF().react; sniperShot(e); }
+        else if (e.gunKind === 'shotgun') { e.fireT = (1.8 + Math.random() * 1.4) * DF().react; for (let i = 0; i < 3; i++) enemyBullet(e, 0.3, i ? null : 'shotgun'); } // three pellets that each might land
         else { e.fireT = (1.1 + Math.random() * 1.6) * DF().react; shootBolt(e); }
         if (sp === 0) eplay(e, 'SW_Idle_Gun_Shoot', { loop: false, fade: 0.08 });
       }
@@ -2076,11 +2214,11 @@ function sever(e, name, push) {
   // the flying piece
   const pr = cloneSkinned(e.template || enemyTemplate); const own = [], mats = [];
   e.root.traverse((o) => { if (o.isMesh) mats.push(o.material); });
-  let mi = 0; pr.traverse((o) => { if (o.isMesh) { o.material = mats[mi++] || o.material; o.frustumCulled = false; o.castShadow = true; } if (o.isBone) own.push(o); });
+  let mi = 0; pr.traverse((o) => { if (o.isMesh) { o.material = mats[mi++] || o.material; if (e.skinGeo) o.geometry = e.skinGeo; o.frustumCulled = false; o.castShadow = true; } if (o.isBone) own.push(o); });
   const byName = new Map(own.map((b) => [b.name, b]));
   e.root.traverse((o) => { const b = byName.get(o.name); if (o.isBone && b) { b.position.copy(o.position); b.quaternion.copy(o.quaternion); b.scale.copy(o.scale); } });
   const pelvis = byName.get('pelvis'), limb = byName.get(name);
-  pelvis.scale.setScalar(1e-3); limb.scale.setScalar(1e3); // everything shrinks away except this limb
+  pelvis.scale.setScalar(1e-3); limb.scale.multiplyScalar(1e3); // everything shrinks away except this limb (which keeps its own scale: the smaller head, v31)
   const inner = new THREE.Group(); inner.add(pr); inner.position.copy(e.g.position); inner.quaternion.copy(e.g.quaternion);
   inner.updateMatrixWorld(true);
   inner.position.add(limbAt.clone().sub(limb.getWorldPosition(new V3())));
@@ -2572,17 +2710,18 @@ function shootBolt(e, onTarget) {
   bolts.push({ m, vel, owner: e, t: 0, back: false, done: false });
   flash(from); sfx('blaster', from, 0.7); noise(from, HEAR.enemy);
 }
-function enemyBullet(e) {
+function enemyBullet(e, dmg = 0.5, snd) {
   const from = muzzleOf(e), onTarget = Math.random() < DF().acc * 0.6, chest = playerChest();
   const aimAt = onTarget ? chest.clone().add(new V3((Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3))
     : player.position.clone().add(new V3((Math.random() - 0.5) * 1.4, 1.2 + (Math.random() - 0.3) * 0.9, (Math.random() - 0.5) * 1.4)); // near misses (v30)
   const dir = aimAt.clone().sub(from).normalize(); camRay.set(from, dir); camRay.far = from.distanceTo(aimAt) + 30;
   const wh0 = castShot(from, dir, 30, false).wall, wh = wh0 && wh0.distance < camRay.far ? wh0 : null; // glass shatters and the bullet goes on
   noise(from, HEAR.enemy);
-  if (onTarget && (!wh || wh.distance > from.distanceTo(chest))) { tracer(from, chest, 0xffc97a); flash(from); sfx(e.gunKind === 'ar' ? 'ar' : 'ak', from, 0.6); hurtHits(0.5, 'bullet', from); return; } // bullets can't be blocked
+  const sound = snd === undefined ? (e.gunKind === 'ar' ? 'ar' : 'ak') : snd;
+  if (onTarget && (!wh || wh.distance > from.distanceTo(chest))) { tracer(from, chest, 0xffc97a); flash(from); if (sound) sfx(sound, from, 0.6); hurtHits(dmg, 'bullet', from); return; } // bullets can't be blocked
   tracer(from, wh ? wh.point : from.clone().addScaledVector(camRay.ray.direction, camRay.far), 0xffc97a);
   impact(from, camRay.ray.direction, wh, wh ? wh.distance : camRay.far);
-  flash(from); sfx('ak', from, 0.6);
+  flash(from); if (sound) sfx(sound, from, 0.6);
 }
 // enemy sniper (v27): a red laser for the second before he fires, a scope glint, then one heavy round (two hits' worth)
 function sniperLaser(e, on) {
@@ -2825,7 +2964,7 @@ function respawn() {
 function deadStep(dt, C) {
   dead.t += dt;
   if (dead.body.rag) { stepRag(dead.body.rag, dt); dead.focus.copy(dead.body.rag.P.pelvis.p); }
-  updateSaber(dt); updateHoles(dt); updateBolts(dt); updateEnemies(dt); updatePieces(dt); updateBlood(dt); updateGrenades(dt); updateFx(dt); updateHealth(dt); updateDebris(dt); updateMission(dt); updateFires(dt); updateGear(dt); updatePickups(dt); updateArc(dt);
+  updateSaber(dt); updateHoles(dt); updateBolts(dt); updateEnemies(dt); updatePieces(dt); updateBlood(dt); updateGrenades(dt); updateFx(dt); updateHealth(dt); updateDebris(dt); updateMission(dt); updateFires(dt); updateGear(dt); updatePickups(dt); updateArc(dt); updateClouds(dt);
   updateCamera(dt, C);
   $('deathhint').hidden = dead.t < 1;
 }
@@ -3059,7 +3198,8 @@ let flamePS = null, smokePS = null, fireLights = [];
 function initFireFx() {
   const A = window.__ASSETS.tex || {}, load = (b64) => { const t = new THREE.TextureLoader().load('data:image/png;base64,' + b64); t.colorSpace = THREE.SRGBColorSpace; return t; };
   if (!A.flames) return;
-  flamePS = makeParticles(FIRE_MAX, load(A.flames), 4, false); // normal blending: additive washed out against the sand smokePS = makeParticles(SMOKE_MAX, load(A.smoke || A.flames), 1, false);
+  flamePS = makeParticles(FIRE_MAX, load(A.flames), 4, false); // normal blending: additive washed out against the sand
+  smokePS = makeParticles(SMOKE_MAX, load(A.smoke || A.flames), 1, false);
   for (let i = 0; i < 3; i++) { const l = new THREE.PointLight(0xff7a2a, 0, 9, 1.6); l.position.set(0, -50, 0); scene.add(l); fireLights.push(l); } // made once, never added later
 }
 function emit(ps, at, spread, o) {
@@ -3780,7 +3920,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v30 · 2026-09-30';
+const BUILD = 'v31 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -4582,7 +4722,7 @@ const LOOT_TABLE = [ // [name, min, max, weight, rare]; every body also carries 
 const lootLog = [];
 let looting = null, lootTarget = null, lootHideT = 0;
 function rollLoot(e) {
-  const n = 1 + Math.floor(Math.random() * 3), out = [e && e.gunKind === 'sniper' ? { name: 'Sniper rounds', qty: 10 + Math.floor(Math.random() * 6), rare: false } : e && (e.gunKind === 'ak' || e.gunKind === 'ar') ? { name: 'Rifle ammo', qty: 60 + Math.floor(Math.random() * 31), rare: false } : { name: 'Pistol ammo', qty: 30 + Math.floor(Math.random() * 7), rare: false }], total = LOOT_TABLE.reduce((a, r) => a + r[3], 0);
+  const n = 1 + Math.floor(Math.random() * 3), out = [e && e.gunKind === 'sniper' ? { name: 'Sniper rounds', qty: 10 + Math.floor(Math.random() * 6), rare: false } : e && (e.gunKind === 'ak' || e.gunKind === 'ar') ? { name: 'Rifle ammo', qty: 60 + Math.floor(Math.random() * 31), rare: false } : e && e.gunKind === 'shotgun' ? { name: 'Shotgun shells', qty: 10 + Math.floor(Math.random() * 9), rare: false } : { name: 'Pistol ammo', qty: 30 + Math.floor(Math.random() * 7), rare: false }], total = LOOT_TABLE.reduce((a, r) => a + r[3], 0);
   for (let i = 0; i < n; i++) {
     let x = Math.random() * total, r = LOOT_TABLE[0];
     for (const row of LOOT_TABLE) { x -= row[3]; if (x <= 0) { r = row; break; } }
@@ -4812,7 +4952,7 @@ function step(dt) {
   heat = Math.max(0, heat - dt * 0.7); overheatT = Math.max(0, overheatT - dt);
   if (blasterMode() && (hudN & 7) === 0) renderAmmo(); // the heat gauge cools down
   updateSaber(dt);
-  updateHoles(dt); updateBolts(dt); updateTakedown(dt); updateHealth(dt); updateDebris(dt); updateMission(dt); updateFires(dt); updateGear(dt); updatePickups(dt); updateArc(dt);
+  updateHoles(dt); updateBolts(dt); updateTakedown(dt); updateHealth(dt); updateDebris(dt); updateMission(dt); updateFires(dt); updateGear(dt); updatePickups(dt); updateArc(dt); updateClouds(dt);
   const te = performance.now(); updateEnemies(dt); updatePieces(dt); updateBlood(dt); perf.enemyAcc += performance.now() - te; updateGrenades(dt); updateFx(dt);
   animateLoco(dt, C);
   updateCamera(dt, C);
@@ -5355,6 +5495,8 @@ function start() {
     setGore(v) { enemyCfg.gore = v; },
     get blockedShots() { return blockedShots; }, get parries() { return parries; }, get guardBrokenT() { return guardBrokenT; }, get bolts() { return bolts.length; },
     loadouts: () => enemies.map((e) => e.gunKind),
+    world: () => ({ ...worldStats, blocks: blocks.length, hidden: blocks.filter((b) => b.model).length, clouds: clouds.length }), setUniform(u) { soldierLook.uniform = u; },
+    looks: () => enemies.map((e) => ({ uniform: e.uniform, tone: e.tone, head: +(e.bones.Head?.scale.x || 0).toFixed(2), kind: e.gunKind })),
     forceState: () => ({ mode: forceMode(), target: forceTarget && forceTarget.id, ring: forceRing.visible, choke: !!choke, zap: !!zap, zapLeft: +zapLeft.toFixed(2), thrown: !!thrown, blaster: blasterMode(), heat, overheat: overheatT, scorches: scorches.length, trail: sabers.some((s) => s.blades.some((b) => b.userData.trail && b.userData.trail.visible)), light: sabers[0]?.blades[0]?.userData.light?.intensity || 0 }),
     blockBoxes: () => blocks.map(({ box: B }) => [B.min.x, B.min.y, B.min.z, B.max.x, B.max.y, B.max.z].map((v) => +v.toFixed(2))),
     forcePull, chokeStart, chokeEnd, zapStart, zapEnd, saberThrow, fireBlaster, get wallRun() { return !!wallRun; }, get jumpsDone() { return jumps; }, get vy() { return vy; },

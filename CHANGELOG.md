@@ -2,6 +2,18 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v31: a real-looking sandbox (downloaded assets)
+- **Buildings:** every grey city block is now an office block, shop, skyscraper or warehouse from Kenney's free City Kits (CC0). Each block picks the model that best fits its footprint and height; the tall far-off towers are skyscrapers. The invisible box underneath still does the collision, cover, shots and grapple, resized to the building. The three low boxes near the start stay as hop platforms.
+- **Nature:** about 70 grass patches with flowers and bushes, rocks, and around 50 trees (palms, oaks, pines) from Kenney's Nature Kit. The kit's cartoon teal is toned to natural greens and greys. Trees and tall rocks have solid trunks you bump into (and can land on).
+- **A stone path** runs from the start to the courtyard gate, with stepping stones round the start.
+- **Clouds** drift slowly across the sky.
+- **Soldiers:**
+  - **Four uniforms, rotated at random:** urban (the original black), desert, woodland and arctic. There are also four skin tones.
+  - **Smaller heads** (86%), which look less cartoon-like. A severed head keeps the size.
+  - **Mixed weapons:** pistols (half), AK-47s, M4s and pump shotguns. A shotgun soldier fires three pellets from under 20 m, and his body drops shotgun shells.
+- **Fix:** v30's fire smoke was never created (a comment swallowed the line). It rises now.
+- Build: 15.2 MB (the world packs add 0.36 MB, meshopt-compressed). Test: `tools/test35-world.mjs`.
+
 ## v30: fixes from your PC play test of v29
 - **Rifles:**
   - **Reloading keeps the gun in your hands.** It used to vanish because the hands played the pistol reload in mid-air. Now the left hand goes from the fore-grip to the magazine, down to your belt and back, while the gun tilts.
