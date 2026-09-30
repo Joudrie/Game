@@ -1,0 +1,11 @@
+import { chromium } from 'playwright';
+const OUT = process.argv[2];
+const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'] });
+const p = await b.newPage({ viewport: { width: 900, height: 600 } });
+p.on('pageerror', e => console.log('pageerror:', e.message));
+await p.goto('http://127.0.0.1:8766/preview2.html'); await p.waitForFunction(() => window.__game, null, { timeout: 120000 });
+console.log(await p.evaluate(() => { __game.setEnemyCount(0); __game.place(-3, 3); __game.look(0, 0.12); __game.selectSlot(3); __game.advance(2);
+  __game.holdFire(true); __game.attackPress(); __game.advance(0.5); __game.attackRelease(); __game.holdFire(false); __game.advance(0.3);
+  const ok = __game.startReload(); __game.advance(0.6); __game.setDebugCam([-1.6, 1.6, 4.2], [-3, 1.2, 3]); __game.advance(0.02); return ok + ' ' + JSON.stringify(__game.reload) + ' ' + JSON.stringify(__game.gunDebug()); }));
+await p.screenshot({ path: `${OUT}/reload-ak.png` });
+await b.close();
