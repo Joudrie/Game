@@ -1,0 +1,6 @@
+Game sound clips, trimmed and re-encoded by tools/make_sfx.sh. All CC0.
+pistol, ak, shotgun, sniper: Free Firearm Sound Library (Walther PPQ, AK-47, Nova, Mosin-Nagant), assets/misc/sounds/free_firearm_library
+pump: OpenGameArt "Gun reload sounds" shotguncock_0.wav (CC0)
+bolt: Freesound 267895 "Mosin Nagant Bolt fast" (CC0)
+reload: OpenGameArt "Handgun reload" reload.wav (CC0)
+blaster, deflect, parry: Kenney Sci-fi Sounds (laserSmall_000, laserRetro_002, laserLarge_001), CC0

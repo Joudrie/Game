@@ -2,6 +2,25 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v24: roadmap batch 2 (guns, sounds, blaster bolts and the parry)
+- **Three new guns,** already in your hotbar (slots 4–6; existing saves get them once). All are free CC0 models from Quaternius:
+  - **AK-47:** fully automatic while you hold the trigger, 30 rounds; the spread grows while you hold it and tightens when you let go.
+  - **Pump shotgun:** 9 pellets that fall off with distance, 6 shells, a pump sound after each shot, and a close kill **blasts the body backwards**.
+  - **Sniper rifle:** bolt-action, 5 rounds, one-shot kills. **Aim and the scope snaps in fast**, so quickscopes work: the view zooms 3×, you get scope crosshairs, and your character and rifle hide so you can see.
+- **Rifles are held properly:** the stock sits in your shoulder, and both hands go onto the gun (right on the grip, left on the fore-grip) using the same arm-reach code as the saber draw. There are no free two-handed rifle animations, so this is done in code. Not aiming, the rifle is held low and ready. Recoil kicks it back into the shoulder and the muzzle climbs.
+- **Holstering:** rifles go on your back and the pistol on your hip.
+- **Ammo per gun:** pistol ammo, rifle ammo, shotgun shells and sniper rounds are separate items, and each gun keeps its own magazine.
+- **Sounds:** every gun has its own shot (real recordings from the CC0 Free Firearm Sound Library), plus pump, bolt, reload, blaster, deflect and parry sounds. Enemy shots get quieter with distance. The whole set is 41 KB (`tools/make_sfx.sh`).
+- **Blaster bolts vs bullets:**
+  - Most soldiers now carry **blaster pistols** that fire red bolts you can see flying at you. Their gun **glints red just before they fire**: that's your cue.
+  - **Holding block** with the lit saber deflects bolts from the front and sides, but **not from behind**.
+  - **A timed block** (pressed in the last 0.3 s before a bolt reaches you) is a **parry**: the bolt turns green and flies straight back and kills the shooter ("Parried · his own bolt").
+  - **Too many blocks in a row break your guard.** You stagger and can't block for 1.6 s.
+  - **About a third of soldiers carry AK-47s** and fire bursts of real bullets, which **can't be deflected**.
+- **Their guns drop and you can take them:** walk over a dropped AK to get it and its rounds. AK soldiers' bodies have rifle ammo (60–90 rounds) when you search them.
+- **Automated test:** `tools/test28-guns.mjs` covers AK auto fire, the shotgun kill and knock-back, the sniper scope and one-shot, the parry kill, held-block deflect, an unguarded back, guard break, AK drop and pickup, and mixed loadouts. All earlier tests pass.
+- Build: 15.77 MB (limit 16).
+
 ## v23: roadmap batch 1 (fixes, limb loss, pickups, 6-slot hotbar)
 - **The pistol no longer climbs to the sky.** This was your report, and the root cause was an engine detail.
   - three.js only rewrites a bone when the animation's value changes. While you aim without moving the mouse, the aim pose never changes, so each shot's recoil kick (a direct rotation of the arms and chest) was never undone and piled up on the last one: +25° on the arms after 12 shots. Moving the mouse changed the pose and snapped it back.

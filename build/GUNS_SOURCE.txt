@@ -1,0 +1,2 @@
+gun_ak.glb = AssaultRifle_2.glb, gun_shotgun.glb = Shotgun_3.glb, gun_sniper.glb = SniperRifle_3.glb
+from Quaternius "Ultimate Gun Pack" (CC0), assets/weapons/quaternius-ultimate-guns/ (see its SOURCE.txt)

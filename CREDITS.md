@@ -24,6 +24,8 @@ Most assets are CC0 (public domain) and need no credit. The ones below need cred
 - **openmw endorphin BVH deaths** (`assets/deaths/_UNLICENSED_reference_openmw_endorphin_bvh`): the repository has **no licence**, so these are reference only and are not in the game.
 - **ACCAD motion capture** (Ohio State, CC BY 3.0): crouch-to-lie and get-up clips, not used yet.
 - **zenxchaos-tps-anims**: listed as Unlicense by its repository. The original source of the animations is unverified.
+- **Guns (v24):** Quaternius *Ultimate Gun Pack* (CC0): AssaultRifle_2 (AK-47), Shotgun_3 (pump), SniperRifle_3. See `build/GUNS_SOURCE.txt`.
+- **Sounds (v24):** Free Firearm Sound Library (Walther PPQ, AK-47, Nova, Mosin-Nagant), OpenGameArt shotgun cock and handgun reload, Freesound 267895 (bolt), and Kenney Sci-fi Sounds (blaster, deflect, parry). All CC0. See `build/sfx/SOURCE.txt`; made by `tools/make_sfx.sh`.
 - Everything else (Kenney, Quaternius, OpenGameArt CC0, Freesound CC0, Free Firearm Sound Library) is CC0. Libraries (Rapier, Jolt, cannon-es, three-vrm, nipplejs, Yuka, Sketchbook, three-fps) are MIT or Apache-2.0.
 
 ## Not included (need a login)

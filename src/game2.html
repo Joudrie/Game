@@ -115,6 +115,10 @@ body.can-loot #pad .loot-only { display: inline-block; }
 #feed { top: calc(64px + env(safe-area-inset-top, 0px)); right: var(--s4); display: grid; gap: var(--s1); justify-items: end; }
 #feed span { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: 2px var(--s2); font: 500 11px var(--font-mono); }
 #feed span.head { border-color: var(--signal); color: var(--signal); }
+#scope { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(circle at 50% 50%, transparent 0 31vmin, rgba(0,0,0,.92) 32vmin); }
+#scope::before, #scope::after { content: ''; position: absolute; background: rgba(0,0,0,.8); }
+#scope::before { left: 50%; top: calc(50% - 31vmin); width: 1px; height: 62vmin; }
+#scope::after { top: 50%; left: calc(50% - 31vmin); height: 1px; width: 62vmin; }
 #xhair.hit { border-color: var(--ink); border-width: 3px; opacity: 1; }
 #xhair.headhit { border-color: var(--signal); border-width: 3px; opacity: 1; transform: scale(1.4); }
 #pad .armed-only { display: none; }
@@ -210,6 +214,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 
 <div id="joy" hidden><i></i></div>
 <div id="xhair" class="hud" aria-hidden="true"></div>
+<div id="scope" hidden aria-hidden="true"></div>
 <div id="pad" class="hud">
   <button type="button" id="grapplebtn">Grapple</button>
   <button type="button" id="blockbtn" class="armed-only">Block</button>
@@ -554,6 +559,7 @@ async function boot() {
   for (const j of (EXTRA.clips || [])) { const c = THREE.AnimationClip.parse(j); clips.set(c.name, c); }
   fillMissingTracks();
   try { rifleModel = (await parseGLB(A.rifle)).scene; pistolModel = (await parseGLB(A.pistol)).scene; } catch (e) { report('error', 'Weapon model failed: ' + e.message); }
+  for (const [k, v] of Object.entries(A.guns || {})) { try { gunModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Gun model ${k} failed: ` + e.message); } }
   try { if (A.jetpack) jetpackModel = new OBJLoader().parse(new TextDecoder().decode(decodeB64(A.jetpack))); } catch (e) { report('error', 'Jetpack model failed: ' + e.message); }
   // height to 1.8 m, feet on the ground
   const fit = (m) => {
@@ -595,13 +601,14 @@ async function boot() {
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
   poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
-  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildFist(); buildGuardPose(); buildJetpack(); buildMags(); renderThumbs();
+  computeMounts(); rebuildSabers(); buildRifle(); buildPistol(); buildGuns(); buildFist(); buildGuardPose(); buildJetpack(); buildMags(); renderThumbs();
   mixer = new THREE.AnimationMixer(hero);
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
   $('loading').hidden = true;
   renderClass(); buildMoves(); setupInventoryUI();
   gear = ITEMS[inv.hot[inv.active]?.id]?.gear || 'none'; // start holding whatever the selected hotbar slot holds
+  if (ITEMS[inv.hot[inv.active]?.id]?.gun) setGunKind(ITEMS[inv.hot[inv.active].id].gun);
   start();
 }
 boot().catch((e) => { console.error(e); $('loadmsg').textContent = 'The character failed to load: ' + (e.message || e); document.querySelector('#loading .bar').hidden = true; });
@@ -691,6 +698,7 @@ try { const g = localStorage.getItem('gear'); if (g) gear = g; } catch (_) {}
 const GEARS = { none: 'no gear', hilt: 'hilt in hand', lit: 'saber lit', pistol: 'pistol' };
 const GEAR_ORDER = ['none', 'hilt', 'lit', 'pistol'];
 let rifleModel = null, rifle = null, pistolModel = null, pistol = null;
+const gunModels = {};
 const mounts = {}, sabers = [];
 const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 const glowMat1 = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.5, depthWrite: false });
@@ -828,6 +836,86 @@ function placeRifle() {
   rifle.root.visible = false; // shown once two-handed rifle animations exist
 }
 // pistol: scaled to 0.22 m, its grip (rear-bottom of the model) at the mount origin
+// ---------------- guns (v24) ----------------
+// One table for every gun. Rifles are held in the pistol's two-handed poses with the grip in the right hand, and the
+// left hand pulled onto the fore-grip by arm IK (no free two-handed rifle animations exist; see assets/weapons/REPORT.md).
+// grip / fore: [fraction along the model from the stock, fraction down from the top]. Models: Quaternius Ultimate Gun Pack (CC0).
+const GUNS = {
+  pistol:  { name: 'Pistol', ammo: 'ammo', mag: 12, cd: 0.16, pellets: 1, spread: 0, dmg: { head: 100, torso: 34, legs: 26 }, sound: 'pistol', kick: 1, camKick: 0.012, reload: [1.05, 1.35], bolt: 'bullet' },
+  ak:      { name: 'AK-47', ammo: 'ammo_rifle', mag: 30, cd: 0.1, auto: true, pellets: 1, spread: 0.008, bloom: 0.003, dmg: { head: 100, torso: 40, legs: 30 }, sound: 'ak', kick: 0.45, camKick: 0.006,
+             reload: [1.5, 1.9], len: 0.88, grip: [0.36, 0.42], fore: [0.63, 0.3], model: 'ak', bolt: 'bullet' },
+  shotgun: { name: 'Pump shotgun', ammo: 'ammo_shells', mag: 6, cd: 0.85, pellets: 9, spread: 0.065, dmg: { head: 45, torso: 30, legs: 22 }, falloff: [8, 26], sound: 'shotgun', after: 'pump', kick: 1.7, camKick: 0.03,
+             reload: [1.7, 2.1], len: 1.0, grip: [0.3, 0.45], fore: [0.62, 0.45], model: 'shotgun', knock: 7, bolt: 'bullet' },
+  sniper:  { name: 'Sniper rifle', ammo: 'ammo_sniper', mag: 5, cd: 1.2, pellets: 1, spread: 0, dmg: { head: 300, torso: 200, legs: 160 }, zoom: 20, sound: 'sniper', after: 'bolt', kick: 2, camKick: 0.035,
+             reload: [1.8, 2.2], len: 1.2, grip: [0.26, 0.5], fore: [0.5, 0.45], model: 'sniper', bolt: 'bullet' },
+};
+let gunKind = 'pistol';
+const G = () => GUNS[gunKind];
+const guns = {}; // kind -> { root, fore (local), muzzle (local) }
+function buildGuns() {
+  if (pistol) { pistol.muzzle = new V3(0.2, 0.03, 0); guns.pistol = pistol; }
+  for (const [kind, def] of Object.entries(GUNS)) {
+    if (!def.model || !gunModels[def.model]) continue;
+    const inner = gunModels[def.model]; inner.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(inner), size = box.getSize(new V3());
+    const k = def.len / size.x; inner.scale.multiplyScalar(k);
+    const at = (f) => new V3(box.min.x + size.x * f[0], box.max.y - size.y * f[1], (box.min.z + box.max.z) / 2).multiplyScalar(k);
+    const grip = at(def.grip);
+    inner.position.sub(grip);
+    inner.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+    const root = new THREE.Group(); root.add(inner);
+    guns[kind] = { root, fore: at(def.fore).sub(grip), butt: at([0, 0.3]).sub(grip), muzzle: new V3(box.max.x * k, (box.max.y - size.y * 0.18) * k, 0).sub(grip), rifle: true };
+  }
+}
+// A rifle in your hands: the stock sits in the right shoulder and the barrel points where you aim (low and ready when
+// you're not aiming); then both arms reach onto it: right hand on the grip, left hand on the fore-grip.
+const UP = new V3(0, 1, 0);
+function holdRifle() {
+  if (!(gear === 'pistol' && pistolInHand && pistol && pistol.rifle && !drawing)) return;
+  hero.updateMatrixWorld(true);
+  const sh = boneByName(hero, 'upperarm_r').getWorldPosition(new V3()), chest = boneByName(hero, 'spine_03').getWorldPosition(new V3());
+  const fwd = new V3(Math.sin(yaw), 0, Math.cos(yaw));
+  const low = fwd.clone().multiplyScalar(Math.cos(0.55)).add(new V3(0, -Math.sin(0.55), 0));
+  const aim = camera.getWorldDirection(new V3()); if (aim.dot(fwd) < 0.2) aim.copy(fwd);
+  const x = low.lerp(aim, guardBlend).normalize();
+  const z = x.clone().cross(UP).normalize(), y = z.clone().cross(x);
+  const r = pistol.root;
+  r.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
+  if (recoil > 0) r.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(new V3(0, 0, 1), 0.08 * recoil * G().kick)); // muzzle climbs a little
+  const butt = sh.lerp(chest, 0.3).add(new V3(0, -0.03, 0)).addScaledVector(x, -0.05 * recoil * G().kick); // kicks back into the shoulder
+  r.position.copy(butt).sub(pistol.butt.clone().applyQuaternion(r.quaternion));
+  r.updateMatrixWorld(true);
+  const rw = 1 - reloadBlend;
+  ikArm('r', r.localToWorld(new V3()), rw);
+  if (rw > 0.01) { hero.updateMatrixWorld(true); ikArm('l', r.localToWorld(pistol.fore.clone()), rw); }
+}
+function holsterOf(kind = gunKind) { return kind === 'pistol' ? 'pistolHip' : 'rifleBack'; }
+// switch the gun in your hands: the old one goes to its holster (hip or back), the new one comes out
+function setGunKind(kind) {
+  if (!guns[kind] || kind === gunKind) return;
+  const inHand = pistolInHand;
+  if (pistol) pistol.root.removeFromParent();
+  gunKind = kind; pistol = guns[kind];
+  if (gunMag) { if (kind === 'pistol') pistol.root.add(gunMag); else gunMag.removeFromParent(); }
+  pistolInHand = inHand; placePistol(); reload = null; renderAmmo();
+}
+// ---------------- sound (v24) ----------------
+// Short, trimmed CC0 clips (build/sfx, made by tools/make_sfx.sh). Web Audio starts on the first click or key.
+const audio = { ctx: null, buf: {} };
+function initAudio() {
+  if (audio.ctx) { if (audio.ctx.state === 'suspended') audio.ctx.resume(); return; }
+  try {
+    audio.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    for (const [k, v] of Object.entries(window.__ASSETS.sfx || {})) audio.ctx.decodeAudioData(decodeB64(v)).then((b) => { audio.buf[k] = b; }).catch(() => {});
+  } catch (_) {}
+}
+addEventListener('pointerdown', initAudio); addEventListener('keydown', initAudio);
+function sfx(name, at, vol = 1) {
+  const c = audio.ctx, b = audio.buf[name]; if (!c || !b) return;
+  const v = at ? vol / (1 + at.distanceTo(player.position) * 0.07) : vol;
+  const src = c.createBufferSource(); src.buffer = b; src.playbackRate.value = 0.95 + Math.random() * 0.1;
+  const g = c.createGain(); g.gain.value = v; src.connect(g).connect(c.destination); src.start();
+}
 function buildPistol() {
   if (!pistolModel) return;
   const inner = pistolModel; inner.updateMatrixWorld(true);
@@ -842,7 +930,8 @@ function buildPistol() {
 let pistolInHand = false; // follows the draw/holster motion, not the gear choice
 function placePistol() {
   if (!pistol) return;
-  const m = pistolInHand ? mounts.pistolHand : mounts.pistolHip; if (!m) return;
+  if (pistolInHand && pistol.rifle) { scene.add(pistol.root); pistol.root.scale.setScalar(1); return; } // a rifle in your hands is placed each frame (holdRifle)
+  const m = pistolInHand ? mounts.pistolHand : mounts[holsterOf()]; if (!m) return;
   m.bone.add(pistol.root); pistol.root.position.copy(m.p); pistol.root.quaternion.copy(m.q); pistol.root.scale.copy(m.s);
 }
 function attach(sb, name) { const m = mounts[name]; m.bone.add(sb.root); sb.root.position.copy(m.p); sb.root.quaternion.copy(m.q); sb.root.scale.copy(m.s); }
@@ -957,12 +1046,13 @@ function saberReach(steps, draw) {
 }
 function startGearChange(from, to) {
   const steps = [], saber = (g) => g === 'lit' || g === 'hilt';
-  if (pistolInHand && to !== 'pistol') steps.push({ kind: 'spin', dur: 0.55 },
-    { kind: 'reach', hands: [['r', 'pistolHip']], dur: 0.2, at: () => { pistolInHand = false; placePistol(); } }, { kind: 'back', hands: [['r', 'pistolHip']], dur: 0.22 });
+  const hol = holsterOf();
+  if (pistolInHand && to !== 'pistol') steps.push(...(gunKind === 'pistol' ? [{ kind: 'spin', dur: 0.55 }] : []),
+    { kind: 'reach', hands: [['r', hol]], dur: 0.2, at: () => { pistolInHand = false; placePistol(); } }, { kind: 'back', hands: [['r', hol]], dur: 0.22 });
   if (armed && !saber(to)) { steps.push({ kind: 'wait', dur: ignite > 0.01 ? 0.2 : 0 }); saberReach(steps, false); } // the blade retracts first
   if (!armed && saber(to)) saberReach(steps, true);
-  if (to === 'pistol' && !pistolInHand) steps.push({ kind: 'reach', hands: [['r', 'pistolHip']], dur: 0.2, at: () => { pistolInHand = true; placePistol(); } },
-    { kind: 'back', hands: [['r', 'pistolHip']], dur: 0.26 });
+  if (to === 'pistol' && !pistolInHand) steps.push({ kind: 'reach', hands: [['r', hol]], dur: 0.2, at: () => { pistolInHand = true; placePistol(); } },
+    { kind: 'back', hands: [['r', hol]], dur: 0.26 });
   drawing = steps.length ? { steps, i: 0, t: 0 } : null;
   if (drawing) { atk = null; log('draw/holster', from, '→', to); }
 }
@@ -1083,11 +1173,14 @@ function heavyAttack() {
   atk.act = playOvr('Sword_Heavy_Combo', { speed: 1.1, fade: 0.12, then: () => { atk = null; stopOvr(0.25); } });
 }
 function blockPress() {
-  if (!canBlock() || atk) return;
+  if (!canBlock() || atk || guardBrokenT > 0) return;
+  lastBlockT = simT; // a block timed to a bolt's arrival parries it
   blocking = true; log('block');
 }
 function blockRelease() { blocking = false; }
 function updateCombat(dt) {
+  bloom = Math.max(0, bloom - dt * 0.08);
+  if (atkHeld && gear === 'pistol' && G().auto) firePistol();
   // self-heal: if a swing reached its end but its finish callback never ran, move the chain on anyway
   // (a v12 report showed the body frozen in hit 1 while walking)
   if (atk && atk.act && atk.act.paused) { // a paused one-shot has finished
@@ -1451,13 +1544,14 @@ function spawnEnemy(at) {
   const g = new THREE.Group(); g.add(root); g.position.copy(at); scene.add(g);
   const bones = {}; root.traverse((o) => { if (ENEMY_BONES.includes(o.name)) bones[o.name] = o; });
   let gun = null;
+  const gunKind = guns.ak && Math.random() < 0.3 ? 'ak' : 'pistol'; // most carry blaster pistols; about a third carry AK-47s
   if (pistolModel && mounts.pistolHand) {
-    gun = pistol.root.clone(true); bones.hand_r.add(gun);
+    gun = guns[gunKind].root.clone(true); bones.hand_r.add(gun);
     gun.position.copy(mounts.pistolHand.p); gun.quaternion.copy(mounts.pistolHand.q); gun.scale.copy(mounts.pistolHand.s);
   }
   const e = { g, root, bones, mixer: new THREE.AnimationMixer(root), act: null, hp: 100, total: 0, dmg: { head: 0, torso: 0, legs: 0 },
     state: 'engage', yaw: Math.atan2(player.position.x - at.x, player.position.z - at.z), vel: new V3(), fireT: 1 + Math.random() * 2,
-    strafe: Math.random() < 0.5 ? 1 : -1, strafeT: 2 + Math.random() * 2, hitT: 0, deadT: 0, id: Math.random().toString(36).slice(2, 6), hitBy: new Set(), gun };
+    strafe: Math.random() < 0.5 ? 1 : -1, strafeT: 2 + Math.random() * 2, hitT: 0, deadT: 0, id: Math.random().toString(36).slice(2, 6), hitBy: new Set(), gun, gunKind };
   enemies.push(e); eplay(e, 'SW_Idle_Gun_Pointing');
   return e;
 }
@@ -1555,10 +1649,10 @@ function updateEnemies(dt) {
         // after the panic he draws a backup pistol with the hand he has left, and fights on one-handed
         const other = isSevered(e, 'hand_r') ? 'hand_l' : 'hand_r';
         if (!isSevered(e, other) && pistolModel && mounts.pistolHand) {
-          const g2 = pistol.root.clone(true); cutBone(e, other).add(g2);
+          const g2 = guns.pistol.root.clone(true); cutBone(e, other).add(g2);
           g2.position.copy(mounts.pistolHand.p); g2.quaternion.copy(mounts.pistolHand.q); g2.scale.copy(mounts.pistolHand.s);
           if (other === 'hand_l') { g2.position.x *= -1; g2.scale.x *= -1; } // mirrored grip in the left hand
-          e.gun = g2; e.gunHand = other; e.unarmed = false; e.fireT = 1.2; log('soldier re-armed', other);
+          e.gun = g2; e.gunHand = other; e.gunKind = 'pistol'; e.unarmed = false; e.fireT = 1.2; log('soldier re-armed', other);
         }
         e.rearmed = true; // one backup pistol; lose that hand too and he just runs
       }
@@ -1582,27 +1676,16 @@ function updateEnemies(dt) {
       collideCircle(pos, 0.35);
       pos.y = groundAt(pos.x, pos.z, pos.y + 0.3);
       if (e.actName !== 'SW_Idle_Gun_Shoot' || e.act.time >= e.act.getClip().duration * 0.9) eplay(e, clip);
-      // shoot: always a miss, with a tracer and flash so you can see it
+      // shoot: blaster pistols fire bolts you can see, block and parry; AK-47s fire bursts of bullets you can't deflect
       e.fireT -= dt;
+      if (e.gunKind !== 'ak' && e.fireT < 0.4 && !e.tell && dist < 50) { e.tell = true; glint(muzzleOf(e)); } // the tell before a bolt: time your block to it
       if (e.fireT <= 0 && dist < 50) {
-        e.fireT = 0.9 + Math.random() * 1.6;
-        const from = muzzleOf(e);
-        // guarding with a lit saber toward the shooter: most shots come in on target and spark off the blade
-        const toE = e.g.position.clone().sub(player.position).setY(0).normalize(), facing = new V3(Math.sin(yaw), 0, Math.cos(yaw));
-        if (blocking && armed && ignite > 0.9 && toE.dot(facing) > 0.26 && Math.random() < 0.75) {
-          const hit = player.position.clone().add(new V3(0, 1.25, 0)).addScaledVector(toE, 0.45).add(new V3((Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.4, 0));
-          tracer(from, hit, 0xffc97a); sparks(hit, toE); blockedShots++;
-          const out = toE.clone().applyAxisAngle(new V3(0, 1, 0), (Math.random() - 0.5) * 2.2).add(new V3(0, (Math.random() - 0.3) * 0.6, 0)).normalize();
-          tracer(hit, hit.clone().addScaledVector(out, 25), 0xfff1c2); // deflected
-        } else {
-          const aimAt = player.position.clone().add(new V3((Math.random() - 0.5) * 2.4, 1.2 + (Math.random() - 0.3) * 1.2, (Math.random() - 0.5) * 2.4));
-          camRay.set(from, aimAt.clone().sub(from).normalize()); camRay.far = from.distanceTo(aimAt) + 30;
-          const wh = camRay.intersectObjects(blockMeshes, false)[0];
-          tracer(from, wh ? wh.point : from.clone().addScaledVector(camRay.ray.direction, camRay.far), 0xffc97a);
-          impact(from, camRay.ray.direction, wh, wh ? wh.distance : camRay.far);
-        }
+        e.tell = false;
+        if (e.gunKind === 'ak') { e.fireT = 1.6 + Math.random() * 1.6; e.burst = 3; e.burstT = 0; }
+        else { e.fireT = 1.1 + Math.random() * 1.6; shootBolt(e); }
         if (sp === 0) eplay(e, 'SW_Idle_Gun_Shoot', { loop: false, fade: 0.08 });
       }
+      if (e.burst > 0 && (e.burstT -= dt) <= 0) { e.burst--; e.burstT = 0.1; enemyBullet(e); }
     } else eplay(e, 'SW_Idle_Gun_Pointing');
     e.g.rotation.y = e.yaw;
     emix(e, dt);
@@ -1642,29 +1725,45 @@ function rayZones(o, dir, far) {
   return best;
 }
 let fireCd = 0;
+let bloom = 0; // automatic fire spreads out while you hold the trigger, and tightens again when you stop
 function firePistol(aimDir) {
   if (movesOpen || gear !== 'pistol' || !pistolInHand || drawing || !hero || fireCd > 0 || reload) return;
-  if (ammo.mag <= 0) { fireCd = 0.25; if (!startReload()) toast('Out of pistol ammo: loot some', 1300); return; } // dry: reload if you can
-  fireCd = 0.16; recoil = 1; fireRaiseT = 0.7;
+  const D = G();
+  if (ammo.mag <= 0) { fireCd = 0.25; if (!startReload()) toast(`Out of ${D.name} ammo: loot some`, 1300); return; } // dry: reload if you can
+  fireCd = D.cd; recoil = D.kick; fireRaiseT = 0.7;
   ammo.mag--; saveAmmo(); renderAmmo();
   if (ammo.mag === 0) setTimeout(() => { if (ammo.mag === 0 && gear === 'pistol') startReload(); }, 250); // empty: reload on its own
-  const dir = aimDir || camera.getWorldDirection(new V3()), o = camera.position.clone();
-  aimRay.set(o, dir); aimRay.far = 300;
-  const wall = aimRay.intersectObjects(blockMeshes, false)[0];
-  const far = wall ? wall.distance : 300;
-  const hit = rayZones(o, dir, far);
-  const muzzle = pistol ? pistol.root.localToWorld(new V3(0.2, 0.03, 0)) : wrist();
-  const end = hit ? hit.point : wall ? wall.point : o.clone().addScaledVector(dir, far);
-  tracer(muzzle, end, 0xfff1c2); flash(muzzle);
-  if (!hit) impact(o, dir, wall, far);
-  camPitch = clamp(camPitch - 0.012, -0.45, 1.15); camKick += 0.012; // the view kicks up and settles back (updateCamera)
-  if (hit) {
-    const dmg = hit.zone === 'head' ? 100 : hit.zone === 'torso' ? 34 : 26;
-    damageEnemy(hit.e, dmg, hit.zone, 'bullet', dir);
-    const x = $('xhair'); x.classList.add(hit.zone === 'head' ? 'headhit' : 'hit'); setTimeout(() => x.classList.remove('hit', 'headhit'), 120);
+  const base = aimDir || camera.getWorldDirection(new V3()), o = camera.position.clone();
+  const muzzle = pistol ? pistol.root.localToWorld(pistol.muzzle.clone()) : wrist();
+  flash(muzzle); sfx(D.sound, null, 0.9);
+  if (D.after) setTimeout(() => sfx(D.after, null, 0.8), D.cd * 400);
+  const aimed = aimHeld && isStrafing();
+  const cone = (D.spread + bloom) * (aimed ? 0.6 : 1);
+  if (D.bloom) bloom = Math.min(0.05, bloom + D.bloom);
+  let best = null; const hitsBy = new Map();
+  for (let pI = 0; pI < D.pellets; pI++) {
+    const dir = base.clone();
+    if (cone > 0) { const a = Math.random() * Math.PI * 2, r = cone * Math.sqrt(Math.random()); const u = new V3().crossVectors(dir, new V3(0, 1, 0)).normalize(), v = new V3().crossVectors(u, dir); dir.addScaledVector(u, Math.cos(a) * r).addScaledVector(v, Math.sin(a) * r).normalize(); }
+    aimRay.set(o, dir); aimRay.far = 300;
+    const wall = aimRay.intersectObjects(blockMeshes, false)[0];
+    const far = wall ? wall.distance : 300;
+    const hit = rayZones(o, dir, far);
+    const end = hit ? hit.point : wall ? wall.point : o.clone().addScaledVector(dir, far);
+    tracer(muzzle, end, 0xfff1c2);
+    if (!hit) { impact(o, dir, wall, far); continue; }
+    let dmg = D.dmg[hit.zone];
+    if (D.falloff) dmg *= clamp(1 - (hit.t - D.falloff[0]) / (D.falloff[1] - D.falloff[0]), 0.15, 1);
+    const h = hitsBy.get(hit.e) || { dmg: 0, zone: hit.zone, dir }; h.dmg += dmg; if (hit.zone === 'head') h.zone = 'head'; hitsBy.set(hit.e, h);
+    if (!best || hit.zone === 'head') best = hit;
   }
-  log('fire', hit ? hit.zone : 'miss');
-  return hit ? hit.zone : 'miss';
+  for (const [e, h] of hitsBy) {
+    damageEnemy(e, h.dmg, h.zone, 'bullet', h.dir);
+    if (D.knock && e.state === 'dead' && e.g.position.distanceTo(player.position) < 9) shoveBody(e, h.dir.clone().setY(0).normalize().multiplyScalar(D.knock).add(new V3(0, 2.5, 0))); // shotgun blasts bodies back
+  }
+  camPitch = clamp(camPitch - D.camKick, -0.45, 1.15); camKick += D.camKick; // the view kicks up and settles back (updateCamera)
+  if (best) { const x = $('xhair'); x.classList.add(best.zone === 'head' ? 'headhit' : 'hit'); setTimeout(() => x.classList.remove('hit', 'headhit'), 120); }
+  log('fire', gunKind, best ? best.zone : 'miss');
+  return best ? best.zone : 'miss';
 }
 function hitReact(e, zone) {
   if (e.state === 'crawl') return;
@@ -1921,7 +2020,7 @@ function dropGun(e, dir) {
   g.updateWorldMatrix(true, false);
   const outer = new THREE.Group(); g.getWorldPosition(outer.position); scene.add(outer); outer.attach(g);
   const vel = (dir ? dir.clone().setY(0).normalize().multiplyScalar(1.5) : new V3()).add(new V3((Math.random() - 0.5) * 2, 2 + Math.random() * 2, (Math.random() - 0.5) * 2));
-  const piece = { outer, vel, axis: new V3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), spin: 5 + Math.random() * 6, rest: false, e, gun: true };
+  const piece = { outer, vel, axis: new V3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize(), spin: 5 + Math.random() * 6, rest: false, e, gun: true, kind: e.gunKind || 'pistol' };
   pieces.push(piece); (e.pieces = e.pieces || []).push(piece);
   if (pieces.length > MAX_PIECES) removePiece(pieces[0]);
 }
@@ -2003,16 +2102,16 @@ function forcePush() {
 // ---------------- pistol ammo and reload ----------------
 // 12 rounds in the magazine; spare rounds are the Pistol ammo in your inventory ("Infinite ammo" keeps them from running out).
 // An empty reload drops the spent magazine, which clatters to the ground and stays; a reload with rounds left keeps it.
-const MAG_SIZE = 12;
-const ammo = { mag: MAG_SIZE };
-try { const a = JSON.parse(localStorage.getItem('ammo') || 'null'); if (a && a.mag >= 0) ammo.mag = Math.min(MAG_SIZE, a.mag); } catch (_) {}
-const saveAmmo = () => { try { localStorage.setItem('ammo', JSON.stringify(ammo)); } catch (_) {} };
+// rounds in each gun's magazine; ammo.mag is the gun in your hands
+const ammo = { mags: Object.fromEntries(Object.entries(GUNS).map(([k, d]) => [k, d.mag])), get mag() { return this.mags[gunKind]; }, set mag(v) { this.mags[gunKind] = v; } };
+try { const a = JSON.parse(localStorage.getItem('ammo') || 'null'); if (a && a.mags) for (const k of Object.keys(ammo.mags)) { if (a.mags[k] >= 0) ammo.mags[k] = Math.min(GUNS[k].mag, a.mags[k]); } else if (a && a.mag >= 0) ammo.mags.pistol = Math.min(12, a.mag); } catch (_) {}
+const saveAmmo = () => { try { localStorage.setItem('ammo', JSON.stringify({ mags: ammo.mags })); } catch (_) {} };
 let reload = null, reloadBlend = 0, magOut = false;
 const mags = [], MAX_MAGS = 24;
 const magMat = new THREE.MeshStandardMaterial({ color: 0x2b2d31, metalness: 0.5, roughness: 0.5 });
 const magGeo = new THREE.BoxGeometry(0.034, 0.14, 0.046); // a touch bigger than life so you can spot it on the ground
 let gunMag = null, handMag = null;
-const reserve = () => (testCfg.infiniteAmmo ? Infinity : countItem('ammo'));
+const reserve = () => (testCfg.infiniteAmmo ? Infinity : countItem(G().ammo));
 function buildMags() {
   if (!pistol) return;
   gunMag = new THREE.Mesh(magGeo, magMat); gunMag.position.set(0.012, -0.055, 0); gunMag.castShadow = true; pistol.root.add(gunMag); // sits in the grip
@@ -2021,10 +2120,11 @@ function buildMags() {
 }
 function startReload() {
   if (reload || gear !== 'pistol' || !pistolInHand || drawing || movesOpen) return false;
-  if (ammo.mag >= MAG_SIZE) return false;
+  if (ammo.mag >= G().mag) return false;
   if (reserve() <= 0) return false;
   const empty = ammo.mag === 0;
-  reload = { t: 0, dur: empty ? 1.35 : 1.05, empty, dropped: false, shown: false, done: false };
+  reload = { t: 0, dur: G().reload[empty ? 1 : 0], empty, dropped: false, shown: false, done: false };
+  sfx('reload', null, 0.8);
   log('reload', empty ? 'empty' : 'tactical', ammo.mag);
   return true;
 }
@@ -2054,13 +2154,14 @@ function updateReload(dt) {
   if (!reload) { if (handMag) handMag.visible = false; if (gunMag) gunMag.visible = !magOut; return; }
   if (gear !== 'pistol' || !pistolInHand || drawing) { reload = null; log('reload cancelled'); return; }
   const r = reload; r.t += dt; const k = r.t / r.dur;
-  if (r.empty && !r.dropped && k > 0.12) { r.dropped = true; dropMag(); }
+  if (r.empty && !r.dropped && k > 0.12) { r.dropped = true; if (gunKind === 'pistol') dropMag(); }
   if (!r.empty && !r.done && k > 0.15) magOut = true; // tactical: the old one goes in a pocket
   if (!r.shown && k > 0.3) r.shown = true;
   if (!r.done && k > 0.68) { // the new magazine goes in
     r.done = true; magOut = false;
-    const need = MAG_SIZE - ammo.mag, take = Math.min(need, reserve());
-    if (!testCfg.infiniteAmmo) takeItem('ammo', take);
+    const need = G().mag - ammo.mag, take = Math.min(need, reserve());
+    if (!testCfg.infiniteAmmo) takeItem(G().ammo, take);
+    if (G().after) setTimeout(() => sfx(G().after, null, 0.9), 350);
     ammo.mag += take; saveAmmo();
   }
   if (handMag) handMag.visible = r.shown && !r.done;
@@ -2072,7 +2173,7 @@ function updateReload(dt) {
 function renderAmmo() {
   const el = $('ammo'); if (!el) return;
   el.hidden = gear !== 'pistol';
-  const res = testCfg.infiniteAmmo ? '∞' : countItem('ammo');
+  const res = testCfg.infiniteAmmo ? '∞' : countItem(G().ammo);
   el.innerHTML = `<b>${ammo.mag}</b><span>/ ${res}</span>${reload ? '<i>Reloading</i>' : ammo.mag === 0 ? '<i>Reload</i>' : ''}`;
   el.classList.toggle('low', ammo.mag <= 3);
   if (renderAmmo.last !== ammo.mag) { renderAmmo.last = ammo.mag; renderInv(); }
@@ -2165,6 +2266,75 @@ function flash(at) {
   m.position.copy(at); scene.add(m); fx.push({ m, t: 0, life: 0.06 });
 }
 let blockedShots = 0;
+// ---------------- blaster bolts, parry and guard (v24) ----------------
+// A bolt flies at about 38 m/s. Guarding (front and sides, never your back) deflects it. Block in the last 0.3 s
+// before it reaches you and it goes straight back at the shooter (a parry: he dies). Blocking a lot in a row breaks your guard.
+const bolts = [], BOLT_SPEED = 38;
+const boltGeo = new THREE.CapsuleGeometry(0.035, 0.5, 3, 8).rotateX(Math.PI / 2);
+const boltMat = new THREE.MeshBasicMaterial({ color: 0xff3b2f }), boltMatBack = new THREE.MeshBasicMaterial({ color: 0x7dffb0 });
+let simT = 0, lastBlockT = -9, guardLoad = 0, guardBrokenT = 0, parries = 0;
+function glint(at) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff5040, transparent: true, opacity: 1, depthWrite: false }));
+  m.position.copy(at); scene.add(m); fx.push({ m, t: 0, life: 0.4, grow: 2.5 });
+}
+const chestAt = (o) => o.clone().add(new V3(0, 1.25, 0)); // a chest point above a position
+function shootBolt(e, onTarget) {
+  const from = muzzleOf(e), chest = chestAt(player.position);
+  // about half the bolts come straight at you; the rest miss nearby (you can't be hurt yet)
+  const at = (onTarget ?? Math.random() < 0.55) ? chest.add(new V3((Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3))
+    : chest.add(new V3((Math.random() - 0.5) * 3, (Math.random() - 0.4) * 1.5, (Math.random() - 0.5) * 3));
+  const vel = at.sub(from).normalize().multiplyScalar(BOLT_SPEED);
+  const m = new THREE.Mesh(boltGeo, boltMat); m.position.copy(from); m.lookAt(from.clone().add(vel)); scene.add(m);
+  bolts.push({ m, vel, owner: e, t: 0, back: false, done: false });
+  flash(from); sfx('blaster', from, 0.7);
+}
+function enemyBullet(e) {
+  const from = muzzleOf(e);
+  const aimAt = player.position.clone().add(new V3((Math.random() - 0.5) * 2.4, 1.2 + (Math.random() - 0.3) * 1.2, (Math.random() - 0.5) * 2.4));
+  camRay.set(from, aimAt.clone().sub(from).normalize()); camRay.far = from.distanceTo(aimAt) + 30;
+  const wh = camRay.intersectObjects(blockMeshes, false)[0];
+  tracer(from, wh ? wh.point : from.clone().addScaledVector(camRay.ray.direction, camRay.far), 0xffc97a);
+  impact(from, camRay.ray.direction, wh, wh ? wh.distance : camRay.far);
+  flash(from); sfx('ak', from, 0.6);
+}
+function guardCovers(from) { // front and sides, not your back
+  const toShooter = from.clone().sub(player.position).setY(0).normalize(), facing = new V3(Math.sin(yaw), 0, Math.cos(yaw));
+  return toShooter.dot(facing) > -0.25;
+}
+function removeBolt(b) { scene.remove(b.m); b.done = true; }
+function updateBolts(dt) {
+  simT += dt; guardLoad = Math.max(0, guardLoad - dt * 1.2); guardBrokenT = Math.max(0, guardBrokenT - dt);
+  for (const b of [...bolts]) {
+    b.t += dt; if (b.t > 3 || b.done) { removeBolt(b); bolts.splice(bolts.indexOf(b), 1); continue; }
+    const p0 = b.m.position.clone(); b.m.position.addScaledVector(b.vel, dt); const p1 = b.m.position;
+    if (!b.back) {
+      const chest = chestAt(player.position);
+      if (segDist(p0, p1, chest, chest) < 0.7 && blocking && armed && ignite > 0.9 && guardCovers(b.owner.g.position)) {
+        const hitAt = p0.clone().lerp(p1, segDist.s);
+        sparks(hitAt, b.vel.clone().negate().normalize()); blockedShots++;
+        if (simT - lastBlockT < 0.3 && b.owner.state !== 'dead') { // parry: straight back at him
+          b.back = true; b.m.material = boltMatBack; b.m.position.copy(hitAt);
+          b.vel.copy(chestAt(b.owner.g.position).sub(hitAt).normalize().multiplyScalar(BOLT_SPEED * 1.4)); b.m.lookAt(hitAt.clone().add(b.vel));
+          sfx('parry', null, 1); parries++; log('parry');
+        } else { // deflected somewhere
+          b.vel.reflect(b.vel.clone().normalize()).applyAxisAngle(UP, (Math.random() - 0.5) * 2.2); b.vel.y = Math.abs(b.vel.y) * 0.3 + Math.random() * 4; b.back = 'away';
+          b.m.lookAt(p1.clone().add(b.vel)); sfx('deflect', null, 0.8);
+          guardLoad += 1; if (guardLoad > 8) breakGuard();
+        }
+        continue;
+      }
+    } else if (b.back === true && b.owner.state !== 'dead' && segDist(p0, p1, chestAt(b.owner.g.position), chestAt(b.owner.g.position)) < 0.6) {
+      b.owner.cutLabel = 'Parried · his own bolt';
+      damageEnemy(b.owner, 999, 'torso', 'bolt', b.vel.clone()); removeBolt(b); continue;
+    }
+    if (p1.y < groundAt(p1.x, p1.z, p1.y + 0.5) || blocks.some(({ box: B }) => B.containsPoint(p1))) { sparks(p1, b.vel.clone().negate().normalize()); removeBolt(b); }
+  }
+}
+function breakGuard() {
+  blocking = false; guardBrokenT = 1.6; guardLoad = 0;
+  playOvr('Hit_Chest', { fade: 0.06, speed: 1.1, then: () => stopOvr(0.2) });
+  toast('Guard broken', 1000); log('guard broken');
+}
 // ---------------- bullet holes ----------------
 // Where a shot ends on a wall or the ground: a small scorched hole, a puff, sparks off walls. They last 20 s.
 const holes = [], MAX_HOLES = 80;
@@ -2260,7 +2430,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v23 · 2026-09-30';
+const BUILD = 'v24 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -2588,11 +2758,17 @@ function endSlide(cancel) {
 // Attack uses the item (throws a grenade, uses a stim). Everything you loot lands here.
 const ITEMS = {
   saber:   { name: 'Lightsaber', gear: 'lit', icon: 'saber' },
-  pistol:  { name: 'Pistol', gear: 'pistol', icon: 'pistol' },
+  pistol:  { name: 'Pistol', gear: 'pistol', gun: 'pistol', icon: 'pistol' },
+  ak:      { name: 'AK-47', gear: 'pistol', gun: 'ak', icon: 'pistol' },
+  shotgun: { name: 'Pump shotgun', gear: 'pistol', gun: 'shotgun', icon: 'pistol' },
+  sniper:  { name: 'Sniper rifle', gear: 'pistol', gun: 'sniper', icon: 'pistol' },
   grenade: { name: 'Frag grenade', stack: 10, icon: 'grenade', use: 'throw' },
   stim:    { name: 'Stim pack', stack: 5, icon: 'stim', use: 'stim' },
   credits: { name: 'Credits', stack: 9999, icon: 'coin' },
   ammo:    { name: 'Pistol ammo', stack: 120, icon: 'ammo' },
+  ammo_rifle:  { name: 'Rifle ammo', stack: 300, icon: 'ammo' },
+  ammo_shells: { name: 'Shotgun shells', stack: 60, icon: 'ammo' },
+  ammo_sniper: { name: 'Sniper rounds', stack: 40, icon: 'ammo' },
   cell:    { name: 'Power cell', stack: 10, icon: 'cell' },
   ration:  { name: 'Ration bar', stack: 10, icon: 'ration' },
   chip:    { name: 'Data chip', stack: 10, icon: 'chip' },
@@ -2600,7 +2776,7 @@ const ITEMS = {
   comlink: { name: 'Comlink', stack: 1, icon: 'comlink' },
   kyber:   { name: 'Kyber shard', stack: 5, icon: 'gem', rare: true },
 };
-const LOOT_IDS = { Credits: 'credits', 'Pistol ammo': 'ammo', 'Power cell': 'cell', 'Stim pack': 'stim', 'Frag grenade': 'grenade',
+const LOOT_IDS = { Credits: 'credits', 'Pistol ammo': 'ammo', 'Rifle ammo': 'ammo_rifle', 'Shotgun shells': 'ammo_shells', 'Sniper rounds': 'ammo_sniper', 'Power cell': 'cell', 'Stim pack': 'stim', 'Frag grenade': 'grenade',
   'Ration bar': 'ration', 'Data chip': 'chip', Keycard: 'keycard', Comlink: 'comlink', 'Kyber shard': 'kyber' };
 // item pictures: the lightsaber, pistol and grenade are rendered from their 3D models at load (see renderThumbs);
 // everything else is a two-tone drawing
@@ -2642,7 +2818,8 @@ function thumbOf(obj, { yaw = 0.6, pitch = 0.35, roll = 0, fill = 0.8 } = {}) {
 }
 function renderThumbs() {
   try {
-    if (pistolModel) thumbs.pistol = thumbOf(pistol.root.children[0].clone(true), { yaw: 0, pitch: 0, fill: 0.95 });
+    if (pistolModel) thumbs.pistol = thumbOf(guns.pistol.root.children[0].clone(true), { yaw: 0, pitch: 0, fill: 0.95 });
+    for (const k of ['ak', 'shotgun', 'sniper']) if (guns[k]) thumbs[k] = thumbOf(guns[k].root.children[0].clone(true), { yaw: 0, pitch: 0, fill: 0.98 });
     const sb = makeSaber(false); for (const b of sb.blades) { b.visible = true; b.scale.y = 1; }
     thumbs.saber = thumbOf(sb.root, { yaw: 0.3, pitch: 0, roll: -0.8, fill: 0.92 });
     thumbs.grenade = thumbOf(makeGrenade(), { yaw: 0.4, pitch: 0.2, fill: 0.85 });
@@ -2650,16 +2827,19 @@ function renderThumbs() {
   renderInv();
 }
 const HOT = 6; // hotbar slots (v23: six, centred)
-const inv = { hot: [{ id: 'saber', qty: 1 }, { id: 'pistol', qty: 1 }, { id: 'grenade', qty: 5 }, null, null, null], bag: new Array(20).fill(null), active: 0 };
+const inv = { hot: [{ id: 'saber', qty: 1 }, { id: 'pistol', qty: 1 }, { id: 'grenade', qty: 5 }, { id: 'ak', qty: 1 }, { id: 'shotgun', qty: 1 }, { id: 'sniper', qty: 1 }], bag: new Array(20).fill(null), active: 0 };
 try { const s = JSON.parse(localStorage.getItem('inv') || 'null'); if (s && s.hot?.length >= 5 && s.bag?.length === 20) { while (s.hot.length < HOT) s.hot.push(null); Object.assign(inv, s); } } catch (_) {}
 const saveInv = () => { try { localStorage.setItem('inv', JSON.stringify(inv)); } catch (_) {} };
+try { if (!localStorage.getItem('v24-guns')) { // hand out the new guns once, into free slots
+  for (const id of ['ak', 'shotgun', 'sniper']) if (![...inv.hot, ...inv.bag].some((x) => x && x.id === id)) { const arr = inv.hot.includes(null) ? inv.hot : inv.bag, i = arr.indexOf(null); if (i >= 0) arr[i] = { id, qty: 1 }; }
+  localStorage.setItem('v24-guns', '1'); saveInv(); } } catch (_) {}
 const slotAt = (where, i) => (where === 'hot' ? inv.hot : inv.bag)[i];
 const setSlot = (where, i, v) => { (where === 'hot' ? inv.hot : inv.bag)[i] = v; };
 function slotHTML(it, where, i) {
   const def = it && ITEMS[it.id];
   const icon = !def ? '' : thumbs[it.id] ? `<img src="${thumbs[it.id]}" alt="" draggable="false">` : `<svg viewBox="0 0 30 30" aria-hidden="true">${ICON[def.icon]}</svg>`;
   const key = where === 'hot' ? `<span class="k">${i + 1}</span>` : '';
-  const n = it?.id === 'pistol' ? `<span class="n">${ammo.mag}</span>` : def && def.stack && it.qty > 1 ? `<span class="n">${testCfg.infiniteNades && it.id === 'grenade' ? '∞' : it.qty}</span>` : '';
+  const n = def?.gun ? `<span class="n">${ammo.mags[def.gun]}</span>` : def && def.stack && it.qty > 1 ? `<span class="n">${testCfg.infiniteNades && it.id === 'grenade' ? '∞' : it.qty}</span>` : '';
   const t = def && def.tag ? `<span class="t">${def.tag}</span>` : '';
   const label = def ? `${def.name}${it.qty > 1 ? ' ×' + it.qty : ''}` : 'Empty';
   return `<button type="button" class="slot${where === 'hot' && i === inv.active ? ' on' : ''}${def?.rare ? ' rare' : ''}" data-where="${where}" data-i="${i}" aria-label="Slot ${i + 1}: ${label}" title="${label}">${key}${icon}${n}${t}</button>`;
@@ -2677,6 +2857,7 @@ function selectSlot(i, quiet) {
   inv.active = (i + HOT) % HOT; saveInv();
   const it = inv.hot[inv.active], def = it && ITEMS[it.id];
   const want = def?.gear || 'none';
+  if (def?.gun && def.gun !== gunKind) setGunKind(def.gun);
   if (want !== gear) setGear(want);
   if (!quiet) toast(def ? def.name + (def.stack && it.qty > 1 ? ' ×' + it.qty : '') : 'Fists', 800);
   renderInv();
@@ -2766,8 +2947,8 @@ const LOOT_TABLE = [ // [name, min, max, weight, rare]; every body also carries 
 ];
 const lootLog = [];
 let looting = null, lootTarget = null, lootHideT = 0;
-function rollLoot() {
-  const n = 1 + Math.floor(Math.random() * 3), out = [{ name: 'Pistol ammo', qty: 30 + Math.floor(Math.random() * 7), rare: false }], total = LOOT_TABLE.reduce((a, r) => a + r[3], 0);
+function rollLoot(e) {
+  const n = 1 + Math.floor(Math.random() * 3), out = [e && e.gunKind === 'ak' ? { name: 'Rifle ammo', qty: 60 + Math.floor(Math.random() * 31), rare: false } : { name: 'Pistol ammo', qty: 30 + Math.floor(Math.random() * 7), rare: false }], total = LOOT_TABLE.reduce((a, r) => a + r[3], 0);
   for (let i = 0; i < n; i++) {
     let x = Math.random() * total, r = LOOT_TABLE[0];
     for (const row of LOOT_TABLE) { x -= row[3]; if (x <= 0) { r = row; break; } }
@@ -2795,16 +2976,16 @@ function findGun() {
 }
 function pickUpGun(pc) {
   removePiece(pc);
-  const rounds = 12, left = addItem('ammo', rounds);
-  const hadPistol = countItem('pistol') > 0; if (!hadPistol) addItem('pistol', 1);
-  toast(`Picked up a pistol: +${rounds - left} rounds${hadPistol ? '' : ' and the pistol'}`, 1400); renderAmmo(); log('picked up a pistol');
+  const kind = pc.kind || 'pistol', D = GUNS[kind], rounds = D.mag, left = addItem(D.ammo, rounds);
+  const had = countItem(kind) > 0; if (!had) addItem(kind, 1);
+  toast(`Picked up ${had ? 'ammo from' : 'a'} ${D.name}: +${rounds - left} rounds`, 1400); renderAmmo(); log('picked up', kind);
 }
 function startLoot() {
   if (looting || movesOpen || mode !== 'ground' || drawing) return;
   const e = lootTarget || findLootable(); if (!e) return;
   atk = null; blocking = false; crouch = false; speed = 0;
   yaw = moveYaw = Math.atan2(e.g.position.x - player.position.x, e.g.position.z - player.position.z);
-  looting = { e, t: 0, items: rollLoot(), shown: 0, relight: gear === 'lit' };
+  looting = { e, t: 0, items: rollLoot(e), shown: 0, relight: gear === 'lit' };
   e.looted = true; e.deadT = Math.min(e.deadT, CORPSE_TIME - 10); // a searched body stays a little longer
   playOvr('Fixing_Kneeling', { loop: true, fade: 0.35 });
   $('lootitems').innerHTML = ''; $('lootlist').querySelector('b').textContent = 'Searching…'; $('lootlist').hidden = false; lootHideT = 0;
@@ -2981,7 +3162,7 @@ function step(dt) {
   updateJetpackLook();
   updateCombat(dt); bladeCuts(dt);
   updateSaber(dt);
-  updateHoles(dt);
+  updateHoles(dt); updateBolts(dt);
   const te = performance.now(); updateEnemies(dt); updatePieces(dt); updateBlood(dt); perf.enemyAcc += performance.now() - te; updateGrenades(dt); updateFx(dt);
   animateLoco(dt, C);
   updateCamera(dt, C);
@@ -3088,9 +3269,10 @@ function animateLoco(dt, C) {
   applyFists();
   applyDraw();
   applyRecoil(dt);
+  holdRifle();
   if (gear === 'lit' && armed && ignite > 0.95 && (clipCheckN = (clipCheckN + 1) % 3) === 0) noteSaberClipping();
 }
-let debugTpose = false, clipCheckN = 0;
+let debugTpose = false, clipCheckN = 0, debugCam = null; // debugCam: test hook, a fixed camera {pos, at} for screenshots
 // three.js only rewrites a bone when the animation's value changed since last frame. Recoil, fists, the draw reach
 // and the air guard edit bones after the mixer, so with a still pose (aiming without moving the mouse) those edits
 // were never overwritten and piled up: the pistol climbed to the sky shot by shot (owner's report, fixed v23).
@@ -3123,7 +3305,11 @@ let shoulder = 1, shoulderK = 1; // camera over the right (1) or left (-1) shoul
 try { if (localStorage.getItem('shoulder') === '-1') shoulder = shoulderK = -1; } catch (_) {}
 let camKick = 0; // how far the last shots kicked the view up; eased back so recoil never leaves you aiming higher
 let aimZoom = 0;
+const BASE_FOV = 55;
 function updateCamera(dt, C) {
+  const scoped = gear === 'pistol' && pistolInHand && G().zoom && aimHeld && isStrafing();
+  const inScope = scoped && camera.fov < BASE_FOV * 0.6;
+  $('scope').hidden = !inScope; if (hero) hero.visible = !inScope; if (pistol && pistol.rifle) pistol.root.visible = !inScope; // the scope shows the world, not the back of your head
   if (camKick > 0) { const r = Math.min(camKick, camKick * 10 * dt + 0.0005); camPitch = clamp(camPitch + r, -0.45, 1.15); camKick -= r; }
   const sprintT = clamp((speed - C.jog) / (C.sprint - C.jog), 0, 1);
   const h = mode === 'slide' ? 1.05 : crouch ? 1.15 : 1.55;
@@ -3145,8 +3331,8 @@ function updateCamera(dt, C) {
   if (ch) camPos.copy(eye).addScaledVector(back, Math.max(0.3, ch.distance - 0.3));
   camera.position.copy(camPos);
   camera.lookAt(pivot.x + right.x, pivot.y, pivot.z + right.z);
-  const fov = lerp(55, klass === 'force' ? 66 : 62, sprintT);
-  if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = damp(camera.fov, fov, 4, dt); camera.updateProjectionMatrix(); }
+  const fov = scoped ? G().zoom : lerp(BASE_FOV, klass === 'force' ? 66 : 62, sprintT);
+  if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = damp(camera.fov, fov, scoped || camera.fov < BASE_FOV - 1 ? 16 : 4, dt); camera.updateProjectionMatrix(); } // the scope snaps in fast (quickscopes)
 }
 
 let hudN = 0;
@@ -3435,6 +3621,7 @@ function start() {
       try { mixHero(dt); applyFists(); } catch (_) {}
     }
     const t1 = performance.now();
+    if (debugCam) { camera.position.copy(debugCam.pos); camera.lookAt(debugCam.at); }
     renderer.render(scene, camera);
     perfSample(raw, t1 - t0, performance.now() - t1);
   });
@@ -3447,7 +3634,7 @@ function start() {
     cuts: () => enemies.map((e) => ({ id: e.id, state: e.state, severed: (e.severed || []).map((b) => b.name), unarmed: !!e.unarmed, gun: !!e.gun, label: e.cutLabel || null })),
     blood: () => ({ drops: drops.length, splats: splats.length, bleeders: bleeders.length, pieces: pieces.length, guns: pieces.filter((x) => x.gun).length, holes: holes.length }),
     get jetpackOn() { return !!gadgets.jetpack; }, get hotSlots() { return inv.hot.length; }, get shoulder() { return shoulder; }, countItem,
-    gunsNear: () => pieces.filter((x) => x.gun).map((x) => [+x.outer.position.x.toFixed(2), +x.outer.position.z.toFixed(2), x.rest]),
+    gunsNear: () => pieces.filter((x) => x.gun).map((x) => [+x.outer.position.x.toFixed(2), +x.outer.position.z.toFixed(2), x.rest, x.kind]),
     rearm: () => enemies.map((e) => ({ id: e.id, unarmed: !!e.unarmed, gunHand: e.gunHand || null, state: e.state })), setEnemyCount(n) { enemyCfg.count = n; respawnT = 0; filled = false; },
     // test hook: shoot from the camera at a zone of the i-th living enemy (head, torso or legs)
     shootAt(i, zone) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e) return null; fireCd = 0;
@@ -3457,6 +3644,9 @@ function start() {
     advance(sec) { for (let t = 0; t < sec; t += 1 / 30) step(1 / 30); timer.update(performance.now()); },
     // test hook: where the pistol barrel points (degrees above the horizon) against where the camera looks
     boneQ() { const o = {}; hero.traverse((b) => { if (b.isBone) o[b.name] = b.quaternion.toArray(); }); return o; },
+    setDebugCam(pos, at) { debugCam = pos ? { pos: new V3(...pos), at: new V3(...at) } : null; },
+    gunDebug() { hero.updateMatrixWorld(true); const r = pistol.root, box = new THREE.Box3().setFromObject(r), sz = box.getSize(new V3()); const o = r.localToWorld(new V3()), m = r.localToWorld(pistol.muzzle.clone()), f = pistol.fore ? r.localToWorld(pistol.fore.clone()) : null;
+      const inner = r.children[0]; return { kind: gunKind, box: sz.toArray().map((x) => +x.toFixed(2)), grip: o.toArray().map((x) => +x.toFixed(2)), muzzle: m.toArray().map((x) => +x.toFixed(2)), fore: f && f.toArray().map((x) => +x.toFixed(2)), innerRot: inner.rotation.toArray().slice(0, 3).map((x) => +x.toFixed(2)), innerChildRot: inner.children[0]?.rotation.toArray().slice(0, 3).map((x) => +x.toFixed(2)), innerScale: inner.scale.toArray().map((x) => +x.toFixed(3)) }; },
     aimProbe() { if (!pistol) return null; hero.updateMatrixWorld(true); const a = pistol.root.localToWorld(new V3(0, 0.03, 0)), m = pistol.root.localToWorld(new V3(0.2, 0.03, 0)), d = m.sub(a).normalize(), c = camera.getWorldDirection(new V3());
       return { camPitch: +camPitch.toFixed(3), barrelUp: +(Math.asin(d.y) * 57.3).toFixed(1), camUp: +(Math.asin(c.y) * 57.3).toFixed(1), off: +(d.angleTo(c) * 57.3).toFixed(1), recoil: +recoil.toFixed(2), guard: +guardBlend.toFixed(2) }; },
     enemyAct(i) { const e = enemies.filter((q) => q.state !== 'dead')[i] || enemies[i]; const a = e.act; return { name: e.actName, t: +a.time.toFixed(2), dur: +a.getClip().duration.toFixed(2), paused: a.paused, enabled: a.enabled, w: +a.getEffectiveWeight().toFixed(2), head: +e.bones.Head.getWorldPosition(new V3()).y.toFixed(2), others: e.mixer._actions.filter((x) => x !== a && x.isRunning()).map((x) => x.getClip().name + ':' + x.getEffectiveWeight().toFixed(2)) }; },
@@ -3467,7 +3657,12 @@ function start() {
     get events() { return events.slice(-12); },
     get drawing() { return drawing ? drawing.steps[drawing.i].kind + ' ' + drawing.i + '/' + drawing.steps.length : null; }, get pistolInHand() { return pistolInHand; },
     setGore(v) { enemyCfg.gore = v; },
-    get blockedShots() { return blockedShots; },
+    get blockedShots() { return blockedShots; }, get parries() { return parries; }, get guardBrokenT() { return guardBrokenT; }, get bolts() { return bolts.length; },
+    loadouts: () => enemies.map((e) => e.gunKind),
+    // test hooks: the i-th living soldier fires a bolt straight at you; arm soldier i with a gun kind
+    enemyBolt(i) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) shootBolt(e, true); return !!e; },
+    setLoadout(i, kind) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e || !guns[kind]) return; if (e.gun) e.gun.removeFromParent(); e.gun = guns[kind].root.clone(true); e.bones.hand_r.add(e.gun); const m = mounts.pistolHand; e.gun.position.copy(m.p); e.gun.quaternion.copy(m.q); e.gun.scale.copy(m.s); e.gunKind = kind; },
+    get gunKind() { return gunKind; }, get fov() { return camera.fov; }, ammoMags: () => ({ ...ammo.mags }), holdFire(v) { atkHeld = v; },
     setKey(code, down) { if (down) { keys.add(code); if (code === 'Space') { jumpQueued = true; jumpHeld = true; } if (code === 'KeyC') { slideQueued = true; slideHeld = true; } } else { keys.delete(code); if (code === 'Space') jumpHeld = false; if (code === 'KeyC') slideHeld = false; } }, get vy() { return vy; }, get y() { return player.position.y; },
     explodeAt(x, y, z) { explode(new V3(x, y, z)); },
     startLoot, get looting() { return looting ? { t: +looting.t.toFixed(2), shown: looting.shown, n: looting.items.length } : null; }, get lootLog() { return lootLog.slice(); }, get lootTarget() { return lootTarget ? lootTarget.id : null; },
