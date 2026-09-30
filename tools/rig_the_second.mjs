@@ -59,6 +59,10 @@ const out = await p.evaluate(async ([heroB64, meshB64]) => {
     const pw = up.parent.getWorldQuaternion(new THREE.Quaternion());
     const w = q.multiply(up.getWorldQuaternion(new THREE.Quaternion()));
     up.quaternion.copy(pw.invert().multiply(w)); H.updateMatrixWorld(true);
+    // his arms are longer than the Superhero's: stretch elbow and wrist offsets (animations only rotate these bones)
+    const stretch = c.distanceTo(sh) / P('hand_' + side).lerp(P('middle_01_' + side), 0.5).distanceTo(sh);
+    for (const nm of ['lowerarm_', 'hand_']) byName.get(nm + side).position.multiplyScalar(stretch);
+    H.updateMatrixWorld(true); log['armStretch_' + side] = +stretch.toFixed(3);
     log['hand_' + side] = { verts: k, at: c.toArray().map((v) => +v.toFixed(3)), palmNow: P('hand_' + side).lerp(P('middle_01_' + side), 0.5).toArray().map((v) => +v.toFixed(3)) };
   }
   // 2. weights: distance to bone segments
@@ -67,28 +71,103 @@ const out = await p.evaluate(async ([heroB64, meshB64]) => {
     [`hand_${x}`, `middle_02_${x}`], [`thigh_${x}`, `calf_${x}`], [`calf_${x}`, `foot_${x}`], [`foot_${x}`, `ball_${x}`], [`ball_${x}`, `ball_leaf_${x}`]);
   const segs = SEG.map(([a, bn, len]) => { const A = P(a), B = bn ? P(bn) : A.clone().add(new THREE.Vector3(0, len * hgt / 1.8, 0)); return { bone: bones.indexOf(byName.get(a)), name: a, A, B }; });
   const side = (name) => (/_l$/.test(name) ? Math.sign(P('hand_l').x - pel.x) : /_r$/.test(name) ? -Math.sign(P('hand_l').x - pel.x) : 0);
+  // Solid occupancy grid (about 1 cm voxels): a vertex may only bind to a bone it can reach through the body.
+  // Without this, the sides of the torso and hips (right next to the hanging arms in the A-pose) went to the arm
+  // bones and were dragged out like wings whenever the arms moved (owner's report, v20).
+  const vox = 0.01 * hgt / 1.8, gmin = geo.boundingBox.min.clone().subScalar(3 * vox), gmax = geo.boundingBox.max.clone().addScalar(3 * vox);
+  const NX = Math.ceil((gmax.x - gmin.x) / vox), NY = Math.ceil((gmax.y - gmin.y) / vox), NZ = Math.ceil((gmax.z - gmin.z) / vox);
+  const cell = (x, y, z) => x + NX * (y + NY * z);
+  const tri = [], ix = geo.index.array;
+  for (let t = 0; t < ix.length; t += 3) tri.push([ix[t], ix[t + 1], ix[t + 2]].map((k) => new THREE.Vector3().fromBufferAttribute(pos, k)));
+  // parity fill along one axis: a (u, w) column is inside between pairs of surface crossings
+  const fill = (ax) => {
+    const [u, w, d] = ax === 'z' ? ['x', 'y', 'z'] : ['z', 'y', 'x'];
+    const NU = ax === 'z' ? NX : NZ, NW = NY, ND = ax === 'z' ? NZ : NX;
+    const cols = new Map(), occ = new Uint8Array(NX * NY * NZ);
+    for (const [A, B, C] of tri) {
+      const umin = Math.floor((Math.min(A[u], B[u], C[u]) - gmin[u]) / vox), umax = Math.ceil((Math.max(A[u], B[u], C[u]) - gmin[u]) / vox);
+      const wmin = Math.floor((Math.min(A[w], B[w], C[w]) - gmin[w]) / vox), wmax = Math.ceil((Math.max(A[w], B[w], C[w]) - gmin[w]) / vox);
+      const den = (B[w] - C[w]) * (A[u] - C[u]) + (C[u] - B[u]) * (A[w] - C[w]); if (Math.abs(den) < 1e-14) continue;
+      for (let i = umin; i <= umax; i++) for (let j = wmin; j <= wmax; j++) {
+        const pu = gmin[u] + (i + 0.5) * vox, pw = gmin[w] + (j + 0.5) * vox;
+        const a = ((B[w] - C[w]) * (pu - C[u]) + (C[u] - B[u]) * (pw - C[w])) / den, b = ((C[w] - A[w]) * (pu - C[u]) + (A[u] - C[u]) * (pw - C[w])) / den, c = 1 - a - b;
+        if (a < 0 || b < 0 || c < 0) continue;
+        const key = i + NU * j; if (!cols.has(key)) cols.set(key, []); cols.get(key).push(a * A[d] + b * B[d] + c * C[d]);
+      }
+    }
+    for (const [key, zs] of cols) {
+      zs.sort((p, q) => p - q); const i = key % NU, j = Math.floor(key / NU);
+      for (let k = 0; k + 1 < zs.length; k += 2) {
+        const k0 = Math.max(0, Math.floor((zs[k] - gmin[d]) / vox)), k1 = Math.min(ND - 1, Math.ceil((zs[k + 1] - gmin[d]) / vox));
+        for (let m = k0; m <= k1; m++) occ[ax === 'z' ? cell(i, j, m) : cell(m, j, i)] = 1;
+      }
+    }
+    return occ;
+  };
+  const oz = fill('z'), ox = fill('x'), solid = new Uint8Array(oz.length);
+  for (let i = 0; i < solid.length; i++) solid[i] = oz[i] & ox[i];
+  const inside = (p) => {
+    const x = Math.floor((p.x - gmin.x) / vox), y = Math.floor((p.y - gmin.y) / vox), z = Math.floor((p.z - gmin.z) / vox);
+    for (let dz = -1; dz <= 1; dz++) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { // one voxel of slack
+      const X = x + dx, Y = y + dy, Z = z + dz; if (X >= 0 && Y >= 0 && Z >= 0 && X < NX && Y < NY && Z < NZ && solid[cell(X, Y, Z)]) { if (dx === 0 && dy === 0 && dz === 0) return true; }
+    }
+    return solid[cell(Math.min(NX - 1, Math.max(0, x)), Math.min(NY - 1, Math.max(0, y)), Math.min(NZ - 1, Math.max(0, z)))] === 1;
+  };
+  if (!geo.attributes.normal) geo.computeVertexNormals();
+  const nrm = geo.attributes.normal, st = V(), q = V(), nv = V();
+  const reach = (from, to) => { // the straight path from a point just under the skin to the bone stays inside the body
+    const L = from.distanceTo(to), k = Math.max(1, Math.ceil(L / (vox * 0.7)));
+    for (let m = 1; m <= k; m++) { q.lerpVectors(from, to, m / k); if (!inside(q)) return false; }
+    return true;
+  };
   const NB = segs.length, W = new Float32Array(n * NB), v = V(), ab = V(), av = V();
+  let blind = 0; const blindSet = new Set();
   for (let i = 0; i < n; i++) {
-    v.fromBufferAttribute(pos, i);
-    const d = segs.map((sg) => {
+    v.fromBufferAttribute(pos, i); nv.fromBufferAttribute(nrm, i);
+    st.copy(v).addScaledVector(nv, -1.5 * vox);
+    const near = segs.map((sg) => {
       ab.subVectors(sg.B, sg.A); av.subVectors(v, sg.A);
       const t = Math.min(1, Math.max(0, av.dot(ab) / ab.lengthSq()));
-      let dist = av.sub(ab.multiplyScalar(t)).length();
+      const cp = sg.A.clone().addScaledVector(ab, t);
+      let dist = v.distanceTo(cp);
       const sd = side(sg.name); if (sd && (v.x - pel.x) * sd < -0.04) dist += 1; // never across the body
-      return dist;
+      return { dist, cp };
     });
-    const order = d.map((x, j) => j).sort((a, b) => d[a] - d[b]);
-    const [a, b] = order;
-    if (d[b] < d[a] * 1.35) { const wa = 1 / d[a] ** 4, wb = 1 / d[b] ** 4; W[i * NB + a] = wa / (wa + wb); W[i * NB + b] = wb / (wa + wb); }
+    const order = near.map((x, j) => j).sort((a, b) => near[a].dist - near[b].dist);
+    const ok = order.slice(0, 6).filter((j) => near[j].dist < 1 && reach(st, near[j].cp));
+    if (!ok.length) { blindSet.add(i); blind++; continue; }
+    const d = (j) => near[j].dist, [a, b] = ok;
+    if (b !== undefined && d(b) < d(a) * 1.35) { const wa = 1 / d(a) ** 4, wb = 1 / d(b) ** 4; W[i * NB + a] = wa / (wa + wb); W[i * NB + b] = wb / (wa + wb); }
     else W[i * NB + a] = 1;
   }
+  // his back tank and hose ride on the upper spine, not the shoulders (they stretched into spikes when the arms moved)
+  const s03 = segs.findIndex((sg) => sg.name === 'spine_03'), zc = (geo.boundingBox.min.z + geo.boundingBox.max.z) / 2, u = 1.995 / hgt;
+  let tank = 0;
+  for (let i = 0; i < n; i++) {
+    const back = -(pos.getZ(i) - zc) * fwdZ * u, yy = (pos.getY(i) - y0) / hgt, xx = Math.abs(pos.getX(i) - pel.x) * u;
+    if (back > 0.12 && yy > 0.6 && yy < 1.0 && xx < 0.25) { for (let j = 0; j < NB; j++) W[i * NB + j] = 0; W[i * NB + s03] = 1; blindSet.delete(i); tank++; }
+  }
+  log.tankVerts = tank;
+  log.blindVerts = blind; log.voxels = [NX, NY, NZ]; log.solidFrac = +(solid.reduce((x, y) => x + y, 0) / solid.length).toFixed(3);
   // UV seams split vertices; copies at the same spot must end with the same weights, or the mesh cracks when it bends
   const canon = new Int32Array(n), seen = new Map();
   for (let i = 0; i < n; i++) { const key = [pos.getX(i), pos.getY(i), pos.getZ(i)].map((x) => Math.round(x * 1e5)).join(','); if (!seen.has(key)) seen.set(key, i); canon[i] = seen.get(key); }
-  // smooth the weights along mesh edges (softer joints), over the welded mesh
   const idx = geo.index.array, nbr = Array.from({ length: n }, () => new Set());
   for (let t = 0; t < idx.length; t += 3) for (const [a, b] of [[idx[t], idx[t + 1]], [idx[t + 1], idx[t + 2]], [idx[t + 2], idx[t]]]) { const ca = canon[a], cb = canon[b]; if (ca !== cb) { nbr[ca].add(cb); nbr[cb].add(ca); } }
-  for (let it = 0; it < 3; it++) {
+  // vertices that reach no bone (thin fingers, the tank) take the weights of their resolved neighbours, spreading inwards
+  for (const i of [...blindSet]) if (canon[i] !== i && !blindSet.has(canon[i])) { for (let j = 0; j < NB; j++) W[i * NB + j] = W[canon[i] * NB + j]; blindSet.delete(i); }
+  for (let pass = 0; pass < 200 && blindSet.size; pass++) {
+    const done = [];
+    for (const i of blindSet) {
+      const c = canon[i], ns = [...nbr[c]].filter((m) => !blindSet.has(m)); if (!ns.length) continue;
+      for (let j = 0; j < NB; j++) { let sum = 0; for (const m of ns) sum += W[m * NB + j]; W[i * NB + j] = sum / ns.length; }
+      done.push(i);
+    }
+    if (!done.length) break; for (const i of done) blindSet.delete(i);
+  }
+  log.unresolved = blindSet.size;
+  // smooth the weights along mesh edges (softer joints), over the welded mesh
+  for (let it = 0; it < 2; it++) {
     const W2 = new Float32Array(W.length);
     for (let i = 0; i < n; i++) {
       if (canon[i] !== i) continue;

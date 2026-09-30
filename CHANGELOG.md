@@ -2,6 +2,15 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v20.1: The Second's rig fixed (lumps and stretching)
+- **Fixed your report:** big lumps and webbing between his arms and thighs whenever the arms moved (jumps, folded arms), and bulging hips.
+  - **Cause:** the rig attached each part of the body to the closest bone in a straight line. His arms hang right beside his hips and ribs, so those got attached to the arm bones and were dragged along.
+  - **Fix:** a part can now only attach to a bone it can reach through the body itself, never across the air gap next to the arm (`tools/rig_the_second.mjs`, using a solid voxel model of him).
+- **His arms fit:** the skeleton's forearms and wrists are stretched about 13% to match his longer arms, so the hands bend at his wrists.
+- **His back tank** rides on the upper spine. Before, it stretched into spikes when he moved his shoulders.
+- **New tool:** `tools/posesheet_second.mjs` renders him in the poses that showed the problem (colour-by-bone, arms folded, jumps, sprint, saber, punch), front or side.
+- `test24` also takes a jump screenshot.
+
 ## v20: The Second is playable
 - **You now play as The Second**, a 3D model made from your four turnaround images (front, back, left, right).
   - He has the helmet with its silver stripes, the chest plate markings, the metal left arm, the thigh pouches and boots, and the tank and hose on his back.
