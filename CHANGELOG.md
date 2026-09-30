@@ -19,7 +19,7 @@ Playable build: `dist/index.html`, also published at the claude.ai artifact link
   - **About a third of soldiers carry AK-47s** and fire bursts of real bullets, which **can't be deflected**.
 - **Their guns drop and you can take them:** walk over a dropped AK to get it and its rounds. AK soldiers' bodies have rifle ammo (60–90 rounds) when you search them.
 - **Automated test:** `tools/test28-guns.mjs` covers AK auto fire, the shotgun kill and knock-back, the sniper scope and one-shot, the parry kill, held-block deflect, an unguarded back, guard break, AK drop and pickup, and mixed loadouts. All earlier tests pass.
-- Build: 15.77 MB (limit 16).
+- Build: 15.67 MB (limit 16).
 
 ## v23: roadmap batch 1 (fixes, limb loss, pickups, 6-slot hotbar)
 - **The pistol no longer climbs to the sky.** This was your report, and the root cause was an engine detail.
