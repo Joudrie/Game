@@ -2,6 +2,27 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v29: batch 7 (juggernauts, shields, saber duels, sneaking, Mission 3, move presets, falls)
+- **You're still invincible** (v28.1). Duellist hits and fall damage only count on the damage levels in Weapon → Difficulty.
+- **Special soldiers** turn up in the sandbox now and then (Menu → Tests turns that off, and has buttons to spawn one in front of you).
+  - **Juggernaut** (MW2, Halo): a shimmering skin-tight force field. It takes **three saber hits** (or plenty of bullets, even headshots) to drop. He's too heavy to throw far and walks at you firing long bursts. **A sticky grenade kills him outright.** With the field down he dies like anyone.
+  - **Shield soldier** (Halo's Jackals): a hand-held energy shield covers his front. Shots and the saber from the front hit the shield; **get round him**, or break it (two saber hits or several shots).
+  - **Saber duellist** (Jedi: Survivor): a red blade. From the front he **blocks your swings** (three before his guard breaks, recovering over time) and **bats away your shots**. He closes in and swings: **block just as it lands to parry** and he staggers. Your raised guard clashes with his blade rather than cutting him.
+- **Sneak (V):** a slow, quiet stealth walk. Soldiers see you at about half the range, as when crouching. Sprinting ends it. (V used to be the walk toggle.)
+- **Holocloak** (from *Wake*): 8 s of near-invisibility, then a 20 s recharge. Guards can't see you beyond arm's length. A loud shot ends it. It's in the creative catalogue, and it's the reward for Mission 3.
+- **Mission 3: Infiltration.**
+  - **The job:** ten guards patrol the courtyard, two of them watching from the balcony. Download the plans at the terminal up there (**G**, 3 s, stay close) and leave through the south gate.
+  - **Any guard alerted and it's over;** kill one before he finishes shouting and nobody knows.
+  - **Your kit:** your pistol wears a suppressor for the mission, and your own attachments come back afterwards.
+  - **Missions now take your earned gear:** the holocloak is in the kit once you have it.
+- **Falls:** a long drop (about 8 m or more) hurts everyone but the Force class on the damage levels. Soldiers thrown from high up die ("Fell to his death"), so push them off the tower. The tower's deadly edge is striped red and white. **The blue berry** (on the tower top and the balcony, respawning; also in the catalogue) makes you fall-proof for 30 s with a blue sheen.
+- **Move presets** (your v20 ask; Menu → Moves):
+  - a ★ on every variant marks your favourite
+  - **Mix it up** rotates through what's ticked (as before)
+  - **Always my favourites** plays the starred one every time
+  - **three packs** save and load the whole set for the class
+- **Tests:** `tools/test33-batch7.mjs` covers all of the above, and `tools/serve.sh` runs a test with its own short-lived server. Build 14.64 MB.
+
 ## v28.1: invincible while testing
 - **The player is invincible by default** (owner's rule for the testing phase). Nothing hurts you: bolts, bullets, fire, your own grenade.
 - **Every existing save is switched to it once.** The other levels (Easy to Extreme) stay under Weapon → Difficulty for trying damage out; the level is now called **Invincible** instead of Sandbox.
