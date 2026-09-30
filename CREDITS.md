@@ -28,6 +28,7 @@ Most assets are CC0 (public domain) and need no credit. The ones below need cred
 - **Sounds (v24):** Free Firearm Sound Library (Walther PPQ, AK-47, Nova, Mosin-Nagant), OpenGameArt shotgun cock and handgun reload, Freesound 267895 (bolt), and Kenney Sci-fi Sounds (blaster, deflect, parry). All CC0. See `build/sfx/SOURCE.txt`; made by `tools/make_sfx.sh`.
 - **Saber and Force sounds (v25):** Freesound 47124, 47125, 47126 (gyzhor), 591433 and 423799, plus Kenney forceField_001. All CC0; see `build/sfx/SOURCE.txt`.
 - **v27:** the M4 carbine (AssaultRifle2_4), suppressor (Silencer_Short) and scope (Scope_1) from the same Quaternius *Ultimate Gun Pack* (CC0). Sounds: Free Firearm Sound Library AR-15, Kenney Impact Sounds (glass and wood breaking), and Freesound 609587 (grenade blast). All CC0; see `build/GUNS_SOURCE.txt` and `build/sfx/SOURCE.txt`.
+- **v30:** fire flames and smoke are Kenney's *Particle Pack* (CC0), in `build/fx_flames.png` and `build/fx_smoke.png`. See `assets/misc/particles/SOURCE.txt`.
 - Everything else (Kenney, Quaternius, OpenGameArt CC0, Freesound CC0, Free Firearm Sound Library) is CC0. Libraries (Rapier, Jolt, cannon-es, three-vrm, nipplejs, Yuka, Sketchbook, three-fps) are MIT or Apache-2.0.
 
 ## Not included (need a login)

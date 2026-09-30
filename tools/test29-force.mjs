@@ -34,7 +34,7 @@ await ev(() => { __game.chokeStart(); __game.advance(0.8); });
 const lifted = (await ev(() => __game.enemies())).find((x) => x.id === ct);
 check(lifted.state === 'choked' && lifted.pos[1] > 0.5, `choke lifts him (y ${lifted.pos[1]})`);
 await p.screenshot({ path: `${OUT}/v25-choke.png` });
-await ev(() => __game.advance(2));
+await ev(() => __game.advance(4)); // v30: the choke lasts 4.5 s
 check((await ev(() => __game.enemies())).find((x) => x.id === ct).state === 'dead', 'held long enough, the choke kills');
 await ev(() => { __game.chokeEnd(); __game.fillEnemies(); __game.advance(3); }); await park();
 // lightning
@@ -67,8 +67,8 @@ await ev(() => { __game.look(0, 0.1); __game.advance(1); });
 
 // saber + blaster: four shots overheat
 await ev((bs) => { __game.selectSlot(bs); __game.advance(1.5); }, bs);
-st = await ev(() => { for (let i = 0; i < 5; i++) { __game.fireBlaster(); __game.advance(0.25); } return __game.forceState(); });
-check(st.blaster && st.overheat > 0, `saber + blaster overheats after 4 quick shots (overheat ${st.overheat.toFixed(1)} s)`);
+st = await ev(() => { for (let i = 0; i < 8; i++) { __game.fireBlaster(); __game.advance(0.2); } return __game.forceState(); });
+check(st.blaster && st.overheat > 0, `saber + blaster overheats after 6 quick shots (overheat ${st.overheat.toFixed(1)} s)`);
 await p.screenshot({ path: `${OUT}/v25-saberblaster.png` });
 
 // triple jump, each higher

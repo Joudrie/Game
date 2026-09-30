@@ -1,0 +1,3 @@
+Kenney "Particle Pack" 1.1 (CC0), https://kenney.nl/assets/particle-pack, downloaded 2026-09-30.
+build/fx_flames.png: flame_01..04 (transparent PNGs) scaled to 128 px and laid side by side (a 4-frame atlas).
+build/fx_smoke.png: smoke_07 scaled to 128 px. Used by the fire grenade (v30).
