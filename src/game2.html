@@ -2067,7 +2067,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v20.1 · 2026-09-30';
+const BUILD = 'v20.2 · 2026-09-30';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -3028,6 +3028,10 @@ function buildMoves() {
   h.push(`</section>`);
   $('weaponbody').innerHTML = h.join(''); h.length = 0;
   h.push(`<section data-panel="moves">`);
+  // the character switch also lives here, where people look for it first (it's in the Weapon panel too)
+  h.push(`<h3>Character <small>reloads the game</small></h3><div class="seg" role="group" aria-label="Character" style="grid-template-columns:repeat(2,1fr)">`);
+  for (const [k, l] of [['second', 'The Second'], ['superhero', 'Superhero']]) h.push(`<button type="button" data-char="${k}" aria-pressed="${charCfg === k}">${l}</button>`);
+  h.push(`</div>`);
   for (const [slot, m] of Object.entries(MOVES)) {
     h.push(`<h3>${m.label} <small>${m.variants.length} found</small></h3>`);
     for (const v of m.variants) {

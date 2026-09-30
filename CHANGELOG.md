@@ -2,6 +2,10 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v20.2: character switch in the Menu
+- The Second / Superhero switch is now at the top of **Menu → Moves** too; it was only in the Weapon panel, so there was no obvious way back after switching.
+- Your other requests (jetpack off by default, the pistol stuck pointing up after recoil, bullet holes, a better pistol, move presets) are in `BACKLOG.md` under "On hold until The Second's rig is finished".
+
 ## v20.1: The Second's rig fixed (lumps and stretching)
 - **Fixed your report:** big lumps and webbing between his arms and thighs whenever the arms moved (jumps, folded arms), and bulging hips.
   - **Cause:** the rig attached each part of the body to the closest bone in a straight line. His arms hang right beside his hips and ribs, so those got attached to the arm bones and were dragged along.

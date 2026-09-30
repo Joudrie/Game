@@ -26,9 +26,19 @@ Everything asked for so far that isn't built yet, grouped so nothing gets lost. 
 - [ ] **Dismemberment polish:** choose the cut from where the blade actually passed; limbs cut off living soldiers (they keep fighting one-armed); blood decals on the ground.
 - [ ] **More combat moves:** air slash combos, a dash strike, a grapple yank (pull the enemy to you instead), a finisher on stunned soldiers.
 
+## 0. On hold until The Second's rig is finished (owner's order, v20.2)
+- [ ] **Jetpack off by default;** you turn it on yourself. (The switch exists in the Weapon panel; the default flips.)
+- [ ] **Pistol stuck pointing at the sky:** after aiming and firing, recoil leaves the gun pointing up until the mouse moves again. Find the root cause (recoil offset not decaying while the mouse is still).
+- [ ] **Bullet holes** where shots hit boxes and the ground; short-lived decals.
+- [ ] **A better pistol model** from a free, licensed source.
+- [ ] **Move presets:** instead of rotating at random, pick a default per slot (and saved presets), e.g. "always this idle, this run".
+- [ ] **Easy model switching:** The Second or the default hero. v20.2 put the switch in Menu → Moves; a quicker toggle could follow.
+
 ## 1b. The Second
 - [x] **Playable 3D model from the turnarounds** (v20).
-- [ ] **Polish:** longer arms in the skeleton (the model's hands hang about 7 cm past the rig's wrists), finger bones for a real grip, and a sharper texture (2048 px if the size budget allows).
+- [x] **Rig fix (v20.1):** lumps and webbing between arms and hips, forearm shards, tank spikes, arm length.
+- [ ] **Finish the rig (current priority):** fingers that close around the hilt, the tank's top nozzle still tipping, elbow and knee positions checked against the model, and whatever the owner finds in play.
+- [ ] **Sharper texture** (2048 px if the size budget allows).
 - [ ] **More characters** from the owner's paintings and Lego figures, using the same pipeline.
 
 ## 2. Lightsaber
