@@ -11,8 +11,12 @@ Playable build: `dist/index.html`, also published at the claude.ai artifact link
   - **Four uniforms, rotated at random:** urban (the original black), desert, woodland and arctic. There are also four skin tones.
   - **Smaller heads** (86%), which look less cartoon-like. A severed head keeps the size.
   - **Mixed weapons:** pistols (half), AK-47s, M4s and pump shotguns. A shotgun soldier fires three pellets from under 20 m, and his body drops shotgun shells.
+- **Energy shield for you** (new item, *Pistol + energy shield*, in your backpack): the pistol in your right hand, a round energy shield held out on your left arm.
+  - It stops blaster bolts, bullets and sniper rounds from the front (they spark off it); shots from behind get through.
+  - Each hit drains it (a sniper round nearly half), and it recharges after 2.5 s without a hit. Drained, it drops for 5 s.
+- **The shield soldier** now holds his pistol one-handed with his left forearm out in front, the shield on it.
 - **Fix:** v30's fire smoke was never created (a comment swallowed the line). It rises now.
-- Build: 15.2 MB (the world packs add 0.36 MB, meshopt-compressed). Test: `tools/test35-world.mjs`.
+- Build: 15.2 MB (the world packs add 0.36 MB, meshopt-compressed). Tests: `tools/test35-world.mjs`, `tools/test36-shield.mjs`.
 
 ## v30: fixes from your PC play test of v29
 - **Rifles:**

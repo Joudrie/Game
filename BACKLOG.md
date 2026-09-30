@@ -58,7 +58,7 @@ Your play-by-play, item by item. v30 takes the fixes, and v31 the downloaded ass
   - teleporting while falling left you stuck in the jump pose, and so did pressing X in the air
 - [x] **Blue berry:** a subtle blue aura rather than turning blue all over. Show how long it lasts.
 - [x] **Holocloak:** show how long it lasts.
-- [ ] **Shields for the player** to use.
+- [x] **Shields for the player** to use. *(v31: Pistol + energy shield)*
 
 **Movement**
 - [x] **Air control:** when jumping straight up beside a building you can't steer onto it. Let you move in the air.
@@ -66,7 +66,7 @@ Your play-by-play, item by item. v30 takes the fixes, and v31 the downloaded ass
 **Enemies**
 - [x] **When they shoot, they don't aim at you.**
 - [x] **Different skins,** rotated between spawns (for example a desert SWAT); **heads too big** (too cartoon, not serious); **mixed weapons**.
-- [~] **Shield soldier:** the shield on his arm *(v30: held at his hand, and it takes one blast; the one-handed stance comes in v31)*, a one-handed pistol stance; a sticky grenade on the shield can leave him alive.
+- [x] **Shield soldier:** the shield on his arm *(v30: held at his hand, and it takes one blast; v31: the one-handed stance)*, a one-handed pistol stance; a sticky grenade on the shield can leave him alive.
 - [x] **Cutting a soldier in half turns his whole body red:** blood belongs at the cut.
 - [x] **More enemies** in the sandbox.
 
