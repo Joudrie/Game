@@ -1,0 +1,6 @@
+36 run 1 exit=0
+36 run 2 exit=0
+36 run 3 exit=0
+33 run 1 exit=1
+33 run 2 exit=0
+33 run 3 exit=1

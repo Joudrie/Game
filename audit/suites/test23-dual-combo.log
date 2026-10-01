@@ -1,0 +1,6 @@
+chain 1 Sword_Regular_A → MR_Sword_Regular_A → Sword_Regular_B → MR_Sword_Regular_B → KK_Dual_Slice → KK_Dual_Chop
+chain 2 Sword_Regular_A → MR_Sword_Regular_A → Sword_Regular_C → MR_Sword_Attack → KK_Dual_Stab
+chain 3 KK_Dual_Slice → KK_Dual_Chop → MR_Sword_Regular_C → KK_Dual_Stab
+chain 4 Sword_Regular_A → MR_Sword_Regular_A → Sword_Regular_B → MR_Sword_Regular_B → KK_Dual_Slice → KK_Dual_Chop
+enemy hp 100 → -899 dead
+PASS

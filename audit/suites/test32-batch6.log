@@ -1,0 +1,21 @@
+ok   new throwables handed out (sticky 3, fire 2, orb 2)
+ok   sticky grenade stuck on the soldier ([{"kind":"sticky","stuck":true,"on":"xbp0"}])
+ok   it goes off and kills him (Head, upperarm_l, upperarm_r, thigh_l, thigh_r)
+ok   a thrown sticky sticks where it lands ([{"kind":"sticky","stuck":true,"on":null}])
+ok   the soldier in the fire catches fire
+ok   he runs about, then drops (Burned)
+ok   standing in fire hurts (0.68)
+ok   boards in the fire burn through (9)
+ok   the orb takes you where it lands (0,0,0 → 0,0,9.21)
+ok   X throws the throwable you picked last (fire)
+ok   dash strike across the gap: Saber · cut in half
+ok   grapple yank pulls him to you (dead, Saber · cut through the chest)
+ok   a crawling soldier offers a finisher (Finisher)
+ok   finisher (Finisher · saber)
+ok   grapple swing on a high hook, jump lets go ({"swing":true,"st":"pull","y":0.24}, then 53.01,0.05,3.23)
+ok   Mission 2 starts after 4 s
+ok   reinforcements keep coming (3 on the field)
+ok   held out: the jetpack is yours
+ok   the earned jetpack works in the mission (jet)
+ok   no page errors or reports (0, freeze: The game stopped for 1.6 s)
+all passed

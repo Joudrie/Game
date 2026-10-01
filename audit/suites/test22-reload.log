@@ -1,0 +1,13 @@
+icons rendered: [
+  'pistol',  'ak',
+  'shotgun', 'sniper',
+  'ar',      'saber',
+  'grenade'
+] img slots: 6
+after 12 shots: {"mag":0,"reload":null,"mags":0,"out":false,"hud":"0/ ∞Reload"}
+auto reload started: {"mag":0,"reload":{"t":0.27,"empty":true},"mags":1,"out":true,"hud":"0/ ∞Reloading"}
+after empty reload: {"mag":12,"reload":null,"mags":1,"out":false,"hud":"12/ ∞"}
+after tactical reload: {"mag":12,"reload":null,"mags":1,"out":false,"hud":"12/ ∞"}
+reserve 5 → mag 5 left 0
+no reserve: {"mag":0,"reload":null,"mags":2,"out":false,"hud":"5/ 0"}
+report freeze

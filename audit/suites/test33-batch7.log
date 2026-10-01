@@ -1,0 +1,27 @@
+ok   still invincible by default
+ok   a juggernaut spawns with his force field
+ok   bullets hit the field, not him (field 126 left, even a headshot)
+ok   saber hits drop his field (2 → 2 → 2 → 2 → 1 → 0 → 0 → 0 → 0 → 0); with it down he dies like anyone (Saber · right hand off)
+ok   a sticky grenade kills a juggernaut outright
+ok   a shot from the front hits the shield (126 left)
+ok   from behind (his back to you) a headshot kills him
+ok   enough shots shatter the shield
+ok   a saber duellist with a red blade and full guard
+FAIL he blocks your swings (guard 3 3 2 2 2 2 2 2 2 2 2 2) until a cut gets through (Saber · left hand off)
+ok   blocking just as his swing lands parries it: he staggers (38.9s special duel hpiw / 39.0s block / 39.0s duellist parried hpiw blocking true, guardBroken 0, atk null, gear lit, armed true, pos 0,0,0; {"id":"hpiw","type":"duel","state":"engage","jugg":null,"shield":null,"guard":0,"stagger":1.17,"attack":false})
+ok   V sneaks: a slow walk (1.50 m/s, walk)
+ok   the holocloak turns you nearly invisible for 8 s
+ok   a guard 6 m away looking right at you sees nothing while you are cloaked
+ok   a soldier on the tower top (y 8)
+ok   pushed off the tower, he dies from the fall (Fell to his death)
+ok   a long fall hurts (0.30) on a damage level; the blue berry makes you fall-proof
+ok   two blue berries lie in the courtyard (tower top, balcony)
+ok   Always my favourites: the starred idle every time (Idle_FoldArms_Loop, Idle_FoldArms_Loop, Idle_FoldArms_Loop)
+ok   a saved pack loads back
+ok   Mission 3: 10 guards on patrol, the terminal on the balcony
+ok   a guard raising the alarm fails the mission
+ok   download the plans at the terminal (extract)
+ok   out through the south gate: mission complete, the holocloak is yours
+ok   the pistol gets its own attachments back
+ok   no page errors or reports (0, freeze: The game stopped for 5.5 s)
+1 FAILED

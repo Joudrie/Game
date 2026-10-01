@@ -1,0 +1,14 @@
+ground 8 {"swingingSeconds":5,"maxHeight":4,"states":"pSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpS"}
+ground 14 {"swingingSeconds":0.5,"maxHeight":0.4,"states":"pSpSpSpSpSiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"}
+ground 22 {"swingingSeconds":0.4,"maxHeight":0.3,"states":"pSpSpSpSiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"}
+mid-jump 8 {"swingingSeconds":5,"maxHeight":5.2,"states":"pSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpS"}
+mid-jump 14 {"swingingSeconds":5,"maxHeight":4.6,"states":"pSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpS"}
+mid-jump 22 {"swingingSeconds":0.4,"maxHeight":0.4,"states":"pSpSpSpSiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"}
+mid-double-jump 8 {"swingingSeconds":5,"maxHeight":4.8,"states":"pSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpS"}
+mid-double-jump 14 {"swingingSeconds":5,"maxHeight":4.7,"states":"pSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpSpS"}
+mid-double-jump 22 {"swingingSeconds":0.9,"maxHeight":2.4,"states":"pSpSpSpSpSpSpSpSpSiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"}
+duel try 0 g1 g0:spine_01
+duel try 1 g1 g0:spine_01
+duel try 2 g2 g2:spine_03
+duel try 3 g2 g1 g0 g0:thigh_r g0:thigh_r+Head
+duel try 4 g2 g1 g1:lowerarm_l+spine_03

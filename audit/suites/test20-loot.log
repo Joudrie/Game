@@ -1,0 +1,6 @@
+prompt near body: { target: '6l0l', shown: true }
+mid-loot: {"l":{"t":1.2,"shown":2,"n":3},"lit":"lit","items":["+ Pistol ammo ×32","+ Data chip"]}
+done: {"l":null,"log":["Pistol ammo 32","Data chip 1","Frag grenade 2"],"items":["+ Pistol ammo ×32","+ Data chip","+ Frag grenade ×2"],"title":"Found"}
+prompt again on the same body: null
+cancel by moving: {"l":null,"speed":2.7,"list":false}
+report freeze

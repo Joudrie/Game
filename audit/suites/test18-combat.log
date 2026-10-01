@@ -1,0 +1,7 @@
+grapple on enemy: fire/hit → pull/grappled → idle/dead
+after strike: {"id":"ynri","state":"dead","hp":-19.810930606913587,"pos":[0,0,24.6],"death":"grapple","clip":"Hit_Knockback"} mode ground
+pound started true
+after pound: {"grapple":1} pieces 2 mode ground
+headshot pieces 4
+after lost callback: atk null overrides []
+report freeze The game stopped for 1.3 s

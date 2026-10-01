@@ -1,0 +1,29 @@
+ok   invincible by default while testing (owner, v28.1)
+ok   soldiers start on patrol (patrol, patrol, patrol, patrol, patrol, patrol, patrol, patrol, patrol, patrol)
+ok   patrolling soldiers walk about
+ok   he notices you at 8 m after 1.2 s and shows !
+ok   his shout brings the squad (combat, combat)
+ok   killed mid-shout: no alarm, the other guard stays calm
+ok   the guard who saw it panics (panic)
+ok   then shouts and fights (combat)
+ok   a pistol shot alerts a soldier 25 m away
+ok   behind an unaware soldier: takedown offered (47sn)
+{"id":"47sn","state":"dead","severed":[],"unarmed":false,"gun":false,"label":"Takedown"}
+ok   takedown: silent kill (Takedown)
+ok   no takedown from the front
+ok   hurt to 0.7, no regen for 4 s, then back to 0.948
+ok   a bolt hits you: health 0.857 (Normal: about 7 hits)
+ok   dead: ragdoll ({"kind":"bullet","t":0.1,"severed":[],"rag":true,"asleep":false,"pelvis":[0.01,0.89,0.2]})
+ok   the body falls and lies down (hips at 0.07 m)
+ok   death panel with Respawn
+ok   respawned at full health
+ok   own grenade: blown apart (upperarm_l, Head, upperarm_r, thigh_r)
+ok   blast victim is a ragdoll lying at -16.73,0.07,29.05
+ok   a blast 12 m away leaves you unhurt
+ok   Q next to a box (7.0,0.0,5.0,11.0,1.4,9.0) snaps into low cover
+ok   A/D slides along it (9 → 7.92)
+ok   right-click peeks out (1, stands up over it)
+ok   Q again leaves cover
+ok   Sandbox: no damage
+ok   no page errors or reports (0, freeze: The game stopped for 1.7 s)
+all passed

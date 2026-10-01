@@ -1,0 +1,992 @@
+{
+ "throwables": {
+  "frag thrown at a soldier 10 m ahead (aimed above him)": "engage",
+  "sticky on him: out": [
+   {
+    "kind": "sticky",
+    "stuck": true,
+    "on": "2x1r"
+   }
+  ],
+  "sticky: his state, cut": [
+   "dead",
+   [
+    "Head",
+    "upperarm_l",
+    "upperarm_r",
+    "thigh_l",
+    "thigh_r"
+   ]
+  ],
+  "fire patch: ms to create (first), shader programs before/after, particles": [
+   5,
+   38,
+   39,
+   50
+  ],
+  "soldier stood by fire, combat: burning count, his state": [
+   0,
+   "engage"
+  ],
+  "teleport orb thrown ahead: moved (m)": 7.7,
+  "X throws a frag (count before/after, finite)": [
+   5,
+   5
+  ],
+  "50 mixed grenades: wall-clock ms for 5 s game time": 322,
+  "after: fires, particles, debris, pieces, programs": [
+   16,
+   340,
+   0,
+   18,
+   39
+  ],
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:35:07.954Z, kind: freeze, detail: The game stopped for 5.3 s, build: v31 · 2026-09-30, dbState: waiting}",
+   "[report] {at: 2026-10-01T22:35:25.973Z, kind: freeze, detail: The game stopped for 2.1 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ],
+  "alert": "Game froze: The game stopped for 2.1 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+ },
+ "gadgets": {
+  "grapple at the 6 m block: crosshair class, states each 0.1 s, end y": [
+   "hud on",
+   "pppiiiiiiiiiiiiiiiiiiiiiiiiiii",
+   0
+  ],
+  "grapple a soldier 12 m away: his state, my pos": [
+   "engage",
+   [
+    0.14,
+    0,
+    -9.38
+   ]
+  ],
+  "yank (right-click held): his state, distance": [
+   "engage",
+   4.6,
+   0
+  ],
+  "swing on a tall building: state/swing/y each 0.1 s": "pS0.3 pS0.4 pS0.4 pS0.3 pS0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0 i-0",
+  "grapple straight up (nothing to hit): state": "idle",
+  "holocloak: time left at start, after 8 s, re-use toast": [
+   7.400000000000002,
+   0,
+   "Holocloak recharging: 20 s"
+  ],
+  "effect timer HUD visible text": "Holocloak ready in 19 s",
+  "hp 0.30 → stim → ration": [
+   1,
+   1
+  ],
+  "kyber toast": "The kyber shard glows blue: your blade too",
+  "shield: front bolt blocked, then from behind blocked? (blocked count)": [
+   2,
+   2,
+   -3.12
+  ],
+  "data chip in hand: gear": "lit",
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:35:42.127Z, kind: freeze, detail: The game stopped for 1.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:36:01.185Z, kind: freeze, detail: The game stopped for 4.4 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ],
+  "alert": null
+ },
+ "enemies": {
+  "patrol: metres moved in 20 s per soldier": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "standing 12 m in front of him in plain view: marks each 0.1 s (? then !, p=patrol s=spot c=combat)": ".p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p .p",
+  "sneaking straight at his FRONT: noticed at my pos (he is at z=-14)": [
+   0,
+   0,
+   -5.65
+  ],
+  "sprinting at his front: noticed at my pos": [
+   0,
+   0,
+   -8.84
+  ],
+  "witness of a death 6 m away: his mind": "panic",
+  "pistol shot: soldier at 32 m and 44 m behind you (minds)": [
+   "combat",
+   "patrol"
+  ],
+  "Normal: your health each second, 4 soldiers in combat 15–25 m away, you standing still": [
+   0.857,
+   0.857,
+   0.714,
+   0.714,
+   0.643,
+   0.643,
+   0.643,
+   0.643,
+   0.599,
+   0.599,
+   0.599,
+   0.599,
+   0.635,
+   0.759,
+   0.883,
+   1,
+   0.929,
+   0.929,
+   0.929,
+   0.929
+  ],
+  "loadouts and uniforms": [
+   {
+    "uniform": "woodland",
+    "tone": 0,
+    "head": 0.86,
+    "kind": "shotgun"
+   },
+   {
+    "uniform": "woodland",
+    "tone": 1,
+    "head": 0.86,
+    "kind": "pistol"
+   },
+   {
+    "uniform": "urban",
+    "tone": 3,
+    "head": 0.86,
+    "kind": "ak"
+   },
+   {
+    "uniform": "arctic",
+    "tone": 0,
+    "head": 0.86,
+    "kind": "ak"
+   },
+   {
+    "uniform": "arctic",
+    "tone": 2,
+    "head": 0.86,
+    "kind": "ak"
+   },
+   {
+    "uniform": "arctic",
+    "tone": 2,
+    "head": 0.86,
+    "kind": "pistol"
+   },
+   {
+    "uniform": "woodland",
+    "tone": 3,
+    "head": 0.86,
+    "kind": "pistol"
+   },
+   {
+    "uniform": "woodland",
+    "tone": 3,
+    "head": 0.86,
+    "kind": "ak"
+   },
+   {
+    "uniform": "desert",
+    "tone": 3,
+    "head": 0.86,
+    "kind": "pistol"
+   },
+   {
+    "uniform": "arctic",
+    "tone": 3,
+    "head": 0.86,
+    "kind": "pistol"
+   },
+   {
+    "uniform": "desert",
+    "tone": 0,
+    "head": 0.86,
+    "kind": "shotgun"
+   }
+  ],
+  "death types": [
+   "torso",
+   "head",
+   "torso",
+   "legs",
+   "explosion"
+  ],
+  "loot a body by G: log": [],
+  "bodies: count before/after 95 s (CORPSE_TIME 90)": [
+   14,
+   0
+  ],
+  "20 stacked at one spot, 3 s later: spread (max distance from centre)": "5.6",
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:36:18.301Z, kind: freeze, detail: The game stopped for 3.6 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ],
+  "alert": null
+ },
+ "specials": {
+  "specials": {
+   "jugg": {
+    "frontSwingsToKill": 12,
+    "after": {
+     "id": "5tki",
+     "type": "jugg",
+     "state": "engage",
+     "jugg": {
+      "hits": 3,
+      "pool": 260
+     },
+     "shield": null,
+     "guard": null,
+     "stagger": null,
+     "attack": false
+    },
+    "pistolShotsFront": 41,
+    "grappleOnto": {
+     "his": "engage",
+     "me": [
+      [
+       0.09,
+       0,
+       -9.38
+      ],
+      "ground",
+      "idle"
+     ]
+    },
+    "sticky": [
+     "dead",
+     {
+      "id": "mtlc",
+      "type": "jugg",
+      "state": "dead",
+      "jugg": {
+       "hits": 0,
+       "pool": 0
+      },
+      "shield": null,
+      "guard": null,
+      "stagger": null,
+      "attack": false
+     }
+    ],
+    "choke5s": "dead"
+   },
+   "shield": {
+    "frontSwingsToKill": 12,
+    "after": {
+     "id": "v1r4",
+     "type": "shield",
+     "state": "engage",
+     "jugg": null,
+     "shield": 160,
+     "guard": null,
+     "stagger": null,
+     "attack": false
+    },
+    "pistolShotsFront": 41,
+    "grappleOnto": {
+     "his": "engage",
+     "me": [
+      [
+       0.09,
+       0,
+       -9.38
+      ],
+      "ground",
+      "idle"
+     ]
+    },
+    "sticky": [
+     "knock",
+     {
+      "id": "ne9m",
+      "type": "shield",
+      "state": "knock",
+      "jugg": null,
+      "shield": null,
+      "guard": null,
+      "stagger": null,
+      "attack": false
+     }
+    ]
+   },
+   "duel": {
+    "frontSwingsToKill": 12,
+    "after": {
+     "id": "jxxz",
+     "type": "duel",
+     "state": "engage",
+     "jugg": null,
+     "shield": null,
+     "guard": 2,
+     "stagger": 0,
+     "attack": 0.67
+    },
+    "pistolShotsFront": 41,
+    "grappleOnto": {
+     "his": "engage",
+     "me": [
+      [
+       0.09,
+       0,
+       -9.38
+      ],
+      "ground",
+      "idle"
+     ]
+    },
+    "sticky": [
+     "dead",
+     {
+      "id": "vguc",
+      "type": "duel",
+      "state": "dead",
+      "jugg": null,
+      "shield": null,
+      "guard": 3,
+      "stagger": 0,
+      "attack": false
+     }
+    ]
+   }
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:36:38.707Z, kind: freeze, detail: The game stopped for 1.8 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ],
+  "alert": "Game froze: The game stopped for 1.9 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+ },
+ "stealth": {
+  "prompt shown behind an unaware soldier": [
+   true,
+   "Takedown"
+  ],
+  "takedown: his state, takedowns": [
+   "dead",
+   1
+  ],
+  "prompt from the front": false,
+  "cover low: enter, after D 1 s, peeking": [
+   {
+    "low": true,
+    "peek": 0,
+    "edge": 0,
+    "u": 9,
+    "n": [
+     0,
+     -1
+    ]
+   },
+   {
+    "low": true,
+    "peek": 0,
+    "edge": -1,
+    "u": 7.25,
+    "n": [
+     0,
+     -1
+    ]
+   },
+   {
+    "low": true,
+    "peek": 1,
+    "edge": -1,
+    "u": 7.25,
+    "n": [
+     0,
+     -1
+    ]
+   }
+  ],
+  "cover tall (6 m block)": {
+   "low": false,
+   "peek": 0,
+   "edge": 0,
+   "u": -4,
+   "n": [
+    0,
+    1
+   ]
+  },
+  "tall cover at the edge, peeking": {
+   "low": false,
+   "peek": 1,
+   "edge": 1,
+   "u": -0.25,
+   "n": [
+    0,
+    1
+   ]
+  },
+  "C standing still: crouch with saber / pistol / fists": [
+   false,
+   false,
+   true
+  ],
+  "errors": [],
+  "reports": [],
+  "alert": null
+ },
+ "world": {
+  "world stats": {
+   "buildings": 35,
+   "instances": 1663,
+   "trees": 52,
+   "paths": 93,
+   "blocks": 177,
+   "hidden": 35,
+   "clouds": 26
+  },
+  "walk into buildings: where the body stops vs the collision box face (gap m) — compare with the screenshots": [
+   {
+    "block": 15,
+    "side": "south",
+    "stoppedAt": [
+     -10.85,
+     0,
+     -70.69
+    ],
+    "boxFace": -70.3,
+    "gap": 0.39,
+    "shot": "sb-bldg-15-south"
+   },
+   {
+    "block": 15,
+    "side": "east",
+    "stoppedAt": [
+     -4.24,
+     0,
+     -64.19
+    ],
+    "boxFace": -4.6,
+    "gap": 0.36,
+    "shot": "sb-bldg-15-east"
+   },
+   {
+    "block": 16,
+    "side": "south",
+    "stoppedAt": [
+     -42.21,
+     0,
+     7.9
+    ],
+    "boxFace": 8.2,
+    "gap": 0.3,
+    "shot": "sb-bldg-16-south"
+   },
+   {
+    "block": 16,
+    "side": "east",
+    "stoppedAt": [
+     -35.85,
+     0,
+     12.46
+    ],
+    "boxFace": -36.2,
+    "gap": 0.35,
+    "shot": "sb-bldg-16-east"
+   },
+   {
+    "block": 18,
+    "side": "south",
+    "stoppedAt": [
+     -3.41,
+     0,
+     -43.67
+    ],
+    "boxFace": -43.3,
+    "gap": 0.37,
+    "shot": "sb-bldg-18-south"
+   },
+   {
+    "block": 18,
+    "side": "east",
+    "stoppedAt": [
+     3.15,
+     0,
+     -38.14
+    ],
+    "boxFace": 2.8,
+    "gap": 0.35,
+    "shot": "sb-bldg-18-east"
+   },
+   {
+    "block": 25,
+    "side": "south",
+    "stoppedAt": [
+     -34.11,
+     0,
+     42.2
+    ],
+    "boxFace": 42.5,
+    "gap": 0.3,
+    "shot": "sb-bldg-25-south"
+   },
+   {
+    "block": 25,
+    "side": "east",
+    "stoppedAt": [
+     -29.64,
+     0,
+     45.96
+    ],
+    "boxFace": -30,
+    "gap": 0.36,
+    "shot": "sb-bldg-25-east"
+   },
+   {
+    "block": 26,
+    "side": "south",
+    "stoppedAt": [
+     53.54,
+     0,
+     3.23
+    ],
+    "boxFace": 3.6,
+    "gap": 0.37,
+    "shot": "sb-bldg-26-south"
+   },
+   {
+    "block": 26,
+    "side": "east",
+    "stoppedAt": [
+     58.75,
+     0,
+     11.36
+    ],
+    "boxFace": 58.4,
+    "gap": 0.35,
+    "shot": "sb-bldg-26-east"
+   },
+   {
+    "block": 28,
+    "side": "south",
+    "stoppedAt": [
+     42.69,
+     0,
+     -17.9
+    ],
+    "boxFace": -17.6,
+    "gap": 0.3,
+    "shot": "sb-bldg-28-south"
+   },
+   {
+    "block": 28,
+    "side": "east",
+    "stoppedAt": [
+     48.53,
+     0,
+     -14.19
+    ],
+    "boxFace": 48.2,
+    "gap": 0.33,
+    "shot": "sb-bldg-28-east"
+   }
+  ],
+  "drop onto a roof: y vs roof height": [
+   24,
+   24
+  ],
+  "glass panes before/after one shot": [
+   8,
+   7
+  ],
+  "pistol shots to break one board": 11,
+  "debris pieces after a blast at the crates": [
+   0,
+   {
+    "glass": 1,
+    "wood": 0
+   }
+  ],
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:37:18.577Z, kind: freeze, detail: The game stopped for 1.6 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:37:34.797Z, kind: freeze, detail: The game stopped for 1.5 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:37:52.874Z, kind: freeze, detail: The game stopped for 3.6 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:38:08.254Z, kind: freeze, detail: The game stopped for 1.4 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:38:24.092Z, kind: freeze, detail: The game stopped for 1.8 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:38:41.732Z, kind: freeze, detail: The game stopped for 2.7 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:39:00.355Z, kind: freeze, detail: The game stopped for 3.6 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ],
+  "alert": "Game froze: The game stopped for 3.6 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+ },
+ "missions": {
+  "missions panel text": "Mission 1: The courtyard\nFour waves in the walled courtyard. Loot what they drop. Waves: Pistols, AK-47s, M4 carbines, Snipers.\nReward: Grappling hook (not yet)\nStart\nMission 3: Infiltration\nSlip in, download the plans from the terminal on the balcony, and get out through the south gate. If any guard is alerted, it's over; kill one before he finishes shouting and nobody knows. Your pistol wears a suppressor for this one. Sneak with V, crouch with C.\nReward: Holocloak (not yet)\nStart\nMission 2: Hold the courtyard\nStay alive for three minutes. They keep coming from the north and the sides, more ",
+  "missions": {
+   "m1start": [
+    {
+     "id": "m1",
+     "wave": -1,
+     "state": "break",
+     "left": 0,
+     "kinds": [],
+     "hold": 0
+    },
+    [
+     "saber",
+     "pistol",
+     "grenade",
+     "stim",
+     null,
+     null
+    ]
+   ],
+   "m1wave0": {
+    "id": "m1",
+    "wave": 0,
+    "state": "fight",
+    "left": 4,
+    "kinds": [
+     "pistol",
+     "pistol",
+     "pistol",
+     "pistol"
+    ],
+    "hold": 0
+   },
+   "m1wave1": {
+    "id": "m1",
+    "wave": 0,
+    "state": "break",
+    "left": 0,
+    "kinds": [],
+    "hold": 0
+   },
+   "m1wave2": {
+    "id": "m1",
+    "wave": 1,
+    "state": "fight",
+    "left": 5,
+    "kinds": [
+     "ak",
+     "ak",
+     "ak",
+     "ak",
+     "pistol"
+    ],
+    "hold": 0
+   },
+   "m1wave3": {
+    "id": "m1",
+    "wave": 1,
+    "state": "break",
+    "left": 0,
+    "kinds": [],
+    "hold": 0
+   },
+   "m1wave4": {
+    "id": "m1",
+    "wave": 2,
+    "state": "fight",
+    "left": 5,
+    "kinds": [
+     "ar",
+     "ar",
+     "ar",
+     "ar",
+     "ar"
+    ],
+    "hold": 0
+   },
+   "m1wave5": {
+    "id": "m1",
+    "wave": 2,
+    "state": "break",
+    "left": 0,
+    "kinds": [],
+    "hold": 0
+   },
+   "m1done": {
+    "doneShown": false,
+    "kept": []
+   },
+   "m1back": [
+    null,
+    [
+     "saber",
+     "pistol",
+     "grenade",
+     "ak",
+     "shotgun",
+     "sniper"
+    ]
+   ],
+   "m2start": {
+    "id": "m2",
+    "wave": -1,
+    "state": "break",
+    "left": 0,
+    "kinds": [],
+    "hold": 0
+   },
+   "m2end": {
+    "mission": {
+     "id": "m2",
+     "wave": -1,
+     "state": "fight",
+     "left": 3,
+     "kinds": [
+      "pistol",
+      "pistol",
+      "pistol"
+     ],
+     "hold": 0
+    },
+    "kept": []
+   },
+   "m3start": {
+    "mission": {
+     "id": "m3",
+     "wave": -1,
+     "state": "infil",
+     "left": 10,
+     "kinds": [
+      "pistol",
+      "pistol",
+      "ak",
+      "pistol",
+      "pistol",
+      "pistol",
+      "pistol",
+      "pistol",
+      "pistol",
+      "pistol"
+     ],
+     "hold": 2
+    },
+    "terminal": [
+     0,
+     3.4,
+     195.6
+    ],
+    "pos": [
+     0,
+     0,
+     148
+    ]
+   },
+   "m3spotted": {
+    "mission": {
+     "id": "m3",
+     "wave": -1,
+     "state": "failed",
+     "left": 10,
+     "kinds": [
+      "pistol",
+      "pistol",
+      "ak",
+      "pistol",
+      "pistol",
+      "pistol",
+      "pistol",
+      "pistol",
+      "pistol",
+      "pistol"
+     ],
+     "hold": 2
+    },
+    "panel": true,
+    "text": "MISSION FAILED\nA guard raised the alarm.\nTry again\nBack to the sandboxYou diedRespawnQuit missionEnter to respawn · move the mouse to look around"
+   },
+   "quitThenInv": [
+    "saber",
+    "pistol",
+    "grenade",
+    "ak",
+    "shotgun",
+    "sniper"
+   ],
+   "diedInMission": {
+    "dead": true,
+    "panel": "YOU DIED\nBlaster bolt. Mission failed.\nRetry mission\nQuit mission\nEnter to respawn · move the mouse to look around"
+   },
+   "retry": [
+    {
+     "id": "m1",
+     "wave": -1,
+     "state": "break",
+     "left": 0,
+     "kinds": [],
+     "hold": 0
+    },
+    false
+   ]
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:39:21.009Z, kind: freeze, detail: The game stopped for 4.6 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:39:36.251Z, kind: freeze, detail: The game stopped for 2.4 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:39:53.775Z, kind: freeze, detail: The game stopped for 2.6 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ],
+  "alert": "Game froze: The game stopped for 2.6 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+ },
+ "ui": {
+  "inventory text": "INVENTORY\nDrag to move · or tap one, then another\nClose\nHotbar scroll or 1–6 in play\n1\n2\n0\n3\n∞\n4\n30\n5\n6\n6\n5\nBackpack\n3\n30\n3\n2\n3\n2\n3\n0\n30\n\n \n\nCreative sandbox: click to add",
+  "drag bag 0 → hot 5": {
+   "before": [
+    "force",
+    "shotgun"
+   ],
+   "after": [
+    "shotgun",
+    "force"
+   ]
+  },
+  "after tapping": "INVENTORY\nDrag to move · or tap one, then another\nClose\nHotbar scroll or 1–6 in play\n1\n2\n0\n3\n∞\n4\n30\n5\n6\n5\nBackpack\n6\n3\n30\n3\n2\n3\n2\n3\n0\n30\n\nThe Force: tap a slot to move it there\n\nCreative sandbox: click to add",
+  "Escape closes the inventory": true,
+  "weapon panel text": "WEAPON AND CLASS\nClose\nClass your rules for now\nLight infantry\nUltralight (Force)\nHeavy infantry\n\nSoldiers, suits, civilians. Walk 1.6 · run 4.6 · sprint 8.4 m/s (no stamina limit). Jump single. Slide 0.85s. 150 HP (not used until combat).\n\nEverything ticked below is for Light infantry. Each class keeps its own set.\n\nEquipment for testing; in play use the hotbar\nNo gear\nHilt in hand\nSaber lit\nPistol\n\nNo gear or hilt: jab, cross, kick, hook. Saber lit: the five-hit combo. Dual sabers: four dual combos (both hands strike), picked in Moves → Dual saber combo. Pistol: two hands, right-click or Aim to aim, fire from the hip or while aiming. Switching plays a draw or holster; the pistol gets a spin before it goes back.\n\nSaber\nSingle\nDual\nStaff\nNormal grip\nReverse grip (Ahsoka)\nGreen\nBlue\nPurple\nRed\nYellow\nWhite\n\nTap Attack to chain five hits (the finisher flows back into hit 1), hold it for the heavy combo, hold Block to guard, even in the air.\n\nDifficulty how many hits you can take\nInvincible\nEasy\nNormal\nHard\nExtreme\n\nNothing hurts you, not even your own grenade (the default while we're testing).\n\nSettings\nRagdoll deaths (blasts, pushes and walls throw soldiers limp)\nForce target marker (the red ring on who you're looking at)\nGrapple swings (Spider-Man): a hook high on a wall swings you instead of reeling you in\nJetpack: hold Jump in the air to fly, hold C (or Slide) to hover, sprint to fly flat out\nForce push moves bodies (grenades always do)\nInfinite jumps (every class, tap Jump",
+  "menu tabs": [
+   "Expand",
+   "Done",
+   "Moves",
+   "Library",
+   "Tests",
+   "Mix it up",
+   "Always my favourites",
+   "Default",
+   "Speed",
+   "Silly",
+   "Save pack 1",
+   "Save pack 2",
+   "Save pack 3",
+   "Load pack 1",
+   "Load pack 2",
+   "Load pack 3",
+   "StandardRecommended for Light infantryQuaternius UAL · CC0",
+   "★",
+   "Arms foldedQuaternius UAL · CC0",
+   "★",
+   "TalkingQuaternius UAL · CC0",
+   "★",
+   "Soldier idleMixamo, from the three.js Soldier",
+   "★",
+   "Proud100STYLE mocap · CC BY 4.0",
+   "★",
+   "SubtleMesh2Motion · CC0",
+   "★",
+   "Fighting stanceMesh2Motion · CC0",
+   "★",
+   "StandardRecommended for Light infantryQuaternius UAL · CC0 · 1.0 m/s natural",
+   "★",
+   "FormalQuaternius UAL · CC0 · 1.0 m/s natural",
+   "★",
+   "Soldier walkMixamo, from the three.js Soldier · 1.7 m/s natural",
+   "★",
+   "Neutral100STYLE mocap · CC BY 4.0 · 0.9 m/s natural",
+   "★",
+   "Proud100STYLE mocap · CC BY 4.0 · 1.1 m/s natural",
+   "★",
+   "Rushed100STYLE mocap · CC BY 4.0 · 2.2 m/s natural",
+   "★",
+   "StealthMesh2Motion · CC0 · 1.0 m/s natural",
+   "★",
+   "Heavy strideMesh2Motion · CC0 · 0.8 m/s natural",
+   "★",
+   "JogRecommended for Light infantryQuaternius UAL · CC0 · 6.2 m/s natural",
+   "★",
+   "Soldier runMixamo, from the three.js Soldier · 4.5 m/s natural",
+   "★",
+   "Rushed100STYLE mocap · CC BY 4.0 · 2.9 m/s natural",
+   "★",
+   "Superman100STYLE mocap · CC BY 4.0 · 2.5 m/s natural",
+   "★",
+   "Big steps100STYLE mocap · CC BY 4.0 · 2.2 m/s natural",
+   "★",
+   "Neutral100STYLE mocap · CC BY 4.0 · 1.8 m/s natural",
+   "★",
+   "Proud100STYLE mocap · CC BY 4.0 · 1.8 m/s natural",
+   "★"
+  ],
+  "Escape closes the menu": true,
+  "copy report button text": "Copied",
+  "hud": {
+   "ammo": "0\n/ ∞\nReload",
+   "feed": "Headshot · CMU_Fall_Back\ntest · CMU_Fall_Back\ntest · M2M_Death_A"
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:40:11.507Z, kind: manual, detail: audit check, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ],
+  "alert": null
+ },
+ "phone": {
+  "phone layout": {
+   "scrollW": 375,
+   "overflowing": []
+  },
+  "errors": [],
+  "reports": [],
+  "alert": null
+ },
+ "persistence": {
+  "after a page reload": {
+   "before": {
+    "diff": "hard",
+    "att": true,
+    "hot": [
+     "saber",
+     "grenade",
+     "pistol",
+     "ak",
+     "shotgun",
+     "sniper"
+    ],
+    "shoulder": -1,
+    "slot": 3,
+    "fav": "Jog_Fwd_Loop"
+   },
+   "after": {
+    "diff": "hard",
+    "att": true,
+    "hot": [
+     "saber",
+     "grenade",
+     "pistol",
+     "ak",
+     "shotgun",
+     "sniper"
+    ],
+    "shoulder": -1,
+    "slot": 3,
+    "fav": "Jog_Fwd_Loop"
+   }
+  },
+  "first run": {
+   "hot": [
+    "saber",
+    "pistol",
+    "grenade",
+    "ak",
+    "shotgun",
+    "sniper"
+   ],
+   "bag": [
+    "force",
+    "saberblaster",
+    "shieldpistol",
+    "ar",
+    "sticky",
+    "firenade",
+    "orb"
+   ],
+   "diff": "sandbox",
+   "count": 10,
+   "toast": "",
+   "help": true
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:40:33.340Z, kind: freeze, detail: The game stopped for 3.2 s, build: v31 · 2026-09-30, dbState: waiting}"
+  ],
+  "alert": null
+ }
+}

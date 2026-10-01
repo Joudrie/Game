@@ -1,0 +1,21 @@
+fresh page, 30 s: metres walked per soldier, mind ["vfx2"]
+moved, clip [[1.9,"SW_Run_Left"]]
+minds ["combat","combat","combat","combat","combat","combat","combat","combat","combat","combat"]
+he faces you 6 m away, you stand still: seconds to combat [2,".p ?p !s .c"]
+he faces you 12 m away, you stand still: seconds to combat [2.4,"?p !s .c"]
+he faces you 20 m away, you stand still: seconds to combat [3.3,".p ?p !s .c"]
+he faces you 30 m away, you stand still: seconds to combat [6.1,".p"]
+he faces you 12 m away, you are crouched (fists): seconds to combat 3.5
+he faces you 12 m away, you are sneak (V): seconds to combat 3.7
+walk (sneak V) straight at his back from 12 m ["takedown prompt at",1.8]
+jog straight at his back from 12 m ["takedown prompt at",1.5]
+sprint straight at his back from 12 m ["noticed at",1.1]
+jugg {"saberClicksFront":14,"after":{"id":"42e2","type":"jugg","state":"dead","jugg":{"hits":0,"pool":0},"shield":null,"guard":null,"stagger":null,"attack":false},"death":"head","saberClicksBehind":5,"pistolShots_front":27,"pistolShots_back":30,"grappleOnto":{"his":"engage","myDist":0.9,"events":["38.4s grapple attached","38.4s grapple strike 20.4 m/s"]}}
+shield {"saberClicksFront":10,"after":{"id":"hg4d","type":"shield","state":"dead","jugg":null,"shield":null,"guard":null,"stagger":null,"attack":false},"death":"torso","saberClicksBehind":8,"pistolShots_front":25,"pistolShots_back":">40","grappleOnto":{"his":"engage","myDist":7.6,"events":["63.2s grapple fire at enemy 15.4 m","63.2s alarm pbb8 grappled","63.2s grapple repelled shield pbb8"]}}
+duel {"saberClicksFront":2,"after":{"id":"4zou","type":"duel","state":"dead","jugg":null,"shield":null,"guard":1,"stagger":0,"attack":0},"death":"torso","saberClicksBehind":8,"pistolShots_front":">40","pistolShots_back":">40","grappleOnto":{"his":"engage","myDist":2.1,"events":["81.8s grapple fire at enemy 15.4 m","81.8s alarm 67qd grappled","81.8s grapple repelled rope 67qd"]}}
+grapple a soldier 12 m away: his state, cut, distance ["dead","grapple",21.8,[-103,0,-93.61]]
+yank (hold right-click, R): his state, distance from you, yanks ["dead","torso",1.4,1]
+swing on the nearest 18 m+ building: state/y every 0.1 s "pS0.3 pS0.4 pS0.4 pS0.3 pS0.1 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0 i0.0"
+building {"min":[48.9,0,3.6],"max":[58.4,18,18.9],"c":[53.65,11.25]}
+prompt near the body true
+loot log ["Pistol ammo ×34","Power cell ×1"]

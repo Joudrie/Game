@@ -1,0 +1,23 @@
+ok   ten soldiers is the default (Tests → Performance)
+ok   the AK stays up in your hands while reloading (grip at 1.17 m)
+ok   a fire compiles no new shaders (no freeze) and burns as particles (22)
+ok   a soldier near the fire keeps out of it (engage)
+ok   walking into a juggernaut with the blade does nothing
+ok   grappling into a shield soldier's front bounces you off
+ok   a duellist cuts your grapple line
+ok   teleporting mid-jump lands you properly ()
+ok   arriving next to a soldier shoves him back (knock)
+ok   a jump from standing still can still be steered forward (3.9 m/s)
+ok   a click winds up, then throws (0 → 0 → 1)
+ok   a data chip doesn't take your pistol out of your hand (pistol)
+ok   a ration bar heals a quarter (+0.25)
+ok   the blue berry shows its timer
+ok   saber + blaster: left click fires the blaster (heat 4.2 after 5 shots; six before it overheats)
+["43.4s draw/holster pistol → none","43.5s difficulty sandbox","43.5s berry","43.5s gear lit","43.5s draw/holster none → lit","43.6s force choke zygh"]
+ok   the choke holds longer than before (still held at 2.6 s)
+ok   a click while choking swings the saber instead of pulling
+ok   sniper chest kill: chest blown open (spine_03)
+ok   the Silly build sets a whole set at once
+ok   Default puts it back
+ok   no page errors or reports (0, freeze: The game stopped for 5.4 s)
+all passed

@@ -1,0 +1,1972 @@
+{
+ "blurAutoFire": {
+  "ak rounds: before, at blur, 2 s after blur (no button held)": [
+   30,
+   26,
+   11
+  ],
+  "keeps firing after alt-tab": true,
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:22:40.538Z, kind: freeze, detail: The game stopped for 7.2 s, build: v31 · 2026-09-30, dbState: waiting}"
+  ]
+ },
+ "blurBlock": {
+  "blocking before / 2 s after alt-tab": [
+   true,
+   true
+  ],
+  "speed walking after (block caps at walk speed)": 1.6,
+  "errors": [],
+  "reports": []
+ },
+ "blurKeysHeld": {
+  "speed 1.5 s after blur with W+Shift held": 0,
+  "speed after release": 0,
+  "errors": [],
+  "reports": []
+ },
+ "blurZap": {
+  "zap on before / 3 s after blur with H held": [
+   true,
+   false
+  ],
+  "errors": [],
+  "reports": []
+ },
+ "swapWhileBusy": {
+  "reload": {
+   "scroll-fast": {
+    "before": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "reload": {
+      "t": 0.33,
+      "empty": false
+     },
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "ak",
+     "slot": 3,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 7.75,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 1.3 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "reload": {
+      "t": 0.33,
+      "empty": false
+     },
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 7.75,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "rifle-reload": {
+   "scroll-fast": {
+    "before": {
+     "gear": "pistol",
+     "gun": "ak",
+     "reload": {
+      "t": 0.4,
+      "empty": false
+     },
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "sniper",
+     "slot": 5,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 7.67,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 3.3 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "pistol",
+     "gun": "ak",
+     "reload": {
+      "t": 0.4,
+      "empty": false
+     },
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 7.67,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "swing": {
+   "scroll-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": 0,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "none",
+     "gun": "pistol",
+     "slot": 2,
+     "pistolInHand": false,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 10.09,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": [
+      "Sword_Regular_A (one-shot):1.00"
+     ]
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 1.2 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": 0,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 10.09,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": [
+      "Sword_Regular_A (one-shot):1.00"
+     ]
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "heavy": {
+   "scroll-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": "H",
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "none",
+     "gun": "pistol",
+     "slot": 2,
+     "pistolInHand": false,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 8.79,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 2.0 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": "H",
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 8.79,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": [
+      "Sword_Heavy_Combo (one-shot):1.00"
+     ]
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "windup": {
+   "scroll-fast": {
+    "before": {
+     "gear": "none",
+     "gun": "pistol",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "lit",
+     "gun": "ak",
+     "slot": 4,
+     "pistolInHand": false,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 5.79,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 6.2 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "none",
+     "gun": "ak",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 5.79,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "grapple": {
+   "scroll-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": null,
+     "mode": "grapple"
+    },
+    "after": {
+     "gear": "none",
+     "gun": "pistol",
+     "slot": 2,
+     "pistolInHand": false,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 5.64,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 2.2 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": null,
+     "mode": "grapple"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 5.64,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "block": {
+   "scroll-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "none",
+     "gun": "pistol",
+     "slot": 2,
+     "pistolInHand": false,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 5.53,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 1.5 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 5.53,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "aim": {
+   "scroll-fast": {
+    "before": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "ak",
+     "slot": 3,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 7.71,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 3.3 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 7.71,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "scope": {
+   "scroll-fast": {
+    "before": {
+     "gear": "pistol",
+     "gun": "sniper",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 7.5,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 1.8 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "pistol",
+     "gun": "sniper",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": false,
+     "grapple": "idle",
+     "pose": {
+      "dev": 7.5,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "cover": {
+   "scroll-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "none",
+     "gun": "pistol",
+     "slot": 2,
+     "pistolInHand": false,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": true,
+     "grapple": "idle",
+     "pose": {
+      "dev": 12.09,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 0,
+    "alert": "Character didn't move: Pushing to move (100%) but the character stays at 0.00 m/s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat.",
+    "bad": true
+   },
+   "digits-fast": {
+    "before": {
+     "gear": "lit",
+     "gun": "pistol",
+     "reload": null,
+     "atk": null,
+     "mode": "ground"
+    },
+    "after": {
+     "gear": "pistol",
+     "gun": "pistol",
+     "slot": 1,
+     "pistolInHand": true,
+     "drawing": null,
+     "reload": null,
+     "atk": null,
+     "mode": "ground",
+     "blocking": false,
+     "cover": true,
+     "grapple": "idle",
+     "pose": {
+      "dev": 12.13,
+      "leg": 1,
+      "arm": 1
+     },
+     "ovr": []
+    },
+    "walk": 0,
+    "alert": null,
+    "bad": true
+   }
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:23:01.946Z, kind: freeze, detail: The game stopped for 4.3 s, build: v31 · 2026-09-30, dbState: waiting}",
+   "[report] {at: 2026-10-01T22:23:17.043Z, kind: freeze, detail: The game stopped for 1.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:23:37.412Z, kind: freeze, detail: The game stopped for 4.0 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:23:56.202Z, kind: freeze, detail: The game stopped for 3.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:24:14.237Z, kind: freeze, detail: The game stopped for 5.1 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:24:31.873Z, kind: freeze, detail: The game stopped for 1.2 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:24:47.757Z, kind: freeze, detail: The game stopped for 1.2 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:25:04.838Z, kind: freeze, detail: The game stopped for 4.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:25:21.025Z, kind: freeze, detail: The game stopped for 1.2 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:25:36.737Z, kind: freeze, detail: The game stopped for 2.0 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:25:52.718Z, kind: freeze, detail: The game stopped for 1.9 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:26:08.119Z, kind: freeze, detail: The game stopped for 1.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:26:27.534Z, kind: freeze, detail: The game stopped for 6.2 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:26:43.956Z, kind: freeze, detail: The game stopped for 2.7 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:27:00.399Z, kind: freeze, detail: The game stopped for 1.8 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:27:17.466Z, kind: freeze, detail: The game stopped for 2.2 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:27:33.976Z, kind: freeze, detail: The game stopped for 1.7 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:27:51.690Z, kind: freeze, detail: The game stopped for 1.5 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:28:08.020Z, kind: freeze, detail: The game stopped for 1.5 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:28:25.933Z, kind: freeze, detail: The game stopped for 3.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:28:43.716Z, kind: freeze, detail: The game stopped for 1.5 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:28:59.534Z, kind: freeze, detail: The game stopped for 1.8 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:29:20.836Z, kind: freeze, detail: The game stopped for 5.2 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:29:36.677Z, kind: freeze, detail: The game stopped for 1.6 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:29:52.314Z, kind: freeze, detail: The game stopped for 1.9 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:30:04.461Z, kind: stuck, detail: Pushing to move (100%) but the character stays at 0.00 m/s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:30:08.279Z, kind: freeze, detail: The game stopped for 2.4 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ]
+ },
+ "jumpInto": {
+  "cases": {
+   "slide": {
+    "before": {
+     "mode": "slide",
+     "reload": null,
+     "blocking": false,
+     "cover": false,
+     "takedown": false,
+     "choke": false
+    },
+    "afterJump": {
+     "mode": "air",
+     "reload": null,
+     "takedown": false,
+     "cover": false,
+     "choke": false,
+     "y": 1.26
+    },
+    "settled": {
+     "mode": "ground",
+     "atk": null,
+     "takedown": false,
+     "pose": {
+      "dev": 12.1,
+      "leg": 1,
+      "arm": 1
+     },
+     "reload": null
+    },
+    "alert": null
+   },
+   "reload": {
+    "before": {
+     "mode": "ground",
+     "reload": {
+      "t": 0.33,
+      "empty": false
+     },
+     "blocking": false,
+     "cover": false,
+     "takedown": false,
+     "choke": false
+    },
+    "afterJump": {
+     "mode": "air",
+     "reload": {
+      "t": 0.67,
+      "empty": false
+     },
+     "takedown": false,
+     "cover": false,
+     "choke": false,
+     "y": 0.74
+    },
+    "settled": {
+     "mode": "ground",
+     "atk": null,
+     "takedown": false,
+     "pose": {
+      "dev": 12.1,
+      "leg": 1,
+      "arm": 1
+     },
+     "reload": null
+    },
+    "alert": null
+   },
+   "block": {
+    "before": {
+     "mode": "ground",
+     "reload": null,
+     "blocking": true,
+     "cover": false,
+     "takedown": false,
+     "choke": false
+    },
+    "afterJump": {
+     "mode": "air",
+     "reload": null,
+     "takedown": false,
+     "cover": false,
+     "choke": false,
+     "y": 0.74
+    },
+    "settled": {
+     "mode": "ground",
+     "atk": null,
+     "takedown": false,
+     "pose": {
+      "dev": 12.1,
+      "leg": 1,
+      "arm": 1
+     },
+     "reload": null
+    },
+    "alert": null
+   },
+   "cover": {
+    "before": {
+     "mode": "ground",
+     "reload": null,
+     "blocking": false,
+     "cover": true,
+     "takedown": false,
+     "choke": false
+    },
+    "afterJump": {
+     "mode": "air",
+     "reload": null,
+     "takedown": false,
+     "cover": false,
+     "choke": false,
+     "y": 0.74
+    },
+    "settled": {
+     "mode": "ground",
+     "atk": null,
+     "takedown": false,
+     "pose": {
+      "dev": 12.1,
+      "leg": 1,
+      "arm": 1
+     },
+     "reload": null
+    },
+    "alert": null
+   },
+   "takedown": {
+    "before": {
+     "mode": "ground",
+     "reload": null,
+     "blocking": false,
+     "cover": false,
+     "takedown": true,
+     "choke": false
+    },
+    "afterJump": {
+     "mode": "ground",
+     "reload": null,
+     "takedown": true,
+     "cover": false,
+     "choke": false,
+     "y": 0
+    },
+    "settled": {
+     "mode": "ground",
+     "atk": null,
+     "takedown": false,
+     "pose": {
+      "dev": 12.1,
+      "leg": 1,
+      "arm": 1
+     },
+     "reload": null
+    },
+    "alert": null
+   },
+   "choke": {
+    "before": {
+     "mode": "ground",
+     "reload": null,
+     "blocking": false,
+     "cover": false,
+     "takedown": false,
+     "choke": true
+    },
+    "afterJump": {
+     "mode": "air",
+     "reload": null,
+     "takedown": false,
+     "cover": false,
+     "choke": true,
+     "y": 0.74
+    },
+    "settled": {
+     "mode": "ground",
+     "atk": null,
+     "takedown": false,
+     "pose": {
+      "dev": 5.72,
+      "leg": 1,
+      "arm": 1
+     },
+     "reload": null
+    },
+    "alert": null
+   }
+  },
+  "errors": [],
+  "reports": []
+ },
+ "grappleCancel": {
+  "cases": {
+   "pull-slide": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 5.72,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "pull-jump": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 5.72,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "pull-throwX": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 5.72,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "pull-teleport": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 5.72,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "pull-jetpack": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "jet"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 5.88,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 6,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 2.2 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "pull-regrapple": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 8.56,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "pull-switchItem": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 8.56,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "pull-forcePush": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 8.56,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "pull-attack": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 5.17,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "pull-inventory": {
+    "started": "pull",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-slide": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "slide"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-jump": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-throwX": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "ground"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-teleport": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "ground"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-jetpack": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "jet"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-regrapple": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "ground"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-switchItem": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "ground"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-forcePush": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "ground"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-attack": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "air"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 4.63,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swing-inventory": {
+    "started": "idle",
+    "mid": {
+     "grapple": "idle",
+     "mode": "ground"
+    },
+    "settled": {
+     "grapple": "idle",
+     "mode": "ground",
+     "pose": {
+      "dev": 5.29,
+      "leg": 1,
+      "arm": 1
+     },
+     "y": 0,
+     "atk": null
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:30:28.708Z, kind: freeze, detail: The game stopped for 2.2 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ]
+ },
+ "teleport": {
+  "cases": {
+   "inside-building-centre": {
+    "target": [
+     -10.649999999999999,
+     -64.3
+    ],
+    "landed": [
+     -17.01,
+     0,
+     -64.3
+    ],
+    "mode": "ground",
+    "insideABox": 0,
+    "walkSpeed": 4.6,
+    "moved": 5.8
+   },
+   "building-wall-at-5m": {
+    "target": [
+     -16.65,
+     -64.3
+    ],
+    "landed": [
+     -17.01,
+     0,
+     -64.3
+    ],
+    "mode": "ground",
+    "insideABox": 0,
+    "walkSpeed": 4.6,
+    "moved": 5.8
+   },
+   "roof": {
+    "target": [
+     -10.649999999999999,
+     -64.3
+    ],
+    "landed": [
+     -17.01,
+     0,
+     -64.3
+    ],
+    "mode": "ground",
+    "insideABox": 0,
+    "walkSpeed": 4.6,
+    "moved": 5.8
+   },
+   "inside-low-block": {
+    "target": [
+     9,
+     7
+    ],
+    "landed": [
+     6.65,
+     0,
+     7
+    ],
+    "mode": "ground",
+    "insideABox": 0,
+    "walkSpeed": 4.6,
+    "moved": 5.8
+   },
+   "map-edge-2100": {
+    "target": [
+     2100,
+     0
+    ],
+    "landed": [
+     2100,
+     0,
+     0
+    ],
+    "mode": "ground",
+    "insideABox": 0,
+    "walkSpeed": 4.6,
+    "moved": 5.8
+   },
+   "mid-fall": {
+    "mode": "ground",
+    "y": 0,
+    "pose": {
+     "dev": 5.54,
+     "leg": 1,
+     "arm": 1
+    },
+    "ovr": []
+   },
+   "mid-grapple": {
+    "mode": "ground",
+    "grapple": "idle",
+    "pose": {
+     "dev": 5.54,
+     "leg": 1,
+     "arm": 1
+    }
+   },
+   "next-to-soldiers": {
+    "me": [
+     6,
+     0,
+     6
+    ],
+    "them": [
+     [
+      "getup",
+      [
+       6,
+       0,
+       8.3
+      ]
+     ],
+     [
+      "getup",
+      [
+       6,
+       0,
+       6
+      ]
+     ]
+    ]
+   }
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:30:46.893Z, kind: freeze, detail: The game stopped for 1.6 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:31:03.607Z, kind: freeze, detail: The game stopped for 2.0 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:31:20.326Z, kind: freeze, detail: The game stopped for 2.4 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ]
+ },
+ "fire": {
+  "hp standing in fire 3 s on Normal": [
+   1,
+   0.2
+  ],
+  "ms to light 6 fires": 5,
+  "burning soldiers": 0,
+  "particles": 337,
+  "programs (shaders)": 42,
+  "errors": [],
+  "reports": []
+ },
+ "inventory": {
+  "enemy fight continues with inventory open (pos changes)": [
+   3.8,
+   0,
+   1.5
+  ],
+  "can walk with inventory open (speed)": 4.6,
+  "saber moved out of the active slot": {
+   "gear": "none",
+   "slot": 0,
+   "hot0": null
+  },
+  "grenades left after throwing all, then X×6": 0,
+  "toast": "No frag grenades: loot some",
+  "alert": null,
+  "backpack full, loot": {
+   "bagUsed": 20,
+   "log": [],
+   "toast": "No frag grenades: loot some"
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:31:42.898Z, kind: freeze, detail: The game stopped for 6.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ]
+ },
+ "reload": {
+  "reload a full magazine starts a reload?": null,
+  "no spare pistol ammo: mag, reload state, toast": {
+   "ammoItems": 0,
+   "mags": 0,
+   "reload": null,
+   "toast": "Out of Pistol ammo: loot some"
+  },
+  "pistol reload → AK → pistol": {
+   "right": {
+    "reload": null,
+    "gun": "pistol"
+   },
+   "later": {
+    "reload": null,
+    "mags": {
+     "pistol": 0,
+     "ak": 0,
+     "shotgun": 6,
+     "ar": 30,
+     "sniper": 5
+    },
+    "pose": {
+     "dev": 5.7,
+     "leg": 1,
+     "arm": 1
+    },
+    "pistolInHand": true
+   }
+  },
+  "errors": [],
+  "reports": []
+ },
+ "dieEverywhere": {
+  "cases": {
+   "sliding": {
+    "died": true,
+    "afterRespawn": {
+     "dead": false,
+     "mode": "ground",
+     "grapple": "idle",
+     "cover": false,
+     "reload": null,
+     "atk": null,
+     "fov": 55,
+     "gear": "lit",
+     "pose": {
+      "dev": 7.43,
+      "leg": 1,
+      "arm": 1
+     },
+     "hp": 1
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "air": {
+    "died": true,
+    "afterRespawn": {
+     "dead": false,
+     "mode": "ground",
+     "grapple": "idle",
+     "cover": false,
+     "reload": null,
+     "atk": null,
+     "fov": 55,
+     "gear": "lit",
+     "pose": {
+      "dev": 6.21,
+      "leg": 1,
+      "arm": 1
+     },
+     "hp": 1
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "grapple": {
+    "died": true,
+    "afterRespawn": {
+     "dead": false,
+     "mode": "ground",
+     "grapple": "idle",
+     "cover": false,
+     "reload": null,
+     "atk": null,
+     "fov": 55,
+     "gear": "lit",
+     "pose": {
+      "dev": 4.94,
+      "leg": 1,
+      "arm": 1
+     },
+     "hp": 1
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "cover": {
+    "died": true,
+    "afterRespawn": {
+     "dead": false,
+     "mode": "ground",
+     "grapple": "idle",
+     "cover": false,
+     "reload": null,
+     "atk": null,
+     "fov": 55,
+     "gear": "lit",
+     "pose": {
+      "dev": 12.07,
+      "leg": 1,
+      "arm": 1
+     },
+     "hp": 1
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "swinging": {
+    "died": true,
+    "afterRespawn": {
+     "dead": false,
+     "mode": "ground",
+     "grapple": "idle",
+     "cover": false,
+     "reload": null,
+     "atk": null,
+     "fov": 55,
+     "gear": "lit",
+     "pose": {
+      "dev": 9.42,
+      "leg": 1,
+      "arm": 1
+     },
+     "hp": 1
+    },
+    "walk": 4.6,
+    "alert": "Game froze: The game stopped for 4.9 s. Could not send from here (no-runtime (window.claude missing in this viewer)). Tap Copy report and paste it in the chat."
+   },
+   "reloading": {
+    "died": true,
+    "afterRespawn": {
+     "dead": false,
+     "mode": "ground",
+     "grapple": "idle",
+     "cover": false,
+     "reload": null,
+     "atk": null,
+     "fov": 55,
+     "gear": "pistol",
+     "pose": {
+      "dev": 7.26,
+      "leg": 1,
+      "arm": 1
+     },
+     "hp": 1
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "scoped": {
+    "died": true,
+    "afterRespawn": {
+     "dead": false,
+     "mode": "ground",
+     "grapple": "idle",
+     "cover": false,
+     "reload": null,
+     "atk": null,
+     "fov": 55,
+     "gear": "pistol",
+     "pose": {
+      "dev": 7.78,
+      "leg": 1,
+      "arm": 1
+     },
+     "hp": 1
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "jetpack": {
+    "died": true,
+    "afterRespawn": {
+     "dead": false,
+     "mode": "ground",
+     "grapple": "idle",
+     "cover": false,
+     "reload": null,
+     "atk": null,
+     "fov": 55,
+     "gear": "lit",
+     "pose": {
+      "dev": 5.61,
+      "leg": 1,
+      "arm": 1
+     },
+     "hp": 1
+    },
+    "walk": 4.6,
+    "alert": null
+   },
+   "inventoryOpen": {
+    "died": true,
+    "afterRespawn": {
+     "dead": false,
+     "mode": "ground",
+     "grapple": "idle",
+     "cover": false,
+     "reload": null,
+     "atk": null,
+     "fov": 55,
+     "gear": "lit",
+     "pose": {
+      "dev": 5.74,
+      "leg": 1,
+      "arm": 1
+     },
+     "hp": 1
+    },
+    "walk": 4.6,
+    "alert": null
+   }
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:32:03.781Z, kind: freeze, detail: The game stopped for 4.9 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ]
+ },
+ "missionsOdd": {
+  "start from": {
+   "airborne": {
+    "mission": "break",
+    "mode": "ground",
+    "grapple": "idle",
+    "cover": false,
+    "pos": [
+     0,
+     0,
+     157
+    ]
+   },
+   "cover": {
+    "mission": "break",
+    "mode": "ground",
+    "grapple": "idle",
+    "cover": false,
+    "pos": [
+     0,
+     0,
+     157
+    ]
+   },
+   "grappling": {
+    "mission": "break",
+    "mode": "ground",
+    "grapple": "idle",
+    "cover": false,
+    "pos": [
+     0,
+     0,
+     157
+    ]
+   }
+  },
+  "reload mid-mission restores the sandbox inventory": {
+   "same": true,
+   "before": "[[\"saber1\",\"pistol1\",null,\"ak1\",\"force1\",\"sniper1\"],[\"shotgun1\",\"saberblaster1\",\"shieldpistol1\",\"ar1\",\"sticky3\",\"firenade2\",\"orb2\",\"grenade5\",\"ammo72\",null,null,null,null,null,null,null,null,null,null,null]]",
+   "during": "[[\"saber1\",\"pistol1\",\"grenade3\",\"stim2\",null,null]]",
+   "after": "[[\"saber1\",\"pistol1\",null,\"ak1\",\"force1\",\"sniper1\"],[\"shotgun1\",\"saberblaster1\",\"shieldpistol1\",\"ar1\",\"sticky3\",\"firenade2\",\"orb2\",\"grenade5\",\"ammo72\",null,null,null,null,null,null,null,null,null,null,null]]"
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:32:21.352Z, kind: freeze, detail: The game stopped for 2.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:32:36.444Z, kind: freeze, detail: The game stopped for 1.2 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:32:45.021Z, kind: freeze, detail: The game stopped for 2.4 s, build: v31 · 2026-09-30, dbState: waiting}"
+  ]
+ },
+ "mash": {
+  "W+A+Shift+C+Space held 2 s": {
+   "during": {
+    "mode": "ground",
+    "speed": 8.4,
+    "y": 0
+   },
+   "after": {
+    "mode": "ground",
+    "pose": {
+     "dev": 5.7,
+     "leg": 1,
+     "arm": 1
+    }
+   }
+  },
+  "right+left click spam ×20, 3 s later": {
+   "atk": null,
+   "blocking": false,
+   "pose": {
+    "dev": 5.7,
+    "leg": 1,
+    "arm": 1
+   },
+   "guard": 0
+  },
+  "R+T+X together": {
+   "mode": "ground",
+   "grapple": "idle",
+   "pose": {
+    "dev": 5.7,
+    "leg": 1,
+    "arm": 1
+   },
+   "alert": null
+  },
+  "single-frame Space, C, F, E, E": {
+   "mode": "ground",
+   "gear": "lit",
+   "atk": null,
+   "pose": {
+    "dev": 5.7,
+    "leg": 1,
+    "arm": 1
+   }
+  },
+  "sprint 30 s": {
+   "speed": 8.4,
+   "pos": [
+    -0.35,
+    0,
+    -32.89
+   ],
+   "mode": "ground",
+   "alert": null
+  },
+  "hold C 30 s (saber lit)": {
+   "crouch": false,
+   "mode": "ground",
+   "pose": {
+    "dev": 6.96,
+    "leg": 1,
+    "arm": 1
+   }
+  },
+  "hold left click 30 s with the saber": {
+   "during": {
+    "atk": null,
+    "pose": {
+     "dev": 6.96,
+     "leg": 1,
+     "arm": 1
+    }
+   },
+   "after": {
+    "atk": null,
+    "pose": {
+     "dev": 6.96,
+     "leg": 1,
+     "arm": 1
+    }
+   }
+  },
+  "errors": [],
+  "reports": []
+ },
+ "resize": {
+  "layouts": {
+   "1920x1080": {
+    "canvas": [
+     0,
+     0,
+     1920,
+     1080
+    ],
+    "hotbar": [
+     782,
+     1008,
+     356,
+     56
+    ],
+    "help": [
+     -293,
+     956,
+     2197,
+     37
+    ],
+    "topbar": [
+     16,
+     16,
+     1888,
+     49
+    ],
+    "scrollW": 1920,
+    "innerW": 1920,
+    "overflow": [
+     "help",
+     "",
+     "",
+     ""
+    ]
+   },
+   "375x667": {
+    "canvas": [
+     0,
+     0,
+     375,
+     667
+    ],
+    "hotbar": [
+     34,
+     603,
+     308,
+     48
+    ],
+    "help": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "topbar": [
+     8,
+     16,
+     359,
+     42
+    ],
+    "scrollW": 375,
+    "innerW": 375,
+    "overflow": []
+   },
+   "667x375": {
+    "canvas": [
+     0,
+     0,
+     667,
+     375
+    ],
+    "hotbar": [
+     156,
+     303,
+     356,
+     56
+    ],
+    "help": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "topbar": [
+     16,
+     16,
+     635,
+     49
+    ],
+    "scrollW": 667,
+    "innerW": 667,
+    "overflow": []
+   },
+   "1280x720": {
+    "canvas": [
+     0,
+     0,
+     1280,
+     720
+    ],
+    "hotbar": [
+     462,
+     648,
+     356,
+     56
+    ],
+    "help": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "topbar": [
+     16,
+     16,
+     1248,
+     49
+    ],
+    "scrollW": 1280,
+    "innerW": 1280,
+    "overflow": []
+   }
+  },
+  "errors": [],
+  "reports": [
+   "[report] {at: 2026-10-01T22:33:04.308Z, kind: freeze, detail: The game stopped for 4.9 s, build: v31 · 2026-09-30, dbState: waiting}",
+   "[report] {at: 2026-10-01T22:33:20.223Z, kind: freeze, detail: The game stopped for 3.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:33:39.167Z, kind: freeze, detail: The game stopped for 2.7 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+   "[report] {at: 2026-10-01T22:33:56.752Z, kind: freeze, detail: The game stopped for 6.3 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+  ]
+ }
+}
