@@ -1,0 +1,14 @@
+ok   jetpack is off by default
+ok   six hotbar slots
+ok   hotbar centred (640 vs 640)
+ok   B swaps to the left shoulder
+ok   recoil settles: barrel 5.7° → 6.8°, view 0.1 → 0.1
+ok   bullet holes: 13
+ok   leg off: crawling toward you (4.7 → 3.4 m)
+ok   gun hand off: unarmed at first
+ok   then re-armed with the other hand (hand_l)
+ok   dropped pistols on the ground: 1
+ok   walked over it and picked it up: ammo 0 → 12
+ok   that pistol is gone from the ground
+ok   no page errors
+PASS

@@ -1,0 +1,8 @@
+hotbar saber pistol grenadex5 ak shotgun sniper | slots drawn 6 | gear lit
+scroll through slots 1:pistol 2:none 3:pistol 4:pistol 5:pistol
+key 2 → 1:pistol
+after loot: hot saber pistol grenadex10 ak shotgun sniper | bag forcex1 saberblasterx1 shieldpistolx1 arx1 stickyx3 firenadex2 orbx2 creditsx40 ammox12 grenadex2
+after drag bag0 → hot3: saber pistol grenadex10 ak shotgun sniper
+after tap hot0 → bag5: firenadex2 pistol grenadex10 ak shotgun sniper | bag5 {"id":"saber","qty":1}
+grenade slot attack: 12 → 11 gear none
+report freeze

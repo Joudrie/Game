@@ -1,0 +1,16 @@
+ok   The Force (slot 4) and Saber + blaster (slot 5) in the hotbar
+ok   Force mode: marker on the soldier in front (o8jy)
+ok   pulled in (and onto the blade): engage,  at 0,0,3.9
+ok   choke lifts him (y 0.9)
+ok   held long enough, the choke kills
+ok   lightning kills
+ok   saber thrown
+ok   the thrown saber cuts him (crawl, Saber · left leg off below the knee)
+ok   and comes back to your hand
+ok   the blade lights up its surroundings (1.2)
+ok   scorch marks: 0
+ok   saber + blaster overheats after 6 quick shots (overheat 2.0 s)
+ok   three jumps in the air: vy 4.5 → 7.3 → 9.3 → 3.2
+ok   wall run along a wall at sprint speed (1 s, up to 1.9 m)
+ok   no page errors
+PASS

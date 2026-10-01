@@ -1,0 +1,335 @@
+{
+ "buildBytes": {
+  "index": 15227726,
+  "cap": 16777216
+ },
+ "loadMs": 3693,
+ "loadFreezeReports": [],
+ "bySoldiers": {
+  "5": {
+   "stepMs": 0.9,
+   "fps": 3.4,
+   "cpu": 2.77,
+   "soldiers": 8.9,
+   "render": 136.04,
+   "calls": 154,
+   "tris": 286936
+  },
+  "10": {
+   "stepMs": 1.23,
+   "fps": 5.4,
+   "cpu": 2.42,
+   "soldiers": 12.55,
+   "render": 236.3,
+   "calls": 176,
+   "tris": 367560
+  },
+  "20": {
+   "stepMs": 1.56,
+   "fps": 7.8,
+   "cpu": 2.8,
+   "soldiers": 15.66,
+   "render": 166.94,
+   "calls": 261,
+   "tris": 535114
+  },
+  "30": {
+   "stepMs": 1.62,
+   "fps": 8.3,
+   "cpu": 2.7,
+   "soldiers": 19.77,
+   "render": 129.29,
+   "calls": 348,
+   "tris": 701664
+  }
+ },
+ "firstUse": {
+  "frag": {
+   "firstMs": 14,
+   "secondMs": 3,
+   "twoFramesMs": 4630
+  },
+  "fire": {
+   "firstMs": 3,
+   "secondMs": 3,
+   "twoFramesMs": 1407
+  },
+  "sticky": {
+   "firstMs": 9,
+   "secondMs": 5,
+   "twoFramesMs": 2595
+  },
+  "orb": {
+   "firstMs": 6,
+   "secondMs": 4,
+   "twoFramesMs": 3524
+  },
+  "blood": {
+   "firstMs": 6,
+   "secondMs": 10,
+   "twoFramesMs": 4136
+  },
+  "sparks": {
+   "firstMs": 14,
+   "secondMs": 6,
+   "twoFramesMs": 10165
+  },
+  "jugg": {
+   "firstMs": 6,
+   "secondMs": 10,
+   "twoFramesMs": 38
+  },
+  "shield": {
+   "firstMs": 9,
+   "secondMs": 7,
+   "twoFramesMs": 60
+  },
+  "duel": {
+   "firstMs": 9,
+   "secondMs": 7,
+   "twoFramesMs": 7213
+  }
+ },
+ "reportsDuringFirstUse": [
+  "[report] {at: 2026-10-01T22:43:36.740Z, kind: freeze, detail: The game stopped for 4.2 s, build: v31 · 2026-09-30, dbState: waiting}",
+  "[report] {at: 2026-10-01T22:43:54.634Z, kind: freeze, detail: The game stopped for 1.9 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+  "[report] {at: 2026-10-01T22:44:12.332Z, kind: freeze, detail: The game stopped for 1.5 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+  "[report] {at: 2026-10-01T22:44:27.709Z, kind: freeze, detail: The game stopped for 5.0 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}",
+  "[report] {at: 2026-10-01T22:44:44.768Z, kind: freeze, detail: The game stopped for 7.8 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}"
+ ],
+ "soak": [
+  {
+   "min": 0,
+   "heapMB": 23.4,
+   "nodes": 1736,
+   "enemies": 36,
+   "blood": {
+    "drops": 0,
+    "splats": 29,
+    "bleeders": 0,
+    "pieces": 7,
+    "guns": 3,
+    "holes": 51
+   },
+   "debris": 0,
+   "fires": 0,
+   "particles": 0,
+   "programs": 42,
+   "scorches": 15,
+   "mags": 0
+  },
+  {
+   "min": 1,
+   "heapMB": 25.4,
+   "nodes": 1741,
+   "enemies": 20,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 14
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 57,
+   "programs": 41,
+   "scorches": 0,
+   "mags": 0
+  },
+  {
+   "min": 2,
+   "heapMB": 29.4,
+   "nodes": 1787,
+   "enemies": 20,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 15
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 61,
+   "programs": 40,
+   "scorches": 0,
+   "mags": 0
+  },
+  {
+   "min": 3,
+   "heapMB": 29.6,
+   "nodes": 1787,
+   "enemies": 20,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 28
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 46,
+   "programs": 40,
+   "scorches": 0,
+   "mags": 0
+  },
+  {
+   "min": 4,
+   "heapMB": 26.1,
+   "nodes": 1743,
+   "enemies": 20,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 13
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 48,
+   "programs": 41,
+   "scorches": 0,
+   "mags": 0
+  },
+  {
+   "min": 5,
+   "heapMB": 29.6,
+   "nodes": 1787,
+   "enemies": 19,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 33
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 45,
+   "programs": 40,
+   "scorches": 0,
+   "mags": 0
+  },
+  {
+   "min": 6,
+   "heapMB": 29.7,
+   "nodes": 1787,
+   "enemies": 19,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 23
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 58,
+   "programs": 41,
+   "scorches": 0,
+   "mags": 0
+  },
+  {
+   "min": 7,
+   "heapMB": 26.1,
+   "nodes": 1741,
+   "enemies": 19,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 11
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 55,
+   "programs": 41,
+   "scorches": 0,
+   "mags": 0
+  },
+  {
+   "min": 8,
+   "heapMB": 29.7,
+   "nodes": 1787,
+   "enemies": 19,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 17
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 53,
+   "programs": 40,
+   "scorches": 0,
+   "mags": 0
+  },
+  {
+   "min": 9,
+   "heapMB": 26.5,
+   "nodes": 1741,
+   "enemies": 20,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 19
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 58,
+   "programs": 41,
+   "scorches": 0,
+   "mags": 0
+  },
+  {
+   "min": 10,
+   "heapMB": 30,
+   "nodes": 1787,
+   "enemies": 20,
+   "blood": {
+    "drops": 0,
+    "splats": 90,
+    "bleeders": 0,
+    "pieces": 60,
+    "guns": 34,
+    "holes": 12
+   },
+   "debris": 0,
+   "fires": 1,
+   "particles": 59,
+   "programs": 40,
+   "scorches": 0,
+   "mags": 0
+  }
+ ],
+ "soakWallSeconds": 41,
+ "rendererInfo": {
+  "on": false,
+  "fps": 8.51472819345348,
+  "cpu": 3.7251210185452246,
+  "enemies": 510.9878382430691,
+  "render": 1031.0899557317966,
+  "calls": 337,
+  "tris": 935154,
+  "enemyAcc": 1777.4000000138767,
+  "t": 98.44899999999807
+ },
+ "errors": []
+}

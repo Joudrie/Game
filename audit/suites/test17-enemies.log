@@ -1,0 +1,12 @@
+spawned 1 engage:SW_Walk
+deathCounts after zone kills {"head":1,"legs":1,"torso":1} feed ["Torso · Death01","Leg shot · KK_Death_B","Headshot · CMU_Fall_Back"]
+shots head → hit head | counts {"head":2,"legs":1,"torso":1}
+shots legs,legs,legs,legs → hit legs,legs,legs,legs | counts {"head":2,"legs":2,"torso":1}
+shots torso,torso,torso → hit torso,torso,torso | counts {"head":2,"legs":2,"torso":2}
+shots legs,torso,torso,legs,legs → hit legs,torso,torso,legs, | counts {"head":2,"legs":2,"torso":3}
+pushed (open): ["knock 0,1,11.9"]
+lethal push → {"head":2,"legs":2,"torso":3,"push":1} Force push · ragdoll
+wall push {"head":2,"legs":2,"torso":3,"push":1} → {"head":2,"legs":2,"torso":3,"push":1,"impact":2} Wall impact · ragdoll
+grenade {"head":2,"legs":2,"torso":3,"push":1,"impact":2} → {"head":2,"legs":2,"torso":3,"push":1,"impact":2,"explosion":3}
+now 21 total; 12 corpses; 9 alive
+report freeze The game stopped for 4.0 s

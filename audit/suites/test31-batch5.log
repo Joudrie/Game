@@ -1,0 +1,23 @@
+ok   the M4 carbine is handed out (moved to slot 6)
+ok   M4 in hand, automatic fire (30 → 22)
+ok   scope: aiming zooms to 2.5x (fov 24.0)
+ok   suppressed shots go unheard at 20 m (patrol); loud ones don't (combat)
+ok   courtyard built: {"stone":31,"wood":40,"glass":8}
+ok   one shot shatters a glass pane
+ok   three shots break a board into chunks (1 broken, 6 chunks)
+ok   a blast breaks 16 boards
+ok   mission starts with the kit (saber,pistol,grenade,stim,,)
+ok   no grappling hook until you earn it
+ok   wave 1: 4 pistols
+ok   wave 4: snipers on the balcony (sniper, sniper, sniper, ar, ar, ar)
+ok   snipers stand on the ledge (y 3.4, 3.4, 3.4, 0, 0, 0); lasers showing: 0
+ok   mission complete: the grappling hook is yours
+ok   back in the sandbox with your own inventory (saber,pistol,grenade,ak,shotgun,ar)
+ok   dying in the mission offers a retry
+ok   retry restarts the mission
+ok   the earned grappling hook works in the mission
+ok   a stim heals half (0.812)
+ok   creative: every item, one click adds it
+ok   picking the pistol shows its attachments (2 options)
+ok   no page errors or reports (0, freeze: The game stopped for 1.8 s)
+all passed

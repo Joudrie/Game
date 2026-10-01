@@ -1,0 +1,11 @@
+  console: Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID
+  console: Failed to load resource: the server responded with a status of 404 (File not found)
+ok   city blocks wear Kenney buildings (35), their grey boxes hidden but kept for collision
+ok   grass, flowers, rocks and 52 trees scattered (1663 instances), a 93-stone path
+ok   26 clouds in the sky
+ok   soldiers wear different uniforms (urban, arctic, woodland, desert)
+ok   every soldier has the smaller head
+ok   the head stays smaller while he animates
+ok   mixed weapons (ar, pistol, shotgun, ak)
+ok   no page errors
+PASS

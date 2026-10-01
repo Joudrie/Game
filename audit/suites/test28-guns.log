@@ -1,0 +1,15 @@
+ok   slot 4 is the AK-47
+ok   AK fires on its own while held: 30 → 22 rounds
+ok   shotgun at 5 m kills (dead)
+ok   …and throws the body back (0.3,0,7.5)
+ok   scoped in: fov 20
+ok   sniper: one torso shot kills
+ok   timed block parries the bolt back and kills him (dead, parries 1)
+ok   held block deflects (no parry)
+ok   a bolt from behind is not blocked
+ok   a volley breaks the guard
+ok   a dead AK soldier drops his rifle
+ok   walked over it: rifle ammo 0 → 30
+ok   mixed loadouts: 6 AK / 11 pistol
+ok   no page errors
+PASS

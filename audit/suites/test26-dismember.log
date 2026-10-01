@@ -1,0 +1,13 @@
+real swing → {"id":"wjtp","state":"dead","severed":["thigh_l","spine_03"],"unarmed":false,"gun":false,"label":"Saber · cut through the chest"}
+ok   a real swing cuts the soldier where the blade passes
+hand off → {"id":"jaqe","state":"engage","severed":["hand_r"],"unarmed":true,"gun":false,"label":"Saber · right hand off"} moved [ 0.6, 0, 3 ] → [ 1.9, 0, 7 ]
+ok   gun hand off: alive, unarmed, pistol dropped
+ok   he runs away from you
+blood {"drops":0,"splats":42,"bleeders":0,"pieces":5,"guns":2,"holes":2}
+ok   blood splats on the ground
+ok   left arm off: alive and still armed
+ok   head: dead, Head severed (Saber · head off)
+ok   waist: dead, spine_01 severed (Saber · cut in half)
+ok   loose pieces on the ground: 10
+ok   no page errors
+PASS

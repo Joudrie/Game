@@ -1,0 +1,34 @@
+{
+ "one-cut-chest": {
+  "drops": 0,
+  "splats": 15,
+  "bleeders": 0,
+  "pieces": 2,
+  "guns": 1,
+  "holes": 0
+ },
+ "two-cuts-thigh-then-chest": {
+  "drops": 0,
+  "splats": 23,
+  "bleeders": 0,
+  "pieces": 5,
+  "guns": 2,
+  "holes": 0
+ },
+ "two-cuts-arm-then-head": {
+  "drops": 0,
+  "splats": 31,
+  "bleeders": 0,
+  "pieces": 6,
+  "guns": 2,
+  "holes": 0
+ },
+ "three-cuts": {
+  "drops": 0,
+  "splats": 44,
+  "bleeders": 0,
+  "pieces": 7,
+  "guns": 2,
+  "holes": 0
+ }
+}

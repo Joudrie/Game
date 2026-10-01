@@ -1,0 +1,371 @@
+{
+ "force-pull-then-wait": {
+  "tries": [
+   {
+    "atk": null,
+    "ovr": [],
+    "walk": 4.6,
+    "clickStarts": true
+   },
+   {
+    "atk": null,
+    "ovr": [],
+    "walk": 4.6,
+    "clickStarts": false
+   },
+   {
+    "atk": null,
+    "ovr": [],
+    "walk": 4.6,
+    "clickStarts": true
+   },
+   {
+    "atk": null,
+    "ovr": [],
+    "walk": 4.6,
+    "clickStarts": false
+   },
+   {
+    "atk": null,
+    "ovr": [],
+    "walk": 4.6,
+    "clickStarts": true
+   }
+  ],
+  "stuck": "0/5"
+ },
+ "force-pull-then-R": {
+  "tries": [
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   }
+  ],
+  "stuck": "5/5"
+ },
+ "saber-blaster-click": {
+  "tries": [
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   }
+  ],
+  "stuck": "5/5"
+ },
+ "saber-blaster-right-click": {
+  "tries": [
+   {
+    "atk": "H",
+    "ovr": [
+     "Sword_Heavy_Combo (one-shot):1.00"
+    ],
+    "walk": 4.6,
+    "clickStarts": false
+   },
+   {
+    "atk": "H",
+    "ovr": [
+     "Sword_Heavy_Combo (one-shot):1.00"
+    ],
+    "walk": 4.6,
+    "clickStarts": false
+   },
+   {
+    "atk": "H",
+    "ovr": [
+     "Sword_Heavy_Combo (one-shot):1.00"
+    ],
+    "walk": 4.6,
+    "clickStarts": false
+   },
+   {
+    "atk": "H",
+    "ovr": [
+     "Sword_Heavy_Combo (one-shot):1.00"
+    ],
+    "walk": 4.6,
+    "clickStarts": false
+   },
+   {
+    "atk": "H",
+    "ovr": [
+     "Sword_Heavy_Combo (one-shot):1.00"
+    ],
+    "walk": 4.6,
+    "clickStarts": false
+   }
+  ],
+  "stuck": "0/5"
+ },
+ "takedown-then-F": {
+  "tries": [
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   }
+  ],
+  "stuck": "5/5"
+ },
+ "takedown-then-click": {
+  "tries": [
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   }
+  ],
+  "stuck": "5/5"
+ },
+ "swing-then-R": {
+  "tries": [
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   }
+  ],
+  "stuck": "5/5"
+ },
+ "swing-then-T": {
+  "tries": [
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   }
+  ],
+  "stuck": "5/5"
+ },
+ "swing-then-X": {
+  "tries": [
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   },
+   {
+    "atk": 0,
+    "ovr": [],
+    "walk": 1,
+    "clickStarts": false
+   }
+  ],
+  "stuck": "5/5"
+ },
+ "whatClearsIt": {
+  "E": {
+   "before": 0,
+   "atk": null,
+   "ovr": [],
+   "walk": 4.6,
+   "clickStarts": true
+  },
+  "Digit2": {
+   "before": 0,
+   "atk": null,
+   "ovr": [],
+   "walk": 4.6,
+   "clickStarts": true
+  },
+  "Space": {
+   "before": 0,
+   "atk": null,
+   "ovr": [],
+   "walk": 4.6,
+   "clickStarts": true
+  },
+  "C": {
+   "before": 0,
+   "atk": 0,
+   "ovr": [],
+   "walk": 1,
+   "clickStarts": false
+  },
+  "Q": {
+   "before": 0,
+   "atk": 0,
+   "ovr": [],
+   "walk": 1,
+   "clickStarts": false
+  },
+  "rightClick": {
+   "before": 0,
+   "atk": 0,
+   "ovr": [],
+   "walk": 1,
+   "clickStarts": false
+  }
+ }
+}

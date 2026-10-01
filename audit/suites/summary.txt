@@ -1,0 +1,20 @@
+test17-enemies exit=0
+test9 exit=0
+test18-combat exit=0
+test19-v14 exit=0
+test20-loot exit=0
+test21-inventory exit=0
+test22-reload exit=0
+test23-dual-combo exit=0
+test26-dismember exit=0
+test27-batch1 exit=0
+test28-guns exit=0
+test29-force exit=0
+test30-batch4 exit=0
+test31-batch5 exit=0
+test33-batch7 exit=1
+test32-batch6 exit=0
+test34-playtest exit=0
+test35-world exit=0
+test36-shield exit=1
+DONE

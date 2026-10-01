@@ -1,0 +1,10 @@
+ok   the energy shield is handed out once
+ok   selecting it draws the pistol with the shield on your left arm
+ok   a bolt from the front hits the shield (blocked 2, charge 0.84)
+FAIL a bolt from behind gets past it
+ok   enough hits drain it and it drops (back in 1.8 s)
+ok   it comes back charged
+ok   switching to the saber puts it away
+ok   the shield soldier's left hand is out in front (0.29 m ahead of his shoulder)
+ok   no page errors
+FAILED (1)

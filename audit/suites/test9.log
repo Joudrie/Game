@@ -1,0 +1,21 @@
+console warning [report] {at: 2026-10-01T22:13:37.733Z, kind: freeze, detail: The game stopped for 5.8 s, build: v31 · 2026-09-30, dbState: waiting}
+console warning [report] {at: 2026-10-01T22:13:59.101Z, kind: freeze, detail: The game stopped for 1.2 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}
+after moves {"gear":"lit","gait":"idle","s":0,"pose":{"dev":5.61,"leg":1,"arm":1},"report":"freeze"}
+console warning [report] {at: 2026-10-01T22:14:16.401Z, kind: freeze, detail: The game stopped for 3.1 s, build: v31 · 2026-09-30, dbState: no-runtime (window.claude missing in this viewer)}
+none walk {"gear":"none","gait":"idle","s":0,"pose":{"dev":5.56,"leg":1,"arm":1},"report":"freeze"}
+none run {"gear":"none","gait":"jog","s":1.9,"pose":{"dev":6.06,"leg":1,"arm":1},"report":"freeze"}
+none sprint {"gear":"none","gait":"jog","s":3.9,"pose":{"dev":8.04,"leg":1,"arm":1},"report":"freeze"}
+none stop {"gear":"none","gait":"jog","s":3.3,"pose":{"dev":7.33,"leg":1,"arm":1},"report":"freeze"}
+hilt walk {"gear":"hilt","gait":"walk","s":0.9,"pose":{"dev":8.08,"leg":1,"arm":1},"report":"freeze"}
+hilt run {"gear":"hilt","gait":"jog","s":2.3,"pose":{"dev":7.51,"leg":1,"arm":1},"report":"freeze"}
+hilt sprint {"gear":"hilt","gait":"sprint","s":4.6,"pose":{"dev":8.26,"leg":1,"arm":1},"report":"freeze"}
+hilt stop {"gear":"hilt","gait":"jog","s":3.7,"pose":{"dev":8.2,"leg":1,"arm":1},"report":"freeze"}
+lit walk {"gear":"lit","gait":"walk","s":0.9,"pose":{"dev":6.19,"leg":1,"arm":1},"report":"freeze"}
+lit run {"gear":"lit","gait":"jog","s":2.4,"pose":{"dev":6.02,"leg":1,"arm":1},"report":"freeze"}
+lit sprint {"gear":"lit","gait":"jog","s":4.8,"pose":{"dev":6.2,"leg":1,"arm":1},"report":"freeze"}
+lit stop {"gear":"lit","gait":"jog","s":3.5,"pose":{"dev":7.1,"leg":1,"arm":1},"report":"freeze"}
+pistol walk {"gear":"pistol","gait":"walk","s":0.5,"pose":{"dev":7.73,"leg":1,"arm":1},"report":"freeze"}
+pistol run {"gear":"pistol","gait":"jog","s":2.4,"pose":{"dev":8.23,"leg":1,"arm":1},"report":"freeze"}
+pistol sprint {"gear":"pistol","gait":"sprint","s":4.8,"pose":{"dev":9.11,"leg":1,"arm":1},"report":"freeze"}
+pistol stop {"gear":"pistol","gait":"jog","s":4.2,"pose":{"dev":9.91,"leg":1,"arm":1},"report":"freeze"}
+final report {"at":"2026-10-01T22:14:16.401Z","kind":"freeze","detail":"The game stopped for 3.1 s","build":"v31 · 2026-09-30","dbState":"no-runtime (window.claude missing in this viewer)","device":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36","screen":"1280x720","klass":"light","gear":"none","mode":"ground","gait":"idle","speed":0,"crouch":false,"jumps":0,"movesOpen":false,"atk":null,"blocking":false,"cur":{"idle":"Idle_Loop","walk":"Walk_Loop","jog":"Jog_Fwd_Loop","sprint":"Sprint_Loop","crouch":"Crouch_Fwd_Loop","stance":"Sword_Idle","rst
