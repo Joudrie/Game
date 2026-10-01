@@ -65,7 +65,8 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 - ✅ **Snap-to-cover** with peeking, aiming out, reloading behind cover and blind fire
 - ✅ The look to aim for: RDR2 / Modern Warfare realism at lower fidelity, modern special forces
 - ⬜ **Dead Eye** (slow-motion aim), single player only
-- ⬜ **Civilians walking around, with overheard chatter** (GTA)
+- ⬜ **Civilians walking around, with overheard chatter** (GTA). Next after the audit: neutral civilians who flee soldiers and gunfire and can die (owner, after v31)
+- ⬜ **A "protect the civilians" mode** (owner, later)
 
 ### Rainbow Six Siege
 - ✅ **Destruction by material:** stone takes marks, glass shatters, wooden walls break board by board, and pieces stay on the ground (the courtyard)
