@@ -29,6 +29,15 @@ The ground rules:
 - **Inspiration:** the owner's book *Wake* (weapons such as plasma knives, plasma and beryllium rifles, holocloaks, magboots, hoverboards, breaching kits; worlds like Marfeld and Kelton) and the Lego collection's lore (the Snow Jedi, the Purple Shadow, the realm where guns don't work).
 - **Licences still apply:** assets ripped from commercial games (like the Skate 3 or Call of Duty files people pass around) can't go in. We take ideas from those games, and assets only from properly licensed sources.
 
+## ★ Next (owner, after v31)
+1. **Full audit first.** Run the audit prompt in `docs/AUDIT_PROMPT.md` in a fresh session: test every button and combination, try to break the game, screenshot everything, and score every feature out of 10, with fixes for anything under 9. Its report decides what gets fixed next.
+2. **Civilians** (after the audit). Neutral people walking around the sandbox:
+   - [ ] they wander the streets and paths (ideally with free, licensed civilian models: several looks, men and women)
+   - [ ] they run from soldiers and from gunfire, explosions, the lit saber, and bodies (panic, using the soldiers' `noise` / `witnessDeath` ideas)
+   - [ ] they can die: shot, cut, blown up and ragdolled like soldiers, with dismemberment
+   - [ ] soldiers don't target them, but stray fire can hit them
+   - [ ] later: game modes such as **protect the civilians**; overheard chatter (GTA) is already in Design answers
+
 ## ★ Play test on PC, v29 (owner): fix these first
 Your play-by-play, item by item. v30 takes the fixes, and v31 the downloaded assets.
 
