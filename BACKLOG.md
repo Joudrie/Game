@@ -30,7 +30,29 @@ The ground rules:
 - **Licences still apply:** assets ripped from commercial games (like the Skate 3 or Call of Duty files people pass around) can't go in. We take ideas from those games, and assets only from properly licensed sources.
 
 ## ★ Next (owner, after v31)
-1. **Full audit first.** Run the audit prompt in `docs/AUDIT_PROMPT.md` in a fresh session: test every button and combination, try to break the game, screenshot everything, and score every feature out of 10, with fixes for anything under 9. Its report decides what gets fixed next.
+1. ✅ **Full audit** (done after v31): `audit/REPORT.md`, also as a page at https://claude.ai/artifact/BfXt8RGyuyEq87WM4WiPNF. Overall 6/10. Its fixes come in three batches (below); Batch 1 is done in v32.
+
+### Audit fixes (from `audit/REPORT.md`)
+**Batch 1, quick wins** ✅ *done in v32*: the stuck swing, alt-tab held buttons, red severed pieces, the sword pose after switching, the cover false alarm, the world edge, infinite jumps off, move variety, help and labels.
+
+**Batch 2, feature fixes** (a session each)
+- [ ] **Mission 3:** a safe start beside the gate, out of sight, with patrols kept off the gate for the first 15 s (it fails on its own in 6–8 s today)
+- [ ] **Duellist:** block or cut decided once per swing; no guard recovery while you attack (test33 fails 3 times in 4)
+- [ ] **Grapple swing:** a launch impulse so it works from the ground, a higher arc, an upright pose (not upside down)
+- [ ] **Crouch with a weapon out** (C does nothing with the saber or a gun)
+- [ ] **Shield soldiers and duellists turn slower** while firing, so you can get behind them
+- [ ] **Saber cut variety:** not the same thigh + chest cut on every frontal kill (towards the slanted cut)
+- [ ] **Recoil you can see:** a real camera kick per gun
+- [ ] **Shader pre-warm at load:** first frag, sticky, orb, blood, sparks and duellist each froze 1.4–10 s in the software renderer (check on a PC first)
+- [ ] **Blood splats** instead of perfect red discs (Kenney Particle Pack, CC0); a real model for the shield soldier's shield (Poly Pizza)
+- [ ] **Juggernaut:** three swings means three hits (14 clicks from the front today)
+
+**Batch 3, the big ones** (several sessions)
+- [ ] **A real player character** instead of the shirtless Superhero (Quaternius Ultimate Modular Men/Women, CC0, mapped like the SWAT soldier; or The Second)
+- [ ] **A fuller world:** roads and props between the towers (Kenney City Kit Roads, KayKit City Builder Bits, both CC0)
+- [ ] **Pause and settings menu:** mouse sensitivity, invert Y, volume, FOV, key list
+- [ ] **Sound pass** (Kenney Impact and Sci-fi Sounds, CC0)
+
 2. **Civilians** (after the audit). Neutral people walking around the sandbox:
    - [ ] they wander the streets and paths (ideally with free, licensed civilian models: several looks, men and women)
    - [ ] they run from soldiers and from gunfire, explosions, the lit saber, and bodies (panic, using the soldiers' `noise` / `witnessDeath` ideas)
@@ -357,4 +379,4 @@ Not everything breaks, but some things do, and by material:
 - [ ] **Your v14 play test**, especially: swing then move, aim + fire, draw/holster, jetpack, pushing bodies.
 - [ ] **Reports sending by themselves from the iPhone app.** The next report will show why they failed (`dbState`).
 - [ ] **A play test on a real iPhone** of the latest version.
-- [ ] **Turn infinite jumps off** (Menu → Setup) once the double-jump rules matter again.
+- [x] **Turn infinite jumps off** *(v32: off by default; the switch is in Weapon → Settings)*

@@ -2,6 +2,25 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v32: audit fixes, batch 1 (the quick wins)
+The full audit is in `audit/REPORT.md` (also as a page: https://claude.ai/artifact/BfXt8RGyuyEq87WM4WiPNF). This version fixes its Batch 1. Tests: `tools/test37-audit-fixes.mjs`.
+- **The saber no longer gets stuck "mid-attack".** Grappling, pushing or throwing in the middle of a swing, clicking during a takedown, or firing the Saber + blaster used to leave you walking at 1 m/s with clicks doing nothing until you jumped. Any action that replaces a swing now ends it cleanly.
+- **Saber + blaster:** a right-click swing no longer turns into an endless heavy combo.
+- **Alt-tab lets go of the mouse:** an AK or M4 stops firing and the saber guard drops when the game loses focus or the mouse is released.
+- **Cut-off body parts keep their uniform** however many cuts a soldier takes. They turned solid red from the second cut on.
+- **Switching weapons mid-swing** (a heavy combo, then the pistol) no longer leaves the body frozen in the sword pose.
+- **No more false "Character didn't move" reports** when you push toward the wall in cover.
+- **The world has an edge** at 1,950 m; you can't run off the sand into the sky any more.
+- **Infinite jumps start off** (every save is switched once), so the class jump rules count: one jump for light and heavy, three for the Force class. Turn it back on in Weapon → Settings. Infinite ammo and grenades stay on while we test.
+- **Animation variety out of the box:** idles, saber and pistol stances, jumps, double jumps and the grapple moves rotate through up to three variants each (old saves on the one-variant default get them once). Walk, run and sprint keep one, matched to each class's speed.
+- **Texts:**
+  - The help bar wraps instead of running off both edges at 1920 px, shows from 1000 px wide, sits above the ammo counter, and lists every key (E, V, H, Y and M were missing).
+  - The speed readout and the Weapon button name the gun in your hands ("AK-47", not "pistol").
+  - The Weapon panel drops its duplicate gear buttons (use the hotbar) and describes the saber combos correctly.
+  - Hotbar keys read 1–6 everywhere.
+  - Mission 3's start text isn't shown twice.
+  - On a narrow window the speed readout sits above the hotbar.
+
 ## v31: a real-looking sandbox (downloaded assets)
 - **Buildings:** every grey city block is now an office block, shop, skyscraper or warehouse from Kenney's free City Kits (CC0). Each block picks the model that best fits its footprint and height; the tall far-off towers are skyscrapers. The invisible box underneath still does the collision, cover, shots and grapple, resized to the building. The three low boxes near the start stay as hop platforms.
 - **Nature:** about 70 grass patches with flowers and bushes, rocks, and around 50 trees (palms, oaks, pines) from Kenney's Nature Kit. The kit's cartoon teal is toned to natural greens and greys. Trees and tall rocks have solid trunks you bump into (and can land on).
