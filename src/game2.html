@@ -33,7 +33,7 @@ html { overscroll-behavior: none; }
 #ammo span { color: var(--ink-soft); }
 #ammo i { font-style: normal; font-size: 11px; color: var(--signal); margin-left: var(--s2); }
 #ammo.low b { color: var(--signal); }
-@media (pointer: fine) { #help { bottom: calc(var(--s4) + 110px + env(safe-area-inset-bottom, 0px)); } }
+@media (pointer: fine) { #help { bottom: calc(var(--s4) + 140px + env(safe-area-inset-bottom, 0px)); } } /* v32: above the ammo counter */
 @media (pointer: coarse) { #ammo { bottom: auto; top: calc(var(--s4) + 72px + env(safe-area-inset-top, 0px)); } }
 #hotbar { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); display: flex; gap: var(--s1); pointer-events: auto; }
 .slot { position: relative; width: 56px; height: 56px; padding: 0; display: grid; place-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); color: var(--ink); touch-action: none; }
@@ -75,9 +75,9 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #perf { top: calc(var(--s4) + 60px + env(safe-area-inset-top, 0px)); left: var(--s4); max-width: calc(100vw - 2 * var(--s4)); font: 500 11px/1.4 var(--font-mono); padding: var(--s1) var(--s2); }
 @media (max-width: 420px) { #perf { top: calc(var(--s4) + 96px + env(safe-area-inset-top, 0px)); } } /* the class card wraps to three lines on phones */
 #readout .gait.hot { color: var(--signal); }
-#help { bottom: calc(var(--s4) + 72px + env(safe-area-inset-bottom, 0px)); right: var(--s4); padding: var(--s2) var(--s3); color: var(--ink-soft); white-space: nowrap; }
+#help { bottom: calc(var(--s4) + 72px + env(safe-area-inset-bottom, 0px)); right: var(--s4); padding: var(--s2) var(--s3); color: var(--ink-soft); max-width: min(640px, calc(100vw - 2 * var(--s4))); line-height: 1.75; } /* v32: wraps instead of running off both edges */
 #help kbd { font-family: var(--font-mono); font-size: 11px; color: var(--ink); background: var(--key); border: 1px solid var(--line); border-radius: 3px; padding: 0 var(--s1); }
-@media (max-width: 1500px) { #help { display: none; } }
+@media (max-width: 1000px) { #help { display: none; } }
 #alert { top: calc(64px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); z-index: 6; width: min(420px, calc(100vw - 32px)); padding: var(--s3); border-color: var(--signal); display: grid; gap: var(--s1); }
 #alert b { color: var(--signal); font-size: 13px; }
 #reportnote { width: 100%; box-sizing: border-box; font: 400 14px/1.4 var(--font-ui); color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: var(--r); padding: var(--s2); resize: vertical; -webkit-user-select: text; user-select: text; }
@@ -160,6 +160,7 @@ body.armed #readout { bottom: calc(260px + env(safe-area-inset-bottom, 0px)); }
 .swatches i { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--line); flex: none; }
 @media (pointer: coarse) { #pad { display: flex; } #readout { bottom: calc(304px + env(safe-area-inset-bottom, 0px)); } } /* above the pad and hotbar */
 @media (pointer: fine) { body.armed #readout { bottom: calc(var(--s4) + env(safe-area-inset-bottom, 0px)); } }
+@media (pointer: fine) and (max-width: 760px) { #readout, body.armed #readout { bottom: calc(var(--s4) + 64px + env(safe-area-inset-bottom, 0px)); } } /* v32: off the hotbar */
 
 /* Moves sheet */
 #weapon { position: fixed; z-index: 6; top: calc(var(--s4) + 48px + env(safe-area-inset-top, 0px)); right: var(--s4); width: min(380px, calc(100vw - 2 * var(--s4))); max-height: 70vh; display: flex; flex-direction: column; pointer-events: auto; padding: 0; }
@@ -242,7 +243,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 <div id="perf" class="hud panel" hidden aria-live="off"></div>
 <div id="readout" class="hud panel"><span id="spd">0.0</span> m/s · <span class="gait" id="gait">Idle</span> · <span id="gearlbl">no gear</span></div>
 <div id="alert" class="hud panel" role="alert" hidden><b id="alerttitle"></b><span id="alerttext"></span><div class="row2"><button type="button" id="alertcopy">Copy report</button><button type="button" id="alertclose">Dismiss</button></div></div>
-<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> jump (twice for Force) · <kbd>C</kbd> slide while running, crouch when still · hold <kbd>Space</kbd> in the air: jetpack, hold <kbd>C</kbd>: hover · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>X</kbd> grenade · <kbd>G</kbd> loot a body · <kbd>Q</kbd> cover · <kbd>F</kbd> takedown from behind · <kbd>Z</kbd> reload · scroll or <kbd>1</kbd>–<kbd>6</kbd> hotbar · <kbd>I</kbd> inventory · <kbd>B</kbd> swap shoulder · <kbd>Shift</kbd>+scroll zoom · <kbd>Tab</kbd> weapon panel · click attack or fire · right-click block or aim</div>
+<div id="help" class="hud panel mouse-only"><kbd>WASD</kbd> move · <kbd>Shift</kbd> sprint · <kbd>V</kbd> sneak · <kbd>Space</kbd> jump (Force class: three) · <kbd>C</kbd> slide, or crouch when still · <kbd>E</kbd> saber on/off · click attack or fire · right-click block or aim · <kbd>R</kbd> grapple · <kbd>T</kbd> push · <kbd>H</kbd> lightning (Force) · <kbd>Y</kbd> saber throw · <kbd>X</kbd> throw · <kbd>Q</kbd> cover · <kbd>F</kbd> takedown · <kbd>G</kbd> loot · <kbd>Z</kbd> reload · <kbd>1</kbd>–<kbd>6</kbd> or scroll: hotbar · <kbd>I</kbd> inventory · <kbd>Tab</kbd> weapon panel · <kbd>M</kbd> menu · <kbd>B</kbd> shoulder · <kbd>Shift</kbd>+scroll zoom</div>
 <div id="toast" class="hud panel" role="status" hidden></div>
 <div id="feed" class="hud" aria-live="polite"></div>
 <div id="lootprompt" class="hud panel" hidden><kbd>G</kbd> Loot body</div>
@@ -433,13 +434,26 @@ for (const k of Object.keys(CLASSES)) {
     pools[k][slot] = want.length ? want : [ids[0]];
   }
 }
+// v32 (audit): variety out of the box. Moves whose speed doesn't have to match the feet rotate through up to three
+// variants by default; a save still on the old one-variant default gets them once.
+const VARIETY = ['idle', 'jump', 'stance', 'rstance', 'gshoot', 'gpull', 'garrive', 'djump'];
+try { if (!localStorage.getItem('v32-variety')) {
+  for (const k of Object.keys(CLASSES)) for (const slot of VARIETY) {
+    const ids = MOVES[slot].variants.map((v) => v.id), cur = pools[k][slot], def = CLASS_DEFAULTS[k][slot] || [ids[0]];
+    if (cur.length === 1 && def.includes(cur[0])) pools[k][slot] = [cur[0], ...ids.filter((id) => id !== cur[0])].slice(0, 3);
+  }
+  localStorage.setItem('v32-variety', '1'); try { localStorage.setItem('moves-pools', JSON.stringify(pools)); } catch (_) {}
+} } catch (_) {}
 const savePool = () => { try { localStorage.setItem('moves-pools', JSON.stringify(pools)); } catch (_) {} };
 let klass = 'light';
 try { const k = localStorage.getItem('moves-class'); if (CLASSES[k]) klass = k; } catch (_) {}
 // switches for play testing
-const testCfg = { infiniteJumps: true, infiniteNades: true, infiniteAmmo: true };
+// v32 (audit BUG-013): infinite jumps start off, so the class jump rules (single, double, the Force triple) and the wall run
+// matter; every save is switched once. Infinite ammo and grenades stay on while we test (the HUD shows ∞).
+const testCfg = { infiniteJumps: false, infiniteNades: true, infiniteAmmo: true };
 try { Object.assign(testCfg, JSON.parse(localStorage.getItem('testcfg') || '{}')); } catch (_) {}
 const saveTest = () => { try { localStorage.setItem('testcfg', JSON.stringify(testCfg)); } catch (_) {} };
+try { if (!localStorage.getItem('v32-jumps')) { testCfg.infiniteJumps = false; saveTest(); localStorage.setItem('v32-jumps', '1'); } } catch (_) {}
 let pool = pools[klass];
 const rot = {};  // rotation cursor per slot
 let moveMode = 'mix'; // 'mix': rotate through the ticked variants; 'fav': always the starred one (v29)
@@ -1006,6 +1020,7 @@ function setGunKind(kind) {
   gunKind = kind; pistol = guns[kind];
   if (gunMag) { if (kind === 'pistol') pistol.root.add(gunMag); else gunMag.removeFromParent(); }
   pistolInHand = inHand; placePistol(); reload = null; renderAmmo();
+  if (gear === 'pistol') { $('gearlbl').textContent = G().name; $('gearbtn').textContent = 'Weapon: ' + G().name; }
 }
 // ---------------- attachments (v27) ----------------
 // Each gun can carry a suppressor (quiet: soldiers only hear it within 8 m) and a scope (aiming zooms in 2.5x, with the
@@ -1107,8 +1122,8 @@ function setGear(g, instant) {
   document.body.classList.toggle('fists', g === 'none' || g === 'hilt');
   renderAmmo();
   if (g !== 'pistol') aimHeld = false;
-  $('gearbtn').textContent = 'Weapon: ' + { none: 'fists', hilt: 'hilt', lit: 'saber', pistol: 'pistol' }[g];
-  $('gearlbl').textContent = GEARS[g];
+  $('gearbtn').textContent = 'Weapon: ' + { none: 'fists', hilt: 'hilt', lit: 'saber', pistol: G().name }[g];
+  $('gearlbl').textContent = g === 'pistol' ? G().name : GEARS[g]; // v32: the gun's own name (it said 'pistol' for every gun)
   document.querySelectorAll('[data-gear]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.gear === g)));
   showBlades();
 }
@@ -1194,7 +1209,7 @@ function startGearChange(from, to) {
   if (to === 'pistol' && !pistolInHand) steps.push({ kind: 'reach', hands: [['r', hol]], dur: 0.2, at: () => { pistolInHand = true; placePistol(); } },
     { kind: 'back', hands: [['r', hol]], dur: 0.26 });
   drawing = steps.length ? { steps, i: 0, t: 0 } : null;
-  if (drawing) { atk = null; log('draw/holster', from, '→', to); }
+  if (drawing) { if (atk) stopOvr(0.15); atk = null; log('draw/holster', from, '→', to); } // v32 (audit BUG-008): the swing's pose used to stay on through the draw
 }
 function updateDraw(dt) {
   if (!drawing) return;
@@ -1326,7 +1341,7 @@ function blockPress() {
   lastBlockT = simT; // a block timed to a bolt's arrival parries it
   blocking = true; log('block');
 }
-function blockRelease() { blocking = false; if (choke) chokeEnd(false); }
+function blockRelease() { blocking = false; if (choke) chokeEnd(false); if (blasterMode()) atkHeld = false; } // v32: the saber + blaster's right-click swing counted as a held attack and turned into an endless heavy combo
 function updateCombat(dt) {
   bloom = Math.max(0, bloom - dt * 0.08);
   if (atkHeld && gear === 'pistol' && G().auto) firePistol();
@@ -1336,6 +1351,9 @@ function updateCombat(dt) {
     atk.stuckT = (atk.stuckT || 0) + dt;
     if (atk.stuckT > 0.1) { log('healed: swing finished without its callback'); const a = atk.act; onDone.delete(a); if (atk.rec || atk.heavy) { atk = null; stopOvr(0.25); } else afterAttack(); }
   }
+  // v32 (audit BUG-001): another action (grapple, push, throw, takedown, the blaster) faded the swing out and its
+  // callback went with it; the swing is over, so free the player (it used to cap walking at 1 m/s and eat clicks)
+  if (atk && atk.act && !(ovr.get(atk.act)?.target > 0)) { log('healed: swing replaced by another action'); atk = null; }
   if (atkHeld) {
     atkHeldT += dt;
     if (atkHeldT > 0.35 && atk && !atk.heavy && atk.i === 0 && !atk.rec && atk.chain !== FISTS) heavyAttack();
@@ -2249,8 +2267,10 @@ function sever(e, name, push) {
   const limbAt = bone.getWorldPosition(new V3());
   // the flying piece
   const pr = cloneSkinned(e.template || enemyTemplate); const own = [], mats = [];
-  e.root.traverse((o) => { if (o.isMesh) mats.push(o.material); });
-  let mi = 0; pr.traverse((o) => { if (o.isMesh) { o.material = mats[mi++] || o.material; if (e.skinGeo) o.geometry = e.skinGeo; o.frustumCulled = false; o.castShadow = true; } if (o.isBone) own.push(o); });
+  // v32 (audit BUG-003): only his own body meshes; the red caps from earlier cuts (and his gun, shield or aura) also hang
+  // on his bones, and picking those up painted the whole piece red from the second cut on
+  e.root.traverse((o) => { if (o.isSkinnedMesh && !o.userData.aura && o.material !== goreMat && o.material !== e.goreMat) mats.push(o.material); });
+  let mi = 0; pr.traverse((o) => { if (o.isSkinnedMesh) { o.material = mats[mi++] || o.material; if (e.skinGeo) o.geometry = e.skinGeo; o.frustumCulled = false; o.castShadow = true; } if (o.isBone) own.push(o); });
   const byName = new Map(own.map((b) => [b.name, b]));
   e.root.traverse((o) => { const b = byName.get(o.name); if (o.isBone && b) { b.position.copy(o.position); b.quaternion.copy(o.quaternion); b.scale.copy(o.scale); } });
   const pelvis = byName.get('pelvis'), limb = byName.get(name);
@@ -3400,7 +3420,7 @@ function makeSpecial(e, type) {
   if (type === 'jugg') {
     let sk = null; e.root.traverse((o) => { if (o.isSkinnedMesh && !sk) sk = o; });
     e.root.traverse((o) => { if (o.isMesh && o.material.color) o.material.color.multiplyScalar(0.55); }); // darker armour
-    const sh = new THREE.SkinnedMesh(sk.geometry, skinShieldMat()); sh.position.copy(sk.position); sh.quaternion.copy(sk.quaternion); sh.scale.copy(sk.scale);
+    const sh = new THREE.SkinnedMesh(sk.geometry, skinShieldMat()); sh.userData.aura = true; sh.position.copy(sk.position); sh.quaternion.copy(sk.quaternion); sh.scale.copy(sk.scale);
     sh.bind(sk.skeleton, sk.bindMatrix); sh.frustumCulled = false; sh.renderOrder = 3; sk.parent.add(sh);
     e.jugg = { hits: 3, pool: 260, cd: 0, mesh: sh, flash: 0 };
   }
@@ -3967,7 +3987,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v31 · 2026-09-30';
+const BUILD = 'v32 · 2026-10-01';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -4022,7 +4042,7 @@ function checkHitch(raw) {
 }
 function checkStuck(dt, inp) {
   lastInput = inp;
-  const wantsMove = inp.mag > 0.3 && mode === 'ground' && !atk && !movesOpen;
+  const wantsMove = inp.mag > 0.3 && mode === 'ground' && !atk && !movesOpen && !cover && !looting && !takedown; // v32: in cover, pushing at the wall is normal (audit BUG-009)
   stuckT = wantsMove && speed < 0.3 ? stuckT + dt : 0;
   if (stuckT > 0.6) { report('stuck', `Pushing to move (${Math.round(inp.mag * 100)}%) but the character stays at ${speed.toFixed(2)} m/s`); stuckT = 0; }
   let sum = 0; for (const b of bindQ.keys()) sum += b.quaternion.x * 3 + b.quaternion.y * 5 + b.quaternion.z * 7;
@@ -4091,7 +4111,11 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyQ' && !e.repeat) { if (cover) leaveCover('key'); else enterCover(); } // cover (v26); aim and block are on the right mouse button
 });
 addEventListener('keyup', (e) => { keys.delete(e.code); if (e.code === 'KeyH') zapEnd(); if (e.code === 'KeyC') slideHeld = false; if (e.code === 'Space') jumpHeld = false; if (e.code === 'KeyF') attackRelease(); });
-addEventListener('blur', () => { keys.clear(); slideHeld = false; jumpHeld = false; });
+// v32 (audit BUG-002): losing focus (alt-tab) or the mouse lets go of everything held, mouse buttons too; their
+// mouseup never reaches the page, so the AK kept firing and the guard stayed up
+function releaseHeld() { keys.clear(); slideHeld = false; jumpHeld = false; atkHeld = false; rmbHeld = false; aimHeld = false; if (blocking || choke) blockRelease(); zapEnd(); }
+addEventListener('blur', releaseHeld);
+document.addEventListener('pointerlockchange', () => { if (!document.pointerLockElement) { atkHeld = false; rmbHeld = false; aimHeld = false; if (blocking || choke) blockRelease(); zapEnd(); } });
 
 let toastTimer = 0;
 function toast(msg, ms = 2500) { const t = $('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, ms); }
@@ -4323,7 +4347,7 @@ function endSlide(cancel) {
 }
 
 // ---------------- inventory ----------------
-// Five hotbar slots (bottom right, scroll or 1–5) and a 20-slot backpack. Weapons and items can be dragged
+// Six hotbar slots (bottom centre, scroll or 1–6) and a 20-slot backpack. Weapons and items can be dragged
 // anywhere in the Inventory panel. Picking a weapon slot draws it; an item slot leaves your hands free and
 // Attack uses the item (throws a grenade, uses a stim). Everything you loot lands here.
 const ITEMS = {
@@ -4584,7 +4608,7 @@ function startMission(id) {
   player.position.copy(courtAt(0, def.stealth ? -27 : -18)); yaw = moveYaw = 0; camYaw = 0; camPitch = 0.12;
   if (def.stealth) stealthSetup(mission);
   selectSlot(1, true); renderInv(); renderAmmo(); toggleMissions(false); renderHealth();
-  log('mission start', id); if (def.stealth) toast(`${def.name}: the terminal is on the balcony. Don't get seen`, 2400); else toast(def.survive ? `${def.name}: they're coming in 4 s` : `${def.name}: first wave in 4 s`, 2000);
+  log('mission start', id); if (def.stealth) toast("Don't get seen", 1600); else toast(def.survive ? `${def.name}: they're coming in 4 s` : `${def.name}: first wave in 4 s`, 2000);
 }
 function courtSpot() {
   for (let i = 0; i < 40; i++) {
@@ -4992,6 +5016,8 @@ function step(dt) {
   }
   updateDash(dt);
   resolveCollisions();
+  // v32 (audit BUG-010): the sand ends at ±2000 m; an invisible edge keeps you on it
+  const EDGE = 1950; if (Math.abs(player.position.x) > EDGE || Math.abs(player.position.z) > EDGE) { player.position.x = clamp(player.position.x, -EDGE, EDGE); player.position.z = clamp(player.position.z, -EDGE, EDGE); speed = Math.min(speed, 2); }
   updateGrapple(dt);
   player.rotation.y = yaw;
   roll = damp(roll, wallRun ? wallRun.side * 0.38 : mode === 'ground' ? clamp(-yawVel * speed * 0.02, -0.14, 0.14) : 0, 8, dt);
@@ -5268,9 +5294,7 @@ function buildMoves() {
   h.push(`<h3>Class <small>your rules for now</small></h3><div class="seg" role="group" aria-label="Class">`);
   for (const [k, C] of Object.entries(CLASSES)) h.push(`<button type="button" data-class="${k}" aria-pressed="${k === klass}">${C.label}</button>`);
   h.push(`</div><p class="stats" id="classdetail"></p><p class="note">Everything ticked below is for <b id="movesfor">${CLASSES[klass].label}</b>. Each class keeps its own set.</p>`);
-  h.push(`<h3>Equipment <small>for testing; in play use the hotbar</small></h3><div class="seg" role="group" aria-label="Equipment" style="grid-template-columns:repeat(2,1fr)">`);
-  for (const g of GEAR_ORDER) h.push(`<button type="button" data-gear="${g}" aria-pressed="${gear === g}">${GEARS[g][0].toUpperCase() + GEARS[g].slice(1)}</button>`);
-  h.push(`</div><p class="note">No gear or hilt: jab, cross, kick, hook. Saber lit: the five-hit combo. Dual sabers: four dual combos (both hands strike), picked in Moves → Dual saber combo. Pistol: two hands, right-click or Aim to aim, fire from the hip or while aiming. Switching plays a draw or holster; the pistol gets a spin before it goes back.</p>`);
+  h.push(`<h3>Weapons <small>pick them in the hotbar (1–6)</small></h3><p class="note">No gear or hilt: jab, cross, kick, hook. Saber lit: the combo for the saber style below (single: five hits; dual, the default: the dual combos, both hands strike, picked in Moves → Dual saber combo). Pistol: two hands, right-click or Aim to aim, fire from the hip or while aiming. Switching plays a draw or holster; the pistol gets a spin before it goes back.</p>`);
   h.push(`<h3>Saber</h3><div class="seg" role="group" aria-label="Saber style">`);
   for (const [k, l] of [['single', 'Single'], ['dual', 'Dual'], ['staff', 'Staff']]) h.push(`<button type="button" data-sstyle="${k}" aria-pressed="${saberCfg.style === k}">${l}</button>`);
   h.push(`</div><div class="seg" role="group" aria-label="Grip" style="margin-top:8px;grid-template-columns:repeat(2,1fr)">`);
@@ -5290,7 +5314,7 @@ function buildMoves() {
     `<label class="switch"><input type="checkbox" id="infjumps" ${testCfg.infiniteJumps ? 'checked' : ''}> Infinite jumps (every class, tap Jump in the air)</label>` +
     `<label class="switch"><input type="checkbox" id="infnades" ${testCfg.infiniteNades ? 'checked' : ''}> Infinite grenades (off: each throw uses one from your inventory)</label>` +
     `<label class="switch"><input type="checkbox" id="infammo" ${testCfg.infiniteAmmo ? 'checked' : ''}> Infinite spare ammo (off: reloads use the pistol ammo in your inventory; the magazine always empties)</label>`);
-  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> throw (the grenade, sticky, fire grenade or teleport orb you picked last), <kbd>G</kbd> loot a body, <kbd>V</kbd> sneak, <kbd>Q</kbd> take cover (A/D along it, right-click to peek, fire without aiming to blind fire), <kbd>F</kbd> behind an unaware soldier: takedown (a finisher on one who's down or hurt), attack while sprinting at a soldier: dash strike, hold right-click and grapple a soldier: yank him to you, <kbd>Z</kbd> reload (it also reloads itself when empty), scroll wheel or <kbd>1</kbd>–<kbd>5</kbd> hotbar, <kbd>I</kbd> inventory, <kbd>E</kbd> saber on/off, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
+  h.push(`<h3>Controls</h3><p class="note">Keyboard: <kbd>WASD</kbd> move, <kbd>Shift</kbd> sprint, <kbd>Space</kbd> jump (hold in the air: jetpack), <kbd>C</kbd> slide or crouch (hold in the air: hover), click attack or fire, right-click block or aim, <kbd>R</kbd> grapple (ground, air, enemies), <kbd>T</kbd> Force push, <kbd>X</kbd> throw (the grenade, sticky, fire grenade or teleport orb you picked last), <kbd>G</kbd> loot a body, <kbd>V</kbd> sneak, <kbd>Q</kbd> take cover (A/D along it, right-click to peek, fire without aiming to blind fire), <kbd>F</kbd> behind an unaware soldier: takedown (a finisher on one who's down or hurt), attack while sprinting at a soldier: dash strike, hold right-click and grapple a soldier: yank him to you, <kbd>Z</kbd> reload (it also reloads itself when empty), scroll wheel or <kbd>1</kbd>–<kbd>6</kbd> hotbar, <kbd>I</kbd> inventory, <kbd>E</kbd> saber on/off, <kbd>Shift</kbd>+scroll zoom, <kbd>Tab</kbd> this panel, <kbd>M</kbd> menu. Saber lit, in the air after a double jump: attack for a ground pound.</p>`);
   h.push(`</section>`);
   $('weaponbody').innerHTML = h.join(''); h.length = 0;
   h.push(`<section data-panel="moves">`);
@@ -5451,7 +5475,7 @@ function renderRec() {
 function renderClassDetail() {
   const C = CLASSES[klass];
   $('classdetail').textContent = `${C.who}. Walk ${C.walk} · run ${C.jog} · sprint ${C.sprint} m/s (no stamina limit). ` +
-    `Jump ${C.doubleJump ? '+ double jump' : 'single'}. Slide ${C.slideTime}s. ${C.health} HP (not used until combat).`;
+    `Jump ${C.tripleJump ? '+ double and triple jump' : C.doubleJump ? '+ double jump' : 'single'}${testCfg.infiniteJumps ? ' (infinite jumps is on below)' : ''}. Slide ${C.slideTime}s. ${C.health} HP (not used until combat).`;
 }
 
 // ---------------- performance readout (Tests → Performance) ----------------
@@ -5597,6 +5621,8 @@ function start() {
     get dash() { return !!dash; }, get dashes() { return dashes; }, dashTarget: () => dashTarget()?.id || null, get yanks() { return yanks; }, setRmb(v) { rmbHeld = v; },
     setGadget(k, v) { gadgets[k] = v; }, get swing() { return grapple.state === 'pull' && !!grapple.swing; }, get grappleState() { return grapple.state; }, get tdLabel() { return $('tdprompt').lastChild.textContent.trim(); },
     enterCover, leaveCover, get cover() { return cover ? { low: cover.low, peek: +cover.peek.toFixed(2), edge: cover.edge, u: +cover.u.toFixed(2), n: [cover.n.x, cover.n.z] } : null; }, get crouch() { return crouch; },
+    // v32 hook: how many flying pieces are painted with the gore material all over (should be 0)
+    redPieces: () => pieces.filter((pc) => { let red = false; pc.outer.traverse((o) => { if (o.isSkinnedMesh && (o.material === goreMat || (pc.e && o.material === pc.e.goreMat))) red = true; }); return red; }).length, get pieceCount() { return pieces.length; },
     ragPelvis(i) { const e = enemies[i]; return e && e.rag ? e.rag.P.pelvis.p.toArray().map((v) => +v.toFixed(2)) : null; } };
 }
 </script>

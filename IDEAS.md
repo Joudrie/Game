@@ -146,7 +146,7 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 ## Other ideas (not tied to a game)
 **Saber**
 - ✅ It lights up faces and the ground; it scorches and sparks when it cuts the world; hum, swing and ignite sounds
-- ✅ Saber and blaster as one item (the blaster overheats after four shots)
+- ✅ Saber and blaster as one item (the blaster overheats after six shots)
 - ⬜ **Choose how you carry and draw it:** hip, cross-draw, back
 - ⬜ **Customisable sabers,** saved as items you find again next time
 - ⬜ Clash effects (saber on saber)
