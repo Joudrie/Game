@@ -54,6 +54,7 @@ check((await ev(() => __game.forceState())).thrown, 'saber thrown');
 await p.screenshot({ path: `${OUT}/v25-throw.png` });
 await ev(() => __game.advance(1));
 const tc = (await ev(() => __game.cuts())).find((x) => x.id === tt);
+if (!(tc.state === 'dead' || tc.severed.length)) console.log('   throw diag', JSON.stringify(await ev((id) => ({ e: __game.enemies().find((x) => x.id === id), me: __game.pos, cam: __game.camPos, look: __game.view, f: __game.forceState(), gear: __game.gear }), tt)));
 check(tc.state === 'dead' || tc.severed.length, `the thrown saber cuts him (${tc.state}, ${tc.label})`);
 check(!(await ev(() => __game.forceState())).thrown, 'and comes back to your hand');
 

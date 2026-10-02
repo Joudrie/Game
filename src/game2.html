@@ -538,7 +538,7 @@ const SUN_OFFSET = new V3(6, 14, 4);
 // Bruno Simon's grass from "infinite-world" (ISC): one field of camera-facing blades that wraps around you, lifted to
 // the terrain from a height texture, thinned with distance and on slopes, moved by wind. The sea uses three.js's
 // water normal map (MIT), scrolled on a plain material (no reflection pass).
-const TER = { half: 640, cell: 4, shore: 500, sea: -1.1, hill: 17 }; // terrain.hills: headless runs keep flat ground unless ?hills=1
+const TER = { half: 640, cell: 4, shore: 530, sea: -1.1, hill: 17 }; // terrain.hills: headless runs keep flat ground unless ?hills=1
 const terrain = { n: Math.round(2 * TER.half / TER.cell) + 1, h: null, dens: null, built: false, hills: !navigator.webdriver || new URLSearchParams(location.search).get('hills') === '1', mesh: null, grass: null, water: null, tex: null };
 function terrainH(x, z) {
   if (!terrain.built) return 0;
@@ -571,8 +571,9 @@ function buildTerrain() {
     let v = noise.noise(x / 95, z / 95, 1.7) * 0.75 + noise.noise(x / 38, z / 38, 7.3) * 0.3 + noise.noise(x / 16, z / 16, 3.1) * 0.08;
     v = Math.max(-0.05, v * TER.hill + 3); // rolling hills up to about 15 m, mostly above the flat parts
     if (!terrain.hills) v = 0;
-    v *= sm(5, 30, dist[k]) * (1 - sm(TER.shore - 150, TER.shore - 50, r)); // flat near buildings and roads (rising over 25 m), and toward the coast
+    v *= 1 - sm(TER.shore - 150, TER.shore - 50, r); // lower toward the coast
     v += 0.6 * (1 - sm(TER.shore - 60, TER.shore - 10, r)) * sm(TER.shore - 150, TER.shore - 60, r); // a low dune behind the beach
+    v *= sm(5, 30, dist[k]); // flat near buildings and roads (rising over 25 m), dune or not
     const fall = sm(TER.shore - 45, TER.shore + 40, r); // the beach, then the sea floor
     h[k] = v * (1 - fall) + (TER.sea - 3.5) * fall;
     if (h[k] < TER.sea + 1.6 && r > TER.shore - 110) dens[k] = 0; // no grass on the beach or under water
