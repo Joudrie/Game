@@ -1,0 +1,13 @@
+# Voice 1 (the owner), session 3 (car): humming and singing to himself (snippets of real songs: replace before any sale).
+# Cut by loudness and word timings, every clip checked with speech-to-text (v40).
+@source assets/voice/raw/v1_owner_session3_songs.m4a
+hum 23.92 29.71
+hum 42.99 49.40
+hum 50.13 53.63
+hum 63.14 71.77
+hum 95.71 98.49
+hum 100.87 103.99
+hum 108.86 110.19
+hum 141.67 145.29
+hum 146.46 150.75
+hum 188.85 197.51

@@ -1,6 +1,6 @@
 # Recording soldier voices
 
-How the owner records lines, and how they become the game's voices (v37).
+How the owner records lines, and how they become the game's voices (v37; build with `python3 tools/make_voice.py v1 assets/voice/v1_takes*.txt`).
 
 ## Recording
 - One long recording is fine. Before each group, say the label quietly: "This is me saying reloading". Then yell the takes, with about a second's pause between them.
@@ -32,9 +32,14 @@ How the owner records lines, and how they become the game's voices (v37).
 | `fire` | set alight | screaming |
 | `barrels` | a barrel blows up near him | "Who put those barrels there?!" |
 | `taunt` | you die | "Target down!", "Got him!" |
+| `death` | the last cry when he dies (not headshots) | 64 takes: grunts, gasps, screams |
+| `ready` | sometimes after a reload | "Good to go!", "I'm back up!" |
+| `calm` | sometimes when they lose you for good | "All right everyone, back to your posts." |
+| `hum` `idle` `radio` `yawn` | a calm guard near you, every 6 to 14 s | humming, "How long is this shift?", "Post four, all clear.", yawns |
+| `bump` `dsus` `blown` | *the disguise, not built yet* | "Watch it!", "What unit are you?", "Impostor!" |
 | `fragout` | *not used yet*: soldiers throwing grenades | "Frag out!" |
 
 ## Rules in the game
 - One voice says one line at a time. With everyone sharing voice v1, you never hear two soldiers at once; a scream cuts a calmer line off.
-- Takes come from a shuffled deck per category, so the same take never plays twice in a row.
+- A take that just played sits out for half its category's takes (at least 5) before it can come back; the next is random from the rest.
 - A soldier who dies mid-sentence stops talking.

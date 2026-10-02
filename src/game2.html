@@ -1294,8 +1294,13 @@ const VO_CATS = { // pri: who interrupts whom; cd: seconds before the same categ
   spot: { pri: 2, cd: 2.5 }, jedi: { pri: 2, cd: 8 }, alarm: { pri: 2, cd: 3 }, grenade: { pri: 2, cd: 1.5 }, mandown: { pri: 2, cd: 3 },
   whatthe: { pri: 2, cd: 6 }, panic: { pri: 2, cd: 10 }, barrels: { pri: 2, cd: 15 }, reload: { pri: 1, cd: 3 }, cover: { pri: 1, cd: 6 },
   search: { pri: 1, cd: 5 }, medic: { pri: 1, cd: 5 }, taunt: { pri: 1, cd: 3 }, sus: { pri: 1, cd: 1.2 }, giveup: { pri: 1, cd: 4 }, fragout: { pri: 2, cd: 2 },
+  death: { pri: 3, cd: 0.2 }, ready: { pri: 1, cd: 6 }, calm: { pri: 1, cd: 6 }, // v40
+  idle: { pri: 0, cd: 20 }, radio: { pri: 0, cd: 12 }, hum: { pri: 0, cd: 10 }, yawn: { pri: 0, cd: 15 }, // v40: calm guards muttering to themselves
+  bump: { pri: 1, cd: 2 }, dsus: { pri: 2, cd: 3 }, blown: { pri: 2, cd: 3 }, // v40: recorded for the disguise (not built yet)
 };
-const vo = { buf: {}, deck: {}, now: {}, cool: {}, pending: [], log: [], total: 0, on: true, range: 55 };
+const VO_FALLBACK = { death: 'pain', ready: null, calm: 'giveup' }; // a voice without the takes uses these instead
+const VO_MUTTER = [['hum', 0.35], ['idle', 0.25], ['radio', 0.25], ['yawn', 0.15]];
+const vo = { buf: {}, recent: {}, now: {}, cool: {}, pending: [], log: [], total: 0, on: true, range: 55, nextMutter: 4 };
 function initVoices() {
   for (const [voice, set] of Object.entries(window.__ASSETS.vo || {})) {
     vo.buf[voice] = {};
@@ -1307,14 +1312,17 @@ function initVoices() {
 }
 const voiceNames = () => Object.keys(window.__ASSETS.vo || {});
 function voiceOf(e) { if (!e.voice) { const v = voiceNames(); e.voice = v[Math.floor(Math.random() * v.length)] || 'v1'; } return e.voice; }
-function dealTake(voice, cat) { // a shuffled deck per category; reshuffled when it runs out, never starting on the take just played
-  const all = vo.buf[voice]?.[cat]; if (!all || !all.length) return null;
-  const key = voice + '/' + cat; let d = vo.deck[key];
-  if (!d || !d.length) {
-    d = vo.deck[key] = [...all].sort(() => Math.random() - 0.5);
-    if (d.length > 1 && d[d.length - 1] === vo.deck[key + ':last']) d.unshift(d.pop());
-  }
-  return (vo.deck[key + ':last'] = d.pop());
+// v40 (the owner's rule): a take that just played sits out for a while before it can come back. It cools down for
+// half the category's takes, at least 5 (64 deaths: any death sound waits 32 deaths; 5 taunts: 4), and the next one
+// is picked at random from the rest, across every soldier with this voice.
+function dealTake(voice, cat) {
+  const all = vo.buf[voice]?.[cat];
+  if (!all || !all.length) return VO_FALLBACK[cat] ? dealTake(voice, VO_FALLBACK[cat]) : null;
+  const key = voice + '/' + cat, recent = vo.recent[key] || (vo.recent[key] = []);
+  const hold = Math.min(all.length - 1, Math.max(5, Math.floor(all.length / 2)));
+  const free = all.filter((t) => !recent.includes(t)), take = free[Math.floor(Math.random() * free.length)] || all[0];
+  recent.push(take); while (recent.length > hold) recent.shift();
+  return take;
 }
 // a soldier says a line of this category now, or after `delay` seconds if he's still alive by then; a delayed line
 // waits up to `patience` more seconds for the voice to be free (someone else may be mid-sentence)
@@ -1347,6 +1355,11 @@ function updateVoices() {
     if (gone || say(p.e, p.cat) || simT > p.until) vo.pending.splice(vo.pending.indexOf(p), 1);
   }
   for (const v in vo.now) { const cur = vo.now[v]; if (cur && cur.end > simT && cur.e) cur.g.gain.value = 1.1 / (1 + cur.e.g.position.distanceTo(player.position) * 0.06); } // follows him as he moves
+  if (simT >= vo.nextMutter) { // v40: now and then a calm guard near you mutters, hums, yawns or checks in on the radio
+    vo.nextMutter = simT + 6 + Math.random() * 8;
+    const near = enemies.filter((o) => !o.civ && o.state !== 'dead' && o.mind === 'patrol' && (o.sus || 0) < 0.2 && o.g.position.distanceTo(player.position) < 24);
+    if (near.length) { let r = Math.random(), cat = 'hum'; for (const [c, w] of VO_MUTTER) if ((r -= w) <= 0) { cat = c; break; } say(near[Math.floor(Math.random() * near.length)], cat); }
+  }
 }
 // the nearest soldier still standing within r of a spot, who can see it (or is close enough to hear it)
 function nearestSoldier(at, r, but) {
@@ -2540,7 +2553,7 @@ function updateEnemies(dt) {
       if ((e.losT = (e.losT || 0) - dt) <= 0) { e.losT = 0.25; e.los = lineOfSight(eyeOf(e), playerChest()); }
       const lostBefore = e.lostT || 0; e.lostT = e.los ? 0 : lostBefore + dt;
       if (lostBefore < 4 && e.lostT >= 4) say(e, 'search'); // v37: "Where'd he go?"
-      if (e.lostT > 20) { e.mind = 'patrol'; e.post = pos.clone(); e.sus = 0; e.wp = null; log('lost you', e.id); say(e, 'giveup'); }
+      if (e.lostT > 20) { e.mind = 'patrol'; e.post = pos.clone(); e.sus = 0; e.wp = null; log('lost you', e.id); say(e, Math.random() < 0.5 ? 'calm' : 'giveup'); }
       let move = new V3(), clip = 'SW_Idle_Gun_Pointing', sp = 0;
       if (!e.los && dist > 3) { move.copy(DF().smart ? fwd.clone().applyAxisAngle(UP, 0.9 * (e.strafe || 1)) : fwd); sp = 3.2; clip = clips.has('SW_Run') ? 'SW_Run' : 'SW_Run_Shoot'; }
       else if (dist > 18) { move.copy(fwd); sp = 3.2; clip = 'SW_Run_Shoot'; }
@@ -2557,7 +2570,7 @@ function updateEnemies(dt) {
       // shoot: blaster pistols fire bolts you can see, block and parry; AK-47s fire bursts of bullets you can't deflect
       e.fireT -= dt;
       if (!e.los) e.fireT = Math.max(e.fireT, 0.5);
-      if (e.reloadT > 0) { e.reloadT -= dt; e.fireT = Math.max(e.fireT, e.reloadT + 0.3); } // v37: changing mags, a window to push
+      if (e.reloadT > 0) { e.reloadT -= dt; e.fireT = Math.max(e.fireT, e.reloadT + 0.3); if (e.reloadT <= 0 && Math.random() < 0.35) say(e, 'ready'); } // v37: changing mags, a window to push (v40: "Good to go!")
       const range = e.gunKind === 'sniper' ? 120 : e.gunKind === 'shotgun' ? 20 : 50, rifle = e.gunKind === 'ak' || e.gunKind === 'ar' || e.gunKind === 'shotgun';
       if (!rifle && e.fireT < 0.4 && !e.tell && dist < range) { e.tell = true; glint(muzzleOf(e)); } // the tell before a bolt (or a sniper's scope glint): time your block to it
       if (e.gunKind === 'sniper') sniperLaser(e, e.los && e.fireT < 1.3 && dist < range);
@@ -2667,7 +2680,7 @@ function damageEnemy(e, amount, zone, kind, dir) {
   e.last = { zone, kind };
   if (e.hp > 0) { alarm(e, 'hurt'); if (e.state !== 'knock') hitReact(e, zone); say(e, kind !== 'saber' && Math.random() < 0.2 ? 'hit' : 'pain'); return; }
   setMark(e, null);
-  hushDead(e); if (zone !== 'head' && kind !== 'choke' && kind !== 'fire') say(e, 'pain'); // v37: a last cry, unless it was instant
+  hushDead(e); if (zone !== 'head' && kind !== 'choke' && kind !== 'fire') say(e, 'death'); // v37: a last cry, unless it was instant (v40: its own 64 takes)
   // your rules: head if the killing shot is in the head; legs if most of the damage (and the killing shot) went to the legs
   const type = kind === 'explosion' ? 'explosion' : kind === 'impact' ? 'impact' : kind === 'push' ? 'push' : kind === 'grapple' ? 'grapple' : kind === 'pound' ? 'pound' : kind === 'choke' ? 'choke' : kind === 'lightning' ? 'lightning' :
     zone === 'head' ? 'head' : zone === 'legs' && e.dmg.legs >= e.total / 2 ? 'legs' : 'torso';
@@ -2955,7 +2968,7 @@ function applyCut(e, c, sweep) {
   } else if (/^(thigh|calf|foot)_/.test(sev)) { // a leg: he goes down and crawls after you
     sever(e, sev, push.clone().multiplyScalar(1.1)); bleedStump(e, sev);
     e.crawling = true; e.state = 'crawl'; eplay(e, 'M2M_Crawl', { fade: 0.35 });
-    say(e, 'pain'); say(e, 'medic', 2.2, 4); // v37
+    say(e, 'arm'); say(e, 'medic', 2.2, 4); // v37 (v40: the cut-off screams)
     killFeed.unshift(e.cutLabel); if (killFeed.length > 5) killFeed.pop(); renderFeed('cut');
   } else { // a hand or an arm: it comes off and he lives
     const side = sev.slice(-1), gunSide = (e.gunHand || 'hand_r').slice(-1);
@@ -4744,7 +4757,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v39 · 2026-10-02';
+const BUILD = 'v40 · 2026-10-02';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
