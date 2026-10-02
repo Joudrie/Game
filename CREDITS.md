@@ -29,6 +29,7 @@ Most assets are CC0 (public domain) and need no credit. The ones below need cred
 - **Saber and Force sounds (v25):** Freesound 47124, 47125, 47126 (gyzhor), 591433 and 423799, plus Kenney forceField_001. All CC0; see `build/sfx/SOURCE.txt`.
 - **v27:** the M4 carbine (AssaultRifle2_4), suppressor (Silencer_Short) and scope (Scope_1) from the same Quaternius *Ultimate Gun Pack* (CC0). Sounds: Free Firearm Sound Library AR-15, Kenney Impact Sounds (glass and wood breaking), and Freesound 609587 (grenade blast). All CC0; see `build/GUNS_SOURCE.txt` and `build/sfx/SOURCE.txt`.
 - **v30:** fire flames and smoke are Kenney's *Particle Pack* (CC0), in `build/fx_flames.png` and `build/fx_smoke.png`. See `assets/misc/particles/SOURCE.txt`.
+- **v33:** blood splats are the same pack's dirt sprites (CC0), in `build/fx_splat.png`.
 - **v31 world:** Kenney *City Kit (Commercial)* 2.1, *City Kit (Industrial)* 2.0 and *Nature Kit* (CC0): the buildings, grass, flowers, bushes, rocks, trees and path stones, packed into `build/world_buildings.glb` and `build/world_nature.glb` by `tools/pack_buildings.mjs`. The clouds reuse the v30 Kenney smoke sprite. See `assets/world/kenney/SOURCE.txt`.
 - Everything else (Kenney, Quaternius, OpenGameArt CC0, Freesound CC0, Free Firearm Sound Library) is CC0. Libraries (Rapier, Jolt, cannon-es, three-vrm, nipplejs, Yuka, Sketchbook, three-fps) are MIT or Apache-2.0.
 

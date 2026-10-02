@@ -2,6 +2,23 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v33: audit fixes, batch 2
+Most of Batch 2 from `audit/REPORT.md`. Tests: `tools/test38-audit-batch2.mjs`.
+- **Mission 3 starts out of sight:** against the outside of the south wall, left of the gate, facing it. Standing still used to fail the mission in 6–8 s.
+- **The saber duellist's guard works:**
+  - Each of your swings is blocked or lands once (it used to be decided on every frame of contact). He blocks three, his guard breaks, then you cut him.
+  - He also opens up right after his own blow lands: counter him.
+  - No guard recovery while you're attacking.
+  - He fights inside your blade's reach (at 2.1 m your swings fell short while his landed).
+- **You can get round the shield soldier and the duellist:** they turn at most 100° and 140° a second. Three pistol shots in the back drop the shield soldier.
+- **The grapple swing works from the ground:** a launch along the rope, and it no longer lets go while the rope is still reeling in. You hang upright now; the flying pose had you upside down.
+- **C crouches with the saber, pistol or a rifle out,** not just with fists.
+- **Juggernauts and shield soldiers:** one hit per swing (a long swing could count twice).
+- **Recoil you can see:** each shot kicks the view about three times as much as before and settles back over about 0.3 s.
+- **No first-use freeze from guns:** the shaders for every gun, the throwables, the throw arc, tracers, sparks and gore compile while the game loads. The first pistol draw compiled 11 new shaders mid-play; now it compiles 2.
+- **Blood splats are irregular splatter,** not perfect red discs: Kenney's Particle Pack dirt sprites (CC0), tinted dark red.
+- **Still to do from Batch 2:** cut variety (tried a random combo opener, but some openers fall short and it scrambled the designed combo order; next is the slanted cut that follows the blade's angle) and a real model for the shield soldier's shield.
+
 ## v32: audit fixes, batch 1 (the quick wins)
 The full audit is in `audit/REPORT.md` (also as a page: https://claude.ai/artifact/BfXt8RGyuyEq87WM4WiPNF). This version fixes its Batch 1. Tests: `tools/test37-audit-fixes.mjs`.
 - **The saber no longer gets stuck "mid-attack".** Grappling, pushing or throwing in the middle of a swing, clicking during a takedown, or firing the Saber + blaster used to leave you walking at 1 m/s with clicks doing nothing until you jumped. Any action that replaces a swing now ends it cleanly.

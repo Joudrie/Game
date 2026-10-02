@@ -722,6 +722,23 @@ async function boot() {
   gear = ITEMS[inv.hot[inv.active]?.id]?.gear || 'none'; // start holding whatever the selected hotbar slot holds
   if (ITEMS[inv.hot[inv.active]?.id]?.gun) setGunKind(ITEMS[inv.hot[inv.active].id].gun);
   start();
+  prewarm();
+}
+// v33 (audit): compile the shaders of things that otherwise first appear mid-fight (every gun, the throwables, the
+// throw arc, tracers, sparks, gore), so the first pistol draw or grenade doesn't stall the game while they compile
+function prewarm() {
+  try {
+    const g = new THREE.Group(); g.position.copy(player.position).add(new V3(0, -40, 0)); // below the ground, out of sight
+    for (const k of Object.keys(guns)) g.add(guns[k].root.clone(true));
+    for (const k of Object.keys(NADES)) g.add(makeThrowable(k));
+    g.add(new THREE.Mesh(new THREE.SphereGeometry(0.1, 6, 4), goreMat)); for (let i = 0; i < 3; i++) g.add(new THREE.Mesh(splatPlane, splatMaterial()));
+    scene.add(g); g.updateMatrixWorld(true);
+    const vis = [arcLine.visible, arcEnd.visible]; arcLine.visible = arcEnd.visible = true;
+    const at = g.position.clone(); tracer(at, at.clone().add(UP), 0xfff1c2); flash(at); sparks(at, UP);
+    renderer.compile(scene, camera);
+    scene.remove(g); arcLine.visible = vis[0]; arcEnd.visible = vis[1];
+    log('prewarm', renderer.info.programs.length, 'programs');
+  } catch (e) { log('prewarm failed', e.message); }
 }
 boot().catch((e) => { console.error(e); $('loadmsg').textContent = 'The character failed to load: ' + (e.message || e); document.querySelector('#loading .bar').hidden = true; });
 
@@ -953,14 +970,14 @@ function placeRifle() {
 // left hand pulled onto the fore-grip by arm IK (no free two-handed rifle animations exist; see assets/weapons/REPORT.md).
 // grip / fore: [fraction along the model from the stock, fraction down from the top]. Models: Quaternius Ultimate Gun Pack (CC0).
 const GUNS = {
-  pistol:  { name: 'Pistol', ammo: 'ammo', mag: 12, cd: 0.16, pellets: 1, spread: 0, dmg: { head: 100, torso: 34, legs: 26 }, sound: 'pistol', kick: 1, camKick: 0.012, reload: [1.05, 1.35], bolt: 'bullet' },
-  ak:      { name: 'AK-47', ammo: 'ammo_rifle', mag: 30, cd: 0.1, auto: true, pellets: 1, spread: 0.008, bloom: 0.003, dmg: { head: 100, torso: 40, legs: 30 }, sound: 'ak', kick: 0.45, camKick: 0.006,
+  pistol:  { name: 'Pistol', ammo: 'ammo', mag: 12, cd: 0.16, pellets: 1, spread: 0, dmg: { head: 100, torso: 34, legs: 26 }, sound: 'pistol', kick: 1, camKick: 0.035, reload: [1.05, 1.35], bolt: 'bullet' },
+  ak:      { name: 'AK-47', ammo: 'ammo_rifle', mag: 30, cd: 0.1, auto: true, pellets: 1, spread: 0.008, bloom: 0.003, dmg: { head: 100, torso: 40, legs: 30 }, sound: 'ak', kick: 0.45, camKick: 0.02,
              reload: [1.5, 1.9], len: 0.88, grip: [0.36, 0.42], fore: [0.63, 0.3], model: 'ak', bolt: 'bullet' },
-  shotgun: { name: 'Pump shotgun', ammo: 'ammo_shells', mag: 6, cd: 0.85, pellets: 9, spread: 0.065, dmg: { head: 45, torso: 30, legs: 22 }, falloff: [8, 26], sound: 'shotgun', after: 'pump', kick: 1.7, camKick: 0.03,
+  shotgun: { name: 'Pump shotgun', ammo: 'ammo_shells', mag: 6, cd: 0.85, pellets: 9, spread: 0.065, dmg: { head: 45, torso: 30, legs: 22 }, falloff: [8, 26], sound: 'shotgun', after: 'pump', kick: 1.7, camKick: 0.075,
              reload: [1.7, 2.1], len: 1.0, grip: [0.3, 0.45], fore: [0.62, 0.45], model: 'shotgun', knock: 7, bolt: 'bullet' },
-  ar:      { name: 'M4 carbine', ammo: 'ammo_rifle', mag: 30, cd: 0.085, auto: true, pellets: 1, spread: 0.005, bloom: 0.002, dmg: { head: 100, torso: 34, legs: 26 }, sound: 'ar', kick: 0.35, camKick: 0.005,
+  ar:      { name: 'M4 carbine', ammo: 'ammo_rifle', mag: 30, cd: 0.085, auto: true, pellets: 1, spread: 0.005, bloom: 0.002, dmg: { head: 100, torso: 34, legs: 26 }, sound: 'ar', kick: 0.35, camKick: 0.016,
              reload: [1.4, 1.8], len: 0.84, grip: [0.34, 0.52], fore: [0.64, 0.36], model: 'ar', bolt: 'bullet' },
-  sniper:  { name: 'Sniper rifle', ammo: 'ammo_sniper', mag: 5, cd: 1.2, pellets: 1, spread: 0, dmg: { head: 300, torso: 200, legs: 160 }, zoom: 20, sound: 'sniper', after: 'bolt', kick: 2, camKick: 0.035,
+  sniper:  { name: 'Sniper rifle', ammo: 'ammo_sniper', mag: 5, cd: 1.2, pellets: 1, spread: 0, dmg: { head: 300, torso: 200, legs: 160 }, zoom: 20, sound: 'sniper', after: 'bolt', kick: 2, camKick: 0.085,
              reload: [1.8, 2.2], len: 1.2, grip: [0.26, 0.5], fore: [0.5, 0.45], model: 'sniper', bolt: 'bullet' },
 };
 let gunKind = 'pistol';
@@ -1635,7 +1652,12 @@ function updateGrapple(dt) {
       if (grapple.swing) { grapple.len = grapple.anchor.distanceTo(player.position.clone().add(new V3(0, 1.6, 0))); grapple.swingT = 0; }
       grapple.state = 'pull'; mode = 'grapple'; crouch = false; atk = null;
       grapple.vel.set(Math.sin(moveYaw) * speed, vy, Math.cos(moveYaw) * speed);
-      playGrappleAnim('gpull', true); log('grapple attached');
+      if (grapple.swing) { // v33 (audit BUG-006): a launch along the rope and up, so a swing started from the ground leaves the ground
+        const to = grapple.anchor.clone().sub(player.position).setY(0); if (to.lengthSq() > 1e-4) to.normalize();
+        grapple.vel.addScaledVector(to, 9).add(new V3(0, 7, 0));
+        playOvr('Jump_Loop', { loop: true, fade: 0.15 }); // upright while swinging (the flying pulls hung you upside down)
+      } else playGrappleAnim('gpull', true);
+      log('grapple attached');
       if (grapple.enemy) { const e = grapple.enemy; e.state = 'grappled'; e.grabT = 0; e.vel.set(0, 0, 0); eplay(e, 'SW_HitRecieve', { loop: false, fade: 0.06 }); }
     }
     if (grapple.state === 'miss' && grapple.t > grapple.flight * 2) { grapple.state = 'idle'; rope.visible = hook.visible = false; stopOvr(0.2); return; }
@@ -2024,7 +2046,7 @@ function updateEnemies(dt) {
         eplay(e, clips.has('SW_Run') ? 'SW_Run' : 'Jog_Fwd_Loop');
         e.g.rotation.y = e.yaw; emix(e, dt); continue;
       }
-      e.yaw = wrapAngle(e.yaw + wrapAngle(Math.atan2(to.x, to.z) - e.yaw) * (1 - Math.exp(-6 * dt)));
+      if (e.jackal) turnCapped(e, Math.atan2(to.x, to.z), 1.75, dt); else e.yaw = wrapAngle(e.yaw + wrapAngle(Math.atan2(to.x, to.z) - e.yaw) * (1 - Math.exp(-6 * dt)));
       const fwd = to.clone().normalize(), side = new V3(fwd.z, 0, -fwd.x);
       e.strafeT -= dt; if (e.strafeT <= 0) { e.strafe = -e.strafe || 1; e.strafeT = 1.5 + Math.random() * 2.5; }
       // he only shoots what he can see; out of sight he closes in (on Hard and Extreme he comes round the side)
@@ -2445,8 +2467,22 @@ function updateBlood(dt) {
   }
   for (const s of [...splats]) { s.t += dt; if (s.t > 25) { scene.remove(s.m); splats.splice(splats.indexOf(s), 1); } }
 }
+// v33 (audit): blood lands as irregular splatter (Kenney Particle Pack "dirt" sprites, CC0, tinted dark red) instead of perfect discs
+let splatMats = null;
+function splatMaterial() {
+  if (splatMats === null) {
+    splatMats = [];
+    const b64 = (window.__ASSETS.tex || {}).splat;
+    if (b64) for (let i = 0; i < 3; i++) {
+      const t = new THREE.TextureLoader().load('data:image/png;base64,' + b64); t.colorSpace = THREE.SRGBColorSpace; t.repeat.set(1 / 3, 1); t.offset.set(i / 3, 0);
+      splatMats.push(new THREE.MeshBasicMaterial({ map: t, color: 0x8a0d0d, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }));
+    }
+  }
+  return splatMats.length ? splatMats[Math.floor(Math.random() * splatMats.length)] : splatMat;
+}
+const splatPlane = new THREE.PlaneGeometry(2.6, 2.6).rotateX(-Math.PI / 2);
 function splat(at, r) {
-  const m = new THREE.Mesh(splatGeo, splatMat); m.position.set(at.x, at.y + 0.012, at.z); m.scale.setScalar(r); m.rotation.y = Math.random() * 6.3; scene.add(m);
+  const sm = splatMaterial(), m = new THREE.Mesh(sm === splatMat ? splatGeo : splatPlane, sm); m.position.set(at.x, at.y + 0.012, at.z); m.scale.setScalar(r); m.rotation.y = Math.random() * 6.3; scene.add(m);
   splats.push({ m, t: 0 }); if (splats.length > 90) { scene.remove(splats[0].m); splats.shift(); }
 }
 
@@ -2865,6 +2901,8 @@ const eyeOf = (e) => e.g.position.clone().add(new V3(0, 1.6, 0));
 const playerChest = () => player.position.clone().add(new V3(0, crouch ? 0.85 : 1.25, 0));
 const playerHead = () => player.position.clone().add(new V3(0, crouch ? 1.05 : 1.6, 0));
 function turnTo(e, want, rate, dt) { const d = wrapAngle(want - e.yaw); e.yaw = wrapAngle(e.yaw + d * (1 - Math.exp(-rate * dt))); return d; }
+// v33 (audit BUG-014): a capped turn (radians per second), so you can get round the shield soldier and the duellist
+function turnCapped(e, want, maxRate, dt) { const d = wrapAngle(want - e.yaw); e.yaw = wrapAngle(e.yaw + clamp(d, -maxRate * dt, maxRate * dt)); return d; }
 // the ? and ! over a soldier's head
 const markTex = {};
 function markTexture(ch) {
@@ -3391,7 +3429,8 @@ function swingGrapple(dt, wx, wz) {
   const hz = Math.hypot(v.x, v.z); if (hz > 0.5) yaw = moveYaw = wrapAngle(yaw + wrapAngle(Math.atan2(v.x, v.z) - yaw) * (1 - Math.exp(-8 * dt)));
   const gy = groundAt(player.position.x, player.position.z, player.position.y + 0.3);
   if (player.position.y <= gy) player.position.y = gy;
-  if (player.position.y <= gy + 0.01 && grapple.swingT > 0.4 && v.y <= 0) { releaseGrapple(false); mode = 'ground'; vy = 0; speed = Math.min(hz, CLASSES[klass].sprint); jumps = 0; log('swing landed'); }
+  // v33: a swing only 'lands' once the rope has finished reeling in
+  if (player.position.y <= gy + 0.01 && grapple.swingT > 0.4 && v.y <= 0 && grapple.len <= clear + 0.05) { releaseGrapple(false); mode = 'ground'; vy = 0; speed = Math.min(hz, CLASSES[klass].sprint); jumps = 0; log('swing landed'); }
   if (grapple.t > 25) releaseGrapple(false);
 }
 
@@ -3449,22 +3488,28 @@ function juggDown(e) { e.jugg.mesh.removeFromParent(); e.jugg.hits = 0; e.jugg.p
 // a blade meeting a special soldier: true when the hit is stopped (by the force field, the shield or his own saber)
 function guardAgainstBlade(e, tip) {
   if (!(atk || thrown || dash) && ((e.jugg && e.jugg.hits > 0) || e.duel || (e.jackal && facingAway(e, player.position) > 0.3))) return true; // walking into them with the blade does nothing: swing (owner, v30)
+  const sw = atk || thrown || dash; // v33: one hit per swing (a long swing used to count twice, a cooldown blocked the next)
   if (e.jugg && e.jugg.hits > 0) {
-    if (e.jugg.cd > 0) return true;
-    e.jugg.cd = 0.35; e.jugg.hits--; shieldFlash(e.jugg); sparks(tip, UP); sfx('deflect', tip, 0.9);
+    if (e.jugg.cd > 0 || (sw && e.jugg.swing === sw)) return true;
+    e.jugg.cd = 0.12; e.jugg.swing = sw; e.jugg.hits--; shieldFlash(e.jugg); sparks(tip, UP); sfx('deflect', tip, 0.9);
     if (e.jugg.hits <= 0) juggDown(e); return true;
   }
   if (e.jackal && facingAway(e, player.position) > 0.3) {
-    if (e.jackal.cd > 0) return true;
-    e.jackal.cd = 0.35; e.jackal.hits--; shieldFlash(e.jackal); sparks(tip, UP); sfx('deflect', tip, 0.9);
+    if (e.jackal.cd > 0 || (sw && e.jackal.swing === sw)) return true;
+    e.jackal.cd = 0.12; e.jackal.swing = sw; e.jackal.hits--; shieldFlash(e.jackal); sparks(tip, UP); sfx('deflect', tip, 0.9);
     if (e.jackal.hits <= 0) jackalBreak(e); return true;
   }
   if (e.duel && blocking && !atk && e.duel.stagger <= 0) return true; // your guard meets his blade: a clash, not a cut
-  if (e.duel && e.duel.stagger <= 0 && !e.duel.attack && e.duel.guard > 0 && facingAway(e, player.position) > 0.2) {
-    if (e.duel.cd > 0) return true;
-    e.duel.cd = 0.3; e.duel.guard--; e.duel.regenT = 0; sparks(tip, UP); sfx('parry', tip, 0.6);
+  if (e.duel) { // v33 (audit BUG-005): block or cut is decided once per swing (it used to be per blade contact, so one swing could
+    // spend two guard points, or be blocked on one frame and cut on the next). Open: staggered, from behind, or after his own blow lands.
+    const D = e.duel;
+    if (sw && D.swing === sw) return D.swingBlocked;
+    const open = D.stagger > 0 || D.guard <= 0 || facingAway(e, player.position) <= 0.2 || (D.attack && D.attack.hit);
+    D.swing = sw; D.swingBlocked = !open;
+    if (open) return false;
+    D.guard--; D.regenT = 0; sparks(tip, UP); sfx('parry', tip, 0.6);
     eplay(e, 'Sword_Block', { loop: false, fade: 0.05, speed: 1.4 });
-    if (e.duel.guard <= 0) { e.duel.stagger = 1.6; toast('Guard broken', 700); log('duellist guard broken', e.id); }
+    if (D.guard <= 0) { D.stagger = 1.6; D.attack = null; toast('Guard broken', 700); log('duellist guard broken', e.id); }
     return true;
   }
   return false;
@@ -3497,9 +3542,9 @@ function updateSpecialFx(e, dt) {
 // the duellist's fight: close in, circle, swing; you block or parry it
 function duelUpdate(e, dt, to, dist) {
   const D = e.duel, pos = e.g.position;
-  turnTo(e, Math.atan2(to.x, to.z), 8, dt);
+  turnCapped(e, Math.atan2(to.x, to.z), 2.45, dt);
   if (D.stagger > 0) { D.stagger -= dt; eplay(e, 'M2M_Dizzy', { fade: 0.1 }); if (D.stagger <= 0) D.guard = 2; return; }
-  if ((D.regenT += dt) > 2.2 && D.guard < 3) { D.guard++; D.regenT = 0; }
+  if (!atk && (D.regenT += dt) > 2.2 && D.guard < 3) { D.guard++; D.regenT = 0; } // v33: no recovery while you're swinging
   if (D.attack) {
     const A = D.attack; A.t += dt;
     if (!A.hit && A.t > 0.38) {
@@ -3514,7 +3559,7 @@ function duelUpdate(e, dt, to, dist) {
     return;
   }
   let clip = 'Sword_Idle';
-  if (dist > 2.1) { pos.addScaledVector(to.clone().normalize(), 3.2 * dt); clip = 'Jog_Fwd_Loop'; }
+  if (dist > 1.65) { pos.addScaledVector(to.clone().normalize(), 3.2 * dt); clip = 'Jog_Fwd_Loop'; } // v33: he duels inside your blade's reach (at 2.1 m your swings fell short while his landed)
   else { const side = new V3(to.z, 0, -to.x).normalize(); pos.addScaledVector(side, (e.strafe || 1) * 0.8 * dt); }
   collideCircle(pos, 0.35); pos.y = groundAt(pos.x, pos.z, pos.y + 0.3);
   eplay(e, clip, { fade: 0.2 });
@@ -3987,7 +4032,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v32 · 2026-10-01';
+const BUILD = 'v33 · 2026-10-02';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -4605,7 +4650,8 @@ function startMission(id) {
   [...enemies].forEach(removeEnemy); for (const b of [...bolts]) removeBolt(b);
   if (grapple.state !== 'idle') releaseGrapple(false);
   cover = null; takedown = null; hp = 1; hurtT = 99; mode = 'ground'; speed = 0; vy = 0;
-  player.position.copy(courtAt(0, def.stealth ? -27 : -18)); yaw = moveYaw = 0; camYaw = 0; camPitch = 0.12;
+  player.position.copy(courtAt(def.stealth ? -10 : 0, def.stealth ? -23.6 : -18)); yaw = moveYaw = 0; camYaw = 0; camPitch = 0.12;
+  if (def.stealth) { yaw = moveYaw = camYaw = Math.PI / 2; } // v33 (audit BUG-004): start outside, against the south wall beside the gate, out of every guard's sight; face the gate
   if (def.stealth) stealthSetup(mission);
   selectSlot(1, true); renderInv(); renderAmmo(); toggleMissions(false); renderHealth();
   log('mission start', id); if (def.stealth) toast("Don't get seen", 1600); else toast(def.survive ? `${def.name}: they're coming in 4 s` : `${def.name}: first wave in 4 s`, 2000);
@@ -4928,7 +4974,7 @@ function step(dt) {
   if (atk) target = Math.min(target, 1.0);
   if (atk) { jumpQueued = false; slideQueued = false; }
   if (blocking) slideQueued = false;                     // you can block in the air, but not slide while guarding
-  if ((gear === 'lit' || gear === 'pistol') && crouch && !inCover) crouch = false;
+  // v33 (audit BUG-007): crouching works with the saber or a gun out too (it used to be cancelled here)
   if (takedown || dash) target = 0;
 
   // facing
@@ -5179,7 +5225,7 @@ function updateCamera(dt, C) {
   const scoped = gear === 'pistol' && pistolInHand && gunZoom() && aimHeld && isStrafing();
   const inScope = scoped && camera.fov < BASE_FOV * 0.6;
   $('scope').hidden = !inScope; if (hero) hero.visible = !inScope && !dead; if (pistol && pistol.rifle) pistol.root.visible = !inScope; // the scope shows the world, not the back of your head
-  if (camKick > 0) { const r = Math.min(camKick, camKick * 10 * dt + 0.0005); camPitch = clamp(camPitch + r, -0.45, 1.15); camKick -= r; }
+  if (camKick > 0) { const r = Math.min(camKick, camKick * 6 * dt + 0.0003); camPitch = clamp(camPitch + r, -0.45, 1.15); camKick -= r; } // v33: bigger kicks (GUNS camKick) that settle over about 0.3 s
   const sprintT = clamp((speed - C.jog) / (C.sprint - C.jog), 0, 1);
   const h = dead ? 0.5 : mode === 'slide' ? 1.05 : crouch ? 1.15 : 1.55;
   const F = dead ? dead.focus : player.position; // dead: the camera watches your body
