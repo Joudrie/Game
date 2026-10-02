@@ -2,6 +2,27 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v36: things that go off, and a score
+The first step toward VISION.md's first milestone (Mission 1, "The cargo yard"). Test: `tools/test44-barrels-score.mjs`.
+- **Exploding barrels and gas tanks** (Quaternius Toon Shooter kit, CC0). These set them off:
+  - a shot, yours or a soldier's;
+  - a swing of the saber or the thrown saber;
+  - a grenade or another blast;
+  - a soldier thrown into one;
+  - a Force push, which throws the barrel so it goes off wherever it lands or on whoever it hits.
+- Barrels near a blast go off a moment later, one after another: **chain reactions**. A gas tank leaves a fire burning.
+- **Landmines** click when someone steps on them (you, a soldier or a civilian), then blow a third of a second later. Blasts set them off too.
+- The sandbox has ten clusters of barrels by the roads and one minefield with warning signs. They come back a minute after going off, once you're away.
+- **Score:** points pop up where someone dies.
+  - Every kill is 50. Extra: barrel or landmine +150, chain reaction +200, silent takedown +100, Force kill +75, long fall +100, headshot +50, and +50 for anyone who never knew you were there.
+  - Kills within 4 s of each other multiply, up to ×5.
+  - A civilian costs 200.
+  - The score shows top left, under the class.
+- **Missions:**
+  - Each mission keeps its own score, and the mission result shows it with your best.
+  - Finishing without any of the mission's soldiers spotting you earns the **perfect-stealth trophy**.
+- The hidden collision boxes of barrels, trees and street props now have their position set when they're made. Shots could pass straight through them until the next frame was drawn.
+
 ## v35: civilians, and a build half the size
 Test: `tools/test43-civilians.mjs`.
 - **Civilians walk the streets:** men and women from Quaternius' *Universal Base Characters* in the Peasant clothes from *Modular Character Outfits - Fantasy* (both CC0). Each one gets a hairstyle (six, and beards), a hair colour, a skin tone and a clothes colour.
