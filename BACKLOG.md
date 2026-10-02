@@ -32,6 +32,11 @@ The ground rules:
 - **Inspiration:** the owner's book *Wake* (weapons such as plasma knives, plasma and beryllium rifles, holocloaks, magboots, hoverboards, breaching kits; worlds like Marfeld and Kelton) and the Lego collection's lore (the Snow Jedi, the Purple Shadow, the realm where guns don't work).
 - **Licences still apply:** assets ripped from commercial games (like the Skate 3 or Call of Duty files people pass around) can't go in. We take ideas from those games, and assets only from properly licensed sources.
 
+## Fixes (owner, after v38)
+- [x] **Running through the ground** *(v39: the camera sank into hills; now stays over the ground and out of the grass)*
+- [x] **Lightsabers killing juggernauts and Force users outright** *(v39: the dash strike skipped their field and guard; the Force ignored them)*
+- [ ] any other movement problems the owner sees: send a report or say where
+
 ## World (owner, after v36)
 - [x] **Grass and hills, water at the edge** *(v38: noise hills flattened under the city, Grass004 ground, infinite-world grass blades, the sea)*
 - [ ] grass that bends around soldiers and civilians too, not only you
