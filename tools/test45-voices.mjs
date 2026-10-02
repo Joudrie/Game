@@ -15,7 +15,7 @@ await p.mouse.click(640, 300); await p.waitForTimeout(2500); // the click starts
 
 const loaded = await ev(() => __game.voLoaded);
 const cats = Object.keys(loaded.v1 || {}), total = Object.values(loaded.v1 || {}).reduce((a, n) => a + n, 0);
-check(cats.length === 21 && total === 97, `voice v1 decodes: ${total} takes in ${cats.length} categories`);
+check(cats.length === 31 && total === 291 && loaded.v1.death === 64, `voice v1 decodes: ${total} takes in ${cats.length} categories, ${loaded.v1.death} death sounds`);
 
 // an open patch of ground away from buildings and roads, as in test42
 const O = await ev(() => { for (let r = 60; r < 400; r += 10) for (let a = 0; a < 6.28; a += 0.2) { const x = Math.cos(a) * r, z = Math.sin(a) * r; if (__game.blocks.every((b) => Math.hypot(Math.max(b.min[0] - x, 0, x - b.max[0]), Math.max(b.min[2] - z, 0, z - b.max[2])) > 25) && !__game.onRoad(x, z, 5)) return [Math.round(x), Math.round(z)]; } return null; });
@@ -37,8 +37,12 @@ check(!blocked && cut && now && now.cat === 'pain', `a calm line waits; a scream
 // takes don't repeat back to back
 const takes = [];
 for (let i = 0; i < 24; i++) { await ev(() => __game.voReset()); await ev(() => __game.say(0, 'spot')); takes.push((await ev(() => __game.voNow.v1))?.take); }
-const repeats = takes.filter((t, i) => i && t === takes[i - 1]).length;
-check(takes.every(Boolean) && repeats === 0 && new Set(takes).size === 10, `24 "Contact!"s: all 10 takes used, none twice in a row (${repeats} repeats)`);
+const soon = (list, hold) => list.filter((t, i) => list.slice(Math.max(0, i - hold), i).includes(t)).length; // v40: a take sits out for `hold` plays
+const repeats = soon(takes, 5);
+check(takes.every(Boolean) && repeats === 0 && new Set(takes).size === 10, `24 "Contact!"s: all 10 takes used, none again within 5 (${repeats} too soon)`);
+const deaths = [];
+for (let i = 0; i < 70; i++) { await ev(() => __game.voReset()); await ev(() => __game.say(0, 'death')); deaths.push((await ev(() => __game.voNow.v1))?.take); }
+check(deaths.every(Boolean) && soon(deaths, 32) === 0 && new Set(deaths).size > 45, `70 death cries: ${new Set(deaths).size} different, none again within 32 (${soon(deaths, 32)} too soon)`);
 // a soldier who dies mid-sentence goes quiet (a headshot: no last cry either)
 await fresh(); await ev(() => __game.say(0, 'alarm'));
 const id0 = (await ev(() => __game.voNow.v1))?.id;
@@ -66,7 +70,7 @@ await fresh(); await ev(() => { __game.cutEnemy(0, 'upperarm_r'); for (let t = 0
 s = await said(); check(s[0] === 'arm' && (s.includes('panic') || s.includes('medic')), `an arm off: "MY ARM!", then "Fall back!" or "Medic!" (${s.join(' ')})`);
 // a leg off: pain, then "Medic!"
 await fresh(); await ev(() => { __game.cutEnemy(0, 'thigh_l'); for (let t = 0; t < 30; t++) __game.advance(0.1); });
-s = await said(); check(s.includes('pain') && s.includes('medic'), `a leg off: a scream, then "Medic!" (${s.join(' ')})`);
+s = await said(); check(s.includes('arm') && s.includes('medic'), `a leg off: a scream, then "Medic!" (${s.join(' ')})`);
 // on fire
 await fresh(); await ev(([x, z]) => { __game.firePatch(x + 3, z + 6); __game.advance(0.3); }, O);
 s = await said(); check(s.includes('fire'), `set alight: screaming (${s.join(' ')})`);
@@ -87,6 +91,12 @@ await fresh();
 s = await ev(([x, z]) => { const g = __game; g.setMind(1, 'combat'); g.advance(0.05); g.voReset(); g.damageEnemy(0, 999, 'head', 'bullet'); for (let t = 0; t < 10; t++) g.advance(0.1); return g.voLog.map((l) => l.split(':')[0]); }, O);
 check(s.includes('mandown') || s.includes('whatthe') || s.includes('panic'), `a buddy goes down: "Man down!" (${s.join(' ')})`);
 
+// v40: a calm guard near you mutters, hums, yawns or talks on the radio now and then
+await fresh();
+s = await ev(([x, z]) => { const g = __game; const n = g.enemies().filter((e) => e.state !== 'dead').length; for (let i = 1; i < n; i++) { g.moveEnemy(i, x + 300 + i * 4, z + 300); g.setMind(i, 'patrol', 999); } /* the rest out of sight */
+  g.moveEnemy(0, x, z + 10, 0); g.setMind(0, 'patrol', 999); g.place(x, z); g.advance(0.05); g.voReset();
+  for (let t = 0; t < 400 && !g.voLog.some((l) => /^(hum|idle|radio|yawn):/.test(l)); t++) g.advance(0.1); return g.voLog.map((l) => l.split(':')[0]); }, O);
+check(s.some((c) => ['hum', 'idle', 'radio', 'yawn'].includes(c)), `a calm guard nearby mutters to himself (${s.join(' ')})`);
 check(errs.length === 0, `no page errors (${errs.length})`);
 console.log(fail ? `${fail} FAILED` : 'all passed');
 await b.close();

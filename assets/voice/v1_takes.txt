@@ -1,6 +1,7 @@
 # Voice 1 (the owner), session 1: one take per line, "category start end" in seconds of raw/v1_owner_session1.m4a.
 # Cut from loudness (quiet = the spoken labels, loud = takes) and checked clip by clip with speech-to-text.
 # Categories are the game's voice events (VO in src/game2.html). tools/make_voice.py turns these into build/vo/.
+@source assets/voice/raw/v1_owner_session1.m4a
 pain 10.14 10.61
 pain 12.80 13.25
 pain 15.26 15.84

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Cut a voice recording into the game's voice clips (build/vo/<voice>/<category>_<n>.ogg).
 
-  python3 tools/make_voice.py v1 assets/voice/raw/v1_owner_session1.m4a assets/voice/v1_takes.txt
+  python3 tools/make_voice.py v1 assets/voice/v1_takes*.txt
 
-The takes file lists "category start end" (seconds). Each take gets a little padding, a high-pass (rumble; the room was quiet enough that noise reduction only smeared consonants),
+Each takes file names its recording on an "@source <path>" line, then lists "category start end" (seconds); one voice
+can draw on any number of sessions. Each take gets a little padding, a high-pass (rumble; the room was quiet enough that noise reduction only smeared consonants),
 the silence after it trimmed (never the start: it eats soft first consonants),
 its loudness evened out from the loud part of the take (ffmpeg's loudnorm misbehaves on one-second clips) with a
 peak limit, short fades, and Opus mono 24 kHz (a few KB a line). Needs ffmpeg and numpy.
@@ -12,18 +13,25 @@ check them with faster-whisper (see v37 in CHANGELOG.md).
 """
 import subprocess, sys, pathlib, collections
 import numpy as np
-voice, src, takes = sys.argv[1], sys.argv[2], sys.argv[3]
+voice, takefiles = sys.argv[1], sys.argv[2:]
 SR = 24000
 out = pathlib.Path('build/vo') / voice; out.mkdir(parents=True, exist_ok=True)
 for f in out.glob('*.ogg'): f.unlink()
-pcm = subprocess.run(['ffmpeg', '-v', 'error', '-i', src, '-af', 'highpass=f=90', '-ac', '1', '-ar', str(SR), '-f', 'f32le', '-'],
-                     check=True, capture_output=True, stdin=subprocess.DEVNULL).stdout
-x = np.frombuffer(pcm, np.float32)
-QUIET = {'sus', 'giveup', 'whatthe'}  # spoken, not yelled: kept a little quieter
+def decode(src):
+    pcm = subprocess.run(['ffmpeg', '-v', 'error', '-i', src, '-af', 'highpass=f=90', '-ac', '1', '-ar', str(SR), '-f', 'f32le', '-'],
+                         check=True, capture_output=True, stdin=subprocess.DEVNULL).stdout
+    return np.frombuffer(pcm, np.float32)
+QUIET = {'sus', 'giveup', 'whatthe', 'dsus', 'calm'}  # spoken, not yelled: kept a little quieter
+MUTTER = {'idle', 'radio', 'hum', 'yawn'}  # to himself: quieter still
 n = collections.Counter()
-for line in open(takes):
-    line = line.split('#')[0].split()
-    if len(line) != 3: continue
+lines = []
+for tf in takefiles:
+    x = None
+    for line in open(tf):
+        if line.startswith('@source'): x = decode(line.split(None, 1)[1].strip()); continue
+        line = line.split('#')[0].split()
+        if len(line) == 3: lines.append((x, line))
+for x, line in lines:
     cat, a, b = line[0], float(line[1]) - 0.07, float(line[2]) + 0.16
     n[cat] += 1
     y = x[int(max(0, a) * SR):int(b * SR)].copy()
@@ -31,7 +39,7 @@ for line in open(takes):
     db = 20 * np.log10(fr); loud = db > db.max() - 30
     last = np.nonzero(loud)[0][-1]; y = y[:min(len(y), (last + 12) * hop)]  # 120 ms after the last loud frame
     act = fr[loud]; level = 20 * np.log10(np.sqrt(np.mean(act ** 2)))
-    y *= 10 ** (((-20 if cat in QUIET else -15) - level) / 20)
+    y *= 10 ** (((-24 if cat in MUTTER else -20 if cat in QUIET else -15) - level) / 20)
     pk = np.abs(y).max(); lim = 10 ** (-1.5 / 20)
     if pk > lim: y *= lim / pk  # the loudest yells: peak-limited rather than clipped
     fi, fo = int(0.01 * SR), int(0.05 * SR); y[:fi] *= np.linspace(0, 1, fi); y[-fo:] *= np.linspace(1, 0, fo)

@@ -2,6 +2,18 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v40: your car recordings (291 lines), and no repeats
+Three more recordings, cut into 194 new takes: your voice now has 291 lines in 31 situations. Test: `tools/test45-voices.mjs`.
+- **64 death sounds** (11 before, borrowed from the pain grunts). A dying soldier now picks from these.
+- **54 ways to say reloading:** "Transitioning!", "Black on ammo!", "I'm dry!", "Topping off!", "Mag change!", "Weapon's jammed!", "Clearing a jam!"… and "Leeroding, fuck, reloading!" as you asked. After reloading, sometimes: "Good to go!", "I'm back up!"
+- **Your no-repeat rule:** a take that just played sits out for a while before it can come back: for half the takes in its group, at least 5. With 64 deaths, a death sound waits 32 deaths before it can play again; the next one is random from the rest. It counts across every soldier with your voice.
+- **Losing an arm or a leg** uses the long cut-off screams ("What—NO!", "Just a flesh wound, buddy!"), then "Medic!"
+- **More searching, giving up and suspicious lines:** "Come out and fight me!", "You can run but you can't hide!", "False alarm, everyone.", "Is someone there?" When they lose you for good, sometimes "All right everyone, back to your posts."
+- **Guards talk to themselves:** a calm guard within 24 m of you now and then hums or sings a bit, mutters ("How long is this shift?"), yawns, or checks in on the radio ("Post four, all clear."). Every 6 to 14 s, quietly.
+- **Saved for the disguise** (not built yet): bumping into a guard ("Watch it!", "Personal space, buddy."), a guard doubting you ("What unit are you?"), cover blown ("He's not one of us!", "Impostor!").
+- The songs are snippets of real songs (fine for playing with friends; swap them before any sale). The build is 11.5 MB (voices 1.5 MB).
+- `tools/make_voice.py` now takes any number of cut lists for one voice, each naming its recording (`@source`): `python3 tools/make_voice.py v1 assets/voice/v1_takes*.txt`.
+
 ## v39: the camera stays out of the ground; no shortcuts through specials
 Owner's report: "running through ground", and lightsabers killing juggernauts and Force users outright. Test: `tools/test47-specials-force.mjs`.
 - **Running through the ground was the camera.** It was only kept above height 0 (the old flat ground) and only pulled in for buildings.
