@@ -1,0 +1,9 @@
+Soldier voices: recorded by the owner (all rights theirs), for this game.
+
+raw/v1_owner_session1.m4a  voice v1, session 1 (6 min 40 s, phone recording, 2026-10-02): every soldier's voice for now.
+v1_takes.txt               where each take is in that recording, by category (cut list for tools/make_voice.py).
+
+Build: python3 tools/make_voice.py v1 assets/voice/raw/v1_owner_session1.m4a assets/voice/v1_takes.txt
+       -> build/vo/v1/<category>_<n>.ogg, embedded by tools/build2.py as __ASSETS.vo.v1.
+A new voice: record it the same way (say "this is me saying <category>" quietly, then the takes loud, with a pause
+between), add raw/v2_….m4a and v2_takes.txt, run make_voice.py v2 …; soldiers then pick v1 or v2 each.

@@ -71,7 +71,9 @@ One mission that delivers the best five minutes: stealth that works, things that
 - [x] **Pause and settings menu:** mouse sensitivity, invert Y, volume, FOV, key list *(v34: Esc or P)*
   - [ ] key rebinding
 - [x] **Sound pass** (Kenney Impact and Sci-fi Sounds, CC0) *(v34: steps, landings, punches, cuts, hits, dry fire, grapple, jetpack, pickups, gun draw, bodies falling, alarm, mission results)*
-  - [ ] voices: soldiers' shouts and chatter, pain sounds
+  - [x] voices: soldiers' shouts and pain sounds *(v37: the owner's own recording, 97 takes in 21 situations; `assets/voice/README.md`)*
+  - [ ] calm chatter on patrol (needs recording: two guards talking), and soldiers throwing grenades ("Frag out!" is recorded)
+  - [ ] more voices (v2, v3…) so the squad doesn't all sound like one guy
 
 2. **Civilians** (after the audit). Neutral people walking around the sandbox:
    - [x] they wander the streets and paths (ideally with free, licensed civilian models: several looks, men and women) *(v35: Quaternius base characters in Peasant clothes; six hairstyles, beards, skin tones, clothes colours)*
