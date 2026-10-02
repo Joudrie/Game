@@ -2,6 +2,19 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v39: the camera stays out of the ground; no shortcuts through specials
+Owner's report: "running through ground", and lightsabers killing juggernauts and Force users outright. Test: `tools/test47-specials-force.mjs`.
+- **Running through the ground was the camera.** It was only kept above height 0 (the old flat ground) and only pulled in for buildings.
+  - With the hills, it sank into the hillside whenever you ran up or down a slope or looked up. While sprinting over hills it was under the ground 41% of the time and down in the grass another 17%, as low as 1.2 m under the surface.
+  - Now it pulls in where the line from you to the camera dips below the ground, and always stays at least 0.75 m above the ground under it, rising over a slope behind you. Over the same runs it was never lower than 0.75 m.
+  - Grass blades right in front of the camera fade out, so they no longer fill the screen.
+- **The dash strike skipped every defence.** Sprinting at a juggernaut or duellist and clicking cut him in half, field or guard up. It now counts as one swing: one hit off a juggernaut's field, one guard point off a duellist (or blocked).
+- **Specials stand up to the Force:**
+  - A juggernaut's field shrugs off a choke ("His field holds"). Lightning and pushes already drained the field.
+  - A duellist (a Force user) with his guard up breaks a choke and holds his ground against a push, each costing him a guard point. He catches lightning on his blade, losing a point every 1.2 s.
+  - Break his guard and he staggers. While he staggers, the Force works on him like on anyone.
+- Swings were already fine: in a test with real clicks a juggernaut takes 7 to 10 swings and a duellist about 11.
+
 ## v38: grassy hills and the sea
 Owner's ask: grass like every game has, hills instead of flat ground, water around the edge, and no falling through the ground. Test: `tools/test46-hills.mjs`.
 - **Rolling hills,** up to about 12 m. The ground stays flat around every building, road, the start, the courtyard and the stone path, so everything that was there sits where it was. Heights come from three.js's own noise (ImprovedNoise, MIT) on a 4 m grid. Feet follow the exact triangles you see.
