@@ -60,7 +60,8 @@ const d1 = await ev(() => __game.spawnSpecial('duel', 0, 1.8)); await ev(() => _
 check((await sp(d1)).guard === 3, 'a saber duellist with a red blade and full guard');
 await p.screenshot({ path: `${OUT}/v29-duel.png` });
 const guards = [];
-for (let k = 0; k < 12 && (await sp(d1)).state !== 'dead'; k++) { await ev(() => { __game.look(0, 0.1); __game.attackPress(); __game.attackRelease(); __game.advance(0.45); }); const q = await sp(d1); guards.push(q.guard + (q.stagger > 0 ? 's' : '')); }
+// v33: face him before each swing, as a player would (he circles)
+for (let k = 0; k < 16 && (await sp(d1)).state !== 'dead'; k++) { await ev((id) => { const e = __game.enemies().find((x) => x.id === id), P = __game.pos; __game.look(Math.atan2(e.pos[0] - P[0], e.pos[2] - P[2]), 0.1); __game.attackPress(); __game.attackRelease(); __game.advance(0.45); }, d1); const q = await sp(d1); guards.push(q.guard + (q.stagger > 0 ? 's' : '')); }
 check(guards.some((g) => parseInt(g) < 3) && (await sp(d1)).state === 'dead', `he blocks your swings (guard ${guards.join(' ')}) until a cut gets through (${(await cut(d1)).label})`);
 // parry his swing
 await ev(() => { __game.advance(1.5); __game.place(0, 0); __game.look(0, 0.1); __game.advance(0.3); }); // let the combo finish (you can't guard mid-swing)

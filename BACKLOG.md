@@ -35,17 +35,18 @@ The ground rules:
 ### Audit fixes (from `audit/REPORT.md`)
 **Batch 1, quick wins** ✅ *done in v32*: the stuck swing, alt-tab held buttons, red severed pieces, the sword pose after switching, the cover false alarm, the world edge, infinite jumps off, move variety, help and labels.
 
-**Batch 2, feature fixes** (a session each)
-- [ ] **Mission 3:** a safe start beside the gate, out of sight, with patrols kept off the gate for the first 15 s (it fails on its own in 6–8 s today)
-- [ ] **Duellist:** block or cut decided once per swing; no guard recovery while you attack (test33 fails 3 times in 4)
-- [ ] **Grapple swing:** a launch impulse so it works from the ground, a higher arc, an upright pose (not upside down)
-- [ ] **Crouch with a weapon out** (C does nothing with the saber or a gun)
-- [ ] **Shield soldiers and duellists turn slower** while firing, so you can get behind them
+**Batch 2, feature fixes** ✅ *mostly done in v33*
+- [x] **Mission 3:** a safe start beside the gate, out of sight, with patrols kept off the gate for the first 15 s (it fails on its own in 6–8 s today)
+- [x] **Duellist:** block or cut decided once per swing; no guard recovery while you attack (test33 fails 3 times in 4)
+- [x] **Grapple swing:** a launch impulse so it works from the ground, a higher arc, an upright pose (not upside down)
+- [x] **Crouch with a weapon out** (C does nothing with the saber or a gun)
+- [x] **Shield soldiers and duellists turn slower** while firing, so you can get behind them
 - [ ] **Saber cut variety:** not the same thigh + chest cut on every frontal kill (towards the slanted cut)
-- [ ] **Recoil you can see:** a real camera kick per gun
-- [ ] **Shader pre-warm at load:** first frag, sticky, orb, blood, sparks and duellist each froze 1.4–10 s in the software renderer (check on a PC first)
-- [ ] **Blood splats** instead of perfect red discs (Kenney Particle Pack, CC0); a real model for the shield soldier's shield (Poly Pizza)
-- [ ] **Juggernaut:** three swings means three hits (14 clicks from the front today)
+- [x] **Recoil you can see:** a real camera kick per gun
+- [x] **Shader pre-warm at load:** first frag, sticky, orb, blood, sparks and duellist each froze 1.4–10 s in the software renderer (check on a PC first)
+- [x] **Blood splats** instead of perfect red discs *(v33: Kenney Particle Pack dirt sprites)*
+- [ ] **A real model for the shield soldier's shield** (Poly Pizza or Kenney; needs a download by hand or a key)
+- [x] **Juggernaut:** three swings means three hits (14 clicks from the front today)
 
 **Batch 3, the big ones** (several sessions)
 - [ ] **A real player character** instead of the shirtless Superhero (Quaternius Ultimate Modular Men/Women, CC0, mapped like the SWAT soldier; or The Second)
