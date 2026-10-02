@@ -2,6 +2,18 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v35: civilians, and a build half the size
+Test: `tools/test43-civilians.mjs`.
+- **Civilians walk the streets:** men and women from Quaternius' *Universal Base Characters* in the Peasant clothes from *Modular Character Outfits - Fantasy* (both CC0). Each one gets a hairstyle (six, and beards), a hair colour, a skin tone and a clothes colour.
+  - They walk from place to place along the roads and stop now and then.
+  - They run from gunfire, explosions, a lit saber close by, soldiers fighting near them, and anyone dying where they can see; about a quarter freeze and cower first.
+  - They can be shot, cut, Force-pushed, blown up and ragdolled like soldiers, with the same dismemberment. Losing an arm, they run; losing a leg, they crawl away.
+  - Soldiers never aim at them, but a soldier's bolt or missed bullet can hit one standing in the way.
+  - The kill feed marks a civilian's death. Their bodies have nothing to loot, and auto-aim and dash strikes skip them.
+  - None during missions; they come back afterwards.
+  - Menu → Tests → Performance → Civilians sets how many (none, 4, 8 or 16; 8 by default). Eight in view cost about as much to draw as sixteen soldiers.
+- **The play link is half the size: 9.3 MB, down from 15.5 MB.** The two animation libraries had every keyframe of every bone stored even where nothing moved. `tools/shrink_anims.mjs` drops the keyframes that interpolation already reproduces: 6.8 MB down to 1.6 MB. The largest difference anywhere is 0.05°. It also loads faster.
+
 ## v34: Batch 3: a real hero, streets, a pause menu, sound
 Batch 3 from `audit/REPORT.md` (civilians are next). Tests: `tools/test39-hero-look.mjs`, `test40-pause.mjs`, `test41-roads.mjs`, `test42-sounds.mjs`.
 - **You're a hooded ranger now,** not a shirtless superhero: hood, tunic, belts, bracers, pauldron and boots from Quaternius' *Modular Character Outfits - Fantasy* (CC0). It's made for the same skeleton, so every animation, cut and ragdoll works on it unchanged.

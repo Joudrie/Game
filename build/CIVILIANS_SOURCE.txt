@@ -1,0 +1,10 @@
+build/civilians.glb (v35): the civilians, a man (civ_m) and a woman (civ_f).
+
+- Bodies, eyes, eyebrows and hairstyles (SimpleParted, Buzzed, Beard, Long, Buns, BuzzedFemale; the "Rigged to Head
+  Bone" glTF versions): Quaternius "Universal Base Characters", CC0 1.0.
+  https://quaternius.itch.io/universal-base-characters
+- Clothes: the Male_Peasant and Female_Peasant outfits from Quaternius "Modular Character Outfits - Fantasy", CC0 1.0.
+  https://quaternius.com/packs/modularcharacteroutfitsfantasy.html (itch: quaternius.itch.io/modular-character-outfits-fantasy)
+- Made with: node tools/make_civilians.mjs <Universal Base Characters zip> <Modular Character Outfits - Fantasy zip>.
+  It keeps only the uncovered parts of each body (head and neck, and the woman's hands), binds clothes and hair to the
+  body's skin, simplifies the dense meshes, shrinks the colour maps to WebP and compresses with meshopt.
