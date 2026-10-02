@@ -357,11 +357,11 @@ const COARSE = matchMedia('(pointer: coarse)').matches;
 // ---------------- classes (your rules) ----------------
 const CLASSES = {
   light: { label: 'Light infantry', who: 'Soldiers, suits, civilians', health: 150,
-           walk: 1.6, jog: 4.6, sprint: 8.4, jump: 4.8, djump: 6.8, doubleJump: false, slideTime: 0.85, slideBoost: 1.1 },
+           walk: 1.6, jog: 4.6, sprint: 8.4, jump: 4.8, djump: 6.8, doubleJump: true, tripleJump: true, slideTime: 0.85, slideBoost: 1.1 },
   force: { label: 'Ultralight (Force)', who: 'Anyone with a lightsaber', health: 100,
            walk: 1.7, jog: 5.4, sprint: 12.5, jump: 5.4, doubleJump: true, tripleJump: true, djump: 8.2, slideTime: 1.15, slideBoost: 1.15 },
   heavy: { label: 'Heavy infantry', who: 'Heavy armour, miniguns', health: 250,
-           walk: 1.4, jog: 3.9, sprint: 7.0, jump: 4.0, djump: 5.6, doubleJump: false, slideTime: 0.6, slideBoost: 1.0 },
+           walk: 1.4, jog: 3.9, sprint: 7.0, jump: 4.0, djump: 5.6, doubleJump: true, tripleJump: true, slideTime: 0.6, slideBoost: 1.0 },
 };
 
 // ---------------- moves catalogue ----------------

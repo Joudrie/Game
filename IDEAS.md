@@ -152,7 +152,7 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 - ⬜ Clash effects (saber on saber)
 
 **Movement**
-- ✅ Triple jump (each jump higher), wall run during the super sprint, slides, double jump, jetpack, ground pound
+- ✅ Triple jump (each jump higher), for every class since v37.1, wall run during the super sprint, slides, double jump, jetpack, ground pound
 - ✅ **Fall damage by class:** the Force class shrugs it off, deadly ledges are striped, soldiers die from high falls (v29)
 - ⬜ Mechs (someday)
 
