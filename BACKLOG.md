@@ -32,6 +32,18 @@ The ground rules:
 - **Inspiration:** the owner's book *Wake* (weapons such as plasma knives, plasma and beryllium rifles, holocloaks, magboots, hoverboards, breaching kits; worlds like Marfeld and Kelton) and the Lego collection's lore (the Snow Jedi, the Purple Shadow, the realm where guns don't work).
 - **Licences still apply:** assets ripped from commercial games (like the Skate 3 or Call of Duty files people pass around) can't go in. We take ideas from those games, and assets only from properly licensed sources.
 
+## ★ First milestone (VISION.md): Mission 1, "The cargo yard"
+One mission that delivers the best five minutes: stealth that works, things that go off, a loud fallback that's just as fun. Built in steps:
+- [x] **Things that go off** *(v36)*: exploding barrels and gas tanks (shot, saber, push, blast, thrown body; chain reactions; a gas tank leaves fire), landmines
+- [x] **Score popups** *(v36)*: barrel, chain-reaction, silent, Force, fall and headshot kills, an "unaware" bonus, combos up to ×5, a civilian penalty; mission scores and bests
+- [x] **The perfect-stealth trophy** *(v36)*: finish a mission without any of its soldiers spotting you
+- [ ] a turret (get past it, destroy it, or take it over)
+- [ ] an alarm panel you can cut before anyone uses it
+- [ ] guard chatter and combat barks (voices: recorded by you and friends, free packs, or text-to-speech)
+- [ ] the cargo yard map (a rocky planet): containers, crates, pallets, sandbags and fences from the Quaternius Toon Shooter kit (CC0, already in `assets/`), a quiet path, a loud path and a Jedi path
+- [ ] one silly trap cutscene, and an ending that shows who the raiders work for
+- [ ] open questions in VISION.md: names (the rogue military, the planet, the faction), which figures become the first Infantry and Jedi, extraction or not
+
 ## ★ Next (owner, after v31)
 1. ✅ **Full audit** (done after v31): `audit/REPORT.md`, also as a page at https://claude.ai/artifact/BfXt8RGyuyEq87WM4WiPNF. Overall 6/10. Its fixes come in three batches (below); Batch 1 is done in v32.
 

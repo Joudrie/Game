@@ -1,0 +1,5 @@
+build/props.glb (v36): props that go off.
+
+- ExplodingBarrel, GasTank, Landmine and Sign from Quaternius "Toon Shooter Game Kit" (Dec 2022), CC0 1.0.
+  https://quaternius.com/packs/toonshootergamekit.html (the kit is in assets/weapons/quaternius-toon-shooter, see its SOURCE.txt)
+- Made with: node tools/pack_props.mjs (each model a top-level node "t-<name>"; welded, quantized, meshopt-compressed).
