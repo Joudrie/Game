@@ -1,0 +1,9 @@
+build/hero_dressed.glb (v34): the player character.
+
+- Body and skeleton: Quaternius Superhero base character (build/hero.glb), CC0. https://quaternius.com
+- Outfit: Quaternius "Modular Character Outfits - Fantasy", the Male_Ranger outfit (hood, tunic, belts, bracers,
+  pauldron, legs, boots) and its colour textures T_Ranger_* and T_Regular_Male_*, from the "glTF (Godot-Unreal)" folder.
+  Licence: CC0 1.0 (public domain). https://quaternius.com/packs/modularcharacteroutfitsfantasy.html
+  Downloaded from https://quaternius.itch.io/modular-character-outfits-fantasy (free download, upload 16289385).
+- Made with: node tools/dress_hero.mjs <the pack zip>. It binds the outfit to the hero's own skeleton (same
+  UE-mannequin joints), splits the bare body into head and rest, shrinks the textures to WebP and compresses with meshopt.

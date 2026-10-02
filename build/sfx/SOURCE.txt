@@ -12,3 +12,13 @@ ar: Free Firearm Sound Library AR-15_D_24P (CC0)
 suppressed: the pistol clip above, muffled with a low-pass filter
 glass, glass2, wood, wood2: Kenney Impact Sounds (impactGlass_heavy_000/003, impactWood_heavy_001, impactPlank_medium_002), CC0
 boom: Freesound 609587 "Grenade Explosion SFX medium-sized meaty realistic" (CC0)
+v34 sound pass:
+step1-3, punch, punch2, hit, impact, bounce: Kenney Impact Sounds (footstep_concrete_000/002/004, impactPunch_medium_000, impactPunch_heavy_001, impactSoft_medium_001, impactGeneric_light_002, impactTin_medium_001), CC0
+cut, pickup: Kenney RPG Audio (knifeSlice, handleSmallLeather), CC0
+alarm, win, lose: Kenney Interface Sounds (error_006, confirmation_002, error_008), CC0
+jet: Kenney Sci-fi Sounds thrusterFire_002 (a loop cut from the middle), CC0
+land: Freesound 364690 "Human Impact on Ground" by alegemaate (CC0)
+dry: Freesound 725402 "A rifle being dry fired once" (CC0)
+grapple: Freesound 541975 "grappling hook" by 16bitstudios (CC0)
+draw: Freesound 239959 "Gun draw holster" by huddwink (CC0)
+bodyfall: Freesound 461697 "Body falls into debris" by leonelmail (CC0)

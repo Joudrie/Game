@@ -43,8 +43,9 @@ await reset(); await ev(() => { __game.selectSlot(3, true); __game.advance(1.5);
 await p.mouse.down(); await adv(0.2); await ev(() => { dispatchEvent(new Event('blur')); document.exitPointerLock(); });
 const m1 = (await ev(() => __game.ammoMags())).ak; await adv(1.5); const m2 = (await ev(() => __game.ammoMags())).ak; await p.mouse.up();
 check(m2 === m1, `AK held, then alt-tab: firing stops (${m1} → ${m2} rounds)`);
+await ev(() => __game.setPause(false)); // v34: alt-tab pauses; resume
 await reset(); await p.mouse.down({ button: 'right' }); await adv(0.3); await ev(() => { dispatchEvent(new Event('blur')); document.exitPointerLock(); }); await adv(0.5);
-check(!(await ev(() => __game.blocking)), 'guarding, then alt-tab: the guard drops'); await p.mouse.up({ button: 'right' });
+check(!(await ev(() => __game.blocking)), 'guarding, then alt-tab: the guard drops'); await p.mouse.up({ button: 'right' }); await ev(() => __game.setPause(false));
 
 // BUG-003: severed pieces keep the uniform after several cuts
 await reset(); await ev(([x, z]) => { __game.moveEnemy(0, x, z - 4, 0); __game.setMind(0, 'patrol', 999); __game.advance(0.3); for (const c of ['hand_l', 'calf_r', 'waist']) { __game.cutEnemy(0, c); __game.advance(0.4); } __game.advance(1); }, O);

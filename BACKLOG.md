@@ -49,10 +49,14 @@ The ground rules:
 - [x] **Juggernaut:** three swings means three hits (14 clicks from the front today)
 
 **Batch 3, the big ones** (several sessions)
-- [ ] **A real player character** instead of the shirtless Superhero (Quaternius Ultimate Modular Men/Women, CC0, mapped like the SWAT soldier; or The Second)
-- [ ] **A fuller world:** roads and props between the towers (Kenney City Kit Roads, KayKit City Builder Bits, both CC0)
-- [ ] **Pause and settings menu:** mouse sensitivity, invert Y, volume, FOV, key list
-- [ ] **Sound pass** (Kenney Impact and Sci-fi Sounds, CC0)
+- [x] **A real player character** instead of the shirtless Superhero *(v34: the hooded Ranger from Quaternius Modular Character Outfits - Fantasy, CC0, on the same skeleton; Menu → Look switches back)*
+  - [ ] more outfits from the same pack (Knight, Wizard, Peasant…) as further looks, if the 16 MB budget allows (~40 KB each without textures)
+- [x] **A fuller world:** roads and props between the towers *(v34: Kenney City Kit Roads: a street grid with lights, traffic lights, signs, closed road ends, dumpsters)*
+  - [ ] more props (benches, cars, fences: KayKit City Builder Bits) and pavements by the buildings
+- [x] **Pause and settings menu:** mouse sensitivity, invert Y, volume, FOV, key list *(v34: Esc or P)*
+  - [ ] key rebinding
+- [x] **Sound pass** (Kenney Impact and Sci-fi Sounds, CC0) *(v34: steps, landings, punches, cuts, hits, dry fire, grapple, jetpack, pickups, gun draw, bodies falling, alarm, mission results)*
+  - [ ] voices: soldiers' shouts and chatter, pain sounds
 
 2. **Civilians** (after the audit). Neutral people walking around the sandbox:
    - [ ] they wander the streets and paths (ideally with free, licensed civilian models: several looks, men and women)
