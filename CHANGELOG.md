@@ -2,6 +2,27 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v37: the soldiers talk (your voice)
+Your recording is in: 97 takes in 21 situations, cut from the one 6½-minute voice memo. Test: `tools/test45-voices.mjs`.
+- **When they say what:**
+  - A guard who notices something: "Huh?", "Did you hear something?" If it comes to nothing: "Must have been the wind."
+  - Spotting you: "Contact!", "There he is!"; with your saber lit, often "We got a Jedi over here! Frag him!" Then "Sound the alarm!"
+  - Losing you in a fight: "Where'd he go?", "Spread out!" Giving up for good: "Eh, whatever."
+  - Mid-fight: "Cover me!", "Moving!", "Push up!"
+  - **Reloading is new:** a soldier stops shooting for 2.2 s after a few shots or bursts ("Reloading!", "Changing mag!"). It's a window to push him.
+  - Hit: grunts, or "I'm hit!"; dying: a last cry (not a headshot). An arm off: "MY ARM!", then "Fall back!" (his gun hand) or "Medic!". A leg off: a scream, then "Medic!"
+  - Set alight: screaming. Force-pushed or blown into the air: "AAAAH!"
+  - Your grenade coming down by them, or a sticky on one: "GRENADE!", "Get down!"
+  - A buddy dropping: "Man down!", "He's dead!", "What the?!" Three dead in a few seconds: "Fall back!"
+  - A barrel going off nearby: "WHO PUT THOSE BARRELS THERE?!"
+  - You die: "Target down!", "Got him!"
+- **Only one at a time.** Everyone has your voice for now, so only one soldier speaks at once; five never shout "Contact!" together. A scream cuts a calmer line off, and a line that has to wait (the alarm after "Contact!", "Medic!" after losing a leg) waits a moment for a gap.
+- **No repeats:** each situation deals its takes from a shuffled deck, so the same take never comes twice in a row. Each soldier's voice is pitched a hair differently.
+- **A soldier who dies mid-sentence stops talking.**
+- Voices fade with distance, and you only hear soldiers within 55 m.
+- Not used yet: "Frag out!" (for when soldiers throw grenades). Not recorded yet: calm patrol chatter.
+- **How it's made:** `tools/make_voice.py` cuts a recording from a list of takes (`assets/voice/v1_takes.txt`). The takes were found by loudness (you said the labels quietly and the lines loud), and each clip was checked with speech-to-text. More voices go in as `v2`, `v3`…; each soldier then gets one. How to record: `assets/voice/README.md`. The build is 9.95 MB (the voices are about 460 KB).
+
 ## v36: things that go off, and a score
 The first step toward VISION.md's first milestone (Mission 1, "The cargo yard"). Test: `tools/test44-barrels-score.mjs`.
 - **Exploding barrels and gas tanks** (Quaternius Toon Shooter kit, CC0). These set them off:
