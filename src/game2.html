@@ -741,6 +741,7 @@ async function boot() {
   hero.rotation.y = soldierBody.rotation.y = -Math.atan2(f.x, f.z);
   enemyTemplate = cloneSkinned(soldierBody);
   playerTemplate = cloneSkinned(hero); // your body when you die (v26), before the saber and guns are hung on it
+  if (A.civ) { try { prepareCivilians((await parseGLB(A.civ)).scene, heroBody.scale); } catch (e) { report('error', 'Civilian models failed: ' + e.message); } } // v35
   if (soldierBody === heroBody) enemyTemplate.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.color = new THREE.Color(0x6a7482); } });
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
@@ -1348,7 +1349,7 @@ function attackRelease() { atkHeld = false; }
 function faceNearestEnemy() {
   let best = null, bd = 3.5;
   for (const e of enemies) {
-    if (e.state === 'dead') continue;
+    if (e.state === 'dead' || e.civ) continue;
     const dx = e.g.position.x - player.position.x, dz = e.g.position.z - player.position.z, d = Math.hypot(dx, dz);
     if (d < bd && Math.abs(wrapAngle(Math.atan2(dx, dz) - camYaw)) < 1.75) { bd = d; best = Math.atan2(dx, dz); }
   }
@@ -2084,13 +2085,137 @@ function openSpot(minR, maxR) {
 let respawnT = 0, filled = false;
 function keepEnemiesUp(dt) {
   if (!enemyCfg.on || !enemyTemplate || !hero || mission) return; // a mission brings its own waves
-  const alive = enemies.filter((e) => e.state !== 'dead').length;
+  const alive = enemies.filter((e) => e.state !== 'dead' && !e.civ).length;
   respawnT -= dt;
   if (alive >= enemyCfg.count) filled = true;
   // the first squad arrives together; after that, replacements trickle in every 3 s
   if (alive < enemyCfg.count && respawnT <= 0) {
     const e = spawnEnemy(openSpot(filled ? 20 : 12, filled ? 34 : 24)); respawnT = filled ? 3 : 0.1;
     if (e && enemyCfg.specials !== false && !TESTING) { const r = Math.random(); if (r < 0.1) makeSpecial(e, 'jugg'); else if (r < 0.22) makeSpecial(e, 'shield'); else if (r < 0.3) makeSpecial(e, 'duel'); } // v29
+  }
+}
+// ---------------- civilians (v35) ----------------
+// People in peasant clothes (Quaternius Universal Base Characters and Modular Character Outfits, CC0) walking the
+// streets of the sandbox. They live in `enemies` with `e.civ`, so shots, cuts, the Force, grenades, ragdolls and
+// dismemberment treat them like anyone else; soldiers never aim at them, but a stray shot can hit them. They run from
+// gunfire, blasts, a lit saber close by, soldiers fighting and bodies; some freeze and cower instead.
+// Each one picks a body (man or woman), a hairstyle (and maybe a beard), hair colour, skin tone and clothes colour.
+const civTemplates = {};
+const civCfg = { count: navigator.webdriver ? 0 : 8 }; // headless tests start without them, so older suites see only soldiers
+try { const c = JSON.parse(localStorage.getItem('civcfg') || 'null'); if (c && typeof c.count === 'number') civCfg.count = c.count; } catch (_) {}
+const saveCivCfg = () => { try { localStorage.setItem('civcfg', JSON.stringify(civCfg)); } catch (_) {} };
+const CIV_CLOTHES = [0xffffff, 0xb8c8f0, 0xf0b8a8, 0xc0e0b0, 0xf0e0a0, 0xa8a8a8, 0xd8b8e0, 0x90a8c0];
+const CIV_SKIN = [0xffffff, 0xf2d6c2, 0xd6a888, 0xa87858, 0x7a5440];
+const CIV_HAIR = [0x2a2018, 0x4a3020, 0x7a5030, 0xc89858, 0x903820, 0x888888, 0x111111];
+const CIV_SPEED = { walk: 1.35, run: 4.4 };
+let civSpawnT = 0, civDeaths = 0;
+const civilians = () => enemies.filter((e) => e.civ);
+const soldiers = () => enemies.filter((e) => !e.civ);
+function prepareCivilians(sceneRoot, scale) {
+  // both skeletons are in one file, so the loader made the second one's names unique (pelvis_1, Head_1…): put them
+  // back, or no clip binds to the woman's bones
+  const male = new Set(); sceneRoot.getObjectByName('civ_m')?.traverse((o) => { if (o.isBone) male.add(o.name); });
+  sceneRoot.getObjectByName('civ_f')?.traverse((o) => { if (!o.isBone || male.has(o.name)) return; const m = o.name.match(/^(.*)_\d+$/); if (m && male.has(m[1])) o.name = m[1]; });
+  for (const [k, name] of [['m', 'civ_m'], ['f', 'civ_f']]) {
+    const n = sceneRoot.getObjectByName(name); if (!n) continue;
+    const g = new THREE.Group(); n.removeFromParent(); g.add(n);
+    g.scale.copy(scale); g.rotation.y = hero.rotation.y; // same skeleton and units as the hero
+    g.traverse((o) => { if (o.isMesh) { o.castShadow = !/^Eye/.test(o.name); o.frustumCulled = false; } }); // eyes and brows cast no shadow worth a draw call
+    civTemplates[k] = g;
+  }
+}
+const hairOf = (o) => { for (let n = o; n; n = n.parent) if (/^hair_/.test(n.name)) return n.name; return null; };
+function spawnCivilian(at, kind) {
+  const k = kind || (Math.random() < 0.5 ? 'f' : 'm'), T = civTemplates[k]; if (!T) return null;
+  const root = cloneSkinned(T);
+  const styles = new Set(); root.traverse((o) => { const h = hairOf(o); if (h && !/Beard/.test(h)) styles.add(h); });
+  const style = [...styles][Math.floor(Math.random() * styles.size)], beard = k === 'm' && Math.random() < 0.35;
+  const drop = []; root.traverse((o) => { const h = hairOf(o); if (o.isMesh && h && h !== style && !(beard && /Beard/.test(h))) drop.push(o); });
+  for (const o of drop) o.removeFromParent();
+  const clothes = new THREE.Color(CIV_CLOTHES[Math.floor(Math.random() * CIV_CLOTHES.length)]), skin = new THREE.Color(CIV_SKIN[Math.floor(Math.random() * CIV_SKIN.length)]), hair = new THREE.Color(CIV_HAIR[Math.floor(Math.random() * CIV_HAIR.length)]);
+  root.traverse((o) => {
+    if (!o.isMesh) return;
+    o.material = o.material.clone(); const m = o.material.name || '';
+    if (/Peasant/.test(m)) o.material.color.copy(clothes);
+    else if (/Superhero|Regular/.test(m)) o.material.color.copy(skin);
+    else if (/Hair/.test(m)) o.material.color.copy(hair);
+  });
+  const template = cloneSkinned(root); // what a cut-off piece is made from (sever), with this person's hair
+  template.traverse((o) => { if (o.isMesh) o.material = o.material.clone(); });
+  const g = new THREE.Group(); g.add(root); g.position.copy(at); scene.add(g);
+  const bones = {}; root.traverse((o) => { if (ENEMY_BONES.includes(o.name)) bones[o.name] = o; });
+  const e = { g, root, bones, template, mixer: new THREE.AnimationMixer(root), act: null, hp: 60, total: 0, dmg: { head: 0, torso: 0, legs: 0 },
+    state: 'engage', yaw: Math.random() * 6.283, vel: new V3(), fireT: 99, strafe: 0, strafeT: 99, hitT: 0, deadT: 0, id: 'c' + Math.random().toString(36).slice(2, 5),
+    hitBy: new Set(), gun: null, gunKind: null, civ: k, mind: 'civ', cs: 'walk', csT: 0, dest: null, fearAt: null, stuckT: 0, lastPos: at.clone(), looted: true };
+  enemies.push(e); eplay(e, 'Walk_Loop');
+  return e;
+}
+// somewhere to walk: a pavement spot on a road near him, or open ground
+function civDestination(e) {
+  const p = e.g.position, cells = [...roadCells.values()].filter((c) => Math.hypot(c.i * ROAD_T - p.x, c.j * ROAD_T - p.z) < 45);
+  for (let t = 0; t < 8; t++) {
+    let x, z;
+    if (cells.length && Math.random() < 0.85) { const c = cells[Math.floor(Math.random() * cells.length)]; x = c.i * ROAD_T + (Math.random() - 0.5) * 7; z = c.j * ROAD_T + (Math.random() - 0.5) * 7; }
+    else { const a = Math.random() * 6.283, r = 8 + Math.random() * 25; x = p.x + Math.cos(a) * r; z = p.z + Math.sin(a) * r; }
+    if (Math.hypot(x - p.x, z - p.z) > 6 && !blocks.some(({ box: B }) => x > B.min.x - 0.8 && x < B.max.x + 0.8 && z > B.min.z - 0.8 && z < B.max.z + 0.8)) return new V3(x, 0, z);
+  }
+  return null;
+}
+// something frightening happened at `at`: run from it (or freeze and cower)
+function scare(e, at, why) {
+  if (!e.civ || e.state === 'dead') return;
+  if ((e.cs === 'flee' || e.cs === 'cower') && e.csT > 2) { e.fearAt = at.clone(); return; }
+  e.fearAt = at.clone(); e.cs = Math.random() < 0.25 ? 'cower' : 'flee'; e.csT = e.cs === 'cower' ? 3 + Math.random() * 3 : 7 + Math.random() * 5;
+  log('civilian', e.id, e.cs, why);
+}
+function civUpdate(e, dt, to, dist) {
+  const pos = e.g.position;
+  // a lit saber next to them, or soldiers fighting close by
+  if (e.cs !== 'flee' && !dead && gear === 'lit' && cloakT <= 0 && dist < 4.5) scare(e, player.position, 'saber');
+  if (e.cs === 'walk' || e.cs === 'idle') for (const o of enemies) if (!o.civ && o.state !== 'dead' && o.mind === 'combat' && o.g.position.distanceTo(pos) < 18) { scare(e, o.g.position, 'fighting'); break; }
+  e.csT -= dt;
+  let sp = 0, clip = 'Idle_Loop', want = e.yaw;
+  if (e.cs === 'flee') {
+    const away = pos.clone().sub(e.fearAt || player.position).setY(0); if (away.lengthSq() < 1e-4) away.set(Math.sin(e.yaw), 0, Math.cos(e.yaw));
+    want = Math.atan2(away.x, away.z) + Math.sin(simT * 0.7 + e.id.charCodeAt(1)) * 0.35; sp = CIV_SPEED.run; clip = clips.has('Sprint_Loop') ? 'Sprint_Loop' : 'Jog_Fwd_Loop';
+    if (e.csT <= 0) { e.cs = 'walk'; e.dest = null; e.fearAt = null; }
+  } else if (e.cs === 'cower') {
+    clip = clips.has('Crouch_Idle_Loop') ? 'Crouch_Idle_Loop' : 'Idle_Loop';
+    if (e.csT <= 0) { e.cs = 'flee'; e.csT = 5 + Math.random() * 4; }
+  } else if (e.cs === 'idle') {
+    if (e.csT <= 0) { e.cs = 'walk'; e.dest = null; }
+  } else { // walk
+    if (!e.dest) e.dest = civDestination(e);
+    if (e.dest) {
+      const d = e.dest.clone().sub(pos).setY(0);
+      if (d.length() < 1) { e.dest = null; if (Math.random() < 0.4) { e.cs = 'idle'; e.csT = 2 + Math.random() * 4; } }
+      else { want = Math.atan2(d.x, d.z); sp = CIV_SPEED.walk; clip = 'Walk_Loop'; }
+    }
+  }
+  const turn = wrapAngle(want - e.yaw);
+  e.yaw = wrapAngle(e.yaw + turn * (1 - Math.exp(-(e.cs === 'flee' ? 8 : 4) * dt)));
+  if (sp > 0) {
+    pos.addScaledVector(new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw)), sp * dt * Math.max(0.2, Math.cos(turn)));
+    e.stuckT = collideCircle(pos, 0.3) ? e.stuckT + dt : Math.max(0, e.stuckT - dt);
+    if (e.stuckT > 1.2) { e.stuckT = 0; e.dest = null; if (e.cs === 'flee') e.fearAt = pos.clone().addScaledVector(new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw)), 2); } // walked into a wall: another way
+    pos.y = groundAt(pos.x, pos.z, pos.y + 0.3);
+  }
+  eplay(e, clip, { fade: 0.25 });
+}
+function keepCiviliansUp(dt) {
+  if (!Object.keys(civTemplates).length || !hero || mission || dead) return;
+  const alive = civilians().filter((e) => e.state !== 'dead');
+  for (const e of alive) if (e.g.position.distanceTo(player.position) > 160 && e.cs !== 'flee') removeEnemy(e); // wandered far off: someone else turns up nearer
+  for (const e of alive.slice(civCfg.count)) removeEnemy(e);
+  if ((civSpawnT -= dt) > 0 || alive.length >= civCfg.count) return;
+  civSpawnT = alive.length < civCfg.count * 0.75 ? 0.2 : 2.5; // the streets fill quickly, then people keep arriving
+  const cells = [...roadCells.values()].filter((c) => { const d = Math.hypot(c.i * ROAD_T - player.position.x, c.j * ROAD_T - player.position.z); return d > 22 && d < 90; });
+  for (let t = 0; t < 6; t++) {
+    let at;
+    if (cells.length) { const c = cells[Math.floor(Math.random() * cells.length)]; at = new V3(c.i * ROAD_T + (Math.random() - 0.5) * 7, 0, c.j * ROAD_T + (Math.random() - 0.5) * 7); }
+    else at = openSpot(25, 60);
+    if (!at || blocks.some(({ box: B }) => at.x > B.min.x - 0.6 && at.x < B.max.x + 0.6 && at.z > B.min.z - 0.6 && at.z < B.max.z + 0.6)) continue;
+    at.y = groundAt(at.x, at.z, 99); spawnCivilian(at); return;
   }
 }
 function collideCircle(p, r) {
@@ -2108,7 +2233,7 @@ function collideCircle(p, r) {
 }
 const muzzleOf = (e) => { const h = e.gunHand ? cutBone(e, e.gunHand) : e.bones.hand_r; return h ? h.getWorldPosition(new V3()) : e.g.position.clone().add(new V3(0, 1.3, 0)); };
 function updateEnemies(dt) {
-  keepEnemiesUp(dt);
+  keepEnemiesUp(dt); keepCiviliansUp(dt);
   for (const e of [...enemies]) {
     const pos = e.g.position;
     if (e.special && e.state !== 'dead') updateSpecialFx(e, dt);
@@ -2158,11 +2283,12 @@ function updateEnemies(dt) {
     if (e.state === 'choked') { emixPost(e, dt, CHOKE_BONES, () => chokePose(e, simT)); continue; } // held in the air by the Force (updateForce): clawing at his throat, kicking (v30)
     if (e.state === 'held') { emix(e, dt); continue; } // in a takedown
     if (e.state === 'crawl') { // lost a leg: drags himself toward you
-      e.yaw = wrapAngle(e.yaw + wrapAngle(Math.atan2(to.x, to.z) - e.yaw) * (1 - Math.exp(-2 * dt)));
-      if (active && dist > 1.2) pos.addScaledVector(new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw)), 0.45 * dt);
+      e.yaw = wrapAngle(e.yaw + wrapAngle(Math.atan2(e.civ ? -to.x : to.x, e.civ ? -to.z : to.z) - e.yaw) * (1 - Math.exp(-2 * dt))); // a civilian drags himself away
+      if (active && (dist > 1.2 || e.civ)) pos.addScaledVector(new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw)), 0.45 * dt);
       collideCircle(pos, 0.35); pos.y = groundAt(pos.x, pos.z, pos.y + 0.3);
       eplay(e, 'M2M_Crawl'); e.g.rotation.y = e.yaw; emix(e, dt); continue;
     }
+    if (e.civ) { if (e.state === 'hit' || e.state === 'getup') { e.hitT -= dt; if (e.hitT <= 0) e.state = 'engage'; } else if (!movesOpen) civUpdate(e, dt, to, dist); e.g.rotation.y = e.yaw; emix(e, dt); continue; } // v35
     if (e.state === 'hit' || e.state === 'getup') { e.hitT -= dt; if (e.hitT <= 0) e.state = 'engage'; }
     else if (active) {
       if (e.mind && e.mind !== 'combat') { calmUpdate(e, dt, to, dist); e.g.rotation.y = e.yaw; emix(e, dt); continue; } // on patrol, panicking or shouting (v26)
@@ -2345,8 +2471,9 @@ function finishDeath(e) {
   if (e.jugg && e.jugg.mesh) e.jugg.mesh.removeFromParent(); if (e.jackal) { e.jackal.mesh.removeFromParent(); e.jackal = null; }
   deathCounts[type] = (deathCounts[type] || 0) + 1;
   const label = e.cutLabel || { head: 'Headshot', torso: 'Torso', legs: 'Leg shot', explosion: 'Explosion', impact: 'Wall impact', push: 'Force push', grapple: 'Grapple strike', pound: 'Ground pound' }[type];
-  killFeed.unshift(`${label} · ${d ? d.clip : '?'}`); if (killFeed.length > 5) killFeed.pop();
-  renderFeed(type); log('enemy died', type, d && d.clip);
+  killFeed.unshift(`${e.civ ? 'Civilian · ' : ''}${label} · ${d ? d.clip : '?'}`); if (killFeed.length > 5) killFeed.pop();
+  if (e.civ) civDeaths++;
+  renderFeed(type); log(e.civ ? 'civilian died' : 'enemy died', type, d && d.clip);
   const corpses = enemies.filter((x) => x.state === 'dead');
   if (corpses.length > MAX_CORPSES) removeEnemy(corpses.sort((a, b) => b.deadT - a.deadT)[0]);
   renderEnemyTests();
@@ -2942,6 +3069,17 @@ function shootBolt(e, onTarget) {
   bolts.push({ m, vel, owner: e, t: 0, back: false, done: false });
   flash(from); sfx('blaster', from, 0.7); noise(from, HEAR.enemy);
 }
+// v35: soldiers never aim at civilians, but a round on its way past can hit one standing in the line of fire
+function strayHit(a, b, r = 0.32) {
+  let best = null, bd = Infinity;
+  for (const e of enemies) {
+    if (!e.civ || e.state === 'dead') continue;
+    const c = chestAt(e.g.position); if (e.cs === 'cower') c.y -= 0.45;
+    if (segDist(a, b, c, c) < r) { const d = a.distanceTo(c); if (d < bd) { bd = d; best = e; } }
+  }
+  return best;
+}
+function hitStray(civ, dir, kind) { civ.cutLabel = kind === 'bolt' ? 'Stray bolt' : 'Stray bullet'; damageEnemy(civ, 70, 'torso', kind, dir.clone()); sfx('hit', civ.g.position, 0.7); log('stray', kind, 'hit', civ.id); }
 function enemyBullet(e, dmg = 0.5, snd) {
   const from = muzzleOf(e), onTarget = Math.random() < DF().acc * 0.6, chest = playerChest();
   const aimAt = onTarget ? chest.clone().add(new V3((Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3, (Math.random() - 0.5) * 0.3))
@@ -2952,7 +3090,9 @@ function enemyBullet(e, dmg = 0.5, snd) {
   const sound = snd === undefined ? (e.gunKind === 'ar' ? 'ar' : 'ak') : snd;
   if (onTarget && (!wh || wh.distance > from.distanceTo(chest)) && shieldStops(from)) { const at = shieldPoint(); tracer(from, at, 0xffc97a); flash(from); if (sound) sfx(sound, from, 0.6); sparks(at, dir.clone().negate()); shieldHit(dmg * 0.12); return; } // stopped by your shield (v31)
   if (onTarget && (!wh || wh.distance > from.distanceTo(chest))) { tracer(from, chest, 0xffc97a); flash(from); if (sound) sfx(sound, from, 0.6); hurtHits(dmg, 'bullet', from); return; } // bullets can't be blocked
-  tracer(from, wh ? wh.point : from.clone().addScaledVector(camRay.ray.direction, camRay.far), 0xffc97a);
+  const end = wh ? wh.point : from.clone().addScaledVector(camRay.ray.direction, camRay.far), stray = strayHit(from, end);
+  if (stray) { tracer(from, chestAt(stray.g.position), 0xffc97a); flash(from); if (sound) sfx(sound, from, 0.6); hitStray(stray, dir, 'bullet'); return; }
+  tracer(from, end, 0xffc97a);
   impact(from, camRay.ray.direction, wh, wh ? wh.distance : camRay.far);
   flash(from); if (sound) sfx(sound, from, 0.6);
 }
@@ -3005,6 +3145,8 @@ function updateBolts(dt) {
       b.owner.cutLabel = 'Parried · his own bolt';
       damageEnemy(b.owner, 999, 'torso', 'bolt', b.vel.clone()); removeBolt(b); continue;
     }
+    const stray = strayHit(p0, p1);
+    if (stray && stray !== b.owner) { hitStray(stray, b.vel.clone().normalize(), 'bolt'); sparks(p1, b.vel.clone().negate().normalize()); removeBolt(b); continue; }
     const hb = blocks.find(({ box: B }) => B.containsPoint(p1));
     if (p1.y < groundAt(p1.x, p1.z, p1.y + 0.5) || (hb && hitBlock(hb, 40, p1, b.vel.clone().normalize()) !== 'through')) { sparks(p1, b.vel.clone().negate().normalize()); removeBolt(b); }
   }
@@ -3061,6 +3203,7 @@ function setMark(e, ch) {
 }
 let alarms = 0;
 function alarm(e, why) {
+  if (e.civ) { scare(e, player.position, why); return; }
   if (e.state === 'dead' || e.mind === 'combat') return;
   e.mind = 'combat'; e.sus = 1; e.lostT = 0; e.fireT = Math.max(e.fireT, 0.7 * DF().react); setMark(e, null); log('alarm', e.id, why);
 }
@@ -3069,7 +3212,7 @@ function raiseAlarm(e) { // his shout: everyone within 40 m joins the fight
   for (const o of enemies) if (o !== e && o.state !== 'dead' && o.g.position.distanceTo(e.g.position) < 40) alarm(o, 'shout');
   toast('Spotted: they know you\'re here', 1100);
 }
-function noise(at, r) { for (const e of enemies) if (e.state !== 'dead' && e.mind !== 'combat' && e.g.position.distanceTo(at) < r) alarm(e, 'heard it'); }
+function noise(at, r) { for (const e of enemies) { if (e.state === 'dead') continue; const d = e.g.position.distanceTo(at); if (e.civ) { if (d < r * 1.3) scare(e, at, 'noise'); } else if (e.mind !== 'combat' && d < r) alarm(e, 'heard it'); } }
 // how fast he notices you, per second (0: he can't see you)
 function seesPlayer(e, dist, to) {
   if (dead || takedown) return 0;
@@ -3084,6 +3227,7 @@ function seesPlayer(e, dist, to) {
 // a calm soldier watching someone die nearby panics for a moment, then shouts
 function witnessDeath(v) {
   const at = chestAt(v.g.position);
+  for (const o of enemies) if (o.civ && o !== v && o.state !== 'dead' && o.g.position.distanceTo(v.g.position) < 25 && lineOfSight(eyeOf(o), at)) scare(o, v.g.position, 'saw a death'); // v35
   for (const o of enemies) {
     if (o === v || o.state === 'dead' || (o.mind && o.mind !== 'patrol')) continue;
     const d = o.g.position.distanceTo(v.g.position); if (d > 22) continue;
@@ -3195,7 +3339,7 @@ function respawn() {
   hero.visible = true; hp = 1; hurtT = 99; hurtFlash = 0;
   player.position.copy(spawnAt); speed = 0; vy = 0; mode = 'ground'; jumps = 0; crouch = false;
   for (const b of [...bolts]) removeBolt(b);
-  for (const e of enemies) if (e.state !== 'dead') { e.mind = 'patrol'; e.sus = 0; e.post = e.g.position.clone(); e.wp = null; setMark(e, null); }
+  for (const e of enemies) if (e.state !== 'dead' && !e.civ) { e.mind = 'patrol'; e.sus = 0; e.post = e.g.position.clone(); e.wp = null; setMark(e, null); }
   $('deathpanel').hidden = true; renderHealth(); log('respawn');
 }
 function deadStep(dt, C) {
@@ -3522,7 +3666,7 @@ let dash = null, dashes = 0;
 function dashTarget() {
   const f = new V3(Math.sin(yaw), 0, Math.cos(yaw)); let best = null, bd = 10;
   for (const e of enemies) {
-    if (e.state === 'dead') continue;
+    if (e.state === 'dead' || e.civ) continue;
     const d = e.g.position.clone().sub(player.position); d.y = 0; const dist = d.length();
     if (dist < 2 || dist > bd || d.normalize().dot(f) < 0.8 || Math.abs(e.g.position.y - player.position.y) > 1.2) continue;
     best = e; bd = dist;
@@ -4152,8 +4296,8 @@ function updateFx(dt) {
 }
 function renderEnemyTests() {
   const el = $('enemystats'); if (!el) return;
-  const alive = enemies.filter((e) => e.state !== 'dead').length, dead = enemies.length - alive;
-  el.textContent = `${alive} alive, ${dead} bodies down. Deaths so far: ${Object.entries(deathCounts).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}.`;
+  const alive = soldiers().filter((e) => e.state !== 'dead').length, dead = soldiers().length - alive, civ = civilians().filter((e) => e.state !== 'dead').length;
+  el.textContent = `${alive} soldiers and ${civ} civilians alive, ${dead + civilians().length - civ} bodies down. Deaths so far: ${Object.entries(deathCounts).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'}.`;
 }
 
 // ---------------- strafing (aim / guard) ----------------
@@ -4187,7 +4331,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v34 · 2026-10-02';
+const BUILD = 'v35 · 2026-10-02';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -5619,6 +5763,8 @@ function buildMoves() {
   h.push(`<h3>Performance</h3><label class="switch"><input type="checkbox" id="perfon" ${perf.on ? 'checked' : ''}> Show frame rate and costs (top left)</label>` +
     `<p class="note" style="margin:8px 0 4px">Soldiers kept alive:</p><div class="seg" role="group" aria-label="Soldier count" style="grid-template-columns:repeat(4,1fr)">` +
     [5, 10, 20, 40].map((n) => `<button type="button" data-ecount="${n}" aria-pressed="${enemyCfg.count === n}">${n}</button>`).join('') + `</div>` +
+    `<p class="note" style="margin:8px 0 4px">Civilians walking the streets (v35):</p><div class="seg" role="group" aria-label="Civilian count" style="grid-template-columns:repeat(4,1fr)">` +
+    [0, 4, 8, 16].map((n) => `<button type="button" data-ccount="${n}" aria-pressed="${civCfg.count === n}">${n === 0 ? 'None' : n}</button>`).join('') + `</div>` +
     `<p class="note">"game" is the time the game logic takes each frame, "soldiers" the part spent on soldiers and severed limbs, "draw" the time to hand the frame to the graphics card. Under 16 ms in total keeps 60 fps.</p>`);
   h.push(`<h3>Status</h3><p class="stats" id="teststatus"></p>`);
   h.push(`</section>`);
@@ -5651,8 +5797,10 @@ function buildMoves() {
   body.addEventListener('click', (e) => {
     const ec = e.target.closest('[data-ecount]');
     if (ec) { enemyCfg.count = +ec.dataset.ecount; saveEnemyCfg(); respawnT = 0; filled = false; body.querySelectorAll('[data-ecount]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.ecount === enemyCfg.count)));
-      const alive = enemies.filter((x) => x.state !== 'dead'); for (const x of alive.slice(enemyCfg.count)) removeEnemy(x); renderEnemyTests(); return; }
-    if (e.target.closest('#enemyreset')) { [...enemies].filter((x) => x.state !== 'dead').forEach(removeEnemy); respawnT = 0; filled = false; renderEnemyTests(); }
+      const alive = soldiers().filter((x) => x.state !== 'dead'); for (const x of alive.slice(enemyCfg.count)) removeEnemy(x); renderEnemyTests(); return; }
+    const cc = e.target.closest('[data-ccount]');
+    if (cc) { civCfg.count = +cc.dataset.ccount; saveCivCfg(); civSpawnT = 0; body.querySelectorAll('[data-ccount]').forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.ccount === civCfg.count))); renderEnemyTests(); return; }
+    if (e.target.closest('#enemyreset')) { soldiers().filter((x) => x.state !== 'dead').forEach(removeEnemy); respawnT = 0; filled = false; renderEnemyTests(); }
     const sp = e.target.closest('[data-spawn]'); if (sp) { closeMoves(); spawnSpecial(sp.dataset.spawn); return; }
     if (e.target.closest('#enemyclear')) { [...enemies].filter((x) => x.state === 'dead').forEach(removeEnemy); renderEnemyTests(); }
   });
@@ -5803,17 +5951,17 @@ function start() {
   });
   $('perf').hidden = !perf.on;
   setGear(gear, true);
-  window.__game = { character: () => { let n = null; hero.traverse((o) => { if (!n && o.isSkinnedMesh) n = o.name; }); return n; }, enemies: () => enemies.map((e) => ({ id: e.id, state: e.state, hp: e.hp, pos: e.g.position.toArray().map((v) => +v.toFixed(1)), death: e.deathType || null, clip: e.actName })),
+  window.__game = { character: () => { let n = null; hero.traverse((o) => { if (!n && o.isSkinnedMesh) n = o.name; }); return n; }, enemies: () => soldiers().map((e) => ({ id: e.id, state: e.state, hp: e.hp, pos: e.g.position.toArray().map((v) => +v.toFixed(1)), death: e.deathType || null, clip: e.actName })),
     firePistol, forcePush, throwGrenade, deathCounts, perf,
     // test hook: cut the i-th living soldier as if the blade passed through that part (see CUTS)
-    cutEnemy(i, name) { const e = enemies.filter((x) => x.state !== 'dead')[i]; const c = CUTS.find((x) => x[0] === name); if (!e || !c) return null; applyCut(e, c, new V3(1, 0, 0)); return e.id; },
-    cuts: () => enemies.map((e) => ({ id: e.id, state: e.state, severed: (e.severed || []).map((b) => b.name), unarmed: !!e.unarmed, gun: !!e.gun, label: e.cutLabel || null })),
+    cutEnemy(i, name) { const e = soldiers().filter((x) => x.state !== 'dead')[i]; const c = CUTS.find((x) => x[0] === name); if (!e || !c) return null; applyCut(e, c, new V3(1, 0, 0)); return e.id; },
+    cuts: () => soldiers().map((e) => ({ id: e.id, state: e.state, severed: (e.severed || []).map((b) => b.name), unarmed: !!e.unarmed, gun: !!e.gun, label: e.cutLabel || null })),
     blood: () => ({ drops: drops.length, splats: splats.length, bleeders: bleeders.length, pieces: pieces.length, guns: pieces.filter((x) => x.gun).length, holes: holes.length }),
     get jetpackOn() { return !!gadgets.jetpack; }, get hotSlots() { return inv.hot.length; }, get shoulder() { return shoulder; }, countItem,
     gunsNear: () => pieces.filter((x) => x.gun).map((x) => [+x.outer.position.x.toFixed(2), +x.outer.position.z.toFixed(2), x.rest, x.kind]),
-    rearm: () => enemies.map((e) => ({ id: e.id, unarmed: !!e.unarmed, gunHand: e.gunHand || null, state: e.state })), setEnemyCount(n) { enemyCfg.count = n; respawnT = 0; filled = false; },
+    rearm: () => soldiers().map((e) => ({ id: e.id, unarmed: !!e.unarmed, gunHand: e.gunHand || null, state: e.state })), setEnemyCount(n) { enemyCfg.count = n; respawnT = 0; filled = false; },
     // test hook: shoot from the camera at a zone of the i-th living enemy (head, torso or legs)
-    shootAt(i, zone) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e) return null; fireCd = 0;
+    shootAt(i, zone) { const e = soldiers().filter((x) => x.state !== 'dead')[i]; if (!e) return null; fireCd = 0;
       const z = enemyZones(e).find((q) => q.zone === zone), at = z.a.clone().lerp(z.b, zone === 'legs' ? 0.8 : 0.5);
       return firePistol(at.sub(camera.position).normalize()); },
     // test hook: run the game for sec seconds at 30 steps a second, without waiting on the browser's frame rate
@@ -5825,69 +5973,72 @@ function start() {
       const inner = r.children[0]; return { kind: gunKind, box: sz.toArray().map((x) => +x.toFixed(2)), grip: o.toArray().map((x) => +x.toFixed(2)), muzzle: m.toArray().map((x) => +x.toFixed(2)), fore: f && f.toArray().map((x) => +x.toFixed(2)), innerRot: inner.rotation.toArray().slice(0, 3).map((x) => +x.toFixed(2)), innerChildRot: inner.children[0]?.rotation.toArray().slice(0, 3).map((x) => +x.toFixed(2)), innerScale: inner.scale.toArray().map((x) => +x.toFixed(3)) }; },
     aimProbe() { if (!pistol) return null; hero.updateMatrixWorld(true); const a = pistol.root.localToWorld(new V3(0, 0.03, 0)), m = pistol.root.localToWorld(new V3(0.2, 0.03, 0)), d = m.sub(a).normalize(), c = camera.getWorldDirection(new V3());
       return { camPitch: +camPitch.toFixed(3), barrelUp: +(Math.asin(d.y) * 57.3).toFixed(1), camUp: +(Math.asin(c.y) * 57.3).toFixed(1), off: +(d.angleTo(c) * 57.3).toFixed(1), recoil: +recoil.toFixed(2), guard: +guardBlend.toFixed(2) }; },
-    enemyAct(i) { const e = enemies.filter((q) => q.state !== 'dead')[i] || enemies[i]; const a = e.act; return { name: e.actName, t: +a.time.toFixed(2), dur: +a.getClip().duration.toFixed(2), paused: a.paused, enabled: a.enabled, w: +a.getEffectiveWeight().toFixed(2), head: +e.bones.Head.getWorldPosition(new V3()).y.toFixed(2), others: e.mixer._actions.filter((x) => x !== a && x.isRunning()).map((x) => x.getClip().name + ':' + x.getEffectiveWeight().toFixed(2)) }; },
+    enemyAct(i) { const e = soldiers().filter((q) => q.state !== 'dead')[i] || soldiers()[i]; const a = e.act; return { name: e.actName, t: +a.time.toFixed(2), dur: +a.getClip().duration.toFixed(2), paused: a.paused, enabled: a.enabled, w: +a.getEffectiveWeight().toFixed(2), head: +e.bones.Head.getWorldPosition(new V3()).y.toFixed(2), others: e.mixer._actions.filter((x) => x !== a && x.isRunning()).map((x) => x.getClip().name + ':' + x.getEffectiveWeight().toFixed(2)) }; },
     get textures() { const out = []; hero.traverse((o) => { if (o.isMesh && o.material.map) out.push(o.material.map.image ? o.material.map.image.constructor.name + ' ' + o.material.map.image.width : 'none'); }); return out; },
     dropCallbacks() { onDone.clear(); }, get atkInfo() { return atk && atk.act ? { t: atk.act.time, d: atk.act.getClip().duration, paused: atk.act.paused, enabled: atk.act.enabled, running: atk.act.isRunning(), w: atk.act.getEffectiveWeight(), stuckT: atk.stuckT, ts: atk.act.timeScale, ets: atk.act._effectiveTimeScale, lc: atk.act._loopCount, st: atk.act._startTime, loop: atk.act.loop, name: atk.act.getClip().name, rec: atk.rec, i: atk.i } : atk; }, get overrides() { return [...ovr].map(([a, o]) => a.getClip().name + ':' + o.w.toFixed(2)); },
-    get pound() { return !!pound; }, tryGroundPound, get pieces() { return pieces.length; }, sever: (i, name) => { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) sever(e, name, new V3(0, 2, 3)); },
+    get pound() { return !!pound; }, tryGroundPound, get pieces() { return pieces.length; }, sever: (i, name) => { const e = soldiers().filter((q) => q.state !== 'dead')[i]; if (e) sever(e, name, new V3(0, 2, 3)); },
     setMode(m, y) { mode = m; if (y !== undefined) player.position.y = y; }, setJumps(n) { jumps = n; }, get grappleEnemy() { return grapple.enemy ? grapple.enemy.id : null; },
     get events() { return events.slice(-12); },
     get drawing() { return drawing ? drawing.steps[drawing.i].kind + ' ' + drawing.i + '/' + drawing.steps.length : null; }, get pistolInHand() { return pistolInHand; },
     setGore(v) { enemyCfg.gore = v; },
     get blockedShots() { return blockedShots; }, get parries() { return parries; }, get guardBrokenT() { return guardBrokenT; }, get bolts() { return bolts.length; },
-    loadouts: () => enemies.map((e) => e.gunKind),
-    enemyBone(id, n) { const e = enemies.find((x) => x.id === id), b = e && cutBone(e, n); return b ? { at: b.getWorldPosition(new V3()).toArray(), g: e.g.position.toArray(), yaw: e.yaw } : null; },
+    loadouts: () => soldiers().map((e) => e.gunKind),
+    enemyBone(id, n) { const e = soldiers().find((x) => x.id === id), b = e && cutBone(e, n); return b ? { at: b.getWorldPosition(new V3()).toArray(), g: e.g.position.toArray(), yaw: e.yaw } : null; },
     shield: () => ({ yaw: +yaw.toFixed(2), bolts: bolts.length, up: shieldUp(), hp: +pshield.hp.toFixed(2), down: +pshield.down.toFixed(1), blocked: pshield.blocked, visible: !!pshield.mesh?.visible }),
     world: () => ({ ...worldStats, blocks: blocks.length, hidden: blocks.filter((b) => b.model).length, clouds: clouds.length }), setUniform(u) { soldierLook.uniform = u; },
-    looks: () => enemies.map((e) => ({ uniform: e.uniform, tone: e.tone, head: +(e.bones.Head?.scale.x || 0).toFixed(2), kind: e.gunKind })),
+    looks: () => soldiers().map((e) => ({ uniform: e.uniform, tone: e.tone, head: +(e.bones.Head?.scale.x || 0).toFixed(2), kind: e.gunKind })),
     forceState: () => ({ mode: forceMode(), target: forceTarget && forceTarget.id, ring: forceRing.visible, choke: !!choke, zap: !!zap, zapLeft: +zapLeft.toFixed(2), thrown: !!thrown, blaster: blasterMode(), heat, overheat: overheatT, scorches: scorches.length, trail: sabers.some((s) => s.blades.some((b) => b.userData.trail && b.userData.trail.visible)), light: sabers[0]?.blades[0]?.userData.light?.intensity || 0 }),
     blockBoxes: () => blocks.map(({ box: B }) => [B.min.x, B.min.y, B.min.z, B.max.x, B.max.y, B.max.z].map((v) => +v.toFixed(2))),
     forcePull, chokeStart, chokeEnd, zapStart, zapEnd, saberThrow, fireBlaster, get wallRun() { return !!wallRun; }, get jumpsDone() { return jumps; }, get vy() { return vy; },
     // test hooks: the i-th living soldier fires a bolt straight at you; arm soldier i with a gun kind
-    enemyBolt(i) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) shootBolt(e, true); return !!e; },
-    setLoadout(i, kind) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e || !guns[kind]) return; if (e.gun) e.gun.removeFromParent(); e.gun = guns[kind].root.clone(true); e.bones.hand_r.add(e.gun); const m = mounts.pistolHand; e.gun.position.copy(m.p); e.gun.quaternion.copy(m.q); e.gun.scale.copy(m.s); e.gunKind = kind; },
+    enemyBolt(i) { const e = soldiers().filter((x) => x.state !== 'dead')[i]; if (e) shootBolt(e, true); return !!e; },
+    setLoadout(i, kind) { const e = soldiers().filter((x) => x.state !== 'dead')[i]; if (!e || !guns[kind]) return; if (e.gun) e.gun.removeFromParent(); e.gun = guns[kind].root.clone(true); e.bones.hand_r.add(e.gun); const m = mounts.pistolHand; e.gun.position.copy(m.p); e.gun.quaternion.copy(m.q); e.gun.scale.copy(m.s); e.gunKind = kind; },
     get gunKind() { return gunKind; }, get fov() { return camera.fov; }, ammoMags: () => ({ ...ammo.mags }), holdFire(v) { atkHeld = v; },
     setKey(code, down) { if (down) { keys.add(code); if (code === 'Space') { jumpQueued = true; jumpHeld = true; } if (code === 'KeyC') { slideQueued = true; slideHeld = true; } } else { keys.delete(code); if (code === 'Space') jumpHeld = false; if (code === 'KeyC') slideHeld = false; } }, get vy() { return vy; }, get y() { return player.position.y; },
     explodeAt(x, y, z) { explode(new V3(x, y, z)); },
     startLoot, get looting() { return looting ? { t: +looting.t.toFixed(2), shown: looting.shown, n: looting.items.length } : null; }, get lootLog() { return lootLog.slice(); }, get lootTarget() { return lootTarget ? lootTarget.id : null; },
     inv, selectSlot, moveItem, addItem, toggleInv, countItem,
     ammo, startReload, get reload() { return reload ? { t: +reload.t.toFixed(2), empty: reload.empty } : null; }, get mags() { return mags.length; }, get magPos() { return mags.map((g) => g.m.position.toArray().map((v) => +v.toFixed(2)).concat(g.rest ? 'rest' : 'moving')); }, magDebug(big) { const g = mags[0]; if (!g) return null; if (big) g.m.scale.setScalar(big); const v = g.m.position.clone().project(camera); return { inScene: g.m.parent === scene, visible: g.m.visible, scale: g.m.scale.toArray(), screen: [+((v.x + 1) / 2 * innerWidth).toFixed(0), +((1 - v.y) / 2 * innerHeight).toFixed(0), +v.z.toFixed(3)], gunMagWorld: gunMag.getWorldScale(new V3()).toArray().map((x) => +x.toFixed(3)) }; }, get thumbs() { return Object.keys(thumbs); }, get magOut() { return magOut; },
-    fillEnemies() { while (enemies.filter((x) => x.state !== 'dead').length < enemyCfg.count) spawnEnemy(openSpot(20, 34)); },
-    moveEnemy(i, x, z, yawR) { const e = enemies.filter((q) => q.state !== 'dead')[i]; if (e) { e.g.position.set(x, groundAt(x, z, 99), z); if (yawR !== undefined) e.yaw = yawR; e.state = 'hit'; e.hitT = 5; e.g.updateMatrixWorld(true); } }, killFeed, damageEnemy: (i, amt, zone, kind) => { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) damageEnemy(e, amt, zone, kind); return !!e; },
-    playOnEnemy(i, name, from = 0, speed = 1) { const e = enemies.filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },
+    fillEnemies() { while (soldiers().filter((x) => x.state !== 'dead').length < enemyCfg.count) spawnEnemy(openSpot(20, 34)); },
+    moveEnemy(i, x, z, yawR) { const e = soldiers().filter((q) => q.state !== 'dead')[i]; if (e) { e.g.position.set(x, groundAt(x, z, 99), z); if (yawR !== undefined) e.yaw = yawR; e.state = 'hit'; e.hitT = 5; e.g.updateMatrixWorld(true); } }, killFeed, damageEnemy: (i, amt, zone, kind) => { const e = soldiers().filter((x) => x.state !== 'dead')[i]; if (e) damageEnemy(e, amt, zone, kind); return !!e; },
+    playOnEnemy(i, name, from = 0, speed = 1) { const e = soldiers().filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },
     get blocks() { return blocks.map((b) => ({ min: b.box.min.toArray().map((v) => +v.toFixed(1)), max: b.box.max.toArray().map((v) => +v.toFixed(1)) })); },
     get paused() { return paused; }, setPause, get view() { return [camYaw, camPitch]; }, get settings() { return { ...settings }; }, get baseFov() { return BASE_FOV; }, get masterVol() { return audio.master ? audio.master.gain.value : null; },
-    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, get heroLook() { return heroLook; }, heroMeshes: () => { const o = []; hero.traverse((m) => { if (m.isMesh && m.visible && m.isSkinnedMesh) o.push(m.material.transparent ? m.material.opacity : 1); }); return o; }, setLook: (l) => setHeroLookPref(l), visibleParts: (corpse) => { const o = []; const r = corpse ? dead?.body.root : hero; r?.traverse((m) => { if (m.isMesh && m.visible) o.push(m.name + ':' + (m.material?.name || '')); }); return o; },
+    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, civilians: () => civilians().map((e) => ({ id: e.id, kind: e.civ, state: e.state, cs: e.cs, pos: e.g.position.toArray().map((v) => +v.toFixed(2)), hp: e.hp, severed: (e.severed || []).map((b) => b.name), label: e.cutLabel || null, rag: !!e.rag, hair: (() => { let h = null; e.root.traverse((o) => { if (!h && o.isMesh) h = hairOf(o); }); return h; })() })),
+    setCivCount(n) { civCfg.count = n; civSpawnT = 0; }, get civDeaths() { return civDeaths; }, strayAt: (ax, ay, az, bx, by, bz) => strayHit(new V3(ax, ay, az), new V3(bx, by, bz))?.id || null, spawnCivilian: (x, z, kind) => spawnCivilian(new V3(x, groundAt(x, z, 99), z), kind)?.id || null,
+    scareCiv(id, x, z) { const e = enemies.find((q) => q.id === id); if (e) scare(e, new V3(x, 0, z), 'test'); }, shootCiv(id, zone = 'torso') { const e = enemies.find((q) => q.id === id); if (e) damageEnemy(e, zone === 'head' ? 100 : 34, zone, 'bullet', e.g.position.clone().sub(player.position).setY(0).normalize()); }, cutCiv(id, name) { const e = enemies.find((q) => q.id === id), c = CUTS.find((x) => x[0] === name); if (e && c) applyCut(e, c, new V3(1, 0, 0)); },
+    get heroLook() { return heroLook; }, heroMeshes: () => { const o = []; hero.traverse((m) => { if (m.isMesh && m.visible && m.isSkinnedMesh) o.push(m.material.transparent ? m.material.opacity : 1); }); return o; }, setLook: (l) => setHeroLookPref(l), visibleParts: (corpse) => { const o = []; const r = corpse ? dead?.body.root : hero; r?.traverse((m) => { if (m.isMesh && m.visible) o.push(m.name + ':' + (m.material?.name || '')); }); return o; },
     get pos() { return player.position.toArray().map((v) => +v.toFixed(2)); }, place(x, z) { player.position.set(x, groundAt(x, z, 99), z); }, look(yawR, pitchR) { camYaw = yawR; camPitch = pitchR; },
     grapplePress, get grapple() { return grapple.state; }, sweepSaberClipping, get slide() { return { speed: +slideSpeed.toFixed(2), dur: +slideDur.toFixed(2) }; }, get crouchBlend() { return crouchBlend; }, get guardBlend() { return guardBlend; }, testCfg, get fingers() { const b = boneByName(hero, 'index_02_l'), f = fist && fist.find((x) => x.bone === b); return f ? +b.quaternion.angleTo(f.q).toFixed(3) : null; }, forceStuck() { speed = 0; CLASSES[klass]._frozen = true; }, strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
     setClass(k) { klass = k; renderClass(); }, openMoves, closeMoves,
     // v26 hooks
     setDifficulty, get difficulty() { return difficulty; }, get hp() { return +hp.toFixed(3); }, get dead() { return dead ? { kind: dead.kind, t: +dead.t.toFixed(2), severed: dead.body.severed.map((b) => b.name), rag: !!dead.body.rag, asleep: !!dead.body.rag?.asleep, pelvis: dead.body.rag?.P.pelvis.p.toArray().map((v) => +v.toFixed(2)) } : null; },
     respawn, setHp(v) { hp = v; hurtT = 99; renderHealth(); }, hurt(frac, kind = 'bolt') { hurtPlayer(frac, kind, player.position.clone().add(new V3(0, 0, 5))); }, get deaths() { return deaths; },
-    minds: () => enemies.map((e) => ({ id: e.id, state: e.state, mind: e.mind || null, sus: +(e.sus || 0).toFixed(2), mark: e.markCh || null, los: !!e.los, rag: !!e.rag, asleep: !!e.rag?.asleep })),
-    setMind(i, m, wait = 0) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e) return; e.mind = m; e.sus = 0; e.wp = null; e.waitT = wait; e.post = e.g.position.clone(); if (e.state === 'hit') { e.state = 'engage'; e.hitT = 0; } setMark(e, null); },
-    faceEnemy(i, yawR) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (e) { e.yaw = yawR; e.g.rotation.y = yawR; } },
+    minds: () => soldiers().map((e) => ({ id: e.id, state: e.state, mind: e.mind || null, sus: +(e.sus || 0).toFixed(2), mark: e.markCh || null, los: !!e.los, rag: !!e.rag, asleep: !!e.rag?.asleep })),
+    setMind(i, m, wait = 0) { const e = soldiers().filter((x) => x.state !== 'dead')[i]; if (!e) return; e.mind = m; e.sus = 0; e.wp = null; e.waitT = wait; e.post = e.g.position.clone(); if (e.state === 'hit') { e.state = 'engage'; e.hitT = 0; } setMark(e, null); },
+    faceEnemy(i, yawR) { const e = soldiers().filter((x) => x.state !== 'dead')[i]; if (e) { e.yaw = yawR; e.g.rotation.y = yawR; } },
     get alarms() { return alarms; }, get takedowns() { return takedowns; }, get tdTarget() { return tdTarget ? tdTarget.id : null; }, get takedown() { return !!takedown; },
     startMission, endMission, get mission() { return mission ? { id: mission.id, wave: mission.wave, state: mission.state, left: mission.team.filter((e) => e.state !== 'dead' && enemies.includes(e)).length, kinds: mission.team.filter((e) => e.state !== 'dead').map((e) => e.gunKind), hold: mission.team.filter((e) => e.hold).length } : null; },
-    killWave() { for (const e of [...enemies]) if (e.mission && e.state !== 'dead') { e.cutLabel = 'test'; damageEnemy(e, 999, 'torso', 'stealth'); } }, get kept() { return [...kept]; }, forgetKept() { kept.clear(); saveKept(); },
+    killWave() { for (const e of soldiers()) if (e.mission && e.state !== 'dead') { e.cutLabel = 'test'; damageEnemy(e, 999, 'torso', 'stealth'); } }, get kept() { return [...kept]; }, forgetKept() { kept.clear(); saveKept(); },
     goCourt(x = 0, z = -18) { player.position.copy(courtAt(x, z)); mode = 'ground'; speed = 0; vy = 0; }, courtAt: (x, z) => courtAt(x, z).toArray(),
     mats: () => { const o = {}; for (const b of blocks) if (b.court) o[b.mat] = (o[b.mat] || 0) + 1; return o; }, get broken() { return { ...broken }; }, get debris() { return debris.length; },
     matBlocks: (m) => blocks.filter((b) => b.court && b.mat === m).map((b) => ({ c: b.box.getCenter(new V3()).toArray().map((v) => +v.toFixed(2)), hp: b.hp })),
     shootPoint(x, y, z) { fireCd = 0; return firePistol(new V3(x, y, z).sub(camera.position).normalize()); }, get camPos() { return camera.position.toArray(); },
-    setAtt, hasAtt, get zoom() { return gunZoom(); }, get lasers() { return enemies.filter((e) => e.laser && e.laser.visible).length; },
+    setAtt, hasAtt, get zoom() { return gunZoom(); }, get lasers() { return soldiers().filter((e) => e.laser && e.laser.visible).length; },
     spawnSpecial: (type, x, z) => { const e = spawnSpecial(type, x !== undefined ? new V3(x, groundAt(x, z, 9), z) : undefined); return e && e.id; },
-    special: () => enemies.filter((e) => e.special).map((e) => ({ id: e.id, type: e.special, state: e.state, jugg: e.jugg ? { hits: e.jugg.hits, pool: e.jugg.pool } : null, shield: e.jackal ? e.jackal.hp : null, guard: e.duel ? e.duel.guard : null, stagger: e.duel ? +e.duel.stagger.toFixed(2) : null, attack: e.duel?.attack ? +e.duel.attack.t.toFixed(2) : false })),
+    special: () => soldiers().filter((e) => e.special).map((e) => ({ id: e.id, type: e.special, state: e.state, jugg: e.jugg ? { hits: e.jugg.hits, pool: e.jugg.pool } : null, shield: e.jackal ? e.jackal.hp : null, guard: e.duel ? e.duel.guard : null, stagger: e.duel ? +e.duel.stagger.toFixed(2) : null, attack: e.duel?.attack ? +e.duel.attack.t.toFixed(2) : false })),
     get cloakT() { return cloakT; }, get fallSafeT() { return fallSafeT; }, get sneak() { return walkToggle; }, setSneak(v) { walkToggle = v; }, fallDamage, get moveMode() { return moveMode; },
     setFavourite, savePack, loadPack, setMoveMode(m) { moveMode = m; }, nextVariant: (s) => nextVariant(s).id, pool: (s) => [...pool[s]], get objective() { return mission ? { state: mission.state, dl: mission.dl || 0, near: !!nearTerminal() } : null; },
     tryObjective, terminalPos: () => mission?.terminal?.position.toArray() || null, pickups: () => worldPickups.map((p) => [p.id, p.m.visible]),
-    get fires() { return fires.length; }, get programs() { return renderer.info.programs.length; }, get particles() { return (flamePS?.list.length || 0) + (smokePS?.list.length || 0); }, burning: () => enemies.filter((e) => e.burning && e.state !== 'dead').length, get grenadesOut() { return grenades.map((g) => ({ kind: g.kind || 'frag', stuck: !!g.stuck, on: g.stuck?.e?.id || null })); },
+    get fires() { return fires.length; }, get programs() { return renderer.info.programs.length; }, get particles() { return (flamePS?.list.length || 0) + (smokePS?.list.length || 0); }, burning: () => soldiers().filter((e) => e.burning && e.state !== 'dead').length, get grenadesOut() { return grenades.map((g) => ({ kind: g.kind || 'frag', stuck: !!g.stuck, on: g.stuck?.e?.id || null })); },
     throwKind(k) { nadeCd = 0; throwGrenade(k); }, get lastNade() { return lastNade; }, firePatch: (x, z) => firePatch(new V3(x, 0, z)), teleportTo: (x, z) => teleportTo(new V3(x, 0, z)),
-    stickOn(i) { const e = enemies.filter((x) => x.state !== 'dead')[i]; if (!e) return null; const m = makeThrowable('sticky'); scene.add(m); const g = { m, kind: 'sticky', vel: new V3(), t: 0 }; grenades.push(g); stickTo(g, chestOf(e), e); return e.id; },
+    stickOn(i) { const e = soldiers().filter((x) => x.state !== 'dead')[i]; if (!e) return null; const m = makeThrowable('sticky'); scene.add(m); const g = { m, kind: 'sticky', vel: new V3(), t: 0 }; grenades.push(g); stickTo(g, chestOf(e), e); return e.id; },
     missionClock(sec) { if (mission && mission.fightT !== undefined) mission.fightT = simT - (mission.def.survive - sec); },
     get dash() { return !!dash; }, get dashes() { return dashes; }, dashTarget: () => dashTarget()?.id || null, get yanks() { return yanks; }, setRmb(v) { rmbHeld = v; },
     setGadget(k, v) { gadgets[k] = v; }, get swing() { return grapple.state === 'pull' && !!grapple.swing; }, get grappleState() { return grapple.state; }, get tdLabel() { return $('tdprompt').lastChild.textContent.trim(); },
     enterCover, leaveCover, get cover() { return cover ? { low: cover.low, peek: +cover.peek.toFixed(2), edge: cover.edge, u: +cover.u.toFixed(2), n: [cover.n.x, cover.n.z] } : null; }, get crouch() { return crouch; },
     // v32 hook: how many flying pieces are painted with the gore material all over (should be 0)
     redPieces: () => pieces.filter((pc) => { let red = false; pc.outer.traverse((o) => { if (o.isSkinnedMesh && (o.material === goreMat || (pc.e && o.material === pc.e.goreMat))) red = true; }); return red; }).length, get pieceCount() { return pieces.length; },
-    ragPelvis(i) { const e = enemies[i]; return e && e.rag ? e.rag.P.pelvis.p.toArray().map((v) => +v.toFixed(2)) : null; } };
+    ragPelvis(i) { const e = soldiers()[i]; return e && e.rag ? e.rag.P.pelvis.p.toArray().map((v) => +v.toFixed(2)) : null; } };
 }
 </script>

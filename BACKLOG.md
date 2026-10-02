@@ -62,10 +62,12 @@ The ground rules:
   - [ ] voices: soldiers' shouts and chatter, pain sounds
 
 2. **Civilians** (after the audit). Neutral people walking around the sandbox:
-   - [ ] they wander the streets and paths (ideally with free, licensed civilian models: several looks, men and women)
-   - [ ] they run from soldiers and from gunfire, explosions, the lit saber, and bodies (panic, using the soldiers' `noise` / `witnessDeath` ideas)
-   - [ ] they can die: shot, cut, blown up and ragdolled like soldiers, with dismemberment
-   - [ ] soldiers don't target them, but stray fire can hit them
+   - [x] they wander the streets and paths (ideally with free, licensed civilian models: several looks, men and women) *(v35: Quaternius base characters in Peasant clothes; six hairstyles, beards, skin tones, clothes colours)*
+   - [x] they run from soldiers and from gunfire, explosions, the lit saber, and bodies (panic, using the soldiers' `noise` / `witnessDeath` ideas) *(v35; a quarter freeze and cower instead)*
+   - [x] they can die: shot, cut, blown up and ragdolled like soldiers, with dismemberment *(v35)*
+   - [x] soldiers don't target them, but stray fire can hit them *(v35: soldiers' bolts and missed bullets)*
+   - [ ] more outfits and walks (the full Quaternius outfit packs are paid; look for other CC0 townsfolk), and screams
+   - [ ] a penalty or a reaction for hurting them (a wanted level?)
    - [ ] later: game modes such as **protect the civilians**; overheard chatter (GTA) is already in Design answers
 
 ## ★ Play test on PC, v29 (owner): fix these first
