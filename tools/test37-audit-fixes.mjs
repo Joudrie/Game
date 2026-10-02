@@ -68,6 +68,11 @@ check((await ev(() => __game.testCfg.infiniteJumps)) === false, 'infinite jumps 
 await reset(); await ev(() => __game.setClass('force')); let top = 0; for (let j = 0; j < 5; j++) { await key('Space', 0.03); for (let t = 0; t < 7; t++) { await adv(0.04); top = Math.max(top, await ev(() => __game.y)); } } await adv(3);
 const jd = top > 5 ? '' : ` [paused ${await ev(() => __game.paused)}, locked ${await ev(() => document.pointerLockElement !== null)}, mode ${await ev(() => __game.mode)}]`;
 check(top > 5 && top < 9, `Force class: five jump taps reach ${top.toFixed(1)} m (three jumps, not five)${jd}`); await ev(() => __game.setClass('light'));
+for (const k of ['light', 'heavy']) { // v37.1: every class triple jumps (the default class had none)
+  await adv(1); await ev((k) => __game.setClass(k), k); let most = 0; for (let j = 0; j < 5; j++) { await key('Space', 0.03); for (let t = 0; t < 7; t++) { await adv(0.04); most = Math.max(most, await ev(() => __game.jumps)); } } await adv(3);
+  check(most === 3, `${k} class: five jump taps give three jumps (${most})`);
+}
+await ev(() => __game.setClass('light'));
 
 // variety: several idles and stances rotate by default
 const pools = await ev(() => ({ idle: __game.pool('idle').length, stance: __game.pool('stance').length, jog: __game.pool('jog').length }));

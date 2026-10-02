@@ -2,6 +2,10 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v37.1: triple jump for everyone
+- **Every class triple jumps now:** Light infantry, Heavy and Force. Only the Force class had it before, and the game starts you as Light infantry, so a fresh browser (or a friend opening the link) couldn't even double jump. Each class keeps its own jump heights; the third jump still goes highest.
+- Test: test37 checks three jumps for Light and Heavy as well as Force.
+
 ## v37: the soldiers talk (your voice)
 Your recording is in: 97 takes in 21 situations, cut from the one 6½-minute voice memo. Test: `tools/test45-voices.mjs`.
 - **When they say what:**
