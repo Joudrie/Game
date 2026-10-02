@@ -1,6 +1,6 @@
 # Working on this game (notes for the next Claude session)
 
-A mobile-first third-person action game in three.js (GTA / Red Dead / Watch Dogs / Assassin's Creed feel, Lego Star Wars fun). Characters come from the owner's custom Lego figures and paintings. Read `CHANGELOG.md` (what exists, newest first), `BACKLOG.md` (what's next, in sections), `IDEAS.md` (every game and idea the owner has named, with what's built) and `ASSET_GUIDE.md` before starting.
+A mobile-first third-person action game in three.js (GTA / Red Dead / Watch Dogs / Assassin's Creed feel, Lego Star Wars fun). Characters come from the owner's custom Lego figures and paintings. Read `VISION.md` (what the game is: Vanguard missions, "Hitman, but loud"), `CHANGELOG.md` (what exists, newest first), `BACKLOG.md` (what's next, in sections), `IDEAS.md` (every game and idea the owner has named, with what's built) and `ASSET_GUIDE.md` before starting.
 
 ## How the owner works
 - **Push and merge everything.** Branch `claude/<topic>`, open a PR to `main`, merge it.

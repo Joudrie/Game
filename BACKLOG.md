@@ -10,7 +10,10 @@ The owner's game references and ideas, with what's built, are in `IDEAS.md`.
 
 ---
 
-## The vision (owner, v21)
+## The vision
+**Current vision: `VISION.md` (after v34).** The game is now missions for the Vanguard on different planets: "Hitman, but loud", with classes, several paths, things that blow up, score and a perfect-stealth trophy. First milestone: Mission 1, the cargo yard. The v21 notes below still hold except "no plot".
+
+### The v21 vision
 No plot. A **third-person combat sandbox, creative-mode style**, where movement and combat are the whole point. **Jedi: Survivor** is the gameplay template, **Lego Star Wars** the model for saber feel (the little blade trail), **Fortnite** the inspiration for gadgets.
 
 The ground rules:
