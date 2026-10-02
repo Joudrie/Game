@@ -37,4 +37,27 @@ enc wood2   $K/impactPlank_medium_002.ogg 0.5
 enc boom    "$F/grenade_explosion__609587_Grenade_Explosion_SFX_medium-sized_meaty_realistic.mp3" 1.4
 # the hum loops: a clean second from the middle of the recording
 "$FF" -hide_banner -loglevel error -y -i $F/lightsaber_hum__47124_lightsaber2.mp3 -ss 0.8 -t 1.2 -af "afade=t=in:d=0.05,afade=t=out:st=1.15:d=0.05" -ac 1 -ar 24000 -c:a libopus -b:a 36k build/sfx/saber_hum.ogg
+# v34 sound pass: steps, landings, hits, cuts, punches, an empty click, the grapple, bouncing grenades, pickups,
+# gun draws, bodies falling, the alarm, mission stingers, the jetpack loop (Kenney Impact, Interface, RPG and Sci-fi
+# Sounds, and Freesound CC0)
+I=$S/kenney/kenney_interface-sounds/Audio; R=$S/kenney/kenney_rpg-audio/Audio; SF=$S/kenney/kenney_sci-fi-sounds/Audio
+enc step1   $K/footstep_concrete_000.ogg 0.3
+enc step2   $K/footstep_concrete_002.ogg 0.3
+enc step3   $K/footstep_concrete_004.ogg 0.3
+enc land    $F/land_thud__364690_Human_Impact_on_Ground.mp3 0.5
+enc punch   $K/impactPunch_medium_000.ogg 0.4
+enc punch2  $K/impactPunch_heavy_001.ogg 0.45
+enc hit     $K/impactSoft_medium_001.ogg 0.3
+enc impact  $K/impactGeneric_light_002.ogg 0.3
+enc cut     $R/knifeSlice.ogg 0.4
+enc dry     $F/dry_fire__725402_A_rifle_being_dry_fired_once.mp3 0.35
+enc grapple $F/grappling_hook__541975_grappling_hook.mp3 0.7
+enc bounce  $K/impactTin_medium_001.ogg 0.3
+enc pickup  $R/handleSmallLeather.ogg 0.5
+enc draw    $F/holster__239959_Gun_draw_holster.wav.mp3 0.6
+enc bodyfall $F/body_fall__461697_Body_falls_into_debris.mp3 0.8
+enc alarm   $I/error_006.ogg 0.6
+enc win     $I/confirmation_002.ogg 0.8
+enc lose    $I/error_008.ogg 0.8
+"$FF" -hide_banner -loglevel error -y -i $SF/thrusterFire_002.ogg -ss 0.2 -t 0.8 -af "afade=t=in:d=0.04,afade=t=out:st=0.76:d=0.04" -ac 1 -ar 24000 -c:a libopus -b:a 32k build/sfx/jet.ogg
 ls -la build/sfx

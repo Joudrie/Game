@@ -2,6 +2,22 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v34: Batch 3: a real hero, streets, a pause menu, sound
+Batch 3 from `audit/REPORT.md` (civilians are next). Tests: `tools/test39-hero-look.mjs`, `test40-pause.mjs`, `test41-roads.mjs`, `test42-sounds.mjs`.
+- **You're a hooded ranger now,** not a shirtless superhero: hood, tunic, belts, bracers, pauldron and boots from Quaternius' *Modular Character Outfits - Fantasy* (CC0). It's made for the same skeleton, so every animation, cut and ragdoll works on it unchanged.
+  - **Menu → Moves → Look** (also in the Weapon panel) switches between the Ranger and the old Superhero. The choice is saved.
+  - Your body when you die wears the same outfit, and the holocloak fades it.
+- **Streets:** a grid of roads between the buildings, three each way, from Kenney's *City Kit (Roads)* (CC0). Each tile's piece (straight, bend, T, crossroads, dead end) follows its neighbours, and a zebra crossing marks where a road meets the stone path to the courtyard.
+  - Street lights line the roads, traffic lights stand at crossroads, stop signs at T junctions, and dead ends are closed with barriers, cones and a warning light. Lamp posts, traffic lights, signs, barriers and dumpsters are solid.
+  - Roads never run into a building, the start or the courtyard. About 50 more draw calls; the game logic costs the same.
+- **Pause and settings:** Esc (or P) pauses the game: the world stops, sound stops, and a panel shows:
+  - mouse sensitivity, invert Y, volume, field of view, and Reset to defaults (saved);
+  - the full key list;
+  - Open the menu, and Quit mission during a mission.
+  - Resume with the button, Esc, P, or a click outside the panel. Alt-tab pauses too. Opening the menu, weapon panel, inventory or missions doesn't pause.
+- **Sound pass:** footsteps (three takes, quiet when sneaking), landings, punches, saber cuts, bullet hits on bodies and walls, an empty gun's click, the grapple, the jetpack's thruster, sticky grenades and dropped magazines, pickups, drawing a gun, bodies falling, a soldier raising the alarm, and mission complete or failed. All CC0 (Kenney and Freesound), 76 KB.
+- The build is 15.53 MB (16 MB cap).
+
 ## v33: audit fixes, batch 2
 Most of Batch 2 from `audit/REPORT.md`. Tests: `tools/test38-audit-batch2.mjs`.
 - **Mission 3 starts out of sight:** against the outside of the south wall, left of the gate, facing it. Standing still used to fail the mission in 6–8 s.

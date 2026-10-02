@@ -1,6 +1,6 @@
 // Pack Kenney kits (CC0) into small GLBs for the sandbox world (v31): each model becomes a named top-level node;
 // geometry is welded, quantized and meshopt-compressed (the game loads them with MeshoptDecoder).
-// Usage: node tools/pack_buildings.mjs   (reads assets/world/kenney/*.zip; writes build/world_buildings.glb, build/world_nature.glb)
+// Usage: node tools/pack_buildings.mjs   (reads assets/world/kenney/*.zip; writes build/world_buildings.glb, build/world_roads.glb, build/world_nature.glb)
 import { NodeIO, Document } from '@gltf-transform/core';
 import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { dedup, weld, quantize, meshopt, prune, mergeDocuments, unpartition } from '@gltf-transform/functions';
@@ -11,6 +11,9 @@ const PACKS = {
   'build/world_buildings.glb': [
     { k: 'c', zip: 'kenney_city-kit-commercial_2.1.zip', dir: 'Models/GLB format', pick: ['building-a', 'building-c', 'building-e', 'building-h', 'building-k', 'building-n', 'building-skyscraper-a', 'building-skyscraper-c', 'building-skyscraper-e'] },
     { k: 'i', zip: 'kenney_city-kit-industrial_2.0.zip', dir: 'Models/GLB format', pick: ['building-b', 'building-d', 'building-h', 'building-k', 'building-q'] }],
+  'build/world_roads.glb': [ // v34: road tiles (1 m squares, laid at 10 m) and street props
+    { k: 'r', zip: 'kenney_city-kit-roads.zip', dir: 'Models/GLB format', pick: ['road-straight', 'road-crossroad', 'road-intersection', 'road-end', 'road-bend', 'road-crossing',
+      'light-square', 'light-square-double', 'traffic-light', 'road-sign-stop', 'road-sign-warning', 'construction-cone', 'construction-barrier', 'construction-light', 'dumpster', 'electricity-pole'] }],
   'build/world_nature.glb': [
     { k: 'n', zip: 'kenney_nature-kit.zip', dir: 'Models/GLTF format', pick: ['grass', 'grass_large', 'grass_leafs', 'plant_bush', 'plant_bushSmall', 'flower_redA', 'flower_yellowA', 'flower_purpleA',
       'rock_smallA', 'rock_smallC', 'rock_tallB', 'tree_palmTall', 'tree_palmDetailedShort', 'tree_oak', 'tree_default', 'path_stone', 'path_stoneCircle'] }],
