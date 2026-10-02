@@ -1,4 +1,4 @@
-// v37: hills, grass and the sea. Sprinting anywhere (up and down hills, into and off every building, to the water's
+// v38: hills, grass and the sea. Sprinting anywhere (up and down hills, into and off every building, to the water's
 // edge) the hero stands on the ground: never under it, never sunk into it. Buildings and roads stay flat; soldiers
 // and bodies sit on the hills; you can wade in to your knees, no deeper.
 import { chromium } from 'playwright';

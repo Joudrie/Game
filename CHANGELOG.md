@@ -2,8 +2,8 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
-## v37: grassy hills and the sea
-Owner's ask: grass like every game has, hills instead of flat ground, water around the edge, and no falling through the ground. Test: `tools/test45-hills.mjs`.
+## v38: grassy hills and the sea
+Owner's ask: grass like every game has, hills instead of flat ground, water around the edge, and no falling through the ground. Test: `tools/test46-hills.mjs`.
 - **Rolling hills,** up to about 12 m. The ground stays flat around every building, road, the start, the courtyard and the stone path, so everything that was there sits where it was. Heights come from three.js's own noise (ImprovedNoise, MIT) on a 4 m grid. Feet follow the exact triangles you see.
 - **Grass:** the ground is ambientCG's Grass004 texture (CC0), with darker and lighter patches.
 - **Grass blades** wave in the wind and are trampled where you stand. They're adapted from Bruno Simon's *infinite-world* (ISC): one field of blades that follows you, rising and falling with the hills, thinning out with distance and on steep slopes, and kept off roads, buildings and the beach.
@@ -11,9 +11,30 @@ Owner's ask: grass like every game has, hills instead of flat ground, water arou
   - You can wade in to your knees, no further; flying over the sea is fine.
   - Soldiers and civilians stay out of it, and nobody spawns in it.
 - Trees, rocks, bodies (the ragdoll) and everything else that touches the ground follow the hills.
-- **Sinking while sprinting:** I couldn't make you sink. Sprinting in 16 directions in all three classes, with barrels and civilians on, then into every side of all 44 buildings and off their roofs: about 3,400 checks, never below the ground. test45 now runs the same checks over the hills on every test run. If it happens again, Menu → Tests → copy the report, or tell me where you were.
+- **Sinking while sprinting:** I couldn't make you sink. Sprinting in 16 directions in all three classes, with barrels and civilians on, then into every side of all 44 buildings and off their roofs: about 3,400 checks, never below the ground. test46 now runs the same checks over the hills on every test run. If it happens again, Menu → Tests → copy the report, or tell me where you were.
 - Headless test runs keep flat ground unless the page is opened with `?hills=1`, so the older suites keep their flat ground.
 - The build is 9.47 MB (grass texture 92 KB, water normals 16 KB).
+
+## v37: the soldiers talk (your voice)
+Your recording is in: 97 takes in 21 situations, cut from the one 6½-minute voice memo. Test: `tools/test45-voices.mjs`.
+- **When they say what:**
+  - A guard who notices something: "Huh?", "Did you hear something?" If it comes to nothing: "Must have been the wind."
+  - Spotting you: "Contact!", "There he is!"; with your saber lit, often "We got a Jedi over here! Frag him!" Then "Sound the alarm!"
+  - Losing you in a fight: "Where'd he go?", "Spread out!" Giving up for good: "Eh, whatever."
+  - Mid-fight: "Cover me!", "Moving!", "Push up!"
+  - **Reloading is new:** a soldier stops shooting for 2.2 s after a few shots or bursts ("Reloading!", "Changing mag!"). It's a window to push him.
+  - Hit: grunts, or "I'm hit!"; dying: a last cry (not a headshot). An arm off: "MY ARM!", then "Fall back!" (his gun hand) or "Medic!". A leg off: a scream, then "Medic!"
+  - Set alight: screaming. Force-pushed or blown into the air: "AAAAH!"
+  - Your grenade coming down by them, or a sticky on one: "GRENADE!", "Get down!"
+  - A buddy dropping: "Man down!", "He's dead!", "What the?!" Three dead in a few seconds: "Fall back!"
+  - A barrel going off nearby: "WHO PUT THOSE BARRELS THERE?!"
+  - You die: "Target down!", "Got him!"
+- **Only one at a time.** Everyone has your voice for now, so only one soldier speaks at once; five never shout "Contact!" together. A scream cuts a calmer line off, and a line that has to wait (the alarm after "Contact!", "Medic!" after losing a leg) waits a moment for a gap.
+- **No repeats:** each situation deals its takes from a shuffled deck, so the same take never comes twice in a row. Each soldier's voice is pitched a hair differently.
+- **A soldier who dies mid-sentence stops talking.**
+- Voices fade with distance, and you only hear soldiers within 55 m.
+- Not used yet: "Frag out!" (for when soldiers throw grenades). Not recorded yet: calm patrol chatter.
+- **How it's made:** `tools/make_voice.py` cuts a recording from a list of takes (`assets/voice/v1_takes.txt`). The takes were found by loudness (you said the labels quietly and the lines loud), and each clip was checked with speech-to-text. More voices go in as `v2`, `v3`…; each soldier then gets one. How to record: `assets/voice/README.md`. The build is 9.95 MB (the voices are about 460 KB).
 
 ## v36: things that go off, and a score
 The first step toward VISION.md's first milestone (Mission 1, "The cargo yard"). Test: `tools/test44-barrels-score.mjs`.

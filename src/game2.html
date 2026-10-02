@@ -530,7 +530,7 @@ Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near:
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
 scene.add(sun, sun.target);
 const SUN_OFFSET = new V3(6, 14, 4);
-// ---------------- terrain, grass and water (v37) ----------------
+// ---------------- terrain, grass and water (v38) ----------------
 // An island of rolling grassy hills. Heights come from three.js's ImprovedNoise (MIT) on a 4 m grid (`terrain.h`),
 // flattened to 0 around the buildings, roads, the courtyard, the start and the stone path, so everything there stays
 // where it was; beaches slope down into the sea past the outer towers. `groundAt` reads `terrainH`, which follows the
@@ -1271,6 +1271,7 @@ function initAudio() {
     audio.ctx = new (window.AudioContext || window.webkitAudioContext)();
     audio.master = audio.ctx.createGain(); audio.master.gain.value = settings.vol; audio.master.connect(audio.ctx.destination); // every sound goes through the volume setting
     for (const [k, v] of Object.entries(window.__ASSETS.sfx || {})) audio.ctx.decodeAudioData(decodeB64(v)).then((b) => { audio.buf[k] = b; }).catch(() => {});
+    initVoices(); // v37
   } catch (_) {}
 }
 addEventListener('pointerdown', initAudio); addEventListener('keydown', initAudio);
@@ -1281,6 +1282,78 @@ function sfx(name, at, vol = 1, delay = 0) {
   const src = c.createBufferSource(); src.buffer = b; src.playbackRate.value = 0.95 + Math.random() * 0.1;
   const g = c.createGain(); g.gain.value = v; src.connect(g).connect(audio.master); src.start(c.currentTime + delay);
 }
+// ---------------- soldier voices (v37) ----------------
+// The owner's recorded lines (build/vo/<voice>/<category>_<n>.ogg, cut by tools/make_voice.py), embedded as
+// __ASSETS.vo[voice][name]. One voice speaks one line at a time, however many soldiers have it, so five soldiers never
+// shout the same "Contact!" together; a more urgent line (pain, fire, flying) cuts a calmer one off. Each category
+// deals its takes from a shuffled deck, so a take never comes up twice in a row. A soldier who dies mid-sentence
+// stops talking. More voices (the owner's other characters) go in as v2, v3…; each soldier gets one in `e.voice`.
+const VO_CATS = { // pri: who interrupts whom; cd: seconds before the same category plays again (any soldier)
+  pain: { pri: 3, cd: 0.35 }, fire: { pri: 3, cd: 0.6 }, flying: { pri: 3, cd: 0.5 }, arm: { pri: 3, cd: 1 }, hit: { pri: 2, cd: 4 },
+  spot: { pri: 2, cd: 2.5 }, jedi: { pri: 2, cd: 8 }, alarm: { pri: 2, cd: 3 }, grenade: { pri: 2, cd: 1.5 }, mandown: { pri: 2, cd: 3 },
+  whatthe: { pri: 2, cd: 6 }, panic: { pri: 2, cd: 10 }, barrels: { pri: 2, cd: 15 }, reload: { pri: 1, cd: 3 }, cover: { pri: 1, cd: 6 },
+  search: { pri: 1, cd: 5 }, medic: { pri: 1, cd: 5 }, taunt: { pri: 1, cd: 3 }, sus: { pri: 1, cd: 1.2 }, giveup: { pri: 1, cd: 4 }, fragout: { pri: 2, cd: 2 },
+};
+const vo = { buf: {}, deck: {}, now: {}, cool: {}, pending: [], log: [], total: 0, on: true, range: 55 };
+function initVoices() {
+  for (const [voice, set] of Object.entries(window.__ASSETS.vo || {})) {
+    vo.buf[voice] = {};
+    for (const [name, b64] of Object.entries(set)) {
+      const cat = name.replace(/_\d+$/, '');
+      audio.ctx.decodeAudioData(decodeB64(b64)).then((b) => { (vo.buf[voice][cat] = vo.buf[voice][cat] || []).push({ b, name }); }).catch(() => {});
+    }
+  }
+}
+const voiceNames = () => Object.keys(window.__ASSETS.vo || {});
+function voiceOf(e) { if (!e.voice) { const v = voiceNames(); e.voice = v[Math.floor(Math.random() * v.length)] || 'v1'; } return e.voice; }
+function dealTake(voice, cat) { // a shuffled deck per category; reshuffled when it runs out, never starting on the take just played
+  const all = vo.buf[voice]?.[cat]; if (!all || !all.length) return null;
+  const key = voice + '/' + cat; let d = vo.deck[key];
+  if (!d || !d.length) {
+    d = vo.deck[key] = [...all].sort(() => Math.random() - 0.5);
+    if (d.length > 1 && d[d.length - 1] === vo.deck[key + ':last']) d.unshift(d.pop());
+  }
+  return (vo.deck[key + ':last'] = d.pop());
+}
+// a soldier says a line of this category now, or after `delay` seconds if he's still alive by then; a delayed line
+// waits up to `patience` more seconds for the voice to be free (someone else may be mid-sentence)
+function say(e, cat, delay = 0, patience = 1.5) {
+  if (!e || e.civ || !VO_CATS[cat]) return false;
+  if (delay > 0) { vo.pending.push({ e, cat, at: simT + delay, until: simT + delay + patience }); return true; }
+  const C = VO_CATS[cat], dying = C.pri === 3;
+  if (e.state === 'dead' && !dying) return false;
+  if ((vo.cool[cat] || 0) > simT) return false;
+  if (e.voT > simT && C.pri < 2) return false; // one soldier doesn't chatter non-stop (shouts and screams still come)
+  if (e.g.position.distanceTo(player.position) > vo.range) return false;
+  const voice = voiceOf(e), cur = vo.now[voice];
+  if (cur && cur.end > simT) { if (cur.pri >= C.pri) return false; stopLine(voice); } // someone with this voice is already talking
+  vo.cool[cat] = simT + C.cd; e.voT = simT + 1.6;
+  vo.total++; vo.log.push(`${cat}:${e.id}`); if (vo.log.length > 60) vo.log.shift(); log('says', cat, e.id);
+  const c = audio.ctx; if (!c || !vo.on) return true;
+  const take = dealTake(voice, cat); if (!take) return true;
+  const src = c.createBufferSource(); src.buffer = take.b; src.playbackRate.value = e.vpitch || (e.vpitch = 0.97 + Math.random() * 0.06);
+  const g = c.createGain(); g.gain.value = 1.1 / (1 + e.g.position.distanceTo(player.position) * 0.06);
+  src.connect(g).connect(audio.master); src.start();
+  vo.now[voice] = { src, g, e, cat, pri: C.pri, end: simT + take.b.duration / src.playbackRate.value, take: take.name };
+  return true;
+}
+function stopLine(voice) { const cur = vo.now[voice]; if (!cur) return; try { cur.g.gain.setTargetAtTime(0, audio.ctx.currentTime, 0.02); cur.src.stop(audio.ctx.currentTime + 0.08); } catch (_) {} vo.now[voice] = null; }
+function hushDead(e) { for (const v in vo.now) { const cur = vo.now[v]; if (cur && cur.e === e && cur.end > simT && VO_CATS[cur.cat].pri < 3) stopLine(v); } } // cut off mid-word
+function updateVoices() {
+  for (const p of [...vo.pending]) {
+    if (simT < p.at) continue;
+    const gone = p.e.state === 'dead' || !enemies.includes(p.e);
+    if (gone || say(p.e, p.cat) || simT > p.until) vo.pending.splice(vo.pending.indexOf(p), 1);
+  }
+  for (const v in vo.now) { const cur = vo.now[v]; if (cur && cur.end > simT && cur.e) cur.g.gain.value = 1.1 / (1 + cur.e.g.position.distanceTo(player.position) * 0.06); } // follows him as he moves
+}
+// the nearest soldier still standing within r of a spot, who can see it (or is close enough to hear it)
+function nearestSoldier(at, r, but) {
+  let best = null, bd = r;
+  for (const o of enemies) { if (o === but || o.civ || o.state === 'dead') continue; const d = o.g.position.distanceTo(at); if (d < bd) { bd = d; best = o; } }
+  return best;
+}
+const saberOut = () => gear === 'lit' && ignite > 0.5;
 function buildPistol() {
   if (!pistolModel) return;
   const inner = pistolModel; inner.updateMatrixWorld(true);
@@ -2376,6 +2449,7 @@ function collideCircle(p, r) {
   if (underwater(p.x, p.z)) { const d = Math.hypot(p.x, p.z) || 1; p.x -= p.x / d * 0.4; p.z -= p.z / d * 0.4; hit = hit || new V3(-p.x / d, 0, -p.z / d); } // v37: people stay out of the sea
   return hit;
 }
+const ENEMY_MAG = { pistol: 6, ak: 5, ar: 5, shotgun: 4, sniper: 4 }, ENEMY_RELOAD = 2.2; // v37: shots (or bursts) before a soldier stops to reload, and for how long
 const muzzleOf = (e) => { const h = e.gunHand ? cutBone(e, e.gunHand) : e.bones.hand_r; return h ? h.getWorldPosition(new V3()) : e.g.position.clone().add(new V3(0, 1.3, 0)); };
 function updateEnemies(dt) {
   keepEnemiesUp(dt); keepCiviliansUp(dt);
@@ -2460,11 +2534,12 @@ function updateEnemies(dt) {
       }
       if (e.jackal) turnCapped(e, Math.atan2(to.x, to.z), 1.75, dt); else e.yaw = wrapAngle(e.yaw + wrapAngle(Math.atan2(to.x, to.z) - e.yaw) * (1 - Math.exp(-6 * dt)));
       const fwd = to.clone().normalize(), side = new V3(fwd.z, 0, -fwd.x);
-      e.strafeT -= dt; if (e.strafeT <= 0) { e.strafe = -e.strafe || 1; e.strafeT = 1.5 + Math.random() * 2.5; }
+      e.strafeT -= dt; if (e.strafeT <= 0) { e.strafe = -e.strafe || 1; e.strafeT = 1.5 + Math.random() * 2.5; if (e.los && simT - (e.combatSince || 0) > 3 && Math.random() < 0.3) say(e, 'cover'); } // v37: "Cover me!" "Moving!"
       // he only shoots what he can see; out of sight he closes in (on Hard and Extreme he comes round the side)
       if ((e.losT = (e.losT || 0) - dt) <= 0) { e.losT = 0.25; e.los = lineOfSight(eyeOf(e), playerChest()); }
-      e.lostT = e.los ? 0 : (e.lostT || 0) + dt;
-      if (e.lostT > 20) { e.mind = 'patrol'; e.post = pos.clone(); e.sus = 0; e.wp = null; log('lost you', e.id); }
+      const lostBefore = e.lostT || 0; e.lostT = e.los ? 0 : lostBefore + dt;
+      if (lostBefore < 4 && e.lostT >= 4) say(e, 'search'); // v37: "Where'd he go?"
+      if (e.lostT > 20) { e.mind = 'patrol'; e.post = pos.clone(); e.sus = 0; e.wp = null; log('lost you', e.id); say(e, 'giveup'); }
       let move = new V3(), clip = 'SW_Idle_Gun_Pointing', sp = 0;
       if (!e.los && dist > 3) { move.copy(DF().smart ? fwd.clone().applyAxisAngle(UP, 0.9 * (e.strafe || 1)) : fwd); sp = 3.2; clip = clips.has('SW_Run') ? 'SW_Run' : 'SW_Run_Shoot'; }
       else if (dist > 18) { move.copy(fwd); sp = 3.2; clip = 'SW_Run_Shoot'; }
@@ -2481,6 +2556,7 @@ function updateEnemies(dt) {
       // shoot: blaster pistols fire bolts you can see, block and parry; AK-47s fire bursts of bullets you can't deflect
       e.fireT -= dt;
       if (!e.los) e.fireT = Math.max(e.fireT, 0.5);
+      if (e.reloadT > 0) { e.reloadT -= dt; e.fireT = Math.max(e.fireT, e.reloadT + 0.3); } // v37: changing mags, a window to push
       const range = e.gunKind === 'sniper' ? 120 : e.gunKind === 'shotgun' ? 20 : 50, rifle = e.gunKind === 'ak' || e.gunKind === 'ar' || e.gunKind === 'shotgun';
       if (!rifle && e.fireT < 0.4 && !e.tell && dist < range) { e.tell = true; glint(muzzleOf(e)); } // the tell before a bolt (or a sniper's scope glint): time your block to it
       if (e.gunKind === 'sniper') sniperLaser(e, e.los && e.fireT < 1.3 && dist < range);
@@ -2492,6 +2568,7 @@ function updateEnemies(dt) {
         else if (e.gunKind === 'shotgun') { e.fireT = (1.8 + Math.random() * 1.4) * DF().react; for (let i = 0; i < 3; i++) enemyBullet(e, 0.3, i ? null : 'shotgun'); } // three pellets that each might land
         else { e.fireT = (1.1 + Math.random() * 1.6) * DF().react; shootBolt(e); }
         if (sp === 0) eplay(e, 'SW_Idle_Gun_Shoot', { loop: false, fade: 0.08 });
+        if ((e.volleys = (e.volleys || 0) + 1) >= (ENEMY_MAG[e.gunKind] || 6) * (e.jugg ? 2 : 1)) { e.volleys = 0; e.reloadT = ENEMY_RELOAD; say(e, 'reload'); } // v37: "Reloading!"
       }
       if (e.burst > 0 && (e.burstT -= dt) <= 0) { e.burst--; e.burstT = e.gunKind === 'ar' ? 0.08 : 0.1; enemyBullet(e); }
     } else eplay(e, 'SW_Idle_Gun_Pointing');
@@ -2587,8 +2664,9 @@ function damageEnemy(e, amount, zone, kind, dir) {
   if (e.special && absorbHit(e, amount, kind, dir)) { alarm(e, 'hurt'); return; } // force field, shield or a saber in the way (v29)
   e.hp -= amount; e.dmg[zone] = (e.dmg[zone] || 0) + amount; e.total += amount;
   e.last = { zone, kind };
-  if (e.hp > 0) { alarm(e, 'hurt'); if (e.state !== 'knock') hitReact(e, zone); return; }
+  if (e.hp > 0) { alarm(e, 'hurt'); if (e.state !== 'knock') hitReact(e, zone); say(e, kind !== 'saber' && Math.random() < 0.2 ? 'hit' : 'pain'); return; }
   setMark(e, null);
+  hushDead(e); if (zone !== 'head' && kind !== 'choke' && kind !== 'fire') say(e, 'pain'); // v37: a last cry, unless it was instant
   // your rules: head if the killing shot is in the head; legs if most of the damage (and the killing shot) went to the legs
   const type = kind === 'explosion' ? 'explosion' : kind === 'impact' ? 'impact' : kind === 'push' ? 'push' : kind === 'grapple' ? 'grapple' : kind === 'pound' ? 'pound' : kind === 'choke' ? 'choke' : kind === 'lightning' ? 'lightning' :
     zone === 'head' ? 'head' : zone === 'legs' && e.dmg.legs >= e.total / 2 ? 'legs' : 'torso';
@@ -2677,6 +2755,7 @@ function knock(e, vel, dmg, kind) {
   if (e.state === 'dead') return;
   if (e.jugg && e.jugg.hits > 0) vel = vel.clone().multiplyScalar(0.3); // too heavy to throw far
   e.state = 'knock'; e.vel.copy(vel); e.g.position.y += 0.05;
+  if (vel.length() > 6) say(e, 'flying'); // v37: "AAAAH!"
   e.yaw = Math.atan2(-vel.x, -vel.z); // face back toward where the blow came from
   // time in the air, so the clip lasts the whole flight instead of ending (and freezing) half-way up
   const p = e.g.position, drop = Math.max(0, p.y - groundAt(p.x, p.z, p.y));
@@ -2875,10 +2954,12 @@ function applyCut(e, c, sweep) {
   } else if (/^(thigh|calf|foot)_/.test(sev)) { // a leg: he goes down and crawls after you
     sever(e, sev, push.clone().multiplyScalar(1.1)); bleedStump(e, sev);
     e.crawling = true; e.state = 'crawl'; eplay(e, 'M2M_Crawl', { fade: 0.35 });
+    say(e, 'pain'); say(e, 'medic', 2.2, 4); // v37
     killFeed.unshift(e.cutLabel); if (killFeed.length > 5) killFeed.pop(); renderFeed('cut');
   } else { // a hand or an arm: it comes off and he lives
     const side = sev.slice(-1), gunSide = (e.gunHand || 'hand_r').slice(-1);
     if (side === gunSide) { dropGun(e, push); e.unarmed = true; e.fleeT = 2.5; } // loses his gun hand: drops it and panics
+    say(e, 'arm'); say(e, side === gunSide ? 'panic' : 'medic', 2, 3); // v37: "MY ARM!", then "Fall back!" or "Medic!"
     sever(e, sev, push.clone().multiplyScalar(1.3));
     bleedStump(e, sev);
     // he clutches what's left (the hurt stance), then carries on
@@ -3105,6 +3186,7 @@ function updateGrenades(dt) {
       continue;
     }
     g.t += dt; g.vel.y -= 14 * dt;
+    if (!g.warned && g.kind !== 'orb' && g.t > 0.2 && g.vel.y < 0) { const o = nearestSoldier(g.m.position, 9); if (o) g.warned = say(o, 'grenade'); } // v37: "GRENADE!"
     const prev = g.m.position.clone(); g.m.position.addScaledVector(g.vel, dt);
     const p = g.m.position;
     let boom = p.y <= groundAt(p.x, p.z, prev.y) + 0.05 || g.t > 6;
@@ -3153,6 +3235,7 @@ function detonate(b, delay = 0, by = 'barrel') { if (b.gone || b.fuse !== undefi
 function barrelBlast(at, b) {
   const prev = blastBy; blastBy = b.by === 'chain' ? 'chain' : 'barrel';
   explode(at, null, null); if (b.kind === 'gas') firePatch(at.clone()); // a gas tank leaves a fire burning
+  const o = nearestSoldier(at, 18); if (o) say(o, 'barrels', 0.9); // v37: "WHO PUT THOSE BARRELS THERE?!"
   blastBy = prev; barrelsBlown++; log('barrel blew', b.id, b.by);
 }
 function goOff(b) {
@@ -3510,7 +3593,7 @@ function alarm(e, why) {
   if (mission && !mission.spotted && e.mission) { mission.spotted = true; log('mission: spotted', why); } // v36: no perfect-stealth trophy
 }
 function raiseAlarm(e) { // his shout: everyone within 40 m joins the fight
-  alarm(e, 'saw you'); alarms++; sfx('alarm', e.g.position, 0.6);
+  alarm(e, 'saw you'); alarms++; sfx('alarm', e.g.position, 0.6); say(e, 'alarm', 0.05, 2.5); // v37: after his "Contact!" if he's still saying it
   for (const o of enemies) if (o !== e && o.state !== 'dead' && o.g.position.distanceTo(e.g.position) < 40) alarm(o, 'shout');
   toast('Spotted: they know you\'re here', 1100);
 }
@@ -3537,9 +3620,15 @@ function witnessDeath(v) {
     if (d > 5 && facing < 0.3) continue;
     if (!lineOfSight(eyeOf(o), at)) continue;
     o.mind = 'panic'; o.panicT = 1.3 + Math.random() * 0.9; o.panicAt = v.g.position.clone(); setMark(o, '!');
+    say(o, Math.random() < 0.35 ? 'whatthe' : 'mandown');
     eplay(o, clips.has('M2M_Dodge_back') ? 'M2M_Dodge_back' : 'Hit_Chest', { loop: false, fade: 0.1 });
     log('panic', o.id, 'saw', v.id, 'die');
   }
+  if (v.civ) return;
+  // v37: a soldier already fighting shouts it; three down in a few seconds and they want out
+  vo.deaths = (vo.deaths || []).filter((t) => simT - t < 6); vo.deaths.push(simT);
+  const o = nearestSoldier(v.g.position, 25, v);
+  if (o && o.mind === 'combat') say(o, vo.deaths.length >= 3 ? 'panic' : 'mandown', 0.4);
 }
 const IDLES = ['SW_Idle', 'Idle_Loop', 'SW_Idle_Gun'];
 function calmUpdate(e, dt, to, dist) {
@@ -3558,8 +3647,10 @@ function calmUpdate(e, dt, to, dist) {
     return;
   }
   e.sus = e.seeRate ? Math.min(1, (e.sus || 0) + e.seeRate * dt) : Math.max(0, (e.sus || 0) - dt * 0.15);
-  if (e.sus >= 1) { e.mind = 'spot'; e.yellT = 1.1 * DF().react; setMark(e, '!'); log('spotted by', e.id); return; }
+  if (e.sus >= 1) { e.mind = 'spot'; e.yellT = 1.1 * DF().react; setMark(e, '!'); log('spotted by', e.id); say(e, saberOut() && Math.random() < 0.6 ? 'jedi' : 'spot'); e.susSaid = false; return; }
   setMark(e, e.sus > 0.2 ? '?' : null);
+  if (e.sus > 0.2 && !e.susSaid) e.susSaid = say(e, 'sus'); // v37: "Huh?" "Did you hear something?"
+  else if (e.susSaid && e.sus < 0.04) { e.susSaid = false; say(e, 'giveup'); } // "Must have been the wind."
   if (e.sus > 0.2) { turnTo(e, Math.atan2(to.x, to.z), 2.5, dt); eplay(e, 'SW_Idle_Gun', { fade: 0.25 }); return; } // something's there: he stops and looks
   if (e.hold) { e.lookT = (e.lookT || 0) + dt; e.yaw = (e.baseYaw ?? (e.baseYaw = e.yaw)) + Math.sin(e.lookT * 0.5) * 0.9; eplay(e, 'SW_Idle', { fade: 0.3 }); return; } // a lookout: stands and scans
   // patrol: strolls between spots near his post and waits at each
@@ -3622,6 +3713,7 @@ function playerDie(kind, push, blownApart) {
   if (dead) return;
   deaths++; atk = null; blocking = false; cover = null; takedown = null; stopOvr(0.05); if (mode === 'grapple') releaseGrapple(false);
   const body = makeCorpse();
+  { const o = nearestSoldier(player.position, 40); if (o && o.mind === 'combat') say(o, 'taunt', 1.1); } // v37: "Target down!"
   hero.visible = false;
   body.rag = makeRag(body.g, (n) => body.root.getObjectByName(n), push || new V3(0, 1, 0), blownApart ? 1.6 : 0.8);
   if (blownApart) { // like anyone else: two to four pieces come off
@@ -3855,7 +3947,8 @@ function stickTo(g, p, e) { // a sticky grenade grabs hold (a soldier's nearest 
   g.fuse = 1.6; g.vel.set(0, 0, 0);
   if (e) { const bones = ['spine_03', 'pelvis', 'Head', 'thigh_l', 'thigh_r'].map((n) => cutBone(e, n)).filter(Boolean); let best = bones[0], bd = 9;
     for (const b of bones) { const d = b.getWorldPosition(new V3()).distanceTo(p); if (d < bd) { bd = d; best = b; } }
-    g.stuck = { e, bone: best, local: best.worldToLocal(p.clone()), shield: !!e.jackal && facingAway(e, player.position) > 0.3 }; log('sticky on', e.id, g.stuck.shield ? '(his shield)' : ''); }
+    g.stuck = { e, bone: best, local: best.worldToLocal(p.clone()), shield: !!e.jackal && facingAway(e, player.position) > 0.3 }; log('sticky on', e.id, g.stuck.shield ? '(his shield)' : '');
+    say(e, 'grenade'); } // v37: he knows
   else g.stuck = { at: p.clone() };
   sfx('deflect', p, 0.4);
 }
@@ -3915,6 +4008,7 @@ function firePatch(at) {
 function setAlight(e) {
   if (e.burning || e.state === 'dead') return;
   e.burning = { t: 0, dir: Math.random() * Math.PI * 2 }; e.flames = true; alarm(e, 'on fire');
+  say(e, 'fire'); say(e, 'fire', 1.2); // v37: screaming the whole way
   noise(e.g.position, 25); log('on fire', e.id);
 }
 // soldiers steer round burning ground (v30): nudges a move direction away from any fire close by
@@ -4633,7 +4727,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v37 · 2026-10-02';
+const BUILD = 'v38 · 2026-10-02';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -5730,7 +5824,7 @@ function step(dt) {
   lean.rotation.z = roll;
 
   updateDraw(dt);
-  updateReload(dt);
+  updateReload(dt); updateVoices(); // v37
   updateJetpackLook();
   footsteps(dt); jetSound(mode === 'jet', jumpHeld || jet.boost ? 1 : 0.3);
   updateCombat(dt); bladeCuts(dt); updateForce(dt); updateThrow(dt); updateBlasterHand(); saberFx(dt);
@@ -6312,7 +6406,7 @@ function start() {
     playOnEnemy(i, name, from = 0, speed = 1) { const e = soldiers().filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },
     get blocks() { return blocks.map((b) => ({ min: b.box.min.toArray().map((v) => +v.toFixed(1)), max: b.box.max.toArray().map((v) => +v.toFixed(1)) })); },
     get paused() { return paused; }, setPause, get view() { return [camYaw, camPitch]; }, get settings() { return { ...settings }; }, get baseFov() { return BASE_FOV; }, get masterVol() { return audio.master ? audio.master.gain.value : null; },
-    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, civilians: () => civilians().map((e) => ({ id: e.id, kind: e.civ, state: e.state, cs: e.cs, pos: e.g.position.toArray().map((v) => +v.toFixed(2)), hp: e.hp, severed: (e.severed || []).map((b) => b.name), label: e.cutLabel || null, rag: !!e.rag, hair: (() => { let h = null; e.root.traverse((o) => { if (!h && o.isMesh) h = hairOf(o); }); return h; })() })),
+    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, get voLog() { return vo.log.slice(); }, get voCount() { return vo.total; }, get voLoaded() { return Object.fromEntries(Object.entries(vo.buf).map(([v, c]) => [v, Object.fromEntries(Object.entries(c).map(([k, a]) => [k, a.length]))])); }, get voNow() { return Object.fromEntries(Object.entries(vo.now).filter(([, c]) => c && c.end > simT).map(([v, c]) => [v, { cat: c.cat, id: c.e.id, take: c.take }])); }, say: (i, cat) => say(soldiers().filter((x) => x.state !== 'dead')[i], cat), setVoices: (on) => { vo.on = on; }, voReset: () => { vo.log.length = 0; vo.total = 0; vo.cool = {}; vo.pending.length = 0; for (const v in vo.now) stopLine(v); for (const e of enemies) e.voT = 0; }, civilians: () => civilians().map((e) => ({ id: e.id, kind: e.civ, state: e.state, cs: e.cs, pos: e.g.position.toArray().map((v) => +v.toFixed(2)), hp: e.hp, severed: (e.severed || []).map((b) => b.name), label: e.cutLabel || null, rag: !!e.rag, hair: (() => { let h = null; e.root.traverse((o) => { if (!h && o.isMesh) h = hairOf(o); }); return h; })() })),
     setCivCount(n) { civCfg.count = n; civSpawnT = 0; }, get civDeaths() { return civDeaths; }, strayAt: (ax, ay, az, bx, by, bz) => strayHit(new V3(ax, ay, az), new V3(bx, by, bz))?.id || null, spawnCivilian: (x, z, kind) => spawnCivilian(new V3(x, groundAt(x, z, 99), z), kind)?.id || null,
     scareCiv(id, x, z) { const e = enemies.find((q) => q.id === id); if (e) scare(e, new V3(x, 0, z), 'test'); }, shootCiv(id, zone = 'torso') { const e = enemies.find((q) => q.id === id); if (e) damageEnemy(e, zone === 'head' ? 100 : 34, zone, 'bullet', e.g.position.clone().sub(player.position).setY(0).normalize()); }, cutCiv(id, name) { const e = enemies.find((q) => q.id === id), c = CUTS.find((x) => x[0] === name); if (e && c) applyCut(e, c, new V3(1, 0, 0)); },
     spawnBarrel: (x, z, kind) => spawnBarrel(new V3(x, 0, z), kind)?.id || null, spawnMine: (x, z) => spawnMine(new V3(x, 0, z))?.id || null, scatterProps: () => { scatterProps(); return props.barrels.length; },

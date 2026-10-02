@@ -161,7 +161,7 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 - ✅ Difficulty modes (easy to extreme; smarter AI on the hard ones); slow health regeneration
 - ✅ Sticky grenade (kills outright), fire grenade (blocks a path with fire)
 - ✅ Wave missions with escalating weapons: pistols, AKs, ARs, snipers
-- ⬜ Enemy chatter and screams; your own recorded voice lines
+- 🟡 Enemy chatter and screams; your own recorded voice lines *(v37: your recording is in: spotting, reloading, pain, man down, grenades, fire, barrels, taunts. Calm patrol chatter still to record)*
 
 **Story and world**
 - ⬜ A light story ("go take out these people"), a villain, silly cutscenes you can walk around in (even out of frame a little)
