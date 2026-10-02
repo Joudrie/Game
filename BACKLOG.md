@@ -32,6 +32,12 @@ The ground rules:
 - **Inspiration:** the owner's book *Wake* (weapons such as plasma knives, plasma and beryllium rifles, holocloaks, magboots, hoverboards, breaching kits; worlds like Marfeld and Kelton) and the Lego collection's lore (the Snow Jedi, the Purple Shadow, the realm where guns don't work).
 - **Licences still apply:** assets ripped from commercial games (like the Skate 3 or Call of Duty files people pass around) can't go in. We take ideas from those games, and assets only from properly licensed sources.
 
+## World (owner, after v36)
+- [x] **Grass and hills, water at the edge** *(v38: noise hills flattened under the city, Grass004 ground, infinite-world grass blades, the sea)*
+- [ ] grass that bends around soldiers and civilians too, not only you
+- [ ] swimming (today the sea stops you at your knees)
+- [ ] a real beach texture and shore foam
+
 ## ★ First milestone (VISION.md): Mission 1, "The cargo yard"
 One mission that delivers the best five minutes: stealth that works, things that go off, a loud fallback that's just as fun. Built in steps:
 - [x] **Things that go off** *(v36)*: exploding barrels and gas tanks (shot, saber, push, blast, thrown body; chain reactions; a gas tank leaves fire), landmines

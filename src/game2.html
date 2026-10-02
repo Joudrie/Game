@@ -342,6 +342,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
 window.__booted = true;
 
 const $ = (id) => document.getElementById(id);
@@ -529,10 +530,142 @@ Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near:
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
 scene.add(sun, sun.target);
 const SUN_OFFSET = new V3(6, 14, 4);
-const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.MeshLambertMaterial({ color: 0xcdb78f })); // sand
+// ---------------- terrain, grass and water (v38) ----------------
+// An island of rolling grassy hills. Heights come from three.js's ImprovedNoise (MIT) on a 4 m grid (`terrain.h`),
+// flattened to 0 around the buildings, roads, the courtyard, the start and the stone path, so everything there stays
+// where it was; beaches slope down into the sea past the outer towers. `groundAt` reads `terrainH`, which follows the
+// mesh's own triangles exactly, so feet stand on what you see. The ground is ambientCG's Grass004 (CC0); the blades are
+// Bruno Simon's grass from "infinite-world" (ISC): one field of camera-facing blades that wraps around you, lifted to
+// the terrain from a height texture, thinned with distance and on slopes, moved by wind. The sea uses three.js's
+// water normal map (MIT), scrolled on a plain material (no reflection pass).
+const TER = { half: 640, cell: 4, shore: 530, sea: -1.1, hill: 17 }; // terrain.hills: headless runs keep flat ground unless ?hills=1
+const terrain = { n: Math.round(2 * TER.half / TER.cell) + 1, h: null, dens: null, built: false, hills: !navigator.webdriver || new URLSearchParams(location.search).get('hills') === '1', mesh: null, grass: null, water: null, tex: null };
+function terrainH(x, z) {
+  if (!terrain.built) return 0;
+  const n = terrain.n, gx = (x + TER.half) / TER.cell, gz = (z + TER.half) / TER.cell;
+  if (!(gx >= 0 && gz >= 0 && gx < n - 1 && gz < n - 1)) return TER.sea - 4;
+  const i = Math.floor(gx), j = Math.floor(gz), fx = gx - i, fz = gz - j, h = terrain.h, k = j * n + i;
+  const a = h[k], b = h[k + 1], c = h[k + n], d = h[k + n + 1]; // a (i,j) b (i+1,j) c (i,j+1) d (i+1,j+1): split along b–c like the mesh
+  return fx + fz <= 1 ? a + (b - a) * fx + (c - a) * fz : d + (c - d) * (1 - fx) + (b - d) * (1 - fz);
+}
+const underwater = (x, z) => terrain.built && terrainH(x, z) < TER.sea - 0.5; // deeper than your knees: you can't go there
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(4000, 4000), new THREE.MeshLambertMaterial({ color: 0x6f8f4a })); // until the terrain is built
 ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-const grid = new THREE.GridHelper(200, 200, 0x8a7550, 0x9c8762); // always on, for judging distance and speed
-grid.material.transparent = true; grid.material.opacity = 0.4; grid.position.y = 0.002; scene.add(grid);
+function buildTerrain() {
+  const n = terrain.n, C = TER.cell, H = TER.half, h = new Float32Array(n * n), dist = new Float32Array(n * n).fill(1e9), dens = new Float32Array(n * n).fill(1);
+  const cellOf = (x) => Math.round((x + H) / C);
+  const mark = (x0, z0, x1, z1, grass = 0) => { // a flat area; grass: blades allowed on it
+    for (let j = Math.max(0, cellOf(z0)); j <= Math.min(n - 1, cellOf(z1)); j++) for (let i = Math.max(0, cellOf(x0)); i <= Math.min(n - 1, cellOf(x1)); i++) { dist[j * n + i] = 0; if (!grass) dens[j * n + i] = 0; }
+  };
+  for (const b of blocks) if (!b.nature) { const B = b.box; mark(B.min.x - 4, B.min.z - 4, B.max.x + 4, B.max.z + 4); }
+  for (const { i, j } of roadCells.values()) mark(i * ROAD_T - 6, j * ROAD_T - 6, i * ROAD_T + 6, j * ROAD_T + 6);
+  mark(COURT.x - COURT.half - 8, COURT.z - COURT.half - 8, COURT.x + COURT.half + 8, COURT.z + COURT.half + 8);
+  mark(-20, -20, 20, 20, 1); mark(-6, 0, 6, COURT.z, 1); // the start and the stone path to the courtyard (grass allowed)
+  // distance (m) to the nearest flat area: two chamfer passes
+  const D1 = C, D2 = C * Math.SQRT2;
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const k = j * n + i; let v = dist[k]; if (i > 0) v = Math.min(v, dist[k - 1] + D1); if (j > 0) { v = Math.min(v, dist[k - n] + D1); if (i > 0) v = Math.min(v, dist[k - n - 1] + D2); if (i < n - 1) v = Math.min(v, dist[k - n + 1] + D2); } dist[k] = v; }
+  for (let j = n - 1; j >= 0; j--) for (let i = n - 1; i >= 0; i--) { const k = j * n + i; let v = dist[k]; if (i < n - 1) v = Math.min(v, dist[k + 1] + D1); if (j < n - 1) { v = Math.min(v, dist[k + n] + D1); if (i < n - 1) v = Math.min(v, dist[k + n + 1] + D2); if (i > 0) v = Math.min(v, dist[k + n - 1] + D2); } dist[k] = v; }
+  const noise = new ImprovedNoise(), sm = (a, b, x) => { const t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+    const k = j * n + i, x = -H + i * C, z = -H + j * C, r = Math.hypot(x, z);
+    let v = noise.noise(x / 95, z / 95, 1.7) * 0.75 + noise.noise(x / 38, z / 38, 7.3) * 0.3 + noise.noise(x / 16, z / 16, 3.1) * 0.08;
+    v = Math.max(-0.05, v * TER.hill + 3); // rolling hills up to about 15 m, mostly above the flat parts
+    if (!terrain.hills) v = 0;
+    v *= 1 - sm(TER.shore - 150, TER.shore - 50, r); // lower toward the coast
+    v += 0.6 * (1 - sm(TER.shore - 60, TER.shore - 10, r)) * sm(TER.shore - 150, TER.shore - 60, r); // a low dune behind the beach
+    v *= sm(5, 30, dist[k]); // flat near buildings and roads (rising over 25 m), dune or not
+    const fall = sm(TER.shore - 45, TER.shore + 40, r); // the beach, then the sea floor
+    h[k] = v * (1 - fall) + (TER.sea - 3.5) * fall;
+    if (h[k] < TER.sea + 1.6 && r > TER.shore - 110) dens[k] = 0; // no grass on the beach or under water
+  }
+  terrain.h = h; terrain.dens = dens; terrain.built = true;
+  // the mesh: one vertex per grid point, triangles split like terrainH
+  const pos = new Float32Array(n * n * 3), col = new Float32Array(n * n * 3), uv = new Float32Array(n * n * 2), idx = new Uint32Array((n - 1) * (n - 1) * 6);
+  const tint = new THREE.Color();
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+    const k = j * n + i, x = -H + i * C, z = -H + j * C, y = h[k];
+    pos.set([x, y, z], k * 3); uv.set([x / 7, z / 7], k * 2);
+    const sand = sm(TER.sea + 2.2, TER.sea + 0.9, y) * sm(TER.shore - 110, TER.shore - 60, Math.hypot(x, z)), shade = 0.92 + noise.noise(x / 23, z / 23, 9.9) * 0.18;
+    tint.setRGB(shade, shade, shade * 0.95).lerp(new THREE.Color(1.9, 1.7, 1.15), sand); // grass, then pale sand at the waterline
+    col.set([tint.r, tint.g, tint.b], k * 3);
+  }
+  let q = 0; for (let j = 0; j < n - 1; j++) for (let i = 0; i < n - 1; i++) { const a = j * n + i, b = a + 1, c = a + n, d = c + 1; idx.set([a, c, b, c, d, b], q); q += 6; }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); geo.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); geo.setIndex(new THREE.BufferAttribute(idx, 1)); geo.computeVertexNormals();
+  const A = window.__ASSETS.tex || {};
+  const load = (b64, type) => { const t = new THREE.TextureLoader().load(`data:image/${type};base64,` + b64); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; };
+  const grassMap = A.grass ? load(A.grass, 'webp') : null; if (grassMap) { grassMap.colorSpace = THREE.SRGBColorSpace; grassMap.anisotropy = 4; }
+  if (terrain.mesh) { scene.remove(terrain.mesh); terrain.mesh.geometry.dispose(); }
+  terrain.mesh = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ map: grassMap, vertexColors: true, color: grassMap ? 0xffffff : 0x6f8f4a }));
+  terrain.mesh.receiveShadow = true; terrain.mesh.name = 'terrain'; scene.add(terrain.mesh);
+  ground.visible = false;
+  // the sea
+  if (!terrain.water) {
+    const wn = A.water ? load(A.water, 'webp') : null; if (wn) wn.repeat.set(220, 220);
+    terrain.water = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000).rotateX(-Math.PI / 2), new THREE.MeshPhongMaterial({ color: 0x2c6c8c, specular: 0x9fc4d8, shininess: 80, normalMap: wn, normalScale: new THREE.Vector2(0.7, 0.7), transparent: true, opacity: 0.88 }));
+    terrain.water.position.y = TER.sea; terrain.water.name = 'sea'; scene.add(terrain.water);
+  }
+  // the height texture the grass reads: R height, G grass allowed
+  const tdata = new Float32Array(n * n * 4); for (let k = 0; k < n * n; k++) { tdata[k * 4] = h[k]; tdata[k * 4 + 1] = dens[k]; }
+  if (terrain.tex) terrain.tex.dispose();
+  terrain.tex = new THREE.DataTexture(tdata, n, n, THREE.RGBAFormat, THREE.FloatType); terrain.tex.needsUpdate = true;
+  buildGrass();
+  log('terrain', n + '×' + n, terrain.hills ? 'hills' : 'flat');
+}
+// the blades (after infinite-world's Grass.js and grass vertex shader, ISC, Bruno Simon)
+const GRASS = { details: 240, size: 60 };
+function buildGrass() {
+  const D = GRASS.details, S = GRASS.size, frag = S / D, count = D * D;
+  const centers = new Float32Array(count * 3 * 2), positions = new Float32Array(count * 3 * 3), tip = new Float32Array(count * 3);
+  for (let ix = 0; ix < D; ix++) for (let iz = 0; iz < D; iz++) {
+    const fx = (ix / D - 0.5) * S + frag * 0.5, fz = (iz / D - 0.5) * S + frag * 0.5, k = ix * D + iz;
+    const cx = fx + (Math.random() - 0.5) * frag * 0.9, cz = fz + (Math.random() - 0.5) * frag * 0.9;
+    centers.set([cx, cz, cx, cz, cx, cz], k * 6);
+    const w = frag * 0.7, hgt = frag * 1.5 * (0.55 + Math.random() * 0.45); // ankle to shin high
+    positions.set([-w / 2, 0, 0, 0, hgt, 0, w / 2, 0, 0], k * 9); tip.set([0, 1, 0], k * 3);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('center', new THREE.Float32BufferAttribute(centers, 2)); geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3)); geo.setAttribute('tip', new THREE.Float32BufferAttribute(tip, 1));
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { uTime: { value: 0 }, uSize: { value: S }, uPlayer: { value: new V3() }, uTer: { value: terrain.tex }, uN: { value: terrain.n }, uHalf: { value: TER.half }, uCell: { value: TER.cell }, uSun: { value: SUN_OFFSET.clone().normalize() }, uFog: { value: SKY.clone() } },
+    vertexShader: `
+      uniform float uTime, uSize, uN, uHalf, uCell; uniform vec3 uPlayer, uSun; uniform sampler2D uTer;
+      attribute vec2 center; attribute float tip; varying vec3 vColor;
+      vec2 ter(vec2 p) { // bilinear height and density from the terrain texture
+        vec2 g = (p + uHalf) / uCell; vec2 i = floor(g), f = g - i;
+        vec2 a = texture2D(uTer, (i + 0.5) / uN).rg, b = texture2D(uTer, (i + vec2(1.5, 0.5)) / uN).rg, c = texture2D(uTer, (i + vec2(0.5, 1.5)) / uN).rg, d = texture2D(uTer, (i + 1.5) / uN).rg;
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+      }
+      void main() {
+        vec2 cen = center - uPlayer.xz; float half_ = uSize * 0.5;
+        cen = mod(cen + half_, uSize) - half_ + uPlayer.xz; // the field wraps around you
+        vec3 p = position;
+        float ang = atan(cen.x - cameraPosition.x, cen.y - cameraPosition.z); // face the camera
+        p.xz = vec2(cos(ang) * p.x, -sin(ang) * p.x);
+        vec2 t = ter(cen), tx = ter(cen + vec2(1.0, 0.0)), tz = ter(cen + vec2(0.0, 1.0));
+        float slope = length(vec2(tx.x - t.x, tz.x - t.x));
+        float dist = distance(uPlayer.xz, cen) / half_;
+        float scale = (1.0 - smoothstep(0.55, 1.0, dist)) * step(0.5, t.y) * (1.0 - smoothstep(0.55, 0.8, slope));
+        float away = 1.0 - smoothstep(0.0, 0.9, distance(uPlayer.xz, cen)); // trampled where you stand
+        p *= scale * (1.0 - 0.6 * away);
+        vec2 wind = vec2(sin(uTime * 1.3 + cen.x * 0.35 + cen.y * 0.2), cos(uTime * 1.1 + cen.y * 0.3)) * 0.12;
+        p.xz += tip * scale * (wind + normalize(cen - uPlayer.xz + 0.001) * away * 0.35);
+        vec3 wpos = vec3(cen.x, t.x, cen.y) + p;
+        gl_Position = projectionMatrix * viewMatrix * vec4(wpos, 1.0);
+        vec3 nrm = normalize(vec3(t.x - tx.x, 1.0, t.x - tz.x));
+        float sun = 0.65 + 0.35 * max(dot(nrm, uSun), 0.0);
+        vec3 base = vec3(0.22, 0.33, 0.1), top = vec3(0.47, 0.6, 0.22);
+        vColor = mix(base, top, tip) * sun;
+      }`,
+    fragmentShader: `varying vec3 vColor; void main() { gl_FragColor = vec4(vColor, 1.0); }`,
+    side: THREE.DoubleSide,
+  });
+  if (terrain.grass) { scene.remove(terrain.grass); terrain.grass.geometry.dispose(); }
+  terrain.grass = new THREE.Mesh(geo, mat); terrain.grass.frustumCulled = false; terrain.grass.name = 'grass'; scene.add(terrain.grass);
+}
+function updateTerrain(dt) {
+  if (terrain.grass) { const u = terrain.grass.material.uniforms; u.uTime.value += dt; u.uPlayer.value.copy(player.position); }
+  if (terrain.water?.material.normalMap) { const o = terrain.water.material.normalMap.offset; o.x += dt * 0.004; o.y += dt * 0.0025; }
+}
 
 let viewShift = { x: 0, y: 0 };
 function resize() {
@@ -624,7 +757,7 @@ buildCourtyard();
 const blockMeshes = blocks.map((b) => b.mesh);
 const PR = 0.35; // player radius
 function groundAt(x, z, y) {
-  let g = 0;
+  let g = terrainH(x, z); // v37: the hills (0 near buildings and roads)
   for (const { box: B } of blocks) if (x > B.min.x - 0.15 && x < B.max.x + 0.15 && z > B.min.z - 0.15 && z < B.max.z + 0.15 && B.max.y <= y + 0.45 && B.max.y > g) g = B.max.y;
   return g;
 }
@@ -1899,6 +2032,7 @@ function dressWorld(bld, nat, roads) {
     b.mesh.visible = false; b.model = m; b.building = best.name; scene.add(m); worldStats.buildings++;
   }
   layRoads();
+  buildTerrain(); // v37: hills, grass and the sea (after the roads, which stay flat)
   scatterNature(rnd);
   buildClouds(rnd);
   log('world dressed', JSON.stringify(worldStats));
@@ -1991,7 +2125,7 @@ function layRoads() {
 }
 function scatterNature(rnd) {
   const courtZone = new THREE.Box3(new V3(COURT.x - COURT.half - 4, -1, COURT.z - COURT.half - 4), new V3(COURT.x + COURT.half + 4, 99, COURT.z + COURT.half + 4));
-  const free = (x, z, pad) => !blocks.some(({ box: B }) => x > B.min.x - pad && x < B.max.x + pad && z > B.min.z - pad && z < B.max.z + pad) && !courtZone.containsPoint(new V3(x, 0, z)) && !onRoad(x, z, pad);
+  const free = (x, z, pad) => !blocks.some(({ box: B }) => x > B.min.x - pad && x < B.max.x + pad && z > B.min.z - pad && z < B.max.z + pad) && !courtZone.containsPoint(new V3(x, 0, z)) && !onRoad(x, z, pad) && terrainH(x, z) > TER.sea + 0.4;
   const lists = {}; const put = (name, x, z, s, r = rnd() * 6.283) => { if (worldModels[name]) (lists[name] = lists[name] || []).push({ x, z, s, r }); };
   // a stone path from the start to the courtyard gate, and a round plaza where you start
   for (let i = 0; i < 7; i++) { const a = i / 7 * 6.283; put('n-path_stoneCircle', Math.cos(a) * 2.6, Math.sin(a) * 2.6 + 1, 2.2); } // stepping stones round the start
@@ -2014,7 +2148,7 @@ function scatterNature(rnd) {
   // rocks, and trees with a trunk you bump into (and can land on)
   for (let i = 0; i < 40; i++) { const a = rnd() * 6.283, r = 12 + rnd() * 160, x = Math.cos(a) * r, z = Math.sin(a) * r; if (free(x, z, 1)) put(rnd() < 0.5 ? 'n-rock_smallA' : 'n-rock_smallC', x, z, 2.5 + rnd() * 2); }
   const TREES = ['n-tree_palmTall', 'n-tree_palmDetailedShort', 'n-tree_oak', 'n-tree_default'], trunkMat = new THREE.MeshBasicMaterial({ visible: false });
-  const solid = (x, z, r, h) => { const box = new THREE.Box3(new V3(x - r, 0, z - r), new V3(x + r, h, z + r)); const mesh = new THREE.Mesh(new THREE.BoxGeometry(2 * r, h, 2 * r), trunkMat); mesh.position.set(x, h / 2, z); mesh.visible = false; scene.add(mesh); mesh.updateMatrixWorld(); blocks.push({ box, mesh, nature: true }); blockMeshes.push(mesh); };
+  const solid = (x, z, r, h) => { const y0 = terrainH(x, z) - 0.2, box = new THREE.Box3(new V3(x - r, y0, z - r), new V3(x + r, y0 + h, z + r)); const mesh = new THREE.Mesh(new THREE.BoxGeometry(2 * r, h, 2 * r), trunkMat); mesh.position.set(x, y0 + h / 2, z); mesh.visible = false; scene.add(mesh); mesh.updateMatrixWorld(); blocks.push({ box, mesh, nature: true }); blockMeshes.push(mesh); };
   for (let i = 0; i < 60; i++) {
     const a = rnd() * 6.283, r = 14 + rnd() * 170, x = Math.cos(a) * r, z = Math.sin(a) * r;
     if (!free(x, z, 3)) continue;
@@ -2031,7 +2165,7 @@ function scatterNature(rnd) {
       const key = o.material.name, local = inv.clone().multiply(o.matrixWorld);
       const mat = mats[key] || (mats[key] = new THREE.MeshLambertMaterial({ color: NATURE_COL[key] ?? o.material.color.getHex(), side: THREE.DoubleSide }));
       const im = new THREE.InstancedMesh(o.geometry, mat, list.length);
-      list.forEach((t, i) => { Q.setFromAxisAngle(UP, t.r); M.compose(new V3(t.x, 0.05 * t.s + (name.includes('path') ? 0.01 : 0), t.z), Q, new V3(t.s, t.s, t.s)); im.setMatrixAt(i, M.multiply(local)); });
+      list.forEach((t, i) => { Q.setFromAxisAngle(UP, t.r); M.compose(new V3(t.x, terrainH(t.x, t.z) + 0.05 * t.s + (name.includes('path') ? 0.01 : 0) - (/tree|rock/.test(name) ? 0.15 : 0), t.z), Q, new V3(t.s, t.s, t.s)); im.setMatrixAt(i, M.multiply(local)); });
       im.castShadow = shadow; im.receiveShadow = true; im.computeBoundingSphere(); im.name = 'nature:' + name; scene.add(im);
       worldStats.instances += list.length;
     });
@@ -2161,7 +2295,7 @@ function openSpot(minR, maxR) {
   for (let i = 0; i < 40; i++) {
     const a = Math.random() * Math.PI * 2, r = minR + Math.random() * (maxR - minR);
     const x = player.position.x + Math.cos(a) * r, z = player.position.z + Math.sin(a) * r;
-    if (blocks.every(({ box: B }) => x < B.min.x - 1.5 || x > B.max.x + 1.5 || z < B.min.z - 1.5 || z > B.max.z + 1.5)) return new V3(x, 0, z);
+    if (!underwater(x, z) && terrainH(x, z) > TER.sea + 0.5 && blocks.every(({ box: B }) => x < B.min.x - 1.5 || x > B.max.x + 1.5 || z < B.min.z - 1.5 || z > B.max.z + 1.5)) return new V3(x, groundAt(x, z, 99), z);
   }
   return new V3(player.position.x + 20, 0, player.position.z);
 }
@@ -2312,6 +2446,7 @@ function collideCircle(p, r) {
     const d = Math.sqrt(d2) || 1e-3, nx = dx / d || 1, nz = dz / d;
     p.x += nx * (r - d); p.z += nz * (r - d); hit = new V3(nx, 0, nz); collideCircle.block = blk;
   }
+  if (underwater(p.x, p.z)) { const d = Math.hypot(p.x, p.z) || 1; p.x -= p.x / d * 0.4; p.z -= p.z / d * 0.4; hit = hit || new V3(-p.x / d, 0, -p.z / d); } // v37: people stay out of the sea
   return hit;
 }
 const ENEMY_MAG = { pistol: 6, ak: 5, ar: 5, shotgun: 4, sniper: 4 }, ENEMY_RELOAD = 2.2; // v37: shots (or bursts) before a soldier stops to reload, and for how long
@@ -3672,7 +3807,7 @@ function ragStick(a, b, L, minOnly) {
 }
 function ragCollide(pt, near) {
   const p = pt.p, R = RAG_R;
-  if (p.y < R) { p.y = R; pt.o.x += (p.x - pt.o.x) * 0.35; pt.o.z += (p.z - pt.o.z) * 0.35; } // the ground, with friction
+  const gh = terrainH(p.x, p.z) + R; if (p.y < gh) { p.y = gh; pt.o.x += (p.x - pt.o.x) * 0.35; pt.o.z += (p.z - pt.o.z) * 0.35; } // the ground (v37: the hills), with friction
   for (const B of near) {
     if (p.x <= B.min.x - R || p.x >= B.max.x + R || p.z <= B.min.z - R || p.z >= B.max.z + R || p.y <= B.min.y - R || p.y >= B.max.y + R) continue;
     const opts = [[B.max.y + R - p.y, 'y', 1], [p.x - B.min.x + R, 'x', -1], [B.max.x + R - p.x, 'x', 1], [p.z - B.min.z + R, 'z', -1], [B.max.z + R - p.z, 'z', 1]];
@@ -4592,7 +4727,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v37.1 · 2026-10-02';
+const BUILD = 'v38 · 2026-10-02';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -5681,6 +5816,8 @@ function step(dt) {
   resolveCollisions();
   // v32 (audit BUG-010): the sand ends at ±2000 m; an invisible edge keeps you on it
   const EDGE = 1950; if (Math.abs(player.position.x) > EDGE || Math.abs(player.position.z) > EDGE) { player.position.x = clamp(player.position.x, -EDGE, EDGE); player.position.z = clamp(player.position.z, -EDGE, EDGE); speed = Math.min(speed, 2); }
+  // v37: the island's edge: you can wade in to your knees, no further (flying over the sea is fine)
+  if (mode === 'ground' && underwater(player.position.x, player.position.z)) { const P = player.position, d = Math.hypot(P.x, P.z) || 1; for (let i = 0; i < 40 && underwater(P.x, P.z); i++) { P.x -= P.x / d * 0.25; P.z -= P.z / d * 0.25; } P.y = groundAt(P.x, P.z, P.y + 0.5); speed = Math.min(speed, 2); }
   updateGrapple(dt);
   player.rotation.y = yaw;
   roll = damp(roll, wallRun ? wallRun.side * 0.38 : mode === 'ground' ? clamp(-yawVel * speed * 0.02, -0.14, 0.14) : 0, 8, dt);
@@ -5700,7 +5837,7 @@ function step(dt) {
   updateCamera(dt, C);
   hud(C);
   sun.position.copy(player.position).add(SUN_OFFSET); sun.target.position.copy(player.position);
-  grid.position.x = Math.round(player.position.x); grid.position.z = Math.round(player.position.z);
+  updateTerrain(dt);
 }
 
 function gaitOf(C) {
@@ -6277,6 +6414,8 @@ function start() {
     get flyingBarrels() { return props.flying.length; }, get blown() { return { barrels: barrelsBlown, mines: minesBlown }; }, get score() { return { total: score.total, combo: score.combo, kills: score.kills, log: score.log.slice(-10), mission: mission ? (mission.score || 0) : null, spotted: mission ? !!mission.spotted : null }; },
     resetScore() { score.total = 0; score.combo = 0; score.kills = 0; score.log.length = 0; score.lastKillT = -99; renderScore(); }, get trophy() { return mission ? !!mission.trophy : null; },
     shotProbe() { const o = camera.position.clone(), d = camera.getWorldDirection(new V3()); aimRay.set(o, d); aimRay.far = 300; const w = aimRay.intersectObjects(blockMeshes, false)[0]; return { dir: d.toArray().map((v) => +v.toFixed(3)), wall: w ? { d: +w.distance.toFixed(2), mat: w.object.userData.block?.mat || null, at: w.point.toArray().map((v) => +v.toFixed(2)) } : null }; },
+    bodyProbe() { hero.updateMatrixWorld(true); const W = (n) => boneByName(hero, n)?.getWorldPosition(new V3()).y ?? null, p = player.position; return { y: +p.y.toFixed(2), ground: +groundAt(p.x, p.z, p.y + 0.5).toFixed(2), head: +(W('Head') - p.y).toFixed(2), pelvis: +(W('pelvis') - p.y).toFixed(2), footL: +(W('foot_l') - p.y).toFixed(2), footR: +(W('foot_r') - p.y).toFixed(2), mode, speed: +speed.toFixed(1), anim: [...locoActive].filter((a) => a.getEffectiveWeight() > 0.3).map((a) => a.getClip().name).join('+'), ovr: [...ovr.keys()].map((a) => a.getClip().name).join('+') }; },
+    setHills(on = true) { terrain.hills = on; buildTerrain(); const P = player.position; P.y = groundAt(P.x, P.z, 99); }, terrainH: (x, z) => +terrainH(x, z).toFixed(3), get hills() { return terrain.hills; }, underwater: (x, z) => underwater(x, z),
     get heroLook() { return heroLook; }, heroMeshes: () => { const o = []; hero.traverse((m) => { if (m.isMesh && m.visible && m.isSkinnedMesh) o.push(m.material.transparent ? m.material.opacity : 1); }); return o; }, setLook: (l) => setHeroLookPref(l), visibleParts: (corpse) => { const o = []; const r = corpse ? dead?.body.root : hero; r?.traverse((m) => { if (m.isMesh && m.visible) o.push(m.name + ':' + (m.material?.name || '')); }); return o; },
     get pos() { return player.position.toArray().map((v) => +v.toFixed(2)); }, place(x, z) { player.position.set(x, groundAt(x, z, 99), z); }, look(yawR, pitchR) { camYaw = yawR; camPitch = pitchR; },
     grapplePress, get grapple() { return grapple.state; }, sweepSaberClipping, get slide() { return { speed: +slideSpeed.toFixed(2), dur: +slideDur.toFixed(2) }; }, get crouchBlend() { return crouchBlend; }, get guardBlend() { return guardBlend; }, testCfg, get fingers() { const b = boneByName(hero, 'index_02_l'), f = fist && fist.find((x) => x.bone === b); return f ? +b.quaternion.angleTo(f.q).toFixed(3) : null; }, forceStuck() { speed = 0; CLASSES[klass]._frozen = true; }, strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },

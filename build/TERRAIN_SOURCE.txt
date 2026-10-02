@@ -1,0 +1,11 @@
+Terrain, grass and sea (v38)
+
+- build/ground_grass.webp: ambientCG "Grass 004" colour map (Grass004_1K-JPG_Color.jpg), CC0 1.0,
+  https://ambientcg.com/view?id=Grass004 , resized to 512 px WebP.
+- build/water_normals.webp: three.js examples/textures/waternormals.jpg, MIT (three.js authors),
+  https://github.com/mrdoob/three.js/blob/dev/examples/textures/waternormals.jpg , resized to 256 px WebP.
+- The grass blades in src/game2.html (buildGrass) are adapted from Bruno Simon's "infinite-world"
+  (https://github.com/brunosimon/infinite-world, package.json licence ISC): sources/Game/View/Grass.js and
+  View/Materials/shaders/grass/vertex.glsl (the wrapping blade field, camera-facing blades, distance and slope
+  attenuation, wind).
+- Hills: three.js examples/jsm/math/ImprovedNoise.js (MIT), loaded from three/addons.

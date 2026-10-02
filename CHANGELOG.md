@@ -2,6 +2,19 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v38: grassy hills and the sea
+Owner's ask: grass like every game has, hills instead of flat ground, water around the edge, and no falling through the ground. Test: `tools/test46-hills.mjs`.
+- **Rolling hills,** up to about 12 m. The ground stays flat around every building, road, the start, the courtyard and the stone path, so everything that was there sits where it was. Heights come from three.js's own noise (ImprovedNoise, MIT) on a 4 m grid. Feet follow the exact triangles you see.
+- **Grass:** the ground is ambientCG's Grass004 texture (CC0), with darker and lighter patches.
+- **Grass blades** wave in the wind and are trampled where you stand. They're adapted from Bruno Simon's *infinite-world* (ISC): one field of blades that follows you, rising and falling with the hills, thinning out with distance and on steep slopes, and kept off roads, buildings and the beach.
+- **An island:** past the outer towers the land flattens, turns to sand and slopes into the sea. The sea uses three.js's water normal map (MIT), scrolling, with no costly reflection pass.
+  - You can wade in to your knees, no further; flying over the sea is fine.
+  - Soldiers and civilians stay out of it, and nobody spawns in it.
+- Trees, rocks, bodies (the ragdoll) and everything else that touches the ground follow the hills.
+- **Sinking while sprinting:** I couldn't make you sink. Sprinting in 16 directions in all three classes, with barrels and civilians on, then into every side of all 44 buildings and off their roofs: about 3,400 checks, never below the ground. test46 now runs the same checks over the hills on every test run. If it happens again, Menu → Tests → copy the report, or tell me where you were.
+- Headless test runs keep flat ground unless the page is opened with `?hills=1`, so the older suites keep their flat ground.
+- The build is 9.47 MB (grass texture 92 KB, water normals 16 KB).
+
 ## v37.1: triple jump for everyone
 - **Every class triple jumps now:** Light infantry, Heavy and Force. Only the Force class had it before, and the game starts you as Light infantry, so a fresh browser (or a friend opening the link) couldn't even double jump. Each class keeps its own jump heights; the third jump still goes highest.
 - Test: test37 checks three jumps for Light and Heavy as well as Force.
