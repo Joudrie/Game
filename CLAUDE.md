@@ -11,12 +11,13 @@ A mobile-first third-person action game in three.js (GTA / Red Dead / Watch Dogs
 - **Variety.** Several variants of every animation, selectable in Menu → Moves and rotated in play.
 - **Report problems back.** T-poses, freezes and stuck states are caught by the in-game watchdog and reported. Take reports the owner pastes seriously and fix the root cause.
 - **Keep the docs current.** Add a `CHANGELOG.md` entry for every version (bump `BUILD` in `src/game2.html`), and keep `BACKLOG.md` in sections.
+- **Phones (v50):** `LITE` (touch screens, or a load that crashed last time: `sessionStorage.booting`) lowers pixel ratio, shadows, soldiers (6) and civilians (4). Check a phone load with `tools/serve.sh node tools/phone_check.mjs http://127.0.0.1:8766/preview2.html` (CPU=4 to slow it).
 - **PC first (owner, v21).** Mouse and keyboard are the real platform. Phones only need to load the game and look right for a quick look (a friend opening a texted link): keep the layout working at 375 px, but new mechanics don't need full touch controls.
 
 ## Build and test
-- **Game source:** `src/game2.html`, a single file with the module script inside. `python3 tools/build2.py` embeds the models, animations and the jetpack OBJ from `build/` and `assets/`, and writes:
+- **Game source:** `src/game2.html`, a single file with the module script inside. Since v50, `build2.py` bundles that script with three.js from `node_modules` (esbuild, target Safari 15), so the page loads nothing from a CDN; keep it that way (one failed CDN file left phones on the loading screen). `python3 tools/build2.py` embeds the models, animations and the jetpack OBJ from `build/` and `assets/`, and writes:
   - `dist/index.html`, for the artifact
-  - `dist/preview2.html`, for local tests, which loads three.js from `/three/`
+  - `dist/preview2.html`, for local tests (the same bundled script)
 - **Setup:**
   1. `npm install`
   2. `mkdir -p dist/three && cp -r node_modules/three/build node_modules/three/examples dist/three/`
