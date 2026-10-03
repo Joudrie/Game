@@ -1,10 +1,9 @@
 # Asset shortlist: weapons, throwables, explosions, enemies (owner, after v47)
 
-**Rule from now on (owner): no 3D models made by Claude in code.** Everything we add is downloaded, licensed and credited. The hand-made ones already in the game stay until a downloaded model replaces them:
+**Rule from now on (owner): no 3D models made by Claude in code.** Everything we add is downloaded, licensed and credited. **Done in v48:** pistol (G17), AK (AKM), M4 (M4a1), shotgun (Remington 870), sniper (L115A3) and the frag (M67), all TastyTony; enemies are bumstrum's "terrorist". The hand-made ones still in the game stay until a downloaded model replaces them:
 
 | In the game now | Made by | Replace with |
 |---|---|---|
-| Frag grenade (`makeGrenade`) | Claude, spheres and a ring | TastyTony M67 or RGD-5 (below) |
 | Sticky grenade, fire grenade, teleport orb (`makeThrowable`) | Claude, spheres and cylinders | Quaternius Toon Shooter `FireGrenade.glb` (on disk); Kenney Blaster Kit `grenade-a/b.glb` (on disk) for the sticky and the orb |
 | Explosion look (flash + fire particles) | code, with Kenney textures | a CC0 explosion flipbook (below) |
 
@@ -51,7 +50,7 @@ Other good CC-BY single guns if we ever want higher detail: "AR-15 style rifle" 
 Flipbooks are flat textures: they cost a few hundred KB, not polygons, and play on a camera-facing sprite (the fire particles already work this way).
 
 ## 4. Enemies (rigged characters)
-Our enemies today: Quaternius SWAT (CC0, from the Ultimate Modular Men pack), reskinned onto our skeleton by `tools/reskin_swat.mjs`. Any rigged humanoid can go through the same retargeting (`tools/retarget.mjs`).
+Our enemies since v48: bumstrum's "terrorist" via `tools/reskin_enemy.mjs` (before: Quaternius SWAT via `tools/reskin_swat.mjs`). Any rigged humanoid with readable bone names can go through `reskin_enemy.mjs` with a new name map.
 
 | Pick | Faces | Licence | Notes | Sketchfab id |
 |---|---|---|---|---|
@@ -67,10 +66,9 @@ Our enemies today: Quaternius SWAT (CC0, from the Ultimate Modular Men pack), re
 Skipped on purpose: "Heavy Nazi Soldier" (not for this game), anything named after a commercial game.
 
 ## Budget
-The play link is 11.6 MB of 16 MB. Rough costs: a TastyTony gun 50–300 KB, a grenade 20–40 KB, a flipbook 200–600 KB, a 23k-face rigged soldier about 1 MB. Swapping the five guns and the frag costs well under 1 MB.
+The play link is 11.9 MB (v48). GitHub Pages has no cap; the claude.ai link caps at 16 MB. Rough costs: a TastyTony gun 50–300 KB, a grenade 20–40 KB, a flipbook 200–600 KB, a 23k-face rigged soldier about 1 MB. Swapping the five guns and the frag costs well under 1 MB.
 
 ## Suggested order
-1. Guns: replace pistol, AK, M4, shotgun, sniper with TastyTony's (one style), and fix the hand placement for each.
-2. Frag grenade: M67 or RGD-5; fire grenade: Quaternius FireGrenade.
+1. ~~Guns~~ and ~~frag~~ (v48). Fire grenade: Quaternius FireGrenade.
 3. Explosion: a Unity Labs or Sinestesia flipbook on the blast.
-4. A second enemy faction: "terrorist" (7k) or the 23k tactical soldier, retargeted.
+4. ~~Terrorist enemy~~ (v48). Next: a second faction, the 23k tactical soldier.

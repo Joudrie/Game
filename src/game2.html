@@ -844,6 +844,7 @@ async function boot() {
   try { rifleModel = (await parseGLB(A.rifle)).scene; pistolModel = (await parseGLB(A.pistol)).scene; } catch (e) { report('error', 'Weapon model failed: ' + e.message); }
   for (const [k, v] of Object.entries(A.att || {})) { try { attModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Attachment ${k} failed: ` + e.message); } }
   for (const [k, v] of Object.entries(A.guns || {})) { try { gunModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Gun model ${k} failed: ` + e.message); } }
+  for (const [k, v] of Object.entries(A.nades || {})) { try { nadeModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Grenade model ${k} failed: ` + e.message); } } // v48
   if (A.world) { try { const [wb, wn, wr] = await Promise.all([parseGLB(A.world.buildings), parseGLB(A.world.nature), A.world.roads ? parseGLB(A.world.roads) : null]); dressWorld(wb.scene, wn.scene, wr?.scene); } catch (e) { report('error', 'World models failed: ' + e.message); } }
   try { if (A.jetpack) jetpackModel = new OBJLoader().parse(new TextDecoder().decode(decodeB64(A.jetpack))); } catch (e) { report('error', 'Jetpack model failed: ' + e.message); }
   // height to 1.8 m, feet on the ground
@@ -1166,13 +1167,13 @@ function placeRifle() {
 const GUNS = {
   pistol:  { name: 'Pistol', ammo: 'ammo', mag: 12, cd: 0.16, pellets: 1, spread: 0, dmg: { head: 100, torso: 34, legs: 26 }, sound: 'pistol', kick: 1, camKick: 0.035, reload: [1.05, 1.35], bolt: 'bullet' },
   ak:      { name: 'AK-47', ammo: 'ammo_rifle', mag: 30, cd: 0.1, auto: true, pellets: 1, spread: 0.008, bloom: 0.003, dmg: { head: 100, torso: 40, legs: 30 }, sound: 'ak', kick: 0.45, camKick: 0.02,
-             reload: [1.5, 1.9], len: 0.88, grip: [0.36, 0.42], fore: [0.63, 0.3], model: 'ak', bolt: 'bullet' },
+             reload: [1.5, 1.9], len: 0.88, grip: [0.33, 0.55], fore: [0.65, 0.22], magAt: [0.5, 0.75], model: 'ak', bolt: 'bullet' },
   shotgun: { name: 'Pump shotgun', ammo: 'ammo_shells', mag: 6, cd: 0.85, pellets: 9, spread: 0.065, dmg: { head: 45, torso: 30, legs: 22 }, falloff: [8, 26], sound: 'shotgun', after: 'pump', kick: 1.7, camKick: 0.075,
-             reload: [1.7, 2.1], len: 1.0, grip: [0.3, 0.45], fore: [0.62, 0.45], model: 'shotgun', knock: 7, bolt: 'bullet' },
+             reload: [1.7, 2.1], len: 0.95, grip: [0.08, 0.7], fore: [0.62, 0.42], model: 'shotgun', knock: 7, bolt: 'bullet' },
   ar:      { name: 'M4 carbine', ammo: 'ammo_rifle', mag: 30, cd: 0.085, auto: true, pellets: 1, spread: 0.005, bloom: 0.002, dmg: { head: 100, torso: 34, legs: 26 }, sound: 'ar', kick: 0.35, camKick: 0.016,
-             reload: [1.4, 1.8], len: 0.84, grip: [0.34, 0.52], fore: [0.64, 0.36], model: 'ar', bolt: 'bullet' },
+             reload: [1.4, 1.8], len: 0.84, grip: [0.3, 0.55], fore: [0.6, 0.3], magAt: [0.45, 0.7], model: 'ar', bolt: 'bullet' },
   sniper:  { name: 'Sniper rifle', ammo: 'ammo_sniper', mag: 5, cd: 1.2, pellets: 1, spread: 0, dmg: { head: 300, torso: 200, legs: 160 }, zoom: 20, sound: 'sniper', after: 'bolt', kick: 2, camKick: 0.085,
-             reload: [1.8, 2.2], len: 1.2, grip: [0.26, 0.5], fore: [0.5, 0.45], model: 'sniper', bolt: 'bullet' },
+             reload: [1.8, 2.2], len: 1.2, grip: [0.3, 0.6], fore: [0.5, 0.5], model: 'sniper', bolt: 'bullet' },
 };
 let gunKind = 'pistol';
 const G = () => GUNS[gunKind];
@@ -2247,6 +2248,7 @@ const UNIFORMS = { // gear (the darkest vertex colour) and cloth (the navy), as 
 };
 const SKIN_TONES = [[0.616, 0.42, 0.239], [0.46, 0.28, 0.15], [0.25, 0.14, 0.08], [0.78, 0.57, 0.42]];
 const skinGeos = new Map();
+const UNIFORM_TINT = { urban: [1, 1, 1], desert: [1.18, 1.02, 0.78], woodland: [0.82, 0.96, 0.72], arctic: [1.4, 1.42, 1.48] }; // v48: multiplies the textured enemy's colours
 function soldierGeo(base, uniform, tone) {
   const key = uniform + tone; if (skinGeos.has(key)) return skinGeos.get(key);
   const g = base.clone(), C = g.attributes.color; if (!C) return base;
@@ -2266,8 +2268,13 @@ function dressSoldier(e) {
   const keys = Object.keys(UNIFORMS);
   e.uniform = soldierLook.uniform !== 'mixed' && UNIFORMS[soldierLook.uniform] !== undefined ? soldierLook.uniform : keys[Math.floor(Math.random() * keys.length)];
   e.tone = Math.floor(Math.random() * SKIN_TONES.length);
-  e.root.traverse((o) => { if (o.isSkinnedMesh && o.geometry.attributes.color) { o.geometry = e.skinGeo = soldierGeo(o.geometry, e.uniform, e.tone); } });
-  if (e.bones.Head) e.bones.Head.scale.setScalar(0.86); // owner: the heads looked too big and cartoon-like
+  let textured = false;
+  e.root.traverse((o) => {
+    if (!o.isSkinnedMesh) return;
+    if (o.geometry.attributes.color) o.geometry = e.skinGeo = soldierGeo(o.geometry, e.uniform, e.tone);
+    else if (o.material.map) { textured = true; o.material.color.setRGB(...(UNIFORM_TINT[e.uniform] || [1, 1, 1])); } // v48: the textured enemy gets his uniform as a tint
+  });
+  if (e.bones.Head && !textured) e.bones.Head.scale.setScalar(0.86); // owner: the SWAT heads looked too big and cartoon-like (the v48 enemy is in proportion)
 }
 function randomLoadout() { const r = Math.random(); return r < 0.5 || !guns.ak ? 'pistol' : r < 0.7 ? 'ak' : r < 0.88 && guns.ar ? 'ar' : guns.shotgun ? 'shotgun' : 'ak'; }
 
@@ -2952,7 +2959,7 @@ function goreOnDeath(e, type, kind, dir) {
 const SHOT_OFF = { shotgun: 0.85, sniper: 1, ak: 0.18, ar: 0.18, pistol: 0.07 };
 function shootOff(e, pt, dir, kind) {
   if (!enemyCfg.gore || e.special || e.civ) return;
-  let chance = SHOT_OFF[kind] ?? 0.1; if (kind === 'shotgun' && e.g.position.distanceTo(player.position) > 9) chance = 0.25;
+  let chance = SHOT_OFF[kind] ?? 0.1; if (kind === 'shotgun' && e.g.position.distanceTo(player.position) > 9) chance = 0.25; if (shootOff.force) chance = 1;
   if (Math.random() > chance) return;
   let best = null, bd = 0.17;
   for (const sg of cutSegs(e)) { if (sg.c[5]) continue; const d = segDist(pt, pt, sg.A, sg.B); if (d < bd) { bd = d; best = sg.c; } }
@@ -3234,7 +3241,14 @@ function renderAmmo() {
 }
 
 // frag grenade: olive body with a grooved band, fuse cap, lever and pin ring
+// v48: the frag is TastyTony's M67 (Sketchfab, CC-BY), 11 cm tall; the old hand-made one stays only as a fallback
+const nadeModels = {};
 function makeGrenade() {
+  if (nadeModels.frag) {
+    const m = nadeModels.frag.clone(true), box = new THREE.Box3().setFromObject(m), sz = box.getSize(new V3()), c = box.getCenter(new V3());
+    const k = 0.11 / Math.max(sz.x, sz.y, sz.z); m.scale.multiplyScalar(k); m.position.copy(c).multiplyScalar(-k);
+    const g = new THREE.Group(); g.add(m); g.traverse((o) => { if (o.isMesh) o.castShadow = true; }); return g;
+  }
   const g = new THREE.Group();
   const olive = new THREE.MeshStandardMaterial({ color: 0x4a5a3c, roughness: 0.65 }), metal = new THREE.MeshStandardMaterial({ color: 0x8d9297, metalness: 0.7, roughness: 0.35 });
   const body = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 12), olive); body.scale.y = 1.15; g.add(body);
@@ -4904,7 +4918,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v47 · 2026-10-03';
+const BUILD = 'v48 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -6599,7 +6613,7 @@ function start() {
     playOnEnemy(i, name, from = 0, speed = 1) { const e = soldiers().filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },
     get blocks() { return blocks.map((b) => ({ min: b.box.min.toArray().map((v) => +v.toFixed(1)), max: b.box.max.toArray().map((v) => +v.toFixed(1)) })); },
     get paused() { return paused; }, setPause, get view() { return [camYaw, camPitch]; }, get settings() { return { ...settings }; }, get baseFov() { return BASE_FOV; }, get masterVol() { return audio.master ? audio.master.gain.value : null; },
-    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, get voLog() { return vo.log.slice(); }, get voCount() { return vo.total; }, get voLoaded() { return Object.fromEntries(Object.entries(vo.buf).map(([v, c]) => [v, Object.fromEntries(Object.entries(c).map(([k, a]) => [k, a.length]))])); }, get voNow() { return Object.fromEntries(Object.entries(vo.now).filter(([, c]) => c && c.end > simT).map(([v, c]) => [v, { cat: c.cat, id: c.e.id, take: c.take }])); }, get voScreams() { return vo.screams.filter((x) => x.end > simT).map((x) => ({ cat: x.cat, id: x.e.id, take: x.take, at: x.pan.positionX ? [x.pan.positionX.value, x.pan.positionZ.value].map((v) => +v.toFixed(1)) : null })); }, get earsAt() { const L = audio.ctx?.listener; return L && L.positionX ? [L.positionX.value, L.positionY.value, L.positionZ.value].map((v) => +v.toFixed(1)) : null; }, say: (i, cat) => say(soldiers().filter((x) => x.state !== 'dead')[i], cat), setVoices: (on) => { vo.on = on; }, deal: (cat, n) => Array.from({ length: n }, () => dealTake('v1', cat)?.name ?? null), plainSoldiers: () => soldiers().filter((x) => x.state !== 'dead' && !x.special && !(x.severed || []).length).map((x) => x.id), shootLimb: (id, bone, gun) => { const e = soldiers().find((x) => x.id === id); if (!e) return null; const SO = SHOT_OFF[gun]; SHOT_OFF[gun] = 1; shootOff(e, cutBone(e, bone).getWorldPosition(new V3()), new V3(0, 0, 1), gun); SHOT_OFF[gun] = SO; return (e.severed || []).map((b) => b.name); },
+    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, get voLog() { return vo.log.slice(); }, get voCount() { return vo.total; }, get voLoaded() { return Object.fromEntries(Object.entries(vo.buf).map(([v, c]) => [v, Object.fromEntries(Object.entries(c).map(([k, a]) => [k, a.length]))])); }, get voNow() { return Object.fromEntries(Object.entries(vo.now).filter(([, c]) => c && c.end > simT).map(([v, c]) => [v, { cat: c.cat, id: c.e.id, take: c.take }])); }, get voScreams() { return vo.screams.filter((x) => x.end > simT).map((x) => ({ cat: x.cat, id: x.e.id, take: x.take, at: x.pan.positionX ? [x.pan.positionX.value, x.pan.positionZ.value].map((v) => +v.toFixed(1)) : null })); }, get earsAt() { const L = audio.ctx?.listener; return L && L.positionX ? [L.positionX.value, L.positionY.value, L.positionZ.value].map((v) => +v.toFixed(1)) : null; }, say: (i, cat) => say(soldiers().filter((x) => x.state !== 'dead')[i], cat), setVoices: (on) => { vo.on = on; }, deal: (cat, n) => Array.from({ length: n }, () => dealTake('v1', cat)?.name ?? null), plainSoldiers: () => soldiers().filter((x) => x.state !== 'dead' && !x.special && !(x.severed || []).length).map((x) => x.id), shootLimb: (id, bone, gun) => { const e = soldiers().find((x) => x.id === id); if (!e) return null; shootOff.force = true; shootOff(e, cutBone(e, bone).getWorldPosition(new V3()), new V3(0, 0, 1), gun); shootOff.force = false; return (e.severed || []).map((b) => b.name); },
     voReset: () => { vo.log.length = 0; vo.played = {}; vo.total = 0; vo.cool = {}; vo.pending.length = 0; for (const v in vo.now) stopLine(v); for (const x of vo.screams) stopScream(x); vo.screams = []; for (const e of enemies) e.voT = 0; }, civilians: () => civilians().map((e) => ({ id: e.id, kind: e.civ, state: e.state, cs: e.cs, pos: e.g.position.toArray().map((v) => +v.toFixed(2)), hp: e.hp, severed: (e.severed || []).map((b) => b.name), label: e.cutLabel || null, rag: !!e.rag, hair: (() => { let h = null; e.root.traverse((o) => { if (!h && o.isMesh) h = hairOf(o); }); return h; })() })),
     setCivCount(n) { civCfg.count = n; civSpawnT = 0; }, get civDeaths() { return civDeaths; }, strayAt: (ax, ay, az, bx, by, bz) => strayHit(new V3(ax, ay, az), new V3(bx, by, bz))?.id || null, spawnCivilian: (x, z, kind) => spawnCivilian(new V3(x, groundAt(x, z, 99), z), kind)?.id || null,
     scareCiv(id, x, z) { const e = enemies.find((q) => q.id === id); if (e) scare(e, new V3(x, 0, z), 'test'); }, shootCiv(id, zone = 'torso') { const e = enemies.find((q) => q.id === id); if (e) damageEnemy(e, zone === 'head' ? 100 : 34, zone, 'bullet', e.g.position.clone().sub(player.position).setY(0).normalize()); }, cutCiv(id, name) { const e = enemies.find((q) => q.id === id), c = CUTS.find((x) => x[0] === name); if (e && c) applyCut(e, c, new V3(1, 0, 0)); },
