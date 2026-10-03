@@ -341,7 +341,42 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
 </section>
 <div id="pvlabel" class="hud panel" hidden></div>
 
-<div id="loading" role="status"><div><span id="loadmsg">Loading character and animations…</span><div class="bar"><i></i></div></div></div>
+<div id="loading" role="status"><div><span id="loadmsg">Downloading the game (7 MB)…</span> <span id="loadtime"></span><div class="bar"><i></i></div><p id="loadinfo" hidden></p><button type="button" id="loadcopy" hidden>Copy details</button></div></div>
+<script>
+  // v52 (owner: "loads forever on her phone"): the loading screen says which step it's on and for how long; a step
+  // stuck for 25 s, or an error, shows the details and a Copy button to send back
+  (function () {
+    var t0 = Date.now(), errs = [];
+    window.__load = { stage: 'download', since: t0, t0: t0, errs: errs };
+    window.__loadStage = function (name, text) { window.__load.stage = name; window.__load.since = Date.now(); var m = document.getElementById('loadmsg'); if (m && text) m.textContent = text; };
+    window.addEventListener('error', function (e) { errs.push((e.message || 'error') + (e.filename ? ' @' + e.filename.slice(-30) + ':' + e.lineno : '')); });
+    window.addEventListener('unhandledrejection', function (e) { errs.push('promise: ' + (e.reason && (e.reason.message || e.reason))); });
+    window.__loadDetails = function () {
+      var L = window.__load, c = document.createElement('canvas'), gl = null; try { gl = c.getContext('webgl2') || c.getContext('webgl'); } catch (_) {}
+      return ['stage: ' + L.stage + ' for ' + Math.round((Date.now() - L.since) / 1000) + ' s, ' + Math.round((Date.now() - L.t0) / 1000) + ' s in all',
+        'device: ' + navigator.userAgent, 'screen: ' + screen.width + 'x' + screen.height + ' @' + devicePixelRatio,
+        'webgl: ' + (gl ? (gl instanceof (window.WebGL2RenderingContext || Object) ? 'webgl2' : 'webgl1') : 'none') + ', wasm: ' + (typeof WebAssembly === 'object'),
+        'memory: ' + (navigator.deviceMemory || '?') + ' GB, cores: ' + (navigator.hardwareConcurrency || '?'),
+        'errors: ' + (errs.length ? errs.slice(-5).join(' | ') : 'none')].join('\n');
+    };
+    var tick = setInterval(function () {
+      var L = window.__load, el = document.getElementById('loadtime'), box = document.getElementById('loading');
+      if (!box || box.hidden) { clearInterval(tick); return; }
+      var s = Math.round((Date.now() - L.since) / 1000); if (el) el.textContent = s >= 3 ? s + ' s' : '';
+      var stuck = L.stage !== 'download' && s >= 25, failed = L.stage === 'failed';
+      if (stuck || failed || errs.length && L.stage !== 'download') {
+        var info = document.getElementById('loadinfo'), btn = document.getElementById('loadcopy');
+        if (info) { info.hidden = false; info.textContent = (failed ? '' : stuck ? 'This step is taking too long. ' : '') + 'Reload to try again, or tap Copy details and send them to whoever sent you the link.'; }
+        if (btn) btn.hidden = false;
+      }
+    }, 1000);
+    document.addEventListener('click', function (e) {
+      if (!e.target || e.target.id !== 'loadcopy') return;
+      var d = window.__loadDetails(), btn = e.target;
+      try { navigator.clipboard.writeText(d).then(function () { btn.textContent = 'Copied'; }, function () { prompt('Copy this:', d); }); } catch (_) { prompt('Copy this:', d); }
+    });
+  })();
+</script>
 
 <script type="importmap">
 { "imports": {
@@ -349,16 +384,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
 } }
 </script>
-<script>window.__ASSETS = __ASSETS_JSON__;</script>
-<script>
-  setTimeout(function () {
-    if (!window.__booted) {
-      var m = document.getElementById('loadmsg');
-      if (m) m.textContent = 'The game didn’t start. Reload the page.';
-      var b = document.querySelector('#loading .bar'); if (b) b.hidden = true;
-    }
-  }, 15000);
-</script>
+<script>window.__ASSETS = __ASSETS_JSON__; window.__loadStage('start', 'Starting the 3D engine…');</script>
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -826,7 +852,8 @@ loader.register((parser) => {
   };
   return { name: 'in-memory-images' };
 });
-const parseGLB = (b64) => new Promise((res, rej) => loader.parse(decodeB64(b64), '', res, rej));
+// v52: a model that takes 30 s fails loudly instead of leaving the loading screen up forever
+const parseGLB = (b64) => new Promise((res, rej) => { const t = setTimeout(() => rej(new Error('a model took over 30 s to unpack')), 30000); loader.parse(decodeB64(b64), '', (g) => { clearTimeout(t); res(g); }, (e) => { clearTimeout(t); rej(e); }); });
 
 const player = new THREE.Group(), lean = new THREE.Group();
 player.add(lean); scene.add(player);
@@ -864,7 +891,9 @@ function analyzeClip(root, clip) {
 
 async function boot() {
   const A = window.__ASSETS;
+  window.__loadStage('hero', 'Loading your character and animations…');
   const [h, u1, u2] = await Promise.all([parseGLB(A.hero), parseGLB(A.ual1), parseGLB(A.ual2)]);
+  window.__loadStage('guns', 'Loading weapons…');
   log('boot', BUILD);
   for (const c of [...u1.animations, ...u2.animations]) clips.set(c.name, c);
   for (const j of (EXTRA.clips || [])) { if (j.T) for (const t of j.tracks) if (!t.times) t.times = j.T; const c = THREE.AnimationClip.parse(j); clips.set(c.name, c); } // tools/build2.py stores shared key times once per clip
@@ -873,6 +902,7 @@ async function boot() {
   for (const [k, v] of Object.entries(A.att || {})) { try { attModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Attachment ${k} failed: ` + e.message); } }
   for (const [k, v] of Object.entries(A.guns || {})) { try { gunModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Gun model ${k} failed: ` + e.message); } }
   for (const [k, v] of Object.entries(A.nades || {})) { try { nadeModels[k] = (await parseGLB(v)).scene; } catch (e) { report('error', `Grenade model ${k} failed: ` + e.message); } } // v48
+  window.__loadStage('world', 'Building the world…');
   if (A.world) { try { const [wb, wn, wr] = await Promise.all([parseGLB(A.world.buildings), parseGLB(A.world.nature), A.world.roads ? parseGLB(A.world.roads) : null]); dressWorld(wb.scene, wn.scene, wr?.scene); } catch (e) { report('error', 'World models failed: ' + e.message); } }
   try { if (A.jetpack) jetpackModel = new OBJLoader().parse(new TextDecoder().decode(decodeB64(A.jetpack))); } catch (e) { report('error', 'Jetpack model failed: ' + e.message); }
   // height to 1.8 m, feet on the ground
@@ -889,6 +919,7 @@ async function boot() {
   hero = heroBody;
   // the soldiers wear the Quaternius SWAT officer, moved onto our skeleton by tools/reskin_swat.mjs (v21)
   let soldierBody = heroBody;
+  window.__loadStage('soldiers', 'Loading soldiers…');
   if (A.enemy) { try { soldierBody = fit((await parseGLB(A.enemy)).scene); } catch (e) { report('error', 'Soldier model failed: ' + e.message); } }
   // v49: more bodies (owner: more variance in enemy models), all on the hero's skeleton (tools/reskin_enemy.mjs)
   const moreBodies = [];
@@ -918,9 +949,11 @@ async function boot() {
   enemyTemplates.length = 0; enemyTemplates.push(enemyTemplate);
   for (const b of moreBodies) { b.rotation.y = soldierBody.rotation.y; const t = cloneSkinned(b); t.userData.body = b.userData.body; enemyTemplates.push(t); }
   playerTemplate = cloneSkinned(hero); // your body when you die (v26), before the saber and guns are hung on it
+  window.__loadStage('props', 'Loading props and people…');
   if (A.props) { try { initProps((await parseGLB(A.props)).scene); } catch (e) { report('error', 'Prop models failed: ' + e.message); } } // v36
   if (A.civ) { try { prepareCivilians((await parseGLB(A.civ)).scene, heroBody.scale); } catch (e) { report('error', 'Civilian models failed: ' + e.message); } } // v35
   if (soldierBody === heroBody) enemyTemplate.traverse((o) => { if (o.isMesh) { o.material = o.material.clone(); o.material.color = new THREE.Color(0x6a7482); } });
+  window.__loadStage('setup', 'Getting everything ready…');
   lean.add(hero);
   poseClip('Sword_Block', 0.45, 'STANCE_HighGuard');
   poseClip('Sword_Dash', 0.35, 'STANCE_Lunge');
@@ -954,7 +987,7 @@ function prewarm() {
     log('prewarm', renderer.info.programs.length, 'programs');
   } catch (e) { log('prewarm failed', e.message); }
 }
-boot().catch((e) => { console.error(e); $('loadmsg').textContent = 'The character failed to load: ' + (e.message || e); document.querySelector('#loading .bar').hidden = true; });
+boot().catch((e) => { console.error(e); window.__load.errs.push('boot: ' + (e.message || e)); window.__loadStage('failed', 'The game failed to load: ' + (e.message || e)); document.querySelector('#loading .bar').hidden = true; });
 
 // ---------------- animation layers ----------------
 const actions = new Map(), ovrActions = new Map();
@@ -4974,7 +5007,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v51 · 2026-10-03';
+const BUILD = 'v52 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;

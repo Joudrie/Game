@@ -2,6 +2,12 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v52: a loading screen that says what it's doing (owner: still loads forever on her phone)
+Test: `tools/test51-loading.mjs`.
+- **Steps with a timer:** the screen now says "Downloading the game (7 MB)…", then "Starting the 3D engine…", "Loading your character and animations…", "Loading weapons…", "Building the world…", "Loading soldiers…", "Loading props and people…", "Getting everything ready…", with the seconds spent on each step.
+- **No more silent spinning:** a step that takes over 25 s, any model that takes over 30 s to unpack, or an error now shows a short note and a **Copy details** button (the step, how long, the phone and browser, WebGL, WebAssembly, memory, the last errors) to send back.
+- Found while testing: with WebAssembly switched off (iPhone **Lockdown Mode** does this) the compressed models can't be unpacked at all. The details line shows `wasm: false` when that's the cause.
+
 ## v51: better phone controls (owner)
 Test: `tools/test50-touch.mjs`.
 - **Buttons in the thumb corner:** see-through buttons fanned into the bottom-right, with Attack or Fire biggest in the corner, Jump next to it, then Slide, Block or Aim, Grapple and Grenade further out. A pressed button lights up.
