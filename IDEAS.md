@@ -86,7 +86,7 @@ Status: ✅ built · 🟡 partly built · ⬜ not yet · ❌ what we avoid from 
 
 ### Hitman
 - ✅ Guards who haven't been alerted yet; a calm guard who sees a death panics
-- ⬜ **Disguises**
+- ✅ **Disguises** (v41): loot a soldier's uniform and walk past calm guards; staring, a lit saber or a loud shot gives you away
 
 ### Assassin's Creed
 - ⬜ **Climbing:** ledges and proper leaps

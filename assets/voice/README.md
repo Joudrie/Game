@@ -36,7 +36,7 @@ How the owner records lines, and how they become the game's voices (v37; build w
 | `ready` | sometimes after a reload | "Good to go!", "I'm back up!" |
 | `calm` | sometimes when they lose you for good | "All right everyone, back to your posts." |
 | `hum` `idle` `radio` `yawn` | a calm guard near you, every 6 to 14 s | humming, "How long is this shift?", "Post four, all clear.", yawns |
-| `bump` `dsus` `blown` | *the disguise, not built yet* | "Watch it!", "What unit are you?", "Impostor!" |
+| `bump` `dsus` `blown` | in disguise: bumping a guard, a guard doubting you, cover blown | "Watch it!", "What unit are you?", "Impostor!" |
 | `fragout` | *not used yet*: soldiers throwing grenades | "Frag out!" |
 
 ## Rules in the game
