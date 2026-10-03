@@ -1589,6 +1589,7 @@ function attackCancelable() {
 function attackPress(fromRight) {
   atkHeld = true; atkHeldT = 0;
   if (dead) return;
+  { const ai = activeItem(); if (ai && ai.def.use === 'disguise' && !looting) { wearDisguise(!disguise.on); return; } } // v44: with the uniform selected, a click always puts it on or takes it off (even by a guard's back or mid-jump)
   if (tdTarget && !takedown) { startTakedown(tdTarget); return; }
   if (looting) { stopLoot(false); return; }
   if (forceMode() && !choke) { forcePull(); return; } // while you hold a choke, a click swings the saber: walk up and strike him down (v30)
@@ -3696,7 +3697,7 @@ function calmUpdate(e, dt, to, dist) {
   if (e.sus >= 1) { e.mind = 'spot'; e.yellT = 1.1 * DF().react; setMark(e, '!'); log('spotted by', e.id); say(e, saberOut() && (disguised() || Math.random() < 0.6) ? 'jedi' : disguised() ? 'blown' : 'spot'); e.susSaid = false; return; }
   setMark(e, e.sus > 0.2 ? '?' : null);
   if (e.sus > 0.2 && !e.susSaid && !(disguised() && saberOut())) e.susSaid = say(e, disguised() ? 'dsus' : 'sus'); // v37: "Huh?" "Did you hear something?" (v41, in uniform: "What unit are you?")
-  else if (e.susSaid && e.sus < 0.04) { e.susSaid = false; say(e, 'giveup'); } // "Must have been the wind."
+  else if (e.susSaid && e.sus < 0.04) { e.susSaid = false; say(e, 'giveup', 1, 3); } // "Must have been the wind." (v44: after a beat, and it waits its turn; said at once it fell inside his own chatter gap and was lost)
   if (e.sus > 0.2) { turnTo(e, Math.atan2(to.x, to.z), 2.5, dt); eplay(e, 'SW_Idle_Gun', { fade: 0.25 }); return; } // something's there: he stops and looks
   if (e.hold) { e.lookT = (e.lookT || 0) + dt; e.yaw = (e.baseYaw ?? (e.baseYaw = e.yaw)) + Math.sin(e.lookT * 0.5) * 0.9; eplay(e, 'SW_Idle', { fade: 0.3 }); return; } // a lookout: stands and scans
   // patrol: strolls between spots near his post and waits at each
@@ -4862,7 +4863,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v43 · 2026-10-03';
+const BUILD = 'v44 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -5087,6 +5088,7 @@ canvas.addEventListener('pointerdown', (e) => {
   if (e.pointerType === 'mouse') {
     if (!movesOpen && isLocked()) return; // buttons are handled by mousedown below
     if (!movesOpen && !isLocked()) { try { const p = canvas.requestPointerLock(); if (p && p.catch) p.catch(() => {}); } catch (_) {} }
+    if (e.button === 0 && !movesOpen && !isLocked() && !dead) { const ai = activeItem(); if (ai && ai.def.use === 'disguise') wearDisguise(!disguise.on); } // v44: the click that takes the mouse back (after the inventory) also puts the uniform on
     dragging = true; return;
   }
   try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
@@ -5413,9 +5415,10 @@ function selectSlot(i, quiet) {
   if (def?.gun && def.gun !== gunKind) setGunKind(def.gun);
   if (def?.use === 'throw') lastNade = nadeKindOf(it.id); // X throws what you picked last
   if (want !== gear) setGear(want);
-  if (!quiet) toast(def ? def.name + (def.stack && it.qty > 1 ? ' ×' + it.qty : '') : 'Fists', 800);
+  if (!quiet) toast(def ? def.name + (def.stack && it.qty > 1 ? ' ×' + it.qty : '') + (USE_HINT[def.use] ? ': ' + USE_HINT[def.use]() : '') : 'Fists', def && USE_HINT[def.use] ? 1600 : 800);
   renderInv();
 }
+const USE_HINT = { disguise: () => (disguise.on ? 'click to take it off' : 'click to put it on'), cloak: () => 'click to cloak', berry: () => 'click to eat', stim: () => 'click to use', eat: () => 'click to eat' }; // v44: say what a click does
 const activeItem = () => { const it = inv.hot[inv.active]; return it && ITEMS[it.id] ? { ...it, def: ITEMS[it.id] } : null; };
 // add looted items: fill matching stacks first (hotbar, then backpack), then empty backpack slots
 function addItem(id, qty) {
