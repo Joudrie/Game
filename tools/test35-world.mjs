@@ -21,9 +21,9 @@ await ev(() => { __game.place(0, 2); __game.setEnemyCount(20); __game.fillEnemie
 const looks = await ev(() => __game.looks());
 const U = new Set(looks.map((l) => l.uniform)), K = new Set(looks.map((l) => l.kind));
 check(U.size >= 3, `soldiers wear different uniforms (${[...U].join(', ')})`);
-check(looks.every((l) => l.head > 0.8 && l.head < 0.9), 'every soldier has the smaller head');
+check(looks.every((l) => l.head > 0.8 && l.head <= 1.001), 'every soldier\'s head is in proportion (v48: the enemy model needs no shrinking)');
 await ev(() => __game.advance(1));
-check((await ev(() => __game.looks())).every((l) => l.head > 0.8 && l.head < 0.9), 'the head stays smaller while he animates');
+check((await ev(() => __game.looks())).every((l) => l.head > 0.8 && l.head <= 1.001), 'the head keeps its size while he animates');
 check(K.size >= 3, `mixed weapons (${[...K].join(', ')})`);
 await ev(() => { const n = __game.enemies().length; for (let i = 0; i < Math.min(n, 5); i++) __game.moveEnemy(i, -3 + i * 1.5, 7, Math.PI); __game.look(0, 0.05); __game.advance(0.4); });
 await p.screenshot({ path: `${OUT}/v31-soldiers.png` });

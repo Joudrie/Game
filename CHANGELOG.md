@@ -2,6 +2,14 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v48: downloaded guns, grenade and enemies (TastyTony, bumstrum)
+Tests: `tools/test28-guns.mjs`, `tools/test26-dismember.mjs`, `tools/test35-world.mjs`, `tools/test38-audit-batch2.mjs`, `tools/test48-disguise.mjs`.
+- **Guns:** the pistol, AK, M4, shotgun and sniper are now TastyTony's low-poly Glock 17, AKM, M4A1, Remington 870 and L115A3 (CC-BY, Sketchfab). Each one's grip and fore-grip were placed again so the hands sit on them. Each gun is one material, so drawing it for the first time doesn't stall.
+- **Frag grenade:** TastyTony's M67 replaces the hand-made one.
+- **Enemies:** soldiers are now bumstrum's masked "terrorist" (CC-BY), fitted to our skeleton with his own skin weights and texture. Dismemberment, ragdolls, deaths, looting and voices all work as before. Uniforms are now a tint over his texture (urban, desert, woodland, arctic).
+- **Pages:** the game is live at https://joudrie.github.io/Game/ and updates on every merge.
+- Tests updated: test48 follows the v45/v46 disguise rules, test35 accepts the new head size.
+
 ## v47: more dismemberment, a 30-second rule for lines, a cry for every wound
 Tests: `tools/test26-dismember.mjs`, `tools/test45-voices.mjs`.
 - **Shot-off limbs:** the arm or leg you shoot can come off a soldier who lives. A shotgun up close almost always (85%), a sniper always, the AK and M4 now and then (18%), a pistol rarely (7%). As with the saber, a lost gun hand drops his gun and he panics; a lost leg puts him on the ground crawling.

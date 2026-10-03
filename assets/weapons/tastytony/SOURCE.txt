@@ -1,0 +1,15 @@
+TastyTony's low-poly gun set, Sketchfab (https://sketchfab.com/TastyTony), licence CC BY 4.0: credit "TastyTony".
+Downloaded 2026-10-03 with the Sketchfab API (/v3/models/<uid>/download).
+
+g17.glb   "Low-Poly G17"            60efc54ac59e47d18bdff94b2f5144ff  -> pistol
+akm.glb   "Low-Poly AKM"            849b7cdf8622487485febc40db89e734  -> AK
+m4a1.glb  "Low-Poly M4a1"           8cab1cbeb82c4396a154f9fc8771417b  -> M4 (ar)
+r870.glb  "Low-Poly Remington 870"  8766498ce778479aa03c3b6078937510  -> shotgun
+l115.glb  "Low-Poly L115A3"         a795adf5f8dd4a2294210d427cbb0e58  -> sniper
+m67.glb   "Low-Poly M67"            c233d27d001d4d19aab9f35bf171f1a5  -> frag grenade
+rgd5.glb  "Low-Poly RGD-5"          506f231826134e47990a9124bbe8ce92  -> not used yet
+
+Changes (allowed by CC BY): rigs baked out, turned to barrel +X, colours baked to vertex colours, compressed.
+Pipeline (dist server on :8766):
+  node tools/prep_guns.mjs assets/weapons/tastytony/g17.glb=tt_g17 assets/weapons/tastytony/akm.glb=tt_akm (and so on)
+  node tools/pack_guns.mjs   (build/tt_*.glb -> build/pistol.glb, gun_ak, gun_ar, gun_shotgun, gun_sniper, nade_frag)

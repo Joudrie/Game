@@ -23,8 +23,7 @@ const mind = () => ev(() => __game.minds().filter((e) => e.state !== 'dead')[0]?
 const said = () => ev(() => __game.voLog.map((l) => l.split(':')[0]));
 await ev(([x, z]) => { __game.place(x, z); __game.selectSlot(0, true); __game.setGear('none'); __game.advance(1); }, O);
 
-// v44: the real way: catalogue → backpack → hotbar slot 6 → press 6 → click, standing right behind a calm guard
-// (where a click would otherwise be a takedown)
+// v45/v46 (owner): holding the uniform is wearing it. The real way: catalogue → backpack → hotbar slot 6 → press 6.
 await setup(0, 1.3, 0); await ev(() => __game.setGear('none'));
 await p.keyboard.press('KeyI'); await p.waitForTimeout(300); await p.click('[data-cat="uniform"]'); await p.waitForTimeout(150);
 const bagI = await ev(() => __game.inv.bag.findIndex((x) => x && x.id === 'uniform'));
@@ -32,12 +31,10 @@ await p.click(`#invbag .slot >> nth=${bagI}`); await p.waitForTimeout(150); awai
 await p.keyboard.press('KeyI'); await p.waitForTimeout(200);
 await p.keyboard.press('Digit6'); await ev(() => __game.advance(0.6));
 const hint = await ev(() => document.getElementById('toast').textContent);
-await p.mouse.click(640, 360); await ev(() => __game.advance(0.3));
-check(await ev(() => __game.disguised), `select the uniform and click, right behind a guard: it goes on (toast "${hint}")`);
-check(/click to put it on/.test(hint), 'selecting it says what a click does');
-await p.mouse.click(640, 360); await ev(() => __game.advance(0.3));
-check(!(await ev(() => __game.disguised)), 'click again: it comes off');
-await ev(() => { __game.selectSlot(0, true); __game.setGear('none'); __game.advance(1); }); // saber away, as at the start
+check(await ev(() => __game.disguised), `select the uniform: you're in it at once (toast "${hint}")`);
+await p.keyboard.press('Digit1'); await ev(() => __game.advance(0.3));
+check(!(await ev(() => __game.disguised)), 'select another slot: it comes off');
+await ev(() => { __game.setGear('none'); __game.advance(1); });
 
 // wearing it: his body on your bones, yours hidden
 await ev(() => __game.setDisguise(true)); await ev(() => __game.advance(0.3));
@@ -55,27 +52,18 @@ const without = await mind();
 check(without !== 'patrol', `without it, the same guard spots you (${without})`);
 await ev(() => __game.setDisguise(true));
 
-// standing in his face: "What unit are you?", then he sees through it
-await setup(0, 2.5); await ev(() => { for (let t = 0; t < 140; t++) __game.advance(0.1); });
-let s = await said();
-check(s.includes('dsus') && (await mind()) !== 'patrol', `staring at him from 2.5 m: "What unit are you?", then he's onto you (${s.join(' ')})`);
-
-// a lit saber: at once
+// v46 (owner): in uniform nothing gives you away: staring up close, a lit saber, a shot, bumping into him
+await setup(0, 2.5); await ev(() => { for (let t = 0; t < 80; t++) __game.advance(0.1); });
+check((await mind()) === 'patrol', `staring at him from 2.5 m for 8 s: he stays calm (${await mind()})`);
 await setup(0, 10); await ev(() => { __game.setGear('lit'); for (let t = 0; t < 25; t++) __game.advance(0.1); });
-s = await said();
-check((await mind()) !== 'patrol' && s.includes('jedi'), `a lit saber in view: "We got a Jedi!" (${s.join(' ')})`);
+check((await mind()) === 'patrol', `a lit saber in view: he stays calm (${await mind()})`);
 await ev(() => { __game.setGear('none'); __game.advance(1); });
-
-// a loud shot in view: cover blown
-await setup(0, 12); await ev(([x, z]) => { const g = __game; g.selectSlot(1, true); g.advance(1.5); g.voReset(); g.shootPoint(x + 6, 1, z + 30); g.advance(0.5); }, O);
-s = await said();
-check((await mind()) === 'combat' && s.includes('blown'), `a shot in front of a guard: "He's not one of us!" (${s.join(' ')})`);
-await ev(() => { __game.selectSlot(0, true); __game.setGear('none'); __game.advance(1); });
-
-// bumping into a calm guard
+await setup(0, 12); await ev(([x, z]) => { const g = __game; g.selectSlot(1, true); g.setDisguise(true); g.advance(1.5); g.shootPoint(x + 6, 1, z + 30); g.advance(0.5); }, O);
+check((await mind()) === 'patrol', `a shot in front of a guard: he stays calm (${await mind()})`);
+await ev(() => { __game.selectSlot(0, true); __game.setDisguise(true); __game.setGear('none'); __game.advance(1); });
 await setup(0, 1.4, 0); // his back to you
 await p.keyboard.down('KeyW'); await ev(() => { for (let t = 0; t < 15; t++) __game.advance(0.1); }); await p.keyboard.up('KeyW');
-s = await said();
+let s = await said();
 check(s.includes('bump') && (await mind()) === 'patrol', `walking into a calm guard: "Watch it!", and he stays calm (${s.join(' ')})`);
 
 // bodies drop uniforms
@@ -97,6 +85,9 @@ await ev(([cx, cz, x0, x1]) => { const g = __game; g.setDisguise(false); g.fillE
 const before = await mind();
 await ev(() => { __game.setDisguise(true); __game.advance(0.2); });
 check(before === 'combat' && (await mind()) === 'patrol', `a guard fighting you from behind a building loses you when you change out of sight (${before} → ${await mind()})`);
+// v46: even one who can see you goes calm the moment it's on
+await ev(([x, z]) => { const g = __game; g.setDisguise(false); g.moveEnemy(0, x, z + 8, Math.PI); g.setMind(0, 'combat'); g.place(x, z); g.advance(0.3); g.setDisguise(true); g.advance(0.3); }, O);
+check((await mind()) === 'patrol', `a guard fighting you in plain view goes calm when it's on (${await mind()})`);
 // reinforcements while you're in uniform come in calm, even with a fight on
 const fresh = await ev(([x, z]) => { const g = __game; g.place(x, z); g.setMind(1, 'combat'); g.damageEnemy(0, 999, 'head', 'bullet'); g.advance(0.2); g.fillEnemies(); g.advance(0.2); const m = g.minds().filter((e) => e.state !== 'dead'); return m[m.length - 1].mind; }, O);
 check(fresh === 'patrol', `a reinforcement spawned while you're in uniform comes in calm (${fresh})`);
