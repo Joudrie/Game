@@ -2554,6 +2554,7 @@ function updateEnemies(dt) {
       eplay(e, 'M2M_Crawl'); e.g.rotation.y = e.yaw; emix(e, dt); continue;
     }
     if (e.civ) { if (e.state === 'hit' || e.state === 'getup') { e.hitT -= dt; if (e.hitT <= 0) e.state = 'engage'; } else if (!movesOpen) civUpdate(e, dt, to, dist); e.g.rotation.y = e.yaw; emix(e, dt); continue; } // v35
+    if (disguised() && e.mind && e.mind !== 'patrol') { e.mind = 'patrol'; e.sus = 0; e.post = pos.clone(); e.wp = null; e.lostT = 0; setMark(e, null); } // v46: uniform on = everyone calm, at once
     if (e.state === 'hit' || e.state === 'getup') { e.hitT -= dt; if (e.hitT <= 0) e.state = 'engage'; }
     else if (active) {
       if (e.mind && e.mind !== 'combat') { calmUpdate(e, dt, to, dist); e.g.rotation.y = e.yaw; emix(e, dt); continue; } // on patrol, panicking or shouting (v26)
@@ -3634,6 +3635,7 @@ function setMark(e, ch) {
 let alarms = 0;
 function alarm(e, why) {
   if (e.civ) { scare(e, player.position, why); return; }
+  if (disguised()) return; // v46: nothing you do in uniform sets them off
   if (e.state === 'dead' || e.mind === 'combat') return;
   e.mind = 'combat'; e.combatSince = simT; e.sus = 1; e.lostT = 0; e.fireT = Math.max(e.fireT, 0.7 * DF().react); setMark(e, null); log('alarm', e.id, why);
   if (mission && !mission.spotted && e.mission) { mission.spotted = true; log('mission: spotted', why); } // v36: no perfect-stealth trophy
@@ -3649,7 +3651,7 @@ function seesPlayer(e, dist, to) {
   if (dead || takedown) return 0;
   if (cloakT > 0 && dist > 1.5) return 0; // the holocloak
   const fwd = new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw)), cos = dist > 1e-3 ? fwd.dot(to) / dist : 1;
-  if (disguised()) { const r = disguiseScrutiny(e, dist, cos); return r && lineOfSight(eyeOf(e), playerHead()) ? r : 0; } // v41: in uniform
+  if (disguised()) return 0; // v46 (owner): in uniform they never see you, no exceptions
   const hidden = crouch || !!cover || sneaking();
   const close = (dist < 2 && cos > -0.2) || (dist < 6 && speed > CLASSES[klass].jog + 0.3 && !hidden); // right beside him, or heard running up (walk or crouch to sneak)
   if (!close && (dist > 26 * DF().see * (hidden ? 0.55 : 1) || cos < 0.45)) return 0;
@@ -4378,6 +4380,7 @@ function disguiseScrutiny(e, dist, cos) {
 }
 // a loud shot, or a body dropping, in front of calm guards: the cover is blown for everyone who saw
 function blowCover(at, why) {
+  return; // v46 (owner): the uniform can't be blown
   if (!disguised()) return;
   let first = null;
   for (const o of enemies) {
@@ -4863,7 +4866,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v45 · 2026-10-03';
+const BUILD = 'v46 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;

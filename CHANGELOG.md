@@ -2,6 +2,9 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v46: uniform on = invisible to them, no exceptions (owner)
+- While you hold the uniform, every soldier goes calm at once and stays calm: no spotting, no suspicion, no alarm. A lit saber, gunshots, bumping into them, even shooting them: nothing sets them off. Switch to another slot and they can see you again.
+
 ## v45: holding the uniform is wearing it (quick fix)
 - Select the uniform's hotbar slot and you're disguised at once; no click needed. Switch to any other slot and your own look is back.
 
