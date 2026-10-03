@@ -63,6 +63,14 @@ await ev(() => { __game.look(0, 0.15); __game.advance(0.2); });
 const moved = await ev(() => { const snap = __game.pieces ? null : null; return null; });
 await ev(() => { __game.forcePush(); __game.advance(1.2); });
 check(pieces0 >= 4, `loose pieces on the ground: ${pieces0}`);
+// v47: shot-off limbs (he lives with it)
+await ev(() => { __game.fillEnemies(); __game.advance(0.2); });
+const ids = await ev(() => __game.plainSoldiers());
+const st = (id) => ev((id) => __game.minds().find((m) => m.id === id)?.state, id);
+const armSev = await ev((id) => { const r = __game.shootLimb(id, 'upperarm_l', 'sniper'); __game.advance(0.3); return r; }, ids[0]);
+check(armSev.includes('upperarm_l') && (await st(ids[0])) !== 'dead', `a sniper shot to the arm takes it off and he lives (${armSev.join(',')}, ${await st(ids[0])})`);
+const legSev = await ev((id) => { const r = __game.shootLimb(id, 'thigh_r', 'shotgun'); __game.advance(0.3); return r; }, ids[1]);
+check(legSev.includes('thigh_r') && (await st(ids[1])) === 'crawl', `a shotgun blast to the thigh takes the leg; he crawls (${legSev.join(',')}, ${await st(ids[1])})`);
 check(!errs.length, 'no page errors');
 const rep = await ev(() => __game.lastReport);
 if (rep && rep.kind !== 'freeze') { console.log('report:', JSON.stringify(rep).slice(0, 300)); fail++; }

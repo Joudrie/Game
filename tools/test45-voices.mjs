@@ -107,6 +107,17 @@ s = await ev(([x, z]) => { const g = __game; const n = g.enemies().filter((e) =>
   g.moveEnemy(0, x, z + 10, 0); g.setMind(0, 'patrol', 999); g.place(x, z); g.advance(0.05); g.voReset();
   for (let t = 0; t < 400 && !g.voLog.some((l) => /^(hum|idle|radio|yawn):/.test(l)); t++) g.advance(0.1); return g.voLog.map((l) => l.split(':')[0]); }, O);
 check(s.some((c) => ['hum', 'idle', 'radio', 'yawn'].includes(c)), `a calm guard nearby mutters to himself (${s.join(' ')})`);
+// v47: no exact take twice within 30 s; wounds and deaths share 75 takes
+await ev(() => __game.voReset());
+const dealt = await ev(() => __game.deal('death', 80));
+const named = dealt.filter(Boolean);
+check(named.length === 75 && new Set(named).size === 75 && dealt.slice(75).every((x) => x === null), `80 cries in one moment: ${new Set(named).size} different takes, then silence instead of a repeat`);
+const later = await ev(() => { __game.advance(31); return __game.deal('pain', 3); });
+check(later.every(Boolean), `31 s later the takes are free again (${later.join(' ')})`);
+// v47: every wound cries out, even several in a row on the same soldier
+await fresh();
+const cries3 = await ev(() => { const g = __game; let n = 0; for (let k = 0; k < 3; k++) { const c0 = g.voLog.length; g.damageEnemy(0, 0.01, 'torso', 'bullet'); if (g.voLog.slice(c0).some((l) => l.startsWith('pain'))) n++; g.advance(0.3); } return n; });
+check(cries3 === 3, `three wounds 0.3 s apart: ${cries3} cries`);
 check(errs.length === 0, `no page errors (${errs.length})`);
 console.log(fail ? `${fail} FAILED` : 'all passed');
 await b.close();

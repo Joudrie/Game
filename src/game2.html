@@ -1306,7 +1306,7 @@ function updateListener() { // the ears are the camera's
 // deals its takes from a shuffled deck, so a take never comes up twice in a row. A soldier who dies mid-sentence
 // stops talking. More voices (the owner's other characters) go in as v2, v3…; each soldier gets one in `e.voice`.
 const VO_CATS = { // pri: who interrupts whom; cd: seconds before the same category plays again (any soldier)
-  pain: { pri: 3, cd: 0.15 }, fire: { pri: 3, cd: 0.6 }, flying: { pri: 3, cd: 0.5 }, arm: { pri: 3, cd: 1 }, hit: { pri: 2, cd: 4 },
+  pain: { pri: 3, cd: 0 }, fire: { pri: 3, cd: 0.6 }, flying: { pri: 3, cd: 0.5 }, arm: { pri: 3, cd: 1 }, hit: { pri: 2, cd: 4 },
   spot: { pri: 2, cd: 2.5 }, jedi: { pri: 2, cd: 8 }, alarm: { pri: 2, cd: 3 }, grenade: { pri: 2, cd: 1.5 }, mandown: { pri: 2, cd: 3 },
   whatthe: { pri: 2, cd: 6 }, panic: { pri: 2, cd: 10 }, barrels: { pri: 2, cd: 15 }, reload: { pri: 1, cd: 3 }, cover: { pri: 1, cd: 6 },
   search: { pri: 1, cd: 5 }, medic: { pri: 1, cd: 5 }, taunt: { pri: 1, cd: 3 }, sus: { pri: 1, cd: 1.2 }, giveup: { pri: 1, cd: 4 }, fragout: { pri: 2, cd: 2 },
@@ -1316,7 +1316,7 @@ const VO_CATS = { // pri: who interrupts whom; cd: seconds before the same categ
 };
 const VO_FALLBACK = { death: 'pain', ready: null, calm: 'giveup' }; // a voice without the takes uses these instead
 const VO_MUTTER = [['hum', 0.35], ['idle', 0.25], ['radio', 0.25], ['yawn', 0.15]];
-const vo = { buf: {}, recent: {}, now: {}, screams: [], cool: {}, pending: [], log: [], total: 0, on: true, range: 55, nextMutter: 4 };
+const vo = { buf: {}, recent: {}, played: {}, now: {}, screams: [], cool: {}, pending: [], log: [], total: 0, on: true, range: 55, nextMutter: 4 };
 function initVoices() {
   for (const [voice, set] of Object.entries(window.__ASSETS.vo || {})) {
     vo.buf[voice] = {};
@@ -1331,13 +1331,20 @@ function voiceOf(e) { if (!e.voice) { const v = voiceNames(); e.voice = v[Math.f
 // v40 (the owner's rule): a take that just played sits out for a while before it can come back. It cools down for
 // half the category's takes, at least 5 (64 deaths: any death sound waits 32 deaths; 5 taunts: 4), and the next one
 // is picked at random from the rest, across every soldier with this voice.
+// v47 (owner): no exact take twice within 30 s, across every soldier with the voice; with every take of a moment
+// heard in the last 30 s he stays quiet rather than repeat one. Wounds and deaths share one pool (pain + death takes).
+const VO_REPEAT = 30, VO_POOL = { pain: ['pain', 'death'], death: ['death', 'pain'] };
 function dealTake(voice, cat) {
-  const all = vo.buf[voice]?.[cat];
-  if (!all || !all.length) return VO_FALLBACK[cat] ? dealTake(voice, VO_FALLBACK[cat]) : null;
+  const all = (VO_POOL[cat] || [cat]).flatMap((c) => vo.buf[voice]?.[c] || []);
+  if (!all.length) return VO_FALLBACK[cat] ? dealTake(voice, VO_FALLBACK[cat]) : null;
+  const played = vo.played[voice] || (vo.played[voice] = {});
+  const fresh = all.filter((t) => !(simT - (played[t.name] ?? -1e9) < VO_REPEAT));
+  if (!fresh.length) return null;
   const key = voice + '/' + cat, recent = vo.recent[key] || (vo.recent[key] = []);
   const hold = Math.min(all.length - 1, Math.max(5, Math.floor(all.length / 2)));
-  const free = all.filter((t) => !recent.includes(t)), take = free[Math.floor(Math.random() * free.length)] || all[0];
+  const free = fresh.filter((t) => !recent.includes(t)), pool = free.length ? free : fresh, take = pool[Math.floor(Math.random() * pool.length)];
   recent.push(take); while (recent.length > hold) recent.shift();
+  played[take.name] = simT;
   return take;
 }
 // a soldier says a line of this category now, or after `delay` seconds if he's still alive by then; a delayed line
@@ -1355,7 +1362,7 @@ function say(e, cat, delay = 0, patience = 1.5) {
   if (dying) { // v42: screams and death cries overlap (a grenade into four men is four cries), one per soldier, no cap (v43)
     vo.screams = vo.screams.filter((x) => x.end > simT);
     const mine = vo.screams.find((x) => x.e === e);
-    if (mine && cat !== 'death') return false; // still screaming from the last hit
+    if (mine && cat !== 'death' && simT - mine.t0 < 0.12) return false; // the same volley (v47: a new wound after that gets its own cry)
     if (vo.screams.length - (mine ? 1 : 0) >= VO_SCREAMS) return false;
     if (mine) stopScream(mine);
     if (cur && cur.e === e && cur.end > simT) stopLine(voice); // he stops mid-sentence; the others carry on
@@ -2684,13 +2691,14 @@ function firePistol(aimDir) {
     if (!hit) { impact(o, dir, wall, far); if (wall && pI === 0) sfx('impact', wall.point, 0.5); continue; }
     let dmg = D.dmg[hit.zone];
     if (D.falloff) dmg *= clamp(1 - (hit.t - D.falloff[0]) / (D.falloff[1] - D.falloff[0]), 0.15, 1);
-    const h = hitsBy.get(hit.e) || { dmg: 0, zone: hit.zone, dir }; h.dmg += dmg; if (hit.zone === 'head') h.zone = 'head'; hitsBy.set(hit.e, h);
+    const h = hitsBy.get(hit.e) || { dmg: 0, zone: hit.zone, dir, pt: hit.point }; h.dmg += dmg; if (hit.zone === 'head') h.zone = 'head'; hitsBy.set(hit.e, h);
     if (!best || hit.zone === 'head') best = hit;
   }
   for (const [e, h] of hitsBy) {
     if (gunKind === 'sniper' && h.zone === 'torso' && !e.special && !e.cut) { e.cut = { sever: 'spine_03', push: h.dir.clone().setY(0).normalize().multiplyScalar(6).add(new V3(0, 2, 0)) }; e.cutLabel = 'Sniper · chest blown open'; } // v30
     damageEnemy(e, h.dmg, h.zone, 'bullet', h.dir); sfx('hit', e.g.position, 0.7);
     if (e.state !== 'dead' && e.cut && gunKind === 'sniper') e.cut = null;
+    if (e.state !== 'dead' && h.pt) shootOff(e, h.pt, h.dir, gunKind); // v47: the limb you hit can come off
     if (D.knock && e.state === 'dead' && e.g.position.distanceTo(player.position) < 9) shoveBody(e, h.dir.clone().setY(0).normalize().multiplyScalar(D.knock).add(new V3(0, 2.5, 0))); // shotgun blasts bodies back
   }
   camPitch = clamp(camPitch - D.camKick, -0.45, 1.15); camKick += D.camKick; // the view kicks up and settles back (updateCamera)
@@ -2710,7 +2718,7 @@ function damageEnemy(e, amount, zone, kind, dir) {
   if (e.special && absorbHit(e, amount, kind, dir)) { alarm(e, 'hurt'); return; } // force field, shield or a saber in the way (v29)
   e.hp -= amount; e.dmg[zone] = (e.dmg[zone] || 0) + amount; e.total += amount;
   e.last = { zone, kind };
-  if (e.hp > 0) { alarm(e, 'hurt'); if (e.state !== 'knock') hitReact(e, zone); say(e, kind !== 'saber' && Math.random() < 0.2 ? 'hit' : 'pain'); return; }
+  if (e.hp > 0) { alarm(e, 'hurt'); if (e.state !== 'knock') hitReact(e, zone); say(e, 'pain'); if (kind !== 'saber' && Math.random() < 0.2) say(e, 'hit', 0.5); return; } // v47: every wound cries out
   setMark(e, null);
   hushDead(e); if (zone !== 'head' && kind !== 'choke' && kind !== 'fire') say(e, 'death'); // v37: a last cry, unless it was instant (v40: its own 64 takes)
   // your rules: head if the killing shot is in the head; legs if most of the damage (and the killing shot) went to the legs
@@ -2929,10 +2937,38 @@ function goreOnDeath(e, type, kind, dir) {
   const pick = (list) => list[Math.floor(Math.random() * list.length)];
   if (e.cut) { const c = e.cut; e.cut = null; sever(e, c.sever, c.push); bleedStump(e, c.sever); return; } // the blade decided (v22)
   if (type === 'head' && kind === 'bullet') sever(e, 'Head', away.clone().multiplyScalar(4));
-  else if (kind === 'saber' || (type === 'grapple' && e.cutBy)) { sever(e, pick(LIMB_SETS.saber), away.clone().multiplyScalar(3)); if (Math.random() < 0.35) sever(e, pick(LIMB_SETS.saber), away.clone().multiplyScalar(3)); }
+  else if (kind === 'saber' || (type === 'grapple' && e.cutBy)) { sever(e, pick(LIMB_SETS.saber), away.clone().multiplyScalar(3)); if (Math.random() < 0.5) sever(e, pick(LIMB_SETS.saber), away.clone().multiplyScalar(3)); } // v47: a second piece more often
   else if (type === 'legs' && kind === 'bullet') sever(e, pick(LIMB_SETS.legs), away.clone().multiplyScalar(2));
-  else if (type === 'explosion' || type === 'pound') { const n = 1 + Math.floor(Math.random() * (type === 'explosion' ? 3 : 2)); for (let i = 0; i < n; i++) sever(e, pick(LIMB_SETS.blast), away.clone().multiplyScalar(6)); }
+  else if (type === 'explosion' || type === 'pound') { // v47: blasts take 2 to 4 pieces (a pound 1 to 2), now and then the head
+    const n = type === 'explosion' ? 2 + Math.floor(Math.random() * 3) : 1 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < n; i++) sever(e, pick(LIMB_SETS.blast), away.clone().multiplyScalar(6).add(new V3((Math.random() - 0.5) * 4, 2 * Math.random(), (Math.random() - 0.5) * 4)));
+    if (type === 'explosion' && Math.random() < 0.25) sever(e, 'Head', away.clone().multiplyScalar(5).add(new V3(0, 6, 0)));
+  }
+  else if (type === 'torso' && kind === 'bullet' && Math.random() < 0.25) sever(e, pick(LIMB_SETS.saber), away.clone().multiplyScalar(3)); // v47: a killing shot sometimes takes an arm too
 }
+// v47: shot-off limbs. A hit near an arm or a leg takes it off a living soldier: a shotgun up close almost always, a
+// sniper always, rifles now and then, a pistol rarely. He lives with it, as with the saber: a lost gun hand drops the
+// gun and he panics, a lost leg puts him on the ground crawling.
+const SHOT_OFF = { shotgun: 0.85, sniper: 1, ak: 0.18, ar: 0.18, pistol: 0.07 };
+function shootOff(e, pt, dir, kind) {
+  if (!enemyCfg.gore || e.special || e.civ) return;
+  let chance = SHOT_OFF[kind] ?? 0.1; if (kind === 'shotgun' && e.g.position.distanceTo(player.position) > 9) chance = 0.25;
+  if (Math.random() > chance) return;
+  let best = null, bd = 0.17;
+  for (const sg of cutSegs(e)) { if (sg.c[5]) continue; const d = segDist(pt, pt, sg.A, sg.B); if (d < bd) { bd = d; best = sg.c; } }
+  if (!best) return;
+  applyCut(e, best, dir.clone());
+  e.cutLabel = `${(GUNS[kind] || GUNS.pistol).name} · ${best[7]}`; log('shot off', e.id, best[0]);
+}
+// v47: a blast that doesn't kill can still take an arm (it can happen in the air, so no change of stance here)
+function blastLimb(e, d) {
+  const side = Math.random() < 0.5 ? 'l' : 'r', bone = pickOne(['hand_', 'lowerarm_', 'upperarm_']) + side;
+  if (isSevered(e, bone)) return;
+  sever(e, bone, d.clone().multiplyScalar(6).add(new V3(0, 4, 0))); bleedStump(e, bone); say(e, 'arm');
+  if (side === (e.gunHand || 'hand_r').slice(-1)) { dropGun(e, d); e.unarmed = true; e.fleeT = 2.5; }
+  log('blast took', bone, 'off', e.id);
+}
+const pickOne = (list) => list[Math.floor(Math.random() * list.length)];
 
 // ---------------- saber cuts (v22) ----------------
 // The blade decides. Every frame a moving lit blade is swept (from last frame's position to this one) against each
@@ -3386,7 +3422,9 @@ function explode(at, direct, gvel) {
     // at their feet: the blast takes the feet off (dismemberment on)
     const feet = Math.hypot(e.g.position.x - at.x, e.g.position.z - at.z) < 1.3 && at.y - e.g.position.y < 0.6;
     if (enemyCfg.gore && feet) { sever(e, 'calf_l', new V3(0, 5, 0)); sever(e, 'calf_r', new V3(0, 5, 0)); }
+    const dd = d.clone();
     knock(e, d.multiplyScalar(9 + 12 * k).add(new V3(0, 5 + 4 * k, 0)), feet ? 999 : 20 + 150 * k, 'explosion');
+    if (enemyCfg.gore && e.state !== 'dead' && !e.special && !e.civ && Math.random() < 0.3 + 0.5 * k) blastLimb(e, dd); // v47
   }
   log('explosion');
 }
@@ -4866,7 +4904,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v46 · 2026-10-03';
+const BUILD = 'v47 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -6561,7 +6599,8 @@ function start() {
     playOnEnemy(i, name, from = 0, speed = 1) { const e = soldiers().filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },
     get blocks() { return blocks.map((b) => ({ min: b.box.min.toArray().map((v) => +v.toFixed(1)), max: b.box.max.toArray().map((v) => +v.toFixed(1)) })); },
     get paused() { return paused; }, setPause, get view() { return [camYaw, camPitch]; }, get settings() { return { ...settings }; }, get baseFov() { return BASE_FOV; }, get masterVol() { return audio.master ? audio.master.gain.value : null; },
-    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, get voLog() { return vo.log.slice(); }, get voCount() { return vo.total; }, get voLoaded() { return Object.fromEntries(Object.entries(vo.buf).map(([v, c]) => [v, Object.fromEntries(Object.entries(c).map(([k, a]) => [k, a.length]))])); }, get voNow() { return Object.fromEntries(Object.entries(vo.now).filter(([, c]) => c && c.end > simT).map(([v, c]) => [v, { cat: c.cat, id: c.e.id, take: c.take }])); }, get voScreams() { return vo.screams.filter((x) => x.end > simT).map((x) => ({ cat: x.cat, id: x.e.id, take: x.take, at: x.pan.positionX ? [x.pan.positionX.value, x.pan.positionZ.value].map((v) => +v.toFixed(1)) : null })); }, get earsAt() { const L = audio.ctx?.listener; return L && L.positionX ? [L.positionX.value, L.positionY.value, L.positionZ.value].map((v) => +v.toFixed(1)) : null; }, say: (i, cat) => say(soldiers().filter((x) => x.state !== 'dead')[i], cat), setVoices: (on) => { vo.on = on; }, voReset: () => { vo.log.length = 0; vo.total = 0; vo.cool = {}; vo.pending.length = 0; for (const v in vo.now) stopLine(v); for (const x of vo.screams) stopScream(x); vo.screams = []; for (const e of enemies) e.voT = 0; }, civilians: () => civilians().map((e) => ({ id: e.id, kind: e.civ, state: e.state, cs: e.cs, pos: e.g.position.toArray().map((v) => +v.toFixed(2)), hp: e.hp, severed: (e.severed || []).map((b) => b.name), label: e.cutLabel || null, rag: !!e.rag, hair: (() => { let h = null; e.root.traverse((o) => { if (!h && o.isMesh) h = hairOf(o); }); return h; })() })),
+    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, get voLog() { return vo.log.slice(); }, get voCount() { return vo.total; }, get voLoaded() { return Object.fromEntries(Object.entries(vo.buf).map(([v, c]) => [v, Object.fromEntries(Object.entries(c).map(([k, a]) => [k, a.length]))])); }, get voNow() { return Object.fromEntries(Object.entries(vo.now).filter(([, c]) => c && c.end > simT).map(([v, c]) => [v, { cat: c.cat, id: c.e.id, take: c.take }])); }, get voScreams() { return vo.screams.filter((x) => x.end > simT).map((x) => ({ cat: x.cat, id: x.e.id, take: x.take, at: x.pan.positionX ? [x.pan.positionX.value, x.pan.positionZ.value].map((v) => +v.toFixed(1)) : null })); }, get earsAt() { const L = audio.ctx?.listener; return L && L.positionX ? [L.positionX.value, L.positionY.value, L.positionZ.value].map((v) => +v.toFixed(1)) : null; }, say: (i, cat) => say(soldiers().filter((x) => x.state !== 'dead')[i], cat), setVoices: (on) => { vo.on = on; }, deal: (cat, n) => Array.from({ length: n }, () => dealTake('v1', cat)?.name ?? null), plainSoldiers: () => soldiers().filter((x) => x.state !== 'dead' && !x.special && !(x.severed || []).length).map((x) => x.id), shootLimb: (id, bone, gun) => { const e = soldiers().find((x) => x.id === id); if (!e) return null; const SO = SHOT_OFF[gun]; SHOT_OFF[gun] = 1; shootOff(e, cutBone(e, bone).getWorldPosition(new V3()), new V3(0, 0, 1), gun); SHOT_OFF[gun] = SO; return (e.severed || []).map((b) => b.name); },
+    voReset: () => { vo.log.length = 0; vo.played = {}; vo.total = 0; vo.cool = {}; vo.pending.length = 0; for (const v in vo.now) stopLine(v); for (const x of vo.screams) stopScream(x); vo.screams = []; for (const e of enemies) e.voT = 0; }, civilians: () => civilians().map((e) => ({ id: e.id, kind: e.civ, state: e.state, cs: e.cs, pos: e.g.position.toArray().map((v) => +v.toFixed(2)), hp: e.hp, severed: (e.severed || []).map((b) => b.name), label: e.cutLabel || null, rag: !!e.rag, hair: (() => { let h = null; e.root.traverse((o) => { if (!h && o.isMesh) h = hairOf(o); }); return h; })() })),
     setCivCount(n) { civCfg.count = n; civSpawnT = 0; }, get civDeaths() { return civDeaths; }, strayAt: (ax, ay, az, bx, by, bz) => strayHit(new V3(ax, ay, az), new V3(bx, by, bz))?.id || null, spawnCivilian: (x, z, kind) => spawnCivilian(new V3(x, groundAt(x, z, 99), z), kind)?.id || null,
     scareCiv(id, x, z) { const e = enemies.find((q) => q.id === id); if (e) scare(e, new V3(x, 0, z), 'test'); }, shootCiv(id, zone = 'torso') { const e = enemies.find((q) => q.id === id); if (e) damageEnemy(e, zone === 'head' ? 100 : 34, zone, 'bullet', e.g.position.clone().sub(player.position).setY(0).normalize()); }, cutCiv(id, name) { const e = enemies.find((q) => q.id === id), c = CUTS.find((x) => x[0] === name); if (e && c) applyCut(e, c, new V3(1, 0, 0)); },
     spawnBarrel: (x, z, kind) => spawnBarrel(new V3(x, 0, z), kind)?.id || null, spawnMine: (x, z) => spawnMine(new V3(x, 0, z))?.id || null, scatterProps: () => { scatterProps(); return props.barrels.length; },
