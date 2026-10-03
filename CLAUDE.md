@@ -4,7 +4,8 @@ A mobile-first third-person action game in three.js (GTA / Red Dead / Watch Dogs
 
 ## How the owner works
 - **Push and merge everything.** Branch `claude/<topic>`, open a PR to `main`, merge it.
-- **Update the play link after every change.** It's the claude.ai artifact https://claude.ai/artifact/E9adumTVxy2TBMT8bVxEfS. Publish `dist/index.html` to that URL; read it first in a new conversation.
+- **The game is on GitHub Pages (owner, v48):** https://joudrie.github.io/Game/, deployed by `.github/workflows/pages.yml` from `dist/index.html` on every push to `main`, so merging is publishing. No 16 MB cap there (the claude.ai artifact caps a file at 16 MB).
+- **Also update the claude.ai play link after every change** while it's still in use: https://claude.ai/artifact/E9adumTVxy2TBMT8bVxEfS. Publish `dist/index.html` to that URL; read it first in a new conversation.
 - **No Claude-made 3D models (owner, v48):** zero tolerance. Every model added from now on is downloaded, licensed and credited. The hand-made ones still in the game (frag, sticky, fire grenade, orb) stay until replaced. The vetted list of guns, grenades, explosions and enemies is `ASSET_SHORTLIST.md`.
 - **Find, don't build.** Look for free public assets (GitHub, Printables, Sketchfab, OpenGameArt, Poly Pizza, Quaternius, KayKit) before writing code. Record each one in `CREDITS.md` and in a `SOURCE.txt` next to the file. Check the licence; never ship unlicensed files.
 - **Variety.** Several variants of every animation, selectable in Menu → Moves and rotated in play.
