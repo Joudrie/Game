@@ -2,6 +2,14 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v47: more dismemberment, a 30-second rule for lines, a cry for every wound
+Tests: `tools/test26-dismember.mjs`, `tools/test45-voices.mjs`.
+- **Shot-off limbs:** the arm or leg you shoot can come off a soldier who lives. A shotgun up close almost always (85%), a sniper always, the AK and M4 now and then (18%), a pistol rarely (7%). As with the saber, a lost gun hand drops his gun and he panics; a lost leg puts him on the ground crawling.
+- **Blasts:** a soldier who survives a grenade or barrel can lose an arm (more likely the closer he was). An explosion kill now takes 2 to 4 pieces (1 to 3 before), sometimes the head.
+- **Killing shots** to the body sometimes take an arm with them. Saber kills take a second piece half the time (a third of the time before).
+- **No exact line twice within 30 s:** each recording sits out 30 s after it plays, across every soldier with your voice. If every take for that moment has played in the last 30 s, the soldier stays quiet rather than repeat one.
+- **Every wound gets a cry:** wounds and deaths now share one pool of 75 grunts and cries (your pain and death takes), no shared cooldown swallows one, and a new wound replaces the soldier's last cry instead of being skipped. "I'm hit!" sometimes follows as well.
+
 ## v46: uniform on = invisible to them, no exceptions (owner)
 - While you hold the uniform, every soldier goes calm at once and stays calm: no spotting, no suspicion, no alarm. A lit saber, gunshots, bumping into them, even shooting them: nothing sets them off. Switch to another slot and they can see you again.
 
