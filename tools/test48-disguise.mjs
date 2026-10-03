@@ -23,6 +23,22 @@ const mind = () => ev(() => __game.minds().filter((e) => e.state !== 'dead')[0]?
 const said = () => ev(() => __game.voLog.map((l) => l.split(':')[0]));
 await ev(([x, z]) => { __game.place(x, z); __game.selectSlot(0, true); __game.setGear('none'); __game.advance(1); }, O);
 
+// v44: the real way: catalogue → backpack → hotbar slot 6 → press 6 → click, standing right behind a calm guard
+// (where a click would otherwise be a takedown)
+await setup(0, 1.3, 0); await ev(() => __game.setGear('none'));
+await p.keyboard.press('KeyI'); await p.waitForTimeout(300); await p.click('[data-cat="uniform"]'); await p.waitForTimeout(150);
+const bagI = await ev(() => __game.inv.bag.findIndex((x) => x && x.id === 'uniform'));
+await p.click(`#invbag .slot >> nth=${bagI}`); await p.waitForTimeout(150); await p.click('#invhot .slot >> nth=5'); await p.waitForTimeout(150);
+await p.keyboard.press('KeyI'); await p.waitForTimeout(200);
+await p.keyboard.press('Digit6'); await ev(() => __game.advance(0.6));
+const hint = await ev(() => document.getElementById('toast').textContent);
+await p.mouse.click(640, 360); await ev(() => __game.advance(0.3));
+check(await ev(() => __game.disguised), `select the uniform and click, right behind a guard: it goes on (toast "${hint}")`);
+check(/click to put it on/.test(hint), 'selecting it says what a click does');
+await p.mouse.click(640, 360); await ev(() => __game.advance(0.3));
+check(!(await ev(() => __game.disguised)), 'click again: it comes off');
+await ev(() => { __game.selectSlot(0, true); __game.setGear('none'); __game.advance(1); }); // saber away, as at the start
+
 // wearing it: his body on your bones, yours hidden
 await ev(() => __game.setDisguise(true)); await ev(() => __game.advance(0.3));
 let parts = await ev(() => __game.disguiseParts());

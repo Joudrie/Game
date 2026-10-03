@@ -2,6 +2,12 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v44: putting the uniform on
+- **Why clicking didn't put it on:** closing the inventory lets go of the mouse, and the first click back in the game only took the mouse back. That click now also puts the uniform on (or takes it off).
+- **With the uniform selected, a click always wears it,** even standing behind a guard (where a click would be a takedown) or in the middle of a jump.
+- **Selecting a usable item says what a click does:** "Soldier uniform: click to put it on", "Holocloak: click to cloak", and so on.
+- Test: `tools/test48-disguise.mjs` now puts the uniform on the real way: catalogue, backpack, hotbar slot 6, press 6, click.
+
 ## v43: the disguise works on guards who are already fighting; no cap on screams
 Tests: `tools/test48-disguise.mjs`, `tools/test45-voices.mjs`.
 - **Why they saw you:** the uniform only fooled guards who hadn't noticed you yet. In the sandbox almost every guard is fighting (once a fight starts, every new soldier joins it), and a fighting guard only gave up after 20 s without seeing you. Now:
