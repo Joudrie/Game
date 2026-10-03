@@ -2,6 +2,13 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v51: better phone controls (owner)
+Test: `tools/test50-touch.mjs`.
+- **Buttons in the thumb corner:** see-through buttons fanned into the bottom-right, with Attack or Fire biggest in the corner, Jump next to it, then Slide, Block or Aim, Grapple and Grenade further out. A pressed button lights up.
+- **Aim while you shoot:** slide your thumb from Fire, Attack, Aim or Block to turn the camera without letting go. Fire now works like holding the mouse button, so automatic guns keep firing.
+- **Less clutter:** the speed readout is gone on phones, the top buttons and hotbar are smaller, and in landscape the hotbar moves left, out of the way of the buttons. Phones held upright get a one-time tip to turn sideways.
+- **The claude.ai link no longer asks to sign in:** the page stopped asking claude.ai for its database, which only collected crash reports (the Copy report button still works). The GitHub Pages link never had the bar.
+
 ## v50: the game loads on phones (owner: it loaded forever on friends' phones)
 - **No more outside downloads:** the 3D engine (three.js) used to come from cdn.jsdelivr.net as ten separate files after the page loaded. If any one of them failed (a slow or filtered phone network) the game sat on "Loading" forever, and iPhones on iOS before 16.4 couldn't load it at all (no import maps). The engine is now built into the page, so the one file is all a phone needs. The page works on iOS 15 and up.
 - **Phones get a lighter game:** sharper edges off, a 1024 px shadow map and a lower render scale, up to 6 soldiers and 4 civilians. A load that never finished last time (a phone that ran out of memory reloads the page) gets the light setup too, on any device.
