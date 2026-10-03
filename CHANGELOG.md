@@ -2,6 +2,21 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v41: the disguise
+Hitman, but loud: wear a soldier's uniform and walk right past his friends. Test: `tools/test48-disguise.mjs`.
+- **Getting one:** loot a soldier's body. Most of them (7 in 10) carry their uniform, unless they were blown apart. You wear the uniform of the soldier you took it from (urban, desert, woodland…). It's also in the creative catalogue.
+- **Wearing it:** select the uniform and click (like the holocloak). You look like that soldier, helmet and vest, with all your own moves. Click again to take it off. Dying or starting a mission takes it off.
+- **Calm guards let you through.** They keep patrolling, muttering, humming and talking on the radio while you walk past, so this is where you hear the idle chatter.
+- **What gives you away:**
+  - standing right in a guard's face for a few seconds: "Hey, wait a sec. What unit are you?", then he sees through it;
+  - sprinting around right next to one makes him suspicious faster;
+  - a lit lightsaber anywhere he can see it: at once, "We got a Jedi!";
+  - firing a loud gun in front of guards: "He's not one of us!", and everyone who saw joins the fight. A suppressor doesn't give you away;
+  - a guard seeing a body drop.
+- **Once you're blown,** the guards fighting you shoot whatever you're wearing. Break line of sight and lose them; when they go back to their posts, the uniform works on them again. The effects line under the hotbar says "Disguised" or "Cover blown: lose them".
+- **Bumping into a calm guard:** "Watch it!", "Personal space, buddy." He stops and turns to you, but stays calm.
+- Your recorded disguise lines are all in use now (bumping, doubting you, cover blown).
+
 ## v40: your car recordings (291 lines), and no repeats
 Three more recordings, cut into 194 new takes: your voice now has 291 lines in 31 situations. Test: `tools/test45-voices.mjs`.
 - **64 death sounds** (11 before, borrowed from the pain grunts). A dying soldier now picks from these.

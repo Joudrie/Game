@@ -2632,7 +2632,7 @@ function firePistol(aimDir) {
   const blind = !!cover && !aimHeld; // blind fire from cover: the gun comes over the top, the shots go wild
   const sup = hasAtt(gunKind, 'suppressor');
   if (!sup) endCloak(); // a loud shot gives you away
-  fireCd = D.cd; recoil = D.kick; fireRaiseT = blind ? 0 : 0.7; noise(player.position, sup ? 8 : HEAR[gunKind] || 40);
+  fireCd = D.cd; recoil = D.kick; fireRaiseT = blind ? 0 : 0.7; if (!sup) blowCover(player.position, 'shot'); noise(player.position, sup ? 8 : HEAR[gunKind] || 40);
   ammo.mag--; saveAmmo(); renderAmmo();
   if (ammo.mag === 0) setTimeout(() => { if (ammo.mag === 0 && gear === 'pistol') startReload(); }, 250); // empty: reload on its own
   const base = aimDir || camera.getWorldDirection(new V3()), o = camera.position.clone();
@@ -3618,6 +3618,7 @@ function seesPlayer(e, dist, to) {
   if (dead || takedown) return 0;
   if (cloakT > 0 && dist > 1.5) return 0; // the holocloak
   const fwd = new V3(Math.sin(e.yaw), 0, Math.cos(e.yaw)), cos = dist > 1e-3 ? fwd.dot(to) / dist : 1;
+  if (disguised()) { const r = disguiseScrutiny(e, dist, cos); return r && lineOfSight(eyeOf(e), playerHead()) ? r : 0; } // v41: in uniform
   const hidden = crouch || !!cover || sneaking();
   const close = (dist < 2 && cos > -0.2) || (dist < 6 && speed > CLASSES[klass].jog + 0.3 && !hidden); // right beside him, or heard running up (walk or crouch to sneak)
   if (!close && (dist > 26 * DF().see * (hidden ? 0.55 : 1) || cos < 0.45)) return 0;
@@ -3662,9 +3663,9 @@ function calmUpdate(e, dt, to, dist) {
     return;
   }
   e.sus = e.seeRate ? Math.min(1, (e.sus || 0) + e.seeRate * dt) : Math.max(0, (e.sus || 0) - dt * 0.15);
-  if (e.sus >= 1) { e.mind = 'spot'; e.yellT = 1.1 * DF().react; setMark(e, '!'); log('spotted by', e.id); say(e, saberOut() && Math.random() < 0.6 ? 'jedi' : 'spot'); e.susSaid = false; return; }
+  if (e.sus >= 1) { e.mind = 'spot'; e.yellT = 1.1 * DF().react; setMark(e, '!'); log('spotted by', e.id); say(e, saberOut() && (disguised() || Math.random() < 0.6) ? 'jedi' : disguised() ? 'blown' : 'spot'); e.susSaid = false; return; }
   setMark(e, e.sus > 0.2 ? '?' : null);
-  if (e.sus > 0.2 && !e.susSaid) e.susSaid = say(e, 'sus'); // v37: "Huh?" "Did you hear something?"
+  if (e.sus > 0.2 && !e.susSaid && !(disguised() && saberOut())) e.susSaid = say(e, disguised() ? 'dsus' : 'sus'); // v37: "Huh?" "Did you hear something?" (v41, in uniform: "What unit are you?")
   else if (e.susSaid && e.sus < 0.04) { e.susSaid = false; say(e, 'giveup'); } // "Must have been the wind."
   if (e.sus > 0.2) { turnTo(e, Math.atan2(to.x, to.z), 2.5, dt); eplay(e, 'SW_Idle_Gun', { fade: 0.25 }); return; } // something's there: he stops and looks
   if (e.hold) { e.lookT = (e.lookT || 0) + dt; e.yaw = (e.baseYaw ?? (e.baseYaw = e.yaw)) + Math.sin(e.lookT * 0.5) * 0.9; eplay(e, 'SW_Idle', { fade: 0.3 }); return; } // a lookout: stands and scans
@@ -3727,6 +3728,7 @@ function makeCorpse() {
 function playerDie(kind, push, blownApart) {
   if (dead) return;
   deaths++; atk = null; blocking = false; cover = null; takedown = null; stopOvr(0.05); if (mode === 'grapple') releaseGrapple(false);
+  wearDisguise(false); // v41
   const body = makeCorpse();
   { const o = nearestSoldier(player.position, 40); if (o && o.mind === 'combat') say(o, 'taunt', 1.1); } // v37: "Target down!"
   hero.visible = false;
@@ -4290,11 +4292,80 @@ function startCloak() {
   cloakT = 8; setHeroLook('cloak'); sfx('zap', null, 0.5); toast('Holocloak: 8 s', 900); log('cloak on');
 }
 function endCloak() { if (cloakT <= 0) return; cloakT = 0; cloakCd = 20; setHeroLook(null); log('cloak off'); }
+// ---------------- the disguise (v41) ----------------
+// Hitman, but loud: take a soldier's uniform off his body (or from the creative catalogue) and use it to look like
+// him: his body on your skeleton, so every move you have still plays. Calm guards let you walk right past and keep
+// muttering, humming and talking on the radio. What gets you noticed:
+//  - standing right in front of a guard and staring, or running about near him: he slowly gets suspicious
+//    ("What unit are you?") and, if it goes on, sees through it;
+//  - a lit saber where a guard can see it: at once;
+//  - firing a loud gun, or a guard seeing a body drop: the shout is "He's not one of us!" and everyone near joins in.
+// Guards who are fighting you shoot whatever you wear; lose them until they go back to their posts and the uniform
+// works on them again. Bumping a calm guard gets a "Watch it!". Use the uniform again to take it off.
+const disguise = { on: false, uniform: 'urban', mesh: null, blownT: -99 };
+try { const u = localStorage.getItem('disguise-uniform'); if (u && UNIFORMS[u] !== undefined) disguise.uniform = u; } catch (_) {}
+function disguiseMeshes() { // the soldier's skinned meshes, rebound to your bones (same skeleton, so they follow every clip)
+  const out = new THREE.Group(); out.name = 'disguise';
+  const byName = {}; hero.traverse((o) => { if (o.isBone) byName[o.name] = o; });
+  enemyTemplate.traverse((o) => {
+    if (!o.isSkinnedMesh) return;
+    const geo = o.geometry.attributes.color ? soldierGeo(o.geometry, disguise.uniform, 1) : o.geometry;
+    const m = new THREE.SkinnedMesh(geo, o.material); m.frustumCulled = false; m.castShadow = true;
+    const bones = o.skeleton.bones.map((b) => byName[b.name] || b);
+    m.bind(new THREE.Skeleton(bones, o.skeleton.boneInverses.map((x) => x.clone())), o.bindMatrix.clone()); // attached: only the bones place it
+    out.add(m);
+  });
+  return out;
+}
+function wearDisguise(on) {
+  if (on === disguise.on || !hero || !enemyTemplate) return;
+  disguise.on = on;
+  if (on) {
+    if (cloakT > 0) endCloak();
+    disguise.mesh = disguiseMeshes(); hero.add(disguise.mesh);
+    hero.traverse((o) => { if (o.isSkinnedMesh && !isDisguisePart(o) && !o.userData.aura) o.visible = false; });
+    toast('Disguised: calm guards take you for one of them. Shooting or a lit saber gives you away', 1800); sfx('pickup', null, 0.6);
+  } else {
+    if (disguise.mesh) { disguise.mesh.removeFromParent(); disguise.mesh = null; }
+    hero.traverse((o) => { if (o.isSkinnedMesh) o.visible = true; }); applyLook(hero, heroLook);
+    toast('Uniform off', 900);
+  }
+  log('disguise', on ? 'on ' + disguise.uniform : 'off');
+}
+const isDisguisePart = (o) => { for (let p = o; p; p = p.parent) if (p === disguise.mesh) return true; return false; };
+const disguised = () => disguise.on && !dead;
+// how fast a calm guard sees through the uniform, per second (seesPlayer asks this while you wear it)
+function disguiseScrutiny(e, dist, cos) {
+  if (gear === 'lit' && ignite > 0.5 && dist < 30) return 4; // a soldier with a lightsaber?
+  if (dist < 3.5 && cos > 0.6) return 0.14; // standing in his face: about 7 s of staring before he's sure
+  if (dist < 7 && speed > CLASSES[klass].jog + 0.3) return 0.3; // sprinting about right next to him
+  return 0;
+}
+// a loud shot, or a body dropping, in front of calm guards: the cover is blown for everyone who saw
+function blowCover(at, why) {
+  if (!disguised()) return;
+  let first = null;
+  for (const o of enemies) {
+    if (o.civ || o.state === 'dead' || o.mind === 'combat') continue;
+    const d = o.g.position.distanceTo(player.position); if (d > 35 || !lineOfSight(eyeOf(o), playerHead())) continue;
+    alarm(o, 'disguise: ' + why); if (!first || d < first.d) first = { o, d };
+  }
+  if (first) { say(first.o, 'blown'); disguise.blownT = simT; toast('Cover blown: lose them, then come back once they calm down', 1600); log('cover blown', why); }
+}
+let bumpT = 0;
+function updateDisguise() {
+  if (!disguised() || simT < bumpT) return;
+  for (const o of enemies) { // walking into a calm guard: he says so
+    if (o.civ || o.state === 'dead' || o.mind !== 'patrol') continue;
+    const d = Math.hypot(o.g.position.x - player.position.x, o.g.position.z - player.position.z);
+    if (d < 0.8 && speed > 0.6) { bumpT = simT + 2.5; say(o, 'bump'); o.waitT = Math.max(o.waitT || 0, 1.2); turnTo(o, Math.atan2(player.position.x - o.g.position.x, player.position.z - o.g.position.z), 30, 0.1); break; }
+  }
+}
 function updateGear(dt) {
   cloakCd = Math.max(0, cloakCd - dt);
   if (cloakT > 0 && (cloakT -= dt) <= 0) { cloakT = 0.001; endCloak(); }
   if (fallSafeT > 0 && (fallSafeT -= dt) <= 0) { fallSafeT = 0; setAura(false); toast('Fall-proof worn off', 900); }
-  if ((hudN & 7) === 0) { const fx = [cloakT > 0 ? `Holocloak ${Math.ceil(cloakT)} s` : cloakCd > 0 ? `Holocloak ready in ${Math.ceil(cloakCd)} s` : '', fallSafeT > 0 ? `Fall-proof ${Math.ceil(fallSafeT)} s` : ''].filter(Boolean).join(' · '); const el = $('effects'); el.hidden = !fx; el.textContent = fx; } // v30: how long each effect lasts
+  if ((hudN & 7) === 0) { const fx = [cloakT > 0 ? `Holocloak ${Math.ceil(cloakT)} s` : cloakCd > 0 ? `Holocloak ready in ${Math.ceil(cloakCd)} s` : '', fallSafeT > 0 ? `Fall-proof ${Math.ceil(fallSafeT)} s` : '', disguise.on ? (simT - disguise.blownT < 20 ? 'Cover blown: lose them' : 'Disguised') : ''].filter(Boolean).join(' · '); const el = $('effects'); el.hidden = !fx; el.textContent = fx; } // v30: how long each effect lasts
 }
 function fallDamage(fall) {
   if (fall < 17 || klass === 'force' || pound || fallSafeT > 0) return;
@@ -4757,7 +4828,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v40 · 2026-10-02';
+const BUILD = 'v41 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -5188,6 +5259,7 @@ const ITEMS = {
   firenade: { name: 'Fire grenade', stack: 10, icon: 'fire', use: 'throw' },
   orb:     { name: 'Teleport orb', stack: 5, icon: 'orb', use: 'throw' },
   holocloak: { name: 'Holocloak', stack: 1, icon: 'cloak', use: 'cloak' },
+  uniform: { name: 'Soldier uniform', stack: 1, icon: 'uniform', use: 'disguise' }, // v41
   berry:   { name: 'Blue berry', stack: 5, icon: 'berry', use: 'berry' },
   stim:    { name: 'Stim pack', stack: 5, icon: 'stim', use: 'stim' },
   credits: { name: 'Credits', stack: 9999, icon: 'coin' },
@@ -5203,7 +5275,7 @@ const ITEMS = {
   kyber:   { name: 'Kyber shard', stack: 5, icon: 'gem', rare: true, use: 'kyber' },
 };
 const LOOT_IDS = { Credits: 'credits', 'Pistol ammo': 'ammo', 'Rifle ammo': 'ammo_rifle', 'Shotgun shells': 'ammo_shells', 'Sniper rounds': 'ammo_sniper', 'Power cell': 'cell', 'Stim pack': 'stim', 'Frag grenade': 'grenade',
-  'Ration bar': 'ration', 'Data chip': 'chip', Keycard: 'keycard', Comlink: 'comlink', 'Kyber shard': 'kyber' };
+  'Ration bar': 'ration', 'Data chip': 'chip', Keycard: 'keycard', Comlink: 'comlink', 'Kyber shard': 'kyber', 'Soldier uniform': 'uniform' };
 // item pictures: the lightsaber, pistol and grenade are rendered from their 3D models at load (see renderThumbs);
 // everything else is a two-tone drawing
 const thumbs = {};
@@ -5211,6 +5283,7 @@ const ICON = {
   shield: '<path d="M15 3l10 4v7c0 7-4.5 11-10 13C9.5 25 5 21 5 14V7z" fill="#7fd0ff" opacity=".6" stroke="#3a8dff" stroke-width="1.4"/><path d="M15 7v16" stroke="#3a8dff" stroke-width="1" opacity=".6"/>',
   sticky: '<circle cx="15" cy="16" r="8" fill="#2f7fe0"/><circle cx="12" cy="13" r="2.4" fill="#9cc8ff"/><path d="M15 8V4" stroke="currentColor" stroke-width="2"/>',
   fire: '<rect x="9" y="9" width="12" height="16" rx="2.5" fill="#b8321c"/><path d="M15 3c3 3 3 5 0 7-3-2-3-4 0-7z" fill="#ffb22e"/><rect x="12" y="7" width="6" height="3" rx="1" fill="currentColor"/>',
+  uniform: '<path d="M10 5l-5 3 2 5 3-1v13h10V12l3 1 2-5-5-3-2 2h-6z" fill="#7d8a6a" stroke="#3c4532" stroke-width="1.2" stroke-linejoin="round"/><path d="M13 10h4v3h-4z" fill="#3c4532"/>',
   cloak: '<path d="M15 4c-5 0-8 4-8 9v13l4-3 4 3 4-3 4 3V13c0-5-3-9-8-9z" fill="#7fd0ff" opacity=".55" stroke="#3a8dff" stroke-width="1.2"/><circle cx="12" cy="12" r="1.4" fill="#3a8dff"/><circle cx="18" cy="12" r="1.4" fill="#3a8dff"/>',
   berry: '<circle cx="13" cy="18" r="6" fill="#3b6cff"/><circle cx="19" cy="15" r="5" fill="#5a86ff"/><path d="M16 9c1-3 4-4 6-4-1 2-3 4-6 4z" fill="#3aa361"/>',
   orb: '<circle cx="15" cy="15" r="6" fill="#c58cff"/><ellipse cx="15" cy="15" rx="12" ry="4" fill="none" stroke="#b070ff" stroke-width="1.6"/>',
@@ -5331,6 +5404,7 @@ function useActiveItem() {
   const it = activeItem(); if (!it || !it.def.use) return false;
   if (it.def.use === 'throw') { windUpThrow(nadeKindOf(it.id)); return true; } // v30: wind up, then throw (the arc shows where it lands)
   if (it.def.use === 'cloak') { startCloak(); return true; }
+  if (it.def.use === 'disguise') { wearDisguise(!disguise.on); return true; } // v41
   if (it.def.use === 'eat') { if (hp >= 1) { toast('Health is full', 900); return true; } takeItem('ration'); hp = Math.min(1, hp + 0.25); renderHealth(); toast('Ration bar: +25% health', 1000); return true; }
   if (it.def.use === 'kyber') { const ks = Object.keys(SABER_COLORS), i = (ks.indexOf(saberCfg.color) + 1) % ks.length; saberCfg.color = ks[i]; saveSaber(); setSaberColor(); toast(`The kyber shard glows ${ks[i].toLowerCase()}: your blade too`, 1300); return true; }
   if (it.def.use === 'berry') { takeItem('berry'); fallSafeT = 30; setAura(true); toast('Fall-proof for 30 s', 1200); log('berry'); return true; }
@@ -5414,6 +5488,7 @@ try { const s = localStorage.getItem('inv-sandbox'); if (s) { const o = JSON.par
 let mission = null;
 const courtAt = (x, z) => new V3(COURT.x + x, groundAt(COURT.x + x, COURT.z + z, 9), COURT.z + z);
 function startMission(id) {
+  wearDisguise(false); // v41: missions start out of uniform
   const def = MISSIONS[id]; if (!def) return;
   if (dead) { scene.remove(dead.body.g); dead = null; hero.visible = true; $('deathpanel').hidden = true; }
   if (mission) endMission('restart', true);
@@ -5626,6 +5701,7 @@ const LOOT_TABLE = [ // [name, min, max, weight, rare]; every body also carries 
 const lootLog = [];
 let looting = null, lootTarget = null, lootHideT = 0;
 function rollLoot(e) {
+  const extra = e && !e.civ && e.uniform !== undefined && e.deathType !== 'explosion' && Math.random() < 0.7 ? [{ name: 'Soldier uniform', qty: 1, rare: false, uniform: e.uniform }] : []; // v41
   const n = 1 + Math.floor(Math.random() * 3), out = [e && e.gunKind === 'sniper' ? { name: 'Sniper rounds', qty: 10 + Math.floor(Math.random() * 6), rare: false } : e && (e.gunKind === 'ak' || e.gunKind === 'ar') ? { name: 'Rifle ammo', qty: 60 + Math.floor(Math.random() * 31), rare: false } : e && e.gunKind === 'shotgun' ? { name: 'Shotgun shells', qty: 10 + Math.floor(Math.random() * 9), rare: false } : { name: 'Pistol ammo', qty: 30 + Math.floor(Math.random() * 7), rare: false }], total = LOOT_TABLE.reduce((a, r) => a + r[3], 0);
   for (let i = 0; i < n; i++) {
     let x = Math.random() * total, r = LOOT_TABLE[0];
@@ -5633,7 +5709,7 @@ function rollLoot(e) {
     const qty = r[1] + Math.floor(Math.random() * (r[2] - r[1] + 1));
     const same = out.find((o) => o.name === r[0]); if (same) same.qty += qty; else out.push({ name: r[0], qty, rare: !!r[4] });
   }
-  return out;
+  return [...extra, ...out];
 }
 // nearest unlooted body in reach, checked a few times a second
 function findLootable() {
@@ -5689,6 +5765,7 @@ function updateLoot(dt, inp) {
       const it = L.items[L.shown++];
       lootLog.push({ ...it, at: Date.now(), from: L.e.id }); sfx('pickup', null, 0.5);
       const left = addItem(LOOT_IDS[it.name], it.qty);
+      if (it.uniform !== undefined && !left) { disguise.uniform = it.uniform; try { localStorage.setItem('disguise-uniform', it.uniform); } catch (_) {} } // v41: you wear what he wore
       const li = document.createElement('li'); li.textContent = `+ ${it.name}${it.qty > 1 ? ' ×' + it.qty : ''}${left ? ' (no room for ' + left + ')' : ''}`; if (it.rare) li.className = 'rare';
       $('lootitems').appendChild(li); log('looted', it.name, it.qty);
     }
@@ -5854,7 +5931,7 @@ function step(dt) {
   lean.rotation.z = roll;
 
   updateDraw(dt);
-  updateReload(dt); updateVoices(); // v37
+  updateReload(dt); updateVoices(); updateDisguise(); // v37, v41
   updateJetpackLook();
   footsteps(dt); jetSound(mode === 'jet', jumpHeld || jet.boost ? 1 : 0.3);
   updateCombat(dt); bladeCuts(dt); updateForce(dt); updateThrow(dt); updateBlasterHand(); saberFx(dt);
@@ -6473,7 +6550,8 @@ function start() {
     setAtt, hasAtt, get zoom() { return gunZoom(); }, get lasers() { return soldiers().filter((e) => e.laser && e.laser.visible).length; },
     spawnSpecial: (type, x, z) => { const e = spawnSpecial(type, x !== undefined ? new V3(x, groundAt(x, z, 9), z) : undefined); return e && e.id; },
     special: () => soldiers().filter((e) => e.special).map((e) => ({ id: e.id, type: e.special, state: e.state, jugg: e.jugg ? { hits: e.jugg.hits, pool: e.jugg.pool } : null, shield: e.jackal ? e.jackal.hp : null, guard: e.duel ? e.duel.guard : null, stagger: e.duel ? +e.duel.stagger.toFixed(2) : null, attack: e.duel?.attack ? +e.duel.attack.t.toFixed(2) : false })),
-    get cloakT() { return cloakT; }, get fallSafeT() { return fallSafeT; }, get sneak() { return walkToggle; }, setSneak(v) { walkToggle = v; }, fallDamage, get moveMode() { return moveMode; },
+    get cloakT() { return cloakT; }, setDisguise: (on) => wearDisguise(on), get disguised() { return disguise.on; }, get disguiseUniform() { return disguise.uniform; }, disguiseParts: () => { let n = 0, shown = 0; hero.traverse((o) => { if (o.isSkinnedMesh) { if (isDisguisePart(o)) n++; else if (o.visible) shown++; } }); return { soldier: n, own: shown }; },
+    lootRoll: (i) => rollLoot(soldiers()[i]).map((x) => x.name), get fallSafeT() { return fallSafeT; }, get sneak() { return walkToggle; }, setSneak(v) { walkToggle = v; }, fallDamage, get moveMode() { return moveMode; },
     setFavourite, savePack, loadPack, setMoveMode(m) { moveMode = m; }, nextVariant: (s) => nextVariant(s).id, pool: (s) => [...pool[s]], get objective() { return mission ? { state: mission.state, dl: mission.dl || 0, near: !!nearTerminal() } : null; },
     tryObjective, terminalPos: () => mission?.terminal?.position.toArray() || null, pickups: () => worldPickups.map((p) => [p.id, p.m.visible]),
     get fires() { return fires.length; }, get programs() { return renderer.info.programs.length; }, get particles() { return (flamePS?.list.length || 0) + (smokePS?.list.length || 0); }, burning: () => soldiers().filter((e) => e.burning && e.state !== 'dead').length, get grenadesOut() { return grenades.map((g) => ({ kind: g.kind || 'frag', stuck: !!g.stuck, on: g.stuck?.e?.id || null })); },
