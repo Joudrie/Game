@@ -32,8 +32,17 @@ await ev(() => __game.voReset());
 await ev(() => __game.say(0, 'sus'));
 const blocked = await ev(() => __game.say(1, 'giveup'));
 const cut = await ev(() => __game.say(2, 'pain'));
-const now = await ev(() => __game.voNow.v1);
-check(!blocked && cut && now && now.cat === 'pain', `a calm line waits; a scream cuts in (now: ${now && now.cat})`);
+const now = await ev(() => __game.voNow.v1), scr = await ev(() => __game.voScreams);
+check(!blocked && cut && now && now.cat === 'sus' && scr.some((x) => x.cat === 'pain'), `a calm line waits; a scream plays over it (talking: ${now && now.cat}, screaming: ${scr.map((x) => x.cat)})`);
+// v42: four men killed at once: four different death cries together, from where each one is
+await ev(() => __game.voReset());
+const four = await ev(() => { let n = 0; for (let i = 0; i < 5; i++) n += __game.say(i, 'death') ? 1 : 0; return n; });
+const cries = await ev(() => __game.voScreams);
+check(four === 4 && cries.length === 4 && new Set(cries.map((x) => x.take)).size === 4 && new Set(cries.map((x) => x.id)).size === 4, `five deaths at once: ${cries.length} cries together (the cap is 4), ${new Set(cries.map((x) => x.take)).size} different takes`);
+const whereFrom = await ev(() => { const g = __game, e = g.enemies().filter((x) => x.state !== 'dead'); return { cry: g.voScreams[0], pos: e.find((x) => x.id === g.voScreams[0].id)?.pos }; });
+check(whereFrom.cry.at && Math.abs(whereFrom.cry.at[0] - whereFrom.pos[0]) < 0.3 && Math.abs(whereFrom.cry.at[1] - whereFrom.pos[2]) < 0.3, `a cry comes from where the soldier stands (${whereFrom.cry.at} vs ${whereFrom.pos[0]},${whereFrom.pos[2]})`);
+const ears = await ev(() => { __game.advance(0.05); return { ears: __game.earsAt, cam: __game.camPos || null }; });
+check(Array.isArray(ears.ears) && ears.ears.some((v) => v !== 0), `the ears follow the camera (${ears.ears})`);
 // takes don't repeat back to back
 const takes = [];
 for (let i = 0; i < 24; i++) { await ev(() => __game.voReset()); await ev(() => __game.say(0, 'spot')); takes.push((await ev(() => __game.voNow.v1))?.take); }
@@ -41,7 +50,7 @@ const soon = (list, hold) => list.filter((t, i) => list.slice(Math.max(0, i - ho
 const repeats = soon(takes, 5);
 check(takes.every(Boolean) && repeats === 0 && new Set(takes).size === 10, `24 "Contact!"s: all 10 takes used, none again within 5 (${repeats} too soon)`);
 const deaths = [];
-for (let i = 0; i < 70; i++) { await ev(() => __game.voReset()); await ev(() => __game.say(0, 'death')); deaths.push((await ev(() => __game.voNow.v1))?.take); }
+for (let i = 0; i < 70; i++) { await ev(() => __game.voReset()); await ev(() => __game.say(0, 'death')); deaths.push((await ev(() => __game.voScreams))[0]?.take); }
 check(deaths.every(Boolean) && soon(deaths, 32) === 0 && new Set(deaths).size > 45, `70 death cries: ${new Set(deaths).size} different, none again within 32 (${soon(deaths, 32)} too soon)`);
 // a soldier who dies mid-sentence goes quiet (a headshot: no last cry either)
 await fresh(); await ev(() => __game.say(0, 'alarm'));
