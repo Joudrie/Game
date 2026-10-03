@@ -1,0 +1,5 @@
+"AMERICAN SOLDIER RIGGED" by matheofrelin3 on Sketchfab, CC Attribution 4.0 (CC-BY): credit matheofrelin3.
+https://sketchfab.com/3d-models/american-soldier-rigged-5b1967e7f83547be8a1c3ae656ab1ad4 (uid 5b1967e7f83547be8a1c3ae656ab1ad4)
+Downloaded 2026-10-03 through the Sketchfab API (glb). Rigged with a Mixamo or UE skeleton.
+Used from v49 as the American soldier in woodland camouflage (enemy_american).
+Steps: tools/serve.sh node tools/reskin_enemy.mjs assets/characters/enemies/american/american.glb enemy_american, then node tools/pack_enemies.mjs build/enemy_american.glb.

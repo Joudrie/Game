@@ -1,0 +1,5 @@
+"Insurgent" by beanibirb on Sketchfab, CC Attribution 4.0 (CC-BY): credit beanibirb.
+https://sketchfab.com/3d-models/insurgent-3389e4f7c9864c40bcf3be4ca33add94 (uid 3389e4f7c9864c40bcf3be4ca33add94)
+Downloaded 2026-10-03 through the Sketchfab API (glb). Rigged with a Mixamo or UE skeleton.
+Used from v49 as the insurgent in a robe and headwrap (enemy_insurgent).
+Steps: tools/serve.sh node tools/reskin_enemy.mjs assets/characters/enemies/insurgent/insurgent.glb enemy_insurgent, then node tools/pack_enemies.mjs build/enemy_insurgent.glb.

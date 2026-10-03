@@ -1,0 +1,5 @@
+"Military soldier character" by AnnonymousCreator on Sketchfab, CC Attribution 4.0 (CC-BY): credit AnnonymousCreator.
+https://sketchfab.com/3d-models/military-soldier-character-4b227207635e4587b0466553d8e8d7bc (uid 4b227207635e4587b0466553d8e8d7bc)
+Downloaded 2026-10-03 through the Sketchfab API (glb). Rigged with a Mixamo or UE skeleton.
+Used from v49 as the female soldier in ACU camouflage (enemy_milsol). Its file uses KHR_materials_pbrSpecularGlossiness: run tools/convert_specgloss.mjs first.
+Steps: tools/serve.sh node tools/reskin_enemy.mjs assets/characters/enemies/milsol/milsol.glb enemy_milsol, then node tools/pack_enemies.mjs build/enemy_milsol.glb.

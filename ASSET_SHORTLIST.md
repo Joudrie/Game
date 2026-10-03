@@ -66,9 +66,9 @@ Our enemies since v48: bumstrum's "terrorist" via `tools/reskin_enemy.mjs` (befo
 Skipped on purpose: "Heavy Nazi Soldier" (not for this game), anything named after a commercial game.
 
 ## Budget
-The play link is 11.9 MB (v48). GitHub Pages has no cap; the claude.ai link caps at 16 MB. Rough costs: a TastyTony gun 50–300 KB, a grenade 20–40 KB, a flipbook 200–600 KB, a 23k-face rigged soldier about 1 MB. Swapping the five guns and the frag costs well under 1 MB.
+The play link is 13.8 MB (v49). GitHub Pages has no cap; the claude.ai link caps at 16 MB. Rough costs: a TastyTony gun 50–300 KB, a grenade 20–40 KB, a flipbook 200–600 KB, a 23k-face rigged soldier about 1 MB. Swapping the five guns and the frag costs well under 1 MB.
 
 ## Suggested order
 1. ~~Guns~~ and ~~frag~~ (v48). Fire grenade: Quaternius FireGrenade.
 3. Explosion: a Unity Labs or Sinestesia flipbook on the blast.
-4. ~~Terrorist enemy~~ (v48). Next: a second faction, the 23k tactical soldier.
+4. ~~Terrorist enemy~~ (v48), ~~four more bodies~~ (v49: SWAT, female soldier, insurgent, American soldier). The 23k tactical soldier's file is broken (head floats); skip it.
