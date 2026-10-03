@@ -2,6 +2,11 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v42: screams overlap, and sound has a direction
+Test: `tools/test45-voices.mjs`.
+- **Deaths and screams overlap.** A grenade into four men is four death cries now, up to 4 at once, each a different take and started a split second apart so they don't sound in unison. It covers dying, pain, fire, flying and losing a limb. One soldier never screams twice at once. Callouts ("Contact!", "Reloading!") are still one at a time, so they never stack up, and a scream plays over a callout instead of cutting it off.
+- **You can hear where things are.** Every voice comes from the soldier's mouth, and gunshots, explosions, barrels, glass and bodies falling come from where they happen. It all turns with your camera: on headphones you can tell left from right, and voices also carry front and behind. Volume still drops with distance exactly as before (half at about 16 m; voices go silent past 55 m).
+
 ## v41: the disguise
 Hitman, but loud: wear a soldier's uniform and walk right past his friends. Test: `tools/test48-disguise.mjs`.
 - **Getting one:** loot a soldier's body. Most of them (7 in 10) carry their uniform, unless they were blown apart. You wear the uniform of the soldier you took it from (urban, desert, woodland…). It's also in the creative catalogue.

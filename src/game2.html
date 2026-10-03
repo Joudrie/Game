@@ -1281,7 +1281,23 @@ function sfx(name, at, vol = 1, delay = 0) {
   const c = audio.ctx, b = audio.buf[name]; if (!c || !b) return;
   const v = at ? vol / (1 + at.distanceTo(player.position) * 0.07) : vol;
   const src = c.createBufferSource(); src.buffer = b; src.playbackRate.value = 0.95 + Math.random() * 0.1;
-  const g = c.createGain(); g.gain.value = v; src.connect(g).connect(audio.master); src.start(c.currentTime + delay);
+  const g = c.createGain(); g.gain.value = v; src.connect(g);
+  (at ? g.connect(spatial(c, at, false)) : g).connect(audio.master); src.start(c.currentTime + delay); // v42: from where it happened
+}
+// v42: sounds come from where they happen. A panner per sound turns it toward the camera (left, right, behind); the
+// volume still falls off with distance from you as before (the panner adds direction only, no distance of its own).
+// Voices use HRTF (front and back cues on headphones); everything else the cheaper equal-power pan.
+const _lf = new V3(), _lu = new V3();
+function placePanner(p, at) { if (p.positionX) { p.positionX.value = at.x; p.positionY.value = at.y; p.positionZ.value = at.z; } else p.setPosition(at.x, at.y, at.z); }
+function spatial(c, at, hrtf) {
+  const p = c.createPanner(); p.panningModel = hrtf ? 'HRTF' : 'equalpower'; p.distanceModel = 'linear'; p.rolloffFactor = 0; p.refDistance = 1; p.maxDistance = 1e4;
+  placePanner(p, at); return p;
+}
+function updateListener() { // the ears are the camera's
+  const c = audio.ctx; if (!c) return;
+  const L = c.listener, q = camera.position, f = camera.getWorldDirection(_lf), u = _lu.set(0, 1, 0).applyQuaternion(camera.quaternion);
+  if (L.positionX) { L.positionX.value = q.x; L.positionY.value = q.y; L.positionZ.value = q.z; L.forwardX.value = f.x; L.forwardY.value = f.y; L.forwardZ.value = f.z; L.upX.value = u.x; L.upY.value = u.y; L.upZ.value = u.z; }
+  else { L.setPosition(q.x, q.y, q.z); L.setOrientation(f.x, f.y, f.z, u.x, u.y, u.z); }
 }
 // ---------------- soldier voices (v37) ----------------
 // The owner's recorded lines (build/vo/<voice>/<category>_<n>.ogg, cut by tools/make_voice.py), embedded as
@@ -1290,17 +1306,17 @@ function sfx(name, at, vol = 1, delay = 0) {
 // deals its takes from a shuffled deck, so a take never comes up twice in a row. A soldier who dies mid-sentence
 // stops talking. More voices (the owner's other characters) go in as v2, v3…; each soldier gets one in `e.voice`.
 const VO_CATS = { // pri: who interrupts whom; cd: seconds before the same category plays again (any soldier)
-  pain: { pri: 3, cd: 0.35 }, fire: { pri: 3, cd: 0.6 }, flying: { pri: 3, cd: 0.5 }, arm: { pri: 3, cd: 1 }, hit: { pri: 2, cd: 4 },
+  pain: { pri: 3, cd: 0.15 }, fire: { pri: 3, cd: 0.6 }, flying: { pri: 3, cd: 0.5 }, arm: { pri: 3, cd: 1 }, hit: { pri: 2, cd: 4 },
   spot: { pri: 2, cd: 2.5 }, jedi: { pri: 2, cd: 8 }, alarm: { pri: 2, cd: 3 }, grenade: { pri: 2, cd: 1.5 }, mandown: { pri: 2, cd: 3 },
   whatthe: { pri: 2, cd: 6 }, panic: { pri: 2, cd: 10 }, barrels: { pri: 2, cd: 15 }, reload: { pri: 1, cd: 3 }, cover: { pri: 1, cd: 6 },
   search: { pri: 1, cd: 5 }, medic: { pri: 1, cd: 5 }, taunt: { pri: 1, cd: 3 }, sus: { pri: 1, cd: 1.2 }, giveup: { pri: 1, cd: 4 }, fragout: { pri: 2, cd: 2 },
-  death: { pri: 3, cd: 0.2 }, ready: { pri: 1, cd: 6 }, calm: { pri: 1, cd: 6 }, // v40
+  death: { pri: 3, cd: 0 }, ready: { pri: 1, cd: 6 }, calm: { pri: 1, cd: 6 }, // v40
   idle: { pri: 0, cd: 20 }, radio: { pri: 0, cd: 12 }, hum: { pri: 0, cd: 10 }, yawn: { pri: 0, cd: 15 }, // v40: calm guards muttering to themselves
   bump: { pri: 1, cd: 2 }, dsus: { pri: 2, cd: 3 }, blown: { pri: 2, cd: 3 }, // v40: recorded for the disguise (not built yet)
 };
 const VO_FALLBACK = { death: 'pain', ready: null, calm: 'giveup' }; // a voice without the takes uses these instead
 const VO_MUTTER = [['hum', 0.35], ['idle', 0.25], ['radio', 0.25], ['yawn', 0.15]];
-const vo = { buf: {}, recent: {}, now: {}, cool: {}, pending: [], log: [], total: 0, on: true, range: 55, nextMutter: 4 };
+const vo = { buf: {}, recent: {}, now: {}, screams: [], cool: {}, pending: [], log: [], total: 0, on: true, range: 55, nextMutter: 4 };
 function initVoices() {
   for (const [voice, set] of Object.entries(window.__ASSETS.vo || {})) {
     vo.buf[voice] = {};
@@ -1335,17 +1351,30 @@ function say(e, cat, delay = 0, patience = 1.5) {
   if (e.voT > simT && C.pri < 2) return false; // one soldier doesn't chatter non-stop (shouts and screams still come)
   if (e.g.position.distanceTo(player.position) > vo.range) return false;
   const voice = voiceOf(e), cur = vo.now[voice];
-  if (cur && cur.end > simT) { if (cur.pri >= C.pri) return false; stopLine(voice); } // someone with this voice is already talking
+  let lag = 0;
+  if (dying) { // v42: screams and death cries overlap (a grenade into four men is four cries), up to 4 at once, one per soldier
+    vo.screams = vo.screams.filter((x) => x.end > simT);
+    const mine = vo.screams.find((x) => x.e === e);
+    if (mine && cat !== 'death') return false; // still screaming from the last hit
+    if (vo.screams.length - (mine ? 1 : 0) >= VO_SCREAMS) return false;
+    if (mine) stopScream(mine);
+    if (cur && cur.e === e && cur.end > simT) stopLine(voice); // he stops mid-sentence; the others carry on
+    if (vo.screams.some((x) => simT - x.t0 < 0.15)) lag = 0.06 + Math.random() * 0.22; // started a beat apart, not in unison
+  } else if (cur && cur.end > simT) { if (cur.pri >= C.pri) return false; stopLine(voice); } // someone with this voice is already talking
   vo.cool[cat] = simT + C.cd; e.voT = simT + 1.6;
   vo.total++; vo.log.push(`${cat}:${e.id}`); if (vo.log.length > 60) vo.log.shift(); log('says', cat, e.id);
   const c = audio.ctx; if (!c || !vo.on) return true;
   const take = dealTake(voice, cat); if (!take) return true;
   const src = c.createBufferSource(); src.buffer = take.b; src.playbackRate.value = e.vpitch || (e.vpitch = 0.97 + Math.random() * 0.06);
   const g = c.createGain(); g.gain.value = 1.1 / (1 + e.g.position.distanceTo(player.position) * 0.06);
-  src.connect(g).connect(audio.master); src.start();
-  vo.now[voice] = { src, g, e, cat, pri: C.pri, end: simT + take.b.duration / src.playbackRate.value, take: take.name };
+  const pan = spatial(c, mouthOf(e), true); src.connect(g).connect(pan).connect(audio.master); src.start(c.currentTime + lag);
+  const line = { src, g, pan, e, cat, voice, pri: C.pri, t0: simT, end: simT + lag + take.b.duration / src.playbackRate.value, take: take.name };
+  if (dying) vo.screams.push(line); else vo.now[voice] = line;
   return true;
 }
+const VO_SCREAMS = 4;
+const mouthOf = (e) => e.g.position.clone().add(new V3(0, 1.6, 0));
+function stopScream(x) { try { x.g.gain.setTargetAtTime(0, audio.ctx.currentTime, 0.02); x.src.stop(audio.ctx.currentTime + 0.08); } catch (_) {} x.end = 0; }
 function stopLine(voice) { const cur = vo.now[voice]; if (!cur) return; try { cur.g.gain.setTargetAtTime(0, audio.ctx.currentTime, 0.02); cur.src.stop(audio.ctx.currentTime + 0.08); } catch (_) {} vo.now[voice] = null; }
 function hushDead(e) { for (const v in vo.now) { const cur = vo.now[v]; if (cur && cur.e === e && cur.end > simT && VO_CATS[cur.cat].pri < 3) stopLine(v); } } // cut off mid-word
 function updateVoices() {
@@ -1354,7 +1383,8 @@ function updateVoices() {
     const gone = p.e.state === 'dead' || !enemies.includes(p.e);
     if (gone || say(p.e, p.cat) || simT > p.until) vo.pending.splice(vo.pending.indexOf(p), 1);
   }
-  for (const v in vo.now) { const cur = vo.now[v]; if (cur && cur.end > simT && cur.e) cur.g.gain.value = 1.1 / (1 + cur.e.g.position.distanceTo(player.position) * 0.06); } // follows him as he moves
+  updateListener(); // v42
+  for (const cur of [...Object.values(vo.now), ...vo.screams]) if (cur && cur.end > simT && cur.e) { cur.g.gain.value = 1.1 / (1 + cur.e.g.position.distanceTo(player.position) * 0.06); placePanner(cur.pan, mouthOf(cur.e)); } // follows him as he moves (v42: and from where he is)
   if (simT >= vo.nextMutter) { // v40: now and then a calm guard near you mutters, hums, yawns or checks in on the radio
     vo.nextMutter = simT + 6 + Math.random() * 8;
     const near = enemies.filter((o) => !o.civ && o.state !== 'dead' && o.mind === 'patrol' && (o.sus || 0) < 0.2 && o.g.position.distanceTo(player.position) < 24);
@@ -4828,7 +4858,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v41 · 2026-10-03';
+const BUILD = 'v42 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -6520,7 +6550,7 @@ function start() {
     playOnEnemy(i, name, from = 0, speed = 1) { const e = soldiers().filter((q) => q.state !== 'dead')[i]; e.state = 'hit'; e.hitT = 99; eplay(e, name, { loop: false, from, speed, fade: 0.01 }); },
     get blocks() { return blocks.map((b) => ({ min: b.box.min.toArray().map((v) => +v.toFixed(1)), max: b.box.max.toArray().map((v) => +v.toFixed(1)) })); },
     get paused() { return paused; }, setPause, get view() { return [camYaw, camPitch]; }, get settings() { return { ...settings }; }, get baseFov() { return BASE_FOV; }, get masterVol() { return audio.master ? audio.master.gain.value : null; },
-    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, get voLog() { return vo.log.slice(); }, get voCount() { return vo.total; }, get voLoaded() { return Object.fromEntries(Object.entries(vo.buf).map(([v, c]) => [v, Object.fromEntries(Object.entries(c).map(([k, a]) => [k, a.length]))])); }, get voNow() { return Object.fromEntries(Object.entries(vo.now).filter(([, c]) => c && c.end > simT).map(([v, c]) => [v, { cat: c.cat, id: c.e.id, take: c.take }])); }, say: (i, cat) => say(soldiers().filter((x) => x.state !== 'dead')[i], cat), setVoices: (on) => { vo.on = on; }, voReset: () => { vo.log.length = 0; vo.total = 0; vo.cool = {}; vo.pending.length = 0; for (const v in vo.now) stopLine(v); for (const e of enemies) e.voT = 0; }, civilians: () => civilians().map((e) => ({ id: e.id, kind: e.civ, state: e.state, cs: e.cs, pos: e.g.position.toArray().map((v) => +v.toFixed(2)), hp: e.hp, severed: (e.severed || []).map((b) => b.name), label: e.cutLabel || null, rag: !!e.rag, hair: (() => { let h = null; e.root.traverse((o) => { if (!h && o.isMesh) h = hairOf(o); }); return h; })() })),
+    onRoad, get roadCells() { return [...roadCells.keys()]; }, get sfxLog() { return sfxLog.slice(); }, get sfxCount() { return sfxLog.total || 0; }, get sfxLoaded() { return Object.keys(audio.buf); }, get voLog() { return vo.log.slice(); }, get voCount() { return vo.total; }, get voLoaded() { return Object.fromEntries(Object.entries(vo.buf).map(([v, c]) => [v, Object.fromEntries(Object.entries(c).map(([k, a]) => [k, a.length]))])); }, get voNow() { return Object.fromEntries(Object.entries(vo.now).filter(([, c]) => c && c.end > simT).map(([v, c]) => [v, { cat: c.cat, id: c.e.id, take: c.take }])); }, get voScreams() { return vo.screams.filter((x) => x.end > simT).map((x) => ({ cat: x.cat, id: x.e.id, take: x.take, at: x.pan.positionX ? [x.pan.positionX.value, x.pan.positionZ.value].map((v) => +v.toFixed(1)) : null })); }, get earsAt() { const L = audio.ctx?.listener; return L && L.positionX ? [L.positionX.value, L.positionY.value, L.positionZ.value].map((v) => +v.toFixed(1)) : null; }, say: (i, cat) => say(soldiers().filter((x) => x.state !== 'dead')[i], cat), setVoices: (on) => { vo.on = on; }, voReset: () => { vo.log.length = 0; vo.total = 0; vo.cool = {}; vo.pending.length = 0; for (const v in vo.now) stopLine(v); for (const x of vo.screams) stopScream(x); vo.screams = []; for (const e of enemies) e.voT = 0; }, civilians: () => civilians().map((e) => ({ id: e.id, kind: e.civ, state: e.state, cs: e.cs, pos: e.g.position.toArray().map((v) => +v.toFixed(2)), hp: e.hp, severed: (e.severed || []).map((b) => b.name), label: e.cutLabel || null, rag: !!e.rag, hair: (() => { let h = null; e.root.traverse((o) => { if (!h && o.isMesh) h = hairOf(o); }); return h; })() })),
     setCivCount(n) { civCfg.count = n; civSpawnT = 0; }, get civDeaths() { return civDeaths; }, strayAt: (ax, ay, az, bx, by, bz) => strayHit(new V3(ax, ay, az), new V3(bx, by, bz))?.id || null, spawnCivilian: (x, z, kind) => spawnCivilian(new V3(x, groundAt(x, z, 99), z), kind)?.id || null,
     scareCiv(id, x, z) { const e = enemies.find((q) => q.id === id); if (e) scare(e, new V3(x, 0, z), 'test'); }, shootCiv(id, zone = 'torso') { const e = enemies.find((q) => q.id === id); if (e) damageEnemy(e, zone === 'head' ? 100 : 34, zone, 'bullet', e.g.position.clone().sub(player.position).setY(0).normalize()); }, cutCiv(id, name) { const e = enemies.find((q) => q.id === id), c = CUTS.find((x) => x[0] === name); if (e && c) applyCut(e, c, new V3(1, 0, 0)); },
     spawnBarrel: (x, z, kind) => spawnBarrel(new V3(x, 0, z), kind)?.id || null, spawnMine: (x, z) => spawnMine(new V3(x, 0, z))?.id || null, scatterProps: () => { scatterProps(); return props.barrels.length; },
