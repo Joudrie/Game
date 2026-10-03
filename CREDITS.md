@@ -12,8 +12,9 @@ Most assets are CC0 (public domain) and need no credit. The ones below need cred
 - **KayKit Character Animations 1.1** by Kay Lousberg (CC0): kneel-and-fall death, two hit reactions, dual-wield chop, slice and stab. kaylousberg.itch.io
 - **"Boba Fett/Mandalorian Jet Pack"** by Jace1969 on Printables (CC BY 4.0): the jetpack model. printables.com/model/23735
 - **"terrorist"** by **bumstrum** on Sketchfab (CC BY 4.0): the enemy soldiers' body since v48 (`build/enemy.glb`, via `tools/reskin_enemy.mjs`). sketchfab.com/3d-models/terrorist-ccce1abd9086451da3bed9ec30c82c37
+- **"Military soldier character"** by **AnnonymousCreator**, **"Insurgent"** by **beanibirb**, **"AMERICAN SOLDIER RIGGED"** by **matheofrelin3**, all on Sketchfab (CC BY 4.0): more enemy bodies since v49 (`build/enemy_milsol.glb`, `enemy_insurgent.glb`, `enemy_american.glb`). Links in each `assets/characters/enemies/*/SOURCE.txt`.
 - **Low-Poly G17, AKM, M4a1, Remington 870, L115A3, M67** by **TastyTony** on Sketchfab (CC BY 4.0): the pistol, AK, M4, shotgun, sniper and frag grenade since v48. `assets/weapons/tastytony/SOURCE.txt`. sketchfab.com/TastyTony
-- **Quaternius Swat** (CC0): the enemy soldiers' body v21 to v47 (`build/enemy_swat.glb`, via `tools/reskin_swat.mjs`), and their run, strafe, shoot and death clips.
+- **Quaternius Swat** (CC0): the enemy soldiers' body v21 to v47 and one of the five bodies again from v49 (`build/enemy_swat.glb`, via `tools/reskin_swat.mjs`), and their run, strafe, shoot and death clips.
 - **three.js** example Soldier model (MIT repository; animations from Mixamo).
 
 ## In `assets/` (downloaded, not all used yet)

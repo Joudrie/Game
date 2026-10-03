@@ -3,4 +3,4 @@ https://sketchfab.com/3d-models/terrorist-ccce1abd9086451da3bed9ec30c82c37 (uid 
 Downloaded 2026-10-03 through the Sketchfab API (glb). Rigged (67 joints), 7,035 triangles, PBR textures.
 Used as the enemy soldiers' body from v48: node tools/reskin_enemy.mjs → build/enemy.glb (his own pistol is left out).
 Steps: node tools/convert_specgloss.mjs (the file uses KHR_materials_pbrSpecularGlossiness; converts to metal-rough),
-then tools/serve.sh node tools/reskin_enemy.mjs <converted.glb>.
+then tools/serve.sh node tools/reskin_enemy.mjs <converted.glb> enemy, then node tools/pack_enemies.mjs build/enemy.glb.

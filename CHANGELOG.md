@@ -2,6 +2,14 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v49: five enemy bodies (owner: more variance in enemy models)
+Test: `tools/test49-bodies.mjs`.
+- **Five bodies, mixed in every squad:** the masked terrorist, the SWAT officer (back from v47), and three new downloads: a female soldier in ACU camouflage, an insurgent in a robe and headwrap, and an American soldier in woodland camouflage (all CC-BY, credited). Each new soldier gets the body the squad has least of, so ten soldiers are two of each.
+- **Heights vary** by up to 6% either way, and the new bodies are a little lighter or darker from soldier to soldier. The terrorist keeps his uniform tints; the SWAT officer keeps his uniforms and skin tones.
+- All of them animate, hold their guns, lose limbs, ragdoll, scream and loot like before.
+- Skipped on purpose: two German soldiers ripped from the game *Call to Arms*, a security guard re-uploaded from another site, and a tactical soldier whose file is broken (head floats, gloves tear).
+- Tools: `tools/reskin_enemy.mjs` now takes any Mixamo or UE-mannequin rig, turns sideways files to face forward, poses the bones from their bind matrices, and packs a model with many textures into one atlas. `tools/pack_enemies.mjs` compresses the bodies (300–450 KB each). The play link is 13.8 MB.
+
 ## v48: downloaded guns, grenade and enemies (TastyTony, bumstrum)
 Tests: `tools/test28-guns.mjs`, `tools/test26-dismember.mjs`, `tools/test35-world.mjs`, `tools/test38-audit-batch2.mjs`, `tools/test48-disguise.mjs`.
 - **Guns:** the pistol, AK, M4, shotgun and sniper are now TastyTony's low-poly Glock 17, AKM, M4A1, Remington 870 and L115A3 (CC-BY, Sketchfab). Each one's grip and fore-grip were placed again so the hands sit on them. Each gun is one material, so drawing it for the first time doesn't stall.
