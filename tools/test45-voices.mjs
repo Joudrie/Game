@@ -38,7 +38,7 @@ check(!blocked && cut && now && now.cat === 'sus' && scr.some((x) => x.cat === '
 await ev(() => __game.voReset());
 const four = await ev(() => { let n = 0; for (let i = 0; i < 5; i++) n += __game.say(i, 'death') ? 1 : 0; return n; });
 const cries = await ev(() => __game.voScreams);
-check(four === 4 && cries.length === 4 && new Set(cries.map((x) => x.take)).size === 4 && new Set(cries.map((x) => x.id)).size === 4, `five deaths at once: ${cries.length} cries together (the cap is 4), ${new Set(cries.map((x) => x.take)).size} different takes`);
+check(four === 5 && cries.length === 5 && new Set(cries.map((x) => x.take)).size === 5 && new Set(cries.map((x) => x.id)).size === 5, `five deaths at once: ${cries.length} cries together (no cap, v43), ${new Set(cries.map((x) => x.take)).size} different takes`);
 const whereFrom = await ev(() => { const g = __game, e = g.enemies().filter((x) => x.state !== 'dead'); return { cry: g.voScreams[0], pos: e.find((x) => x.id === g.voScreams[0].id)?.pos }; });
 check(whereFrom.cry.at && Math.abs(whereFrom.cry.at[0] - whereFrom.pos[0]) < 0.3 && Math.abs(whereFrom.cry.at[1] - whereFrom.pos[2]) < 0.3, `a cry comes from where the soldier stands (${whereFrom.cry.at} vs ${whereFrom.pos[0]},${whereFrom.pos[2]})`);
 const ears = await ev(() => { __game.advance(0.05); return { ears: __game.earsAt, cam: __game.camPos || null }; });
