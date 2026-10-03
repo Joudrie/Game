@@ -2,6 +2,9 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v45: holding the uniform is wearing it (quick fix)
+- Select the uniform's hotbar slot and you're disguised at once; no click needed. Switch to any other slot and your own look is back.
+
 ## v44: putting the uniform on
 - **Why clicking didn't put it on:** closing the inventory lets go of the mouse, and the first click back in the game only took the mouse back. That click now also puts the uniform on (or takes it off).
 - **With the uniform selected, a click always wears it,** even standing behind a guard (where a click would be a takedown) or in the middle of a jump.
