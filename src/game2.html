@@ -331,7 +331,7 @@ body.moves-open #top, body.moves-open #readout, body.moves-open #pad, body.moves
   setTimeout(function () {
     if (!window.__booted) {
       var m = document.getElementById('loadmsg');
-      if (m) m.textContent = 'Couldn’t load the 3D engine from cdn.jsdelivr.net. Check your connection and reload.';
+      if (m) m.textContent = 'The game didn’t start. Reload the page.';
       var b = document.querySelector('#loading .bar'); if (b) b.hidden = true;
     }
   }, 15000);
@@ -353,6 +353,11 @@ const damp = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));
 const wrapAngle = (a) => Math.atan2(Math.sin(a), Math.cos(a));
 const moveTo = (a, b, d) => (a < b ? Math.min(b, a + d) : Math.max(b, a - d));
 const COARSE = matchMedia('(pointer: coarse)').matches;
+// v50: phones load a lighter game (owner: it loaded forever on friends' phones). A load that never finished last time
+// (a phone that ran out of memory reloads the page) also gets the light one.
+const CRASHED = (() => { try { return sessionStorage.getItem('booting') === '1'; } catch (_) { return false; } })();
+const LITE = (COARSE || CRASHED) && !navigator.webdriver;
+try { sessionStorage.setItem('booting', '1'); } catch (_) {}
 
 // ---------------- classes (your rules) ----------------
 const CLASSES = {
@@ -504,8 +509,8 @@ const variantById = (slot, id) => MOVES[slot].variants.find((v) => v.id === id);
 
 // ---------------- renderer / world ----------------
 const stage = $('stage');
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const renderer = new THREE.WebGLRenderer({ antialias: !LITE, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, LITE ? 1.5 : 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.NoToneMapping;
 renderer.shadowMap.enabled = true;
@@ -525,7 +530,7 @@ const camera = new THREE.PerspectiveCamera(settings.fov, 1, 0.05, 2500);
 scene.add(new THREE.HemisphereLight(0xffffff, 0xb09a72, 1.9));
 const sun = new THREE.DirectionalLight(0xffffff, 1.6);
 sun.castShadow = true;
-sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.mapSize.set(LITE ? 1024 : 2048, LITE ? 1024 : 2048);
 Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 60 });
 sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.02;
 scene.add(sun, sun.target);
@@ -901,6 +906,7 @@ async function boot() {
   mixer.addEventListener('finished', onFinished);
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
   $('loading').hidden = true;
+  try { sessionStorage.removeItem('booting'); } catch (_) {}
   renderClass(); buildMoves(); setupInventoryUI();
   gear = ITEMS[inv.hot[inv.active]?.id]?.gear || 'none'; // start holding whatever the selected hotbar slot holds
   if (ITEMS[inv.hot[inv.active]?.id]?.gun) setGunKind(ITEMS[inv.hot[inv.active].id].gun);
@@ -2309,6 +2315,7 @@ const CORPSE_TIME = 90, MAX_CORPSES = 12;
 const enemyCfg = { on: true, gore: true, pushBodies: true, count: 10 }; // v30: ten by default (owner: more enemies) // count: soldiers kept alive (Tests → Performance)
 try { Object.assign(enemyCfg, JSON.parse(localStorage.getItem('enemycfg') || '{}')); } catch (_) {}
 enemyCfg.gore = true; // dismemberment is always on (v14.1)
+if (LITE) enemyCfg.count = Math.min(enemyCfg.count, 6); // v50: phones
 try { if (!localStorage.getItem('v30-count')) { if (enemyCfg.count === 5) enemyCfg.count = 10; localStorage.setItem('v30-count', '1'); } } catch (_) {} // v30: ten soldiers (saves that had the old five)
 const saveEnemyCfg = () => { try { localStorage.setItem('enemycfg', JSON.stringify(enemyCfg)); } catch (_) {} };
 const killFeed = [], deathCounts = {};
@@ -2401,7 +2408,7 @@ function keepEnemiesUp(dt) {
 // gunfire, blasts, a lit saber close by, soldiers fighting and bodies; some freeze and cower instead.
 // Each one picks a body (man or woman), a hairstyle (and maybe a beard), hair colour, skin tone and clothes colour.
 const civTemplates = {};
-const civCfg = { count: navigator.webdriver ? 0 : 8 }; // headless tests start without them, so older suites see only soldiers
+const civCfg = { count: navigator.webdriver ? 0 : LITE ? 4 : 8 }; // headless tests start without them, so older suites see only soldiers
 try { const c = JSON.parse(localStorage.getItem('civcfg') || 'null'); if (c && typeof c.count === 'number') civCfg.count = c.count; } catch (_) {}
 const saveCivCfg = () => { try { localStorage.setItem('civcfg', JSON.stringify(civCfg)); } catch (_) {} };
 const CIV_CLOTHES = [0xffffff, 0xb8c8f0, 0xf0b8a8, 0xc0e0b0, 0xf0e0a0, 0xa8a8a8, 0xd8b8e0, 0x90a8c0];
@@ -4943,7 +4950,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v49 · 2026-10-03';
+const BUILD = 'v50 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;

@@ -2,6 +2,12 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v50: the game loads on phones (owner: it loaded forever on friends' phones)
+- **No more outside downloads:** the 3D engine (three.js) used to come from cdn.jsdelivr.net as ten separate files after the page loaded. If any one of them failed (a slow or filtered phone network) the game sat on "Loading" forever, and iPhones on iOS before 16.4 couldn't load it at all (no import maps). The engine is now built into the page, so the one file is all a phone needs. The page works on iOS 15 and up.
+- **Phones get a lighter game:** sharper edges off, a 1024 px shadow map and a lower render scale, up to 6 soldiers and 4 civilians. A load that never finished last time (a phone that ran out of memory reloads the page) gets the light setup too, on any device.
+- If the game still hasn't started 15 s after the page arrives, the loading screen says to reload instead of blaming the CDN.
+- `tools/phone_check.mjs` loads a build as an iPhone, optionally with a slowed CPU, and logs what fails. The play link is 14.6 MB.
+
 ## v49: five enemy bodies (owner: more variance in enemy models)
 Test: `tools/test49-bodies.mjs`.
 - **Five bodies, mixed in every squad:** the masked terrorist, the SWAT officer (back from v47), and three new downloads: a female soldier in ACU camouflage, an insurgent in a robe and headwrap, and an American soldier in woodland camouflage (all CC-BY, credited). Each new soldier gets the body the squad has least of, so ten soldiers are two of each.
