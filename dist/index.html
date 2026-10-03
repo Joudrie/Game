@@ -3697,7 +3697,7 @@ function calmUpdate(e, dt, to, dist) {
   if (e.sus >= 1) { e.mind = 'spot'; e.yellT = 1.1 * DF().react; setMark(e, '!'); log('spotted by', e.id); say(e, saberOut() && (disguised() || Math.random() < 0.6) ? 'jedi' : disguised() ? 'blown' : 'spot'); e.susSaid = false; return; }
   setMark(e, e.sus > 0.2 ? '?' : null);
   if (e.sus > 0.2 && !e.susSaid && !(disguised() && saberOut())) e.susSaid = say(e, disguised() ? 'dsus' : 'sus'); // v37: "Huh?" "Did you hear something?" (v41, in uniform: "What unit are you?")
-  else if (e.susSaid && e.sus < 0.04) { e.susSaid = false; say(e, 'giveup'); } // "Must have been the wind."
+  else if (e.susSaid && e.sus < 0.04) { e.susSaid = false; say(e, 'giveup', 1, 3); } // "Must have been the wind." (v44: after a beat, and it waits its turn; said at once it fell inside his own chatter gap and was lost)
   if (e.sus > 0.2) { turnTo(e, Math.atan2(to.x, to.z), 2.5, dt); eplay(e, 'SW_Idle_Gun', { fade: 0.25 }); return; } // something's there: he stops and looks
   if (e.hold) { e.lookT = (e.lookT || 0) + dt; e.yaw = (e.baseYaw ?? (e.baseYaw = e.yaw)) + Math.sin(e.lookT * 0.5) * 0.9; eplay(e, 'SW_Idle', { fade: 0.3 }); return; } // a lookout: stands and scans
   // patrol: strolls between spots near his post and waits at each

@@ -67,7 +67,8 @@ let s = await said();
 check(s.includes('sus') && (s.includes('spot') || s.includes('jedi')) && s.includes('alarm'), `a guard who sees you: "Huh?", "Contact!", then the alarm (${s.join(' ')})`);
 // gives up when you slip away
 await fresh();
-s = await ev(([x, z]) => { const g = __game; g.moveEnemy(0, x, z + 14, Math.PI); g.setMind(0, 'patrol', 999); g.advance(0.05); g.voReset();
+s = await ev(([x, z]) => { const g = __game; const n = g.enemies().filter((e) => e.state !== 'dead').length; for (let i = 1; i < n; i++) { g.moveEnemy(i, x + 300 + i * 4, z + 300); g.setMind(i, 'patrol', 999); } /* only him in sight */
+  g.moveEnemy(0, x, z + 14, Math.PI); g.setMind(0, 'patrol', 999); g.advance(0.05); g.voReset();
   for (let t = 0; t < 30 && !g.voLog.some((l) => l.startsWith('sus')); t++) g.advance(0.1);
   g.place(x, z + 45); for (let t = 0; t < 120; t++) g.advance(0.1); /* behind his back, close enough that he is still thinking */ return g.voLog.map((l) => l.split(':')[0]); }, O);
 check(s.includes('sus') && s.includes('giveup'), `slip away after a "Huh?": "Must have been the wind" (${s.join(' ')})`);
@@ -78,7 +79,7 @@ s = await said(); check(s.includes('pain') || s.includes('hit'), `a wound: a gru
 await fresh(); await ev(() => { __game.cutEnemy(0, 'upperarm_r'); for (let t = 0; t < 30; t++) __game.advance(0.1); });
 s = await said(); check(s[0] === 'arm' && (s.includes('panic') || s.includes('medic')), `an arm off: "MY ARM!", then "Fall back!" or "Medic!" (${s.join(' ')})`);
 // a leg off: pain, then "Medic!"
-await fresh(); await ev(() => { __game.cutEnemy(0, 'thigh_l'); for (let t = 0; t < 30; t++) __game.advance(0.1); });
+await fresh(); await ev(() => { __game.cutEnemy(0, 'thigh_l'); for (let t = 0; t < 60 && !__game.voLog.some((l) => l.startsWith('medic')); t++) __game.advance(0.1); }); // "Medic!" waits for a gap in the talking
 s = await said(); check(s.includes('arm') && s.includes('medic'), `a leg off: a scream, then "Medic!" (${s.join(' ')})`);
 // on fire
 await fresh(); await ev(([x, z]) => { __game.firePatch(x + 3, z + 6); __game.advance(0.3); }, O);

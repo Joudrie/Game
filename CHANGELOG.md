@@ -7,6 +7,8 @@ Playable build: `dist/index.html`, also published at the claude.ai artifact link
 - **With the uniform selected, a click always wears it,** even standing behind a guard (where a click would be a takedown) or in the middle of a jump.
 - **Selecting a usable item says what a click does:** "Soldier uniform: click to put it on", "Holocloak: click to cloak", and so on.
 - Test: `tools/test48-disguise.mjs` now puts the uniform on the real way: catalogue, backpack, hotbar slot 6, press 6, click.
+- Fixed: a guard who said "Huh?" and lost interest quickly never said "Must have been the wind" (it fell inside his own pause between lines and was dropped). He now says it after a beat.
+- The voice test no longer flickers (two checks depended on timing and on other guards nearby).
 
 ## v43: the disguise works on guards who are already fighting; no cap on screams
 Tests: `tools/test48-disguise.mjs`, `tools/test45-voices.mjs`.
