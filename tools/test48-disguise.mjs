@@ -72,6 +72,19 @@ check(parts.soldier === 0 && parts.own > 0 && !(await ev(() => __game.disguised)
 await ev(([x, z]) => { __game.place(x, z); __game.look(Math.PI, 0.25); __game.advance(0.6); }, O);
 await p.screenshot({ path: `${OUT}/v41-own.png` });
 
+// v43: changing out of sight. A guard fighting you from the far side of a building loses you when you put it on.
+const wall = await ev(() => __game.blocks.filter((b) => b.max[1] - b.min[1] > 4 && b.max[0] - b.min[0] > 6 && b.max[0] - b.min[0] < 40 && Math.abs(b.min[0]) < 300 && Math.abs(b.min[2]) < 300)[0]);
+const cz = (wall.min[2] + wall.max[2]) / 2, cx = (wall.min[0] + wall.max[0]) / 2;
+await ev(([cx, cz, x0, x1]) => { const g = __game; g.setDisguise(false); g.fillEnemies(); g.advance(0.1); const n = g.enemies().filter((e) => e.state !== 'dead').length;
+  for (let i = 0; i < n; i++) { g.moveEnemy(i, i ? cx + 300 + i * 4 : x1 + 3, i ? cz + 300 : cz, -Math.PI / 2); g.setMind(i, i ? 'patrol' : 'combat', 999); }
+  g.place(x0 - 3, cz); g.advance(0.3); }, [cx, cz, wall.min[0], wall.max[0]]);
+const before = await mind();
+await ev(() => { __game.setDisguise(true); __game.advance(0.2); });
+check(before === 'combat' && (await mind()) === 'patrol', `a guard fighting you from behind a building loses you when you change out of sight (${before} → ${await mind()})`);
+// reinforcements while you're in uniform come in calm, even with a fight on
+const fresh = await ev(([x, z]) => { const g = __game; g.place(x, z); g.setMind(1, 'combat'); g.damageEnemy(0, 999, 'head', 'bullet'); g.advance(0.2); g.fillEnemies(); g.advance(0.2); const m = g.minds().filter((e) => e.state !== 'dead'); return m[m.length - 1].mind; }, O);
+check(fresh === 'patrol', `a reinforcement spawned while you're in uniform comes in calm (${fresh})`);
+await ev(() => __game.setDisguise(false));
 check(errs.length === 0, `no page errors (${errs.length})`);
 console.log(fail ? `${fail} FAILED` : 'all passed');
 await b.close();

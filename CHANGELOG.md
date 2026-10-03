@@ -2,6 +2,14 @@
 
 Playable build: `dist/index.html`, also published at the claude.ai artifact link. Every report the game sends includes its build number (`build: "v11 · …"`), so we can tell which version you were playing.
 
+## v43: the disguise works on guards who are already fighting; no cap on screams
+Tests: `tools/test48-disguise.mjs`, `tools/test45-voices.mjs`.
+- **Why they saw you:** the uniform only fooled guards who hadn't noticed you yet. In the sandbox almost every guard is fighting (once a fight starts, every new soldier joins it), and a fighting guard only gave up after 20 s without seeing you. Now:
+  - **Change where they can't see you and they lose you:** every guard fighting you without a line of sight goes back to patrolling the moment you put the uniform on ("Where'd he go?"). Guards who watch you change keep fighting.
+  - **In uniform, breaking line of sight for 6 s** (not 20) is enough for a guard to give up on you.
+  - **Reinforcements arrive calm** while you're in uniform, even with a fight going on.
+- **No cap on death cries and screams:** 8 deaths at once are 8 cries, still one per soldier, each a different take, started a split second apart.
+
 ## v42: screams overlap, and sound has a direction
 Test: `tools/test45-voices.mjs`.
 - **Deaths and screams overlap.** A grenade into four men is four death cries now, up to 4 at once, each a different take and started a split second apart so they don't sound in unison. It covers dying, pain, fire, flying and losing a limb. One soldier never screams twice at once. Callouts ("Contact!", "Reloading!") are still one at a time, so they never stack up, and a scream plays over a callout instead of cutting it off.

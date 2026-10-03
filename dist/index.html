@@ -1352,7 +1352,7 @@ function say(e, cat, delay = 0, patience = 1.5) {
   if (e.g.position.distanceTo(player.position) > vo.range) return false;
   const voice = voiceOf(e), cur = vo.now[voice];
   let lag = 0;
-  if (dying) { // v42: screams and death cries overlap (a grenade into four men is four cries), up to 4 at once, one per soldier
+  if (dying) { // v42: screams and death cries overlap (a grenade into four men is four cries), one per soldier, no cap (v43)
     vo.screams = vo.screams.filter((x) => x.end > simT);
     const mine = vo.screams.find((x) => x.e === e);
     if (mine && cat !== 'death') return false; // still screaming from the last hit
@@ -1372,7 +1372,7 @@ function say(e, cat, delay = 0, patience = 1.5) {
   if (dying) vo.screams.push(line); else vo.now[voice] = line;
   return true;
 }
-const VO_SCREAMS = 4;
+const VO_SCREAMS = Infinity; // v43 (owner): no cap; 8 deaths are 8 cries
 const mouthOf = (e) => e.g.position.clone().add(new V3(0, 1.6, 0));
 function stopScream(x) { try { x.g.gain.setTargetAtTime(0, audio.ctx.currentTime, 0.02); x.src.stop(audio.ctx.currentTime + 0.08); } catch (_) {} x.end = 0; }
 function stopLine(voice) { const cur = vo.now[voice]; if (!cur) return; try { cur.g.gain.setTargetAtTime(0, audio.ctx.currentTime, 0.02); cur.src.stop(audio.ctx.currentTime + 0.08); } catch (_) {} vo.now[voice] = null; }
@@ -2320,7 +2320,7 @@ function spawnEnemy(at, kind, mind) {
   const e = { g, root, bones, mixer: new THREE.AnimationMixer(root), act: null, hp: 100, total: 0, dmg: { head: 0, torso: 0, legs: 0 },
     state: 'engage', yaw: Math.atan2(player.position.x - at.x, player.position.z - at.z), vel: new V3(), fireT: 1 + Math.random() * 2,
     strafe: Math.random() < 0.5 ? 1 : -1, strafeT: 2 + Math.random() * 2, hitT: 0, deadT: 0, id: Math.random().toString(36).slice(2, 6), hitBy: new Set(), gun, gunKind,
-    mind: mind || (enemies.some((o) => o.state !== 'dead' && o.mind === 'combat') ? 'combat' : 'patrol') }; // reinforcements join a fight already on
+    mind: mind || (!disguised() && enemies.some((o) => o.state !== 'dead' && o.mind === 'combat') ? 'combat' : 'patrol') }; // reinforcements join a fight already on (v43: not while you're in uniform: they don't know you)
   dressSoldier(e);
   enemies.push(e); eplay(e, 'SW_Idle_Gun_Pointing');
   return e;
@@ -2583,7 +2583,7 @@ function updateEnemies(dt) {
       if ((e.losT = (e.losT || 0) - dt) <= 0) { e.losT = 0.25; e.los = lineOfSight(eyeOf(e), playerChest()); }
       const lostBefore = e.lostT || 0; e.lostT = e.los ? 0 : lostBefore + dt;
       if (lostBefore < 4 && e.lostT >= 4) say(e, 'search'); // v37: "Where'd he go?"
-      if (e.lostT > 20) { e.mind = 'patrol'; e.post = pos.clone(); e.sus = 0; e.wp = null; log('lost you', e.id); say(e, Math.random() < 0.5 ? 'calm' : 'giveup'); }
+      if (e.lostT > (disguised() ? 6 : 20)) { e.mind = 'patrol'; e.post = pos.clone(); e.sus = 0; e.wp = null; log('lost you', e.id); say(e, Math.random() < 0.5 ? 'calm' : 'giveup'); }
       let move = new V3(), clip = 'SW_Idle_Gun_Pointing', sp = 0;
       if (!e.los && dist > 3) { move.copy(DF().smart ? fwd.clone().applyAxisAngle(UP, 0.9 * (e.strafe || 1)) : fwd); sp = 3.2; clip = clips.has('SW_Run') ? 'SW_Run' : 'SW_Run_Shoot'; }
       else if (dist > 18) { move.copy(fwd); sp = 3.2; clip = 'SW_Run_Shoot'; }
@@ -4353,6 +4353,10 @@ function wearDisguise(on) {
   if (on) {
     if (cloakT > 0) endCloak();
     disguise.mesh = disguiseMeshes(); hero.add(disguise.mesh);
+    // v43: changed where nobody fighting you could see it: they've lost you
+    let lost = 0;
+    for (const o of enemies) if (!o.civ && o.state !== 'dead' && o.mind === 'combat' && !lineOfSight(eyeOf(o), playerHead())) { o.mind = 'patrol'; o.post = o.g.position.clone(); o.sus = 0; o.wp = null; o.lostT = 0; setMark(o, null); lost++; }
+    if (lost) say(enemies.find((o) => !o.civ && o.state !== 'dead' && o.mind === 'patrol' && o.g.position.distanceTo(player.position) < 40), 'search');
     hero.traverse((o) => { if (o.isSkinnedMesh && !isDisguisePart(o) && !o.userData.aura) o.visible = false; });
     toast('Disguised: calm guards take you for one of them. Shooting or a lit saber gives you away', 1800); sfx('pickup', null, 0.6);
   } else {
@@ -4858,7 +4862,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v42 · 2026-10-03';
+const BUILD = 'v43 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
