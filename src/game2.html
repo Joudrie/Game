@@ -103,6 +103,29 @@ button[aria-pressed="true"] { border-color: var(--ink); background: var(--key); 
 #pad button { width: 60px; height: 60px; font-size: 11px; }
 #pad #jumpbtn, #pad #atkbtn, #pad #firebtn { width: 68px; height: 68px; }
 #pad .force-only { display: none; }
+/* v51 (owner: better phone controls): see-through buttons fanned into the bottom-right corner, the main action biggest
+   and nearest the thumb; drag from Attack, Fire, Aim or Block to aim while holding it */
+@media (pointer: coarse) {
+  #pad { right: calc(var(--s2) + env(safe-area-inset-right, 0px)); bottom: calc(var(--s2) + 64px + env(safe-area-inset-bottom, 0px)); max-width: 216px; gap: var(--s2); }
+  #pad button { width: 56px; height: 56px; font-size: 11px; background: rgba(255,255,255,.38); border-color: rgba(30,32,35,.35); color: var(--ink); -webkit-tap-highlight-color: transparent; }
+  #pad button.held { background: rgba(255,255,255,.8); border-color: var(--ink); }
+  #pad #atkbtn, #pad #firebtn { width: 76px; height: 76px; font-size: 13px; font-weight: 700; order: 9; }
+  #pad #jumpbtn { width: 64px; height: 64px; order: 8; }
+  #pad #slidebtn { order: 7; }
+  #pad #blockbtn, #pad #aimbtn { order: 6; }
+  #pad #grapplebtn { order: 5; }
+  #pad #nadebtn { order: 4; }
+  #readout { display: none; }
+  #top button { padding: 6px 8px; font-size: 11px; }
+  #classchip span { display: none; }
+  .slot { width: 46px; height: 46px; }
+  .slot img { width: 36px; height: 36px; }
+  #hotbar { bottom: calc(var(--s2) + env(safe-area-inset-bottom, 0px)); }
+}
+@media (pointer: coarse) and (orientation: landscape) {
+  #pad { bottom: calc(var(--s2) + env(safe-area-inset-bottom, 0px)); max-width: 300px; }
+  #hotbar { left: calc(var(--s2) + env(safe-area-inset-left, 0px) + 140px); transform: none; }
+}
 body.force #pad .force-only { display: inline-block; }
 #lootprompt { left: 50%; bottom: calc(33% + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); font-size: 13px; padding: var(--s2) var(--s3); }
 #lootprompt kbd { margin-right: var(--s1); }
@@ -907,6 +930,7 @@ async function boot() {
   window.__cal = Object.fromEntries(Object.entries(cal).map(([k, v]) => [k, [+v.speed.toFixed(2), Math.round((v.angle || 0) * 57.3)]]));
   $('loading').hidden = true;
   try { sessionStorage.removeItem('booting'); } catch (_) {}
+  if (COARSE && innerHeight > innerWidth) setTimeout(() => toast('Turn your phone sideways for more room', 4000), 800); // v51
   renderClass(); buildMoves(); setupInventoryUI();
   gear = ITEMS[inv.hot[inv.active]?.id]?.gear || 'none'; // start holding whatever the selected hotbar slot holds
   if (ITEMS[inv.hot[inv.active]?.id]?.gun) setGunKind(ITEMS[inv.hot[inv.active].id].gun);
@@ -4950,7 +4974,7 @@ function strafeWeights(C) {
 // ---------------- T-pose watchdog and reports ----------------
 // Checks every frame that the body is posed and fully covered by animation. If it catches a T-pose,
 // a coverage gap, a missing clip or a script error, it saves a report (state + last events) for Claude to read.
-const BUILD = 'v50 · 2026-10-03';
+const BUILD = 'v51 · 2026-10-03';
 const events = [];
 function log(...a) { events.push(`${(performance.now() / 1000).toFixed(1)}s ${a.join(' ')}`); if (events.length > 40) events.shift(); }
 let dbState = 'waiting', db = null, bindQ = null, lastReport = null, lastDev = 9, lastLeg = 1, lastArm = 1, tposeT = 0, covT = 0;
@@ -5139,7 +5163,7 @@ const press = (el, fn) => el.addEventListener('pointerdown', (e) => { e.preventD
 press($('jumpbtn'), () => { jumpQueued = true; jumpHeld = true; });
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('jumpbtn').addEventListener(ev, () => { jumpHeld = false; });
 press($('grapplebtn'), () => grapplePress());
-press($('firebtn'), () => firePistol());
+press($('firebtn'), attackPress); // v51: held like the mouse button, so automatic guns keep firing
 press($('pushbtn'), () => forcePush());
 press($('nadebtn'), () => throwGrenade());
 press($('lootbtn'), () => startLoot());
@@ -5151,7 +5175,19 @@ press($('atkbtn'), attackPress);
 press($('blockbtn'), blockPress);
 press($('aimbtn'), () => { aimHeld = true; });
 for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('aimbtn').addEventListener(ev, () => { aimHeld = false; });
-for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) { $('atkbtn').addEventListener(ev, attackRelease); $('blockbtn').addEventListener(ev, blockRelease); }
+for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) { $('atkbtn').addEventListener(ev, attackRelease); $('firebtn').addEventListener(ev, attackRelease); $('blockbtn').addEventListener(ev, blockRelease); }
+// v51: a thumb on Attack, Fire, Aim or Block can slide to aim (the button keeps the touch while it's held)
+const padLook = new Map();
+for (const id of ['atkbtn', 'firebtn', 'aimbtn', 'blockbtn']) {
+  const el = $(id);
+  el.addEventListener('pointerdown', (e) => { if (e.pointerType === 'mouse') return; try { el.setPointerCapture(e.pointerId); } catch (_) {} padLook.set(e.pointerId, { x: e.clientX, y: e.clientY }); });
+  el.addEventListener('pointermove', (e) => { const l = padLook.get(e.pointerId); if (!l) return; look(e.clientX - l.x, e.clientY - l.y, 0.006); l.x = e.clientX; l.y = e.clientY; });
+  for (const ev of ['pointerup', 'pointercancel']) el.addEventListener(ev, (e) => padLook.delete(e.pointerId));
+}
+for (const el of document.querySelectorAll('#pad button')) {
+  el.addEventListener('pointerdown', () => el.classList.add('held'));
+  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) el.addEventListener(ev, () => el.classList.remove('held'));
+}
 $('gearbtn').addEventListener('click', () => toggleWeapon());
 const manualReport = () => {
   const note = ($('reportnote')?.value || '').trim();
@@ -6657,7 +6693,7 @@ function start() {
     bodyProbe() { hero.updateMatrixWorld(true); const W = (n) => boneByName(hero, n)?.getWorldPosition(new V3()).y ?? null, p = player.position; return { y: +p.y.toFixed(2), ground: +groundAt(p.x, p.z, p.y + 0.5).toFixed(2), head: +(W('Head') - p.y).toFixed(2), pelvis: +(W('pelvis') - p.y).toFixed(2), footL: +(W('foot_l') - p.y).toFixed(2), footR: +(W('foot_r') - p.y).toFixed(2), mode, speed: +speed.toFixed(1), anim: [...locoActive].filter((a) => a.getEffectiveWeight() > 0.3).map((a) => a.getClip().name).join('+'), ovr: [...ovr.keys()].map((a) => a.getClip().name).join('+') }; },
     setHills(on = true) { terrain.hills = on; buildTerrain(); const P = player.position; P.y = groundAt(P.x, P.z, 99); }, terrainH: (x, z) => +terrainH(x, z).toFixed(3), get hills() { return terrain.hills; }, underwater: (x, z) => underwater(x, z),
     get heroLook() { return heroLook; }, heroMeshes: () => { const o = []; hero.traverse((m) => { if (m.isMesh && m.visible && m.isSkinnedMesh) o.push(m.material.transparent ? m.material.opacity : 1); }); return o; }, setLook: (l) => setHeroLookPref(l), visibleParts: (corpse) => { const o = []; const r = corpse ? dead?.body.root : hero; r?.traverse((m) => { if (m.isMesh && m.visible) o.push(m.name + ':' + (m.material?.name || '')); }); return o; },
-    get pos() { return player.position.toArray().map((v) => +v.toFixed(2)); }, place(x, z) { player.position.set(x, groundAt(x, z, 99), z); }, look(yawR, pitchR) { camYaw = yawR; camPitch = pitchR; },
+    get pos() { return player.position.toArray().map((v) => +v.toFixed(2)); }, place(x, z) { player.position.set(x, groundAt(x, z, 99), z); }, look(yawR, pitchR) { camYaw = yawR; camPitch = pitchR; }, get camYaw() { return camYaw; }, get padLook() { return padLook.size; },
     grapplePress, get grapple() { return grapple.state; }, sweepSaberClipping, get slide() { return { speed: +slideSpeed.toFixed(2), dur: +slideDur.toFixed(2) }; }, get crouchBlend() { return crouchBlend; }, get guardBlend() { return guardBlend; }, testCfg, get fingers() { const b = boneByName(hero, 'index_02_l'), f = fist && fist.find((x) => x.bone === b); return f ? +b.quaternion.angleTo(f.q).toFixed(3) : null; }, forceStuck() { speed = 0; CLASSES[klass]._frozen = true; }, strafeProbe, setAim(v) { aimHeld = v; }, get strafe() { return { angle: +strafeAngle.toFixed(2), on: isStrafing() }; }, simulateTpose(on = true) { debugTpose = on; }, get gear() { return gear; }, setGear, get lastReport() { return lastReport; }, report, get pose() { return { dev: lastDev, leg: lastLeg, arm: lastArm }; }, get armed() { return armed; }, get atk() { return atk && (atk.heavy ? 'H' : atk.i); }, get blocking() { return blocking; }, setArmed, attackPress, attackRelease, blockPress, blockRelease, get speed() { return speed; }, get mode() { return mode; }, get gait() { return gait; }, get jumps() { return jumps; },
     setClass(k) { klass = k; renderClass(); }, openMoves, closeMoves,
     // v26 hooks
